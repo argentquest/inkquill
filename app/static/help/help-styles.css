@@ -1,0 +1,999 @@
+/* ========================================================================
+   UNIFIED HELP SYSTEM STYLES
+   Consistent design system for all help files
+   ======================================================================== */
+
+:root {
+    /* Primary Brand Colors - Consistent with app theme */
+    --help-primary: #6366f1;
+    --help-primary-hover: #5856eb;
+    --help-primary-light: #eef2ff;
+    --help-secondary: #8b5cf6;
+    --help-secondary-hover: #7c3aed;
+    --help-secondary-light: #f3f4f6;
+    
+    /* Status Colors */
+    --help-success: #10b981;
+    --help-success-light: #d1fae5;
+    --help-warning: #f59e0b;
+    --help-warning-light: #fef3c7;
+    --help-danger: #ef4444;
+    --help-danger-light: #fee2e2;
+    --help-info: #3b82f6;
+    --help-info-light: #dbeafe;
+    
+    /* Neutral Colors */
+    --help-dark: #1f2937;
+    --help-medium: #6b7280;
+    --help-light: #f9fafb;
+    --help-white: #ffffff;
+    --help-border: #e5e7eb;
+    --help-border-light: #f3f4f6;
+    --help-shadow: rgba(0, 0, 0, 0.1);
+    --help-shadow-lg: rgba(0, 0, 0, 0.15);
+    
+    /* Difficulty Level Colors */
+    --help-beginner: var(--help-success);
+    --help-intermediate: var(--help-warning);
+    --help-advanced: var(--help-danger);
+    
+    /* Typography */
+    --help-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --help-font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+    
+    /* Spacing Scale */
+    --help-space-xs: 0.25rem;
+    --help-space-sm: 0.5rem;
+    --help-space-md: 1rem;
+    --help-space-lg: 1.5rem;
+    --help-space-xl: 2rem;
+    --help-space-2xl: 2.5rem;
+    --help-space-3xl: 3rem;
+    
+    /* Border Radius */
+    --help-radius-sm: 4px;
+    --help-radius-md: 8px;
+    --help-radius-lg: 12px;
+    --help-radius-xl: 16px;
+    --help-radius-full: 9999px;
+    
+    /* Transitions */
+    --help-transition: all 0.2s ease;
+    --help-transition-slow: all 0.3s ease;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --help-dark: #f9fafb;
+        --help-medium: #d1d5db;
+        --help-light: #1f2937;
+        --help-white: #111827;
+        --help-border: #374151;
+        --help-border-light: #4b5563;
+        --help-shadow: rgba(255, 255, 255, 0.1);
+        --help-shadow-lg: rgba(255, 255, 255, 0.15);
+        --help-primary-light: #1e1b4b;
+        --help-secondary-light: #2d1b69;
+    }
+}
+
+/* ========================================================================
+   BASE STYLES & TYPOGRAPHY
+   ======================================================================== */
+
+/* Base body styles for standalone help pages */
+body {
+    font-family: var(--help-font-family);
+    line-height: 1.6;
+    color: var(--help-dark);
+    margin: 0;
+    padding: var(--help-space-xl);
+    background: var(--help-light);
+}
+
+/* Main container for all help content */
+.help-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--help-white);
+    border-radius: var(--help-radius-lg);
+    box-shadow: 0 4px 12px var(--help-shadow);
+    overflow: hidden;
+}
+
+/* Container padding for content inside */
+.help-content-wrapper {
+    padding: var(--help-space-xl);
+}
+
+/* ========================================================================
+   HEADER COMPONENTS
+   ======================================================================== */
+
+/* Main header with gradient background */
+.help-header {
+    background: linear-gradient(135deg, var(--help-primary) 0%, var(--help-secondary) 100%);
+    color: var(--help-white);
+    padding: var(--help-space-2xl);
+    text-align: center;
+    margin: 0;
+    border-radius: 0; /* Reset for container */
+}
+
+.help-header.centered {
+    text-align: center;
+}
+
+.help-header.left-aligned {
+    text-align: left;
+}
+
+/* Header typography */
+.help-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 var(--help-space-sm) 0;
+    color: inherit;
+}
+
+.help-subtitle {
+    font-size: 1.25rem;
+    margin: 0;
+    opacity: 0.9;
+    color: inherit;
+}
+
+/* Simple header variant for pages that don't need gradient */
+.help-header-simple {
+    padding: var(--help-space-xl) var(--help-space-xl) var(--help-space-lg) var(--help-space-xl);
+    border-bottom: 2px solid var(--help-border);
+    background: var(--help-white);
+    color: var(--help-dark);
+    margin-bottom: var(--help-space-xl);
+}
+
+.help-header-simple .help-title {
+    color: var(--help-primary);
+    font-size: 2rem;
+}
+
+.help-header-simple .help-subtitle {
+    color: var(--help-medium);
+}
+
+/* ========================================================================
+   NAVIGATION COMPONENTS
+   ======================================================================== */
+
+/* Quick navigation box */
+.help-navigation {
+    background: var(--help-primary-light);
+    border: 1px solid var(--help-border);
+    border-radius: var(--help-radius-md);
+    padding: var(--help-space-lg);
+    margin: var(--help-space-xl) 0;
+}
+
+.help-navigation h4 {
+    margin: 0 0 var(--help-space-md) 0;
+    color: var(--help-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.help-navigation ul {
+    margin: 0;
+    padding-left: var(--help-space-lg);
+    list-style-type: disc;
+}
+
+.help-navigation li {
+    margin-bottom: var(--help-space-xs);
+}
+
+.help-navigation a {
+    color: var(--help-primary);
+    text-decoration: none;
+    transition: var(--help-transition);
+}
+
+.help-navigation a:hover {
+    text-decoration: underline;
+    color: var(--help-primary-hover);
+}
+
+/* Breadcrumb navigation */
+.help-breadcrumb {
+    padding: var(--help-space-lg);
+    background: var(--help-border-light);
+    border-bottom: 1px solid var(--help-border);
+    font-size: 0.875rem;
+}
+
+.help-breadcrumb a {
+    color: var(--help-primary);
+    text-decoration: none;
+}
+
+.help-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.help-breadcrumb-separator {
+    margin: 0 var(--help-space-sm);
+    color: var(--help-medium);
+}
+
+/* ========================================================================
+   CONTENT SECTIONS
+   ======================================================================== */
+
+/* Main content sections */
+.help-section {
+    margin-bottom: var(--help-space-3xl);
+    padding-bottom: var(--help-space-xl);
+    border-bottom: 1px solid var(--help-border-light);
+}
+
+.help-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Section with background card */
+.help-section-card {
+    background: var(--help-white);
+    border-radius: var(--help-radius-md);
+    padding: var(--help-space-xl);
+    margin-bottom: var(--help-space-xl);
+    box-shadow: 0 2px 8px var(--help-shadow);
+    border: 1px solid var(--help-border);
+}
+
+/* Section titles */
+.help-section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: var(--help-space-lg);
+    color: var(--help-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--help-space-sm);
+    border-left: 4px solid var(--help-primary);
+    padding-left: var(--help-space-md);
+}
+
+.help-section-subtitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: var(--help-space-xl) 0 var(--help-space-md) 0;
+    color: var(--help-primary);
+}
+
+/* Difficulty badges */
+.difficulty-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.difficulty-beginner {
+    background: var(--help-beginner);
+    color: white;
+}
+
+.difficulty-intermediate {
+    background: var(--help-intermediate);
+    color: white;
+}
+
+.difficulty-advanced {
+    background: var(--help-danger);
+    color: white;
+}
+
+/* Quick actions bar */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.quick-action {
+    background: var(--help-primary);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.quick-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--help-shadow);
+}
+
+.quick-action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.quick-action-text {
+    font-weight: 500;
+}
+
+/* Feature grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.feature-card {
+    border: 1px solid var(--help-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
+}
+
+.feature-card:hover {
+    box-shadow: 0 4px 12px var(--help-shadow);
+}
+
+.feature-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--help-primary);
+}
+
+.feature-card-description {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Code blocks and examples */
+.code-block {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    position: relative;
+    margin: 1rem 0;
+}
+
+.code-block pre {
+    margin: 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--help-primary);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.copy-button:hover {
+    background: var(--help-secondary);
+}
+
+.copy-button.copied {
+    background: var(--help-success);
+}
+
+/* Collapsible sections */
+.collapsible {
+    margin: 1rem 0;
+}
+
+.collapsible-header {
+    background: var(--help-light);
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.collapsible-header:hover {
+    background: var(--help-border);
+}
+
+.collapsible-header.active {
+    border-radius: 8px 8px 0 0;
+}
+
+.collapsible-icon {
+    transition: transform 0.3s;
+}
+
+.collapsible-header.active .collapsible-icon {
+    transform: rotate(180deg);
+}
+
+.collapsible-content {
+    display: none;
+    padding: 1rem;
+    border: 1px solid var(--help-border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: white;
+}
+
+.collapsible-content.active {
+    display: block;
+}
+
+/* Tables */
+.help-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.help-table th,
+.help-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--help-border);
+}
+
+.help-table th {
+    background: var(--help-light);
+    font-weight: 600;
+    color: var(--help-dark);
+}
+
+.help-table tr:hover {
+    background: var(--help-light);
+}
+
+/* Keyboard shortcuts */
+.keyboard-shortcut {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;
+    border: 1px solid var(--help-border);
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 0 #d1d5db;
+}
+
+/* ========================================================================
+   ALERT & TIP COMPONENTS
+   ======================================================================== */
+
+/* Base alert styles */
+.help-alert {
+    padding: var(--help-space-lg);
+    border-radius: var(--help-radius-md);
+    margin: var(--help-space-lg) 0;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--help-space-md);
+    border-left: 4px solid;
+}
+
+.help-alert-icon {
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    margin-top: 2px;
+}
+
+.help-alert-content {
+    flex: 1;
+}
+
+.help-alert-title {
+    font-weight: 600;
+    margin: 0 0 var(--help-space-sm) 0;
+}
+
+.help-alert-text {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Alert variants */
+.help-alert-info {
+    background: var(--help-info-light);
+    border-left-color: var(--help-info);
+    color: #1e40af;
+}
+
+.help-alert-success {
+    background: var(--help-success-light);
+    border-left-color: var(--help-success);
+    color: #065f46;
+}
+
+.help-alert-warning {
+    background: var(--help-warning-light);
+    border-left-color: var(--help-warning);
+    color: #92400e;
+}
+
+.help-alert-danger {
+    background: var(--help-danger-light);
+    border-left-color: var(--help-danger);
+    color: #991b1b;
+}
+
+/* Tip box - special style for helpful tips */
+.help-tip {
+    background: linear-gradient(135deg, var(--help-primary-light) 0%, var(--help-secondary-light) 100%);
+    border: 1px solid var(--help-primary);
+    border-left: 4px solid var(--help-primary);
+    border-radius: var(--help-radius-md);
+    padding: var(--help-space-lg);
+    margin: var(--help-space-lg) 0;
+}
+
+.help-tip-title {
+    font-weight: 600;
+    color: var(--help-primary);
+    margin: 0 0 var(--help-space-sm) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--help-space-sm);
+}
+
+.help-tip-icon {
+    color: var(--help-primary);
+}
+
+.help-tip-content {
+    color: var(--help-dark);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Legacy support for existing classes */
+.alert {
+    padding: var(--help-space-lg);
+    border-radius: var(--help-radius-md);
+    margin: var(--help-space-lg) 0;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--help-space-md);
+    border-left: 4px solid;
+}
+
+.alert-info {
+    background: var(--help-info-light);
+    border-left-color: var(--help-info);
+    color: #1e40af;
+}
+
+.alert-success {
+    background: var(--help-success-light);
+    border-left-color: var(--help-success);
+    color: #065f46;
+}
+
+.alert-warning {
+    background: var(--help-warning-light);
+    border-left-color: var(--help-warning);
+    color: #92400e;
+}
+
+.alert-danger {
+    background: var(--help-danger-light);
+    border-left-color: var(--help-danger);
+    color: #991b1b;
+}
+
+.tip-box {
+    background: linear-gradient(135deg, var(--help-primary-light) 0%, var(--help-secondary-light) 100%);
+    border: 1px solid var(--help-primary);
+    border-left: 4px solid var(--help-primary);
+    border-radius: var(--help-radius-md);
+    padding: var(--help-space-lg);
+    margin: var(--help-space-lg) 0;
+}
+
+/* AI feature box */
+.ai-feature-box {
+    background: linear-gradient(135deg, var(--help-primary), var(--help-secondary));
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.ai-feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.ai-feature-description {
+    opacity: 0.9;
+}
+
+/* Credit usage indicator */
+.credit-usage {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--help-warning);
+    color: white;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Tabs */
+.tabs {
+    border-bottom: 2px solid var(--help-border);
+    margin-bottom: 1.5rem;
+}
+
+.tab-list {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.tab-button:hover {
+    color: var(--help-primary);
+}
+
+.tab-button.active {
+    color: var(--help-primary);
+    border-bottom-color: var(--help-primary);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Recipe cards */
+.recipe-card {
+    background: white;
+    border: 2px solid var(--help-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.recipe-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.recipe-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--help-primary);
+}
+
+.recipe-card-time {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.recipe-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recipe-step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--help-border);
+}
+
+.recipe-step:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.recipe-step-number {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    background: var(--help-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.recipe-step-content {
+    flex: 1;
+}
+
+/* Search box */
+.help-search {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.help-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 1px solid var(--help-border);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.help-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+/* ========================================================================
+   RESPONSIVE DESIGN
+   ======================================================================== */
+
+/* Mobile devices (up to 768px) */
+@media (max-width: 768px) {
+    body {
+        padding: var(--help-space-md);
+    }
+    
+    .help-container {
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+    
+    .help-content-wrapper,
+    .help-header {
+        padding: var(--help-space-lg);
+    }
+    
+    .help-title {
+        font-size: 2rem;
+    }
+    
+    .help-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .help-section-title {
+        font-size: 1.5rem;
+    }
+    
+    .help-section-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: var(--help-space-sm);
+    }
+    
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: var(--help-space-md);
+    }
+    
+    .tab-list {
+        flex-wrap: wrap;
+        gap: var(--help-space-sm);
+    }
+    
+    .tab-button {
+        padding: var(--help-space-sm) var(--help-space-md);
+        font-size: 0.875rem;
+    }
+    
+    .help-alert,
+    .help-tip,
+    .alert,
+    .tip-box {
+        padding: var(--help-space-md);
+        margin: var(--help-space-md) 0;
+    }
+    
+    .help-steps {
+        margin: var(--help-space-md) 0;
+    }
+    
+    .help-step {
+        flex-direction: column;
+        gap: var(--help-space-sm);
+        margin-bottom: var(--help-space-lg);
+    }
+    
+    .help-step-number {
+        align-self: flex-start;
+        margin-bottom: var(--help-space-sm);
+    }
+}
+
+/* Small mobile devices (up to 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: var(--help-space-sm);
+    }
+    
+    .help-header,
+    .help-content-wrapper {
+        padding: var(--help-space-md);
+    }
+    
+    .help-title {
+        font-size: 1.75rem;
+    }
+    
+    .help-subtitle {
+        font-size: 1rem;
+    }
+    
+    .help-section-title {
+        font-size: 1.25rem;
+        padding-left: var(--help-space-sm);
+    }
+    
+    .help-section {
+        margin-bottom: var(--help-space-xl);
+        padding-bottom: var(--help-space-lg);
+    }
+    
+    .quick-action {
+        padding: var(--help-space-md);
+    }
+    
+    .quick-action-icon {
+        font-size: 1.5rem;
+        margin-bottom: var(--help-space-xs);
+    }
+    
+    .help-alert,
+    .help-tip,
+    .alert,
+    .tip-box {
+        padding: var(--help-space-sm);
+        flex-direction: column;
+        gap: var(--help-space-sm);
+    }
+    
+    .help-alert-icon {
+        align-self: flex-start;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+    
+    .help-container {
+        box-shadow: none;
+        border-radius: 0;
+        max-width: none;
+    }
+    
+    .help-header {
+        background: white !important;
+        color: black !important;
+        border-bottom: 2px solid #000;
+    }
+    
+    .help-search,
+    .quick-actions,
+    .help-actions,
+    .tab-list {
+        display: none;
+    }
+    
+    .tab-content {
+        display: block !important;
+    }
+}
+
+/* ========================================================================
+   UTILITY CLASSES
+   ======================================================================== */
+
+/* Spacing utilities */
+.mt-xs { margin-top: var(--help-space-xs); }
+.mt-sm { margin-top: var(--help-space-sm); }
+.mt-md { margin-top: var(--help-space-md); }
+.mt-lg { margin-top: var(--help-space-lg); }
+.mt-xl { margin-top: var(--help-space-xl); }
+
+.mb-xs { margin-bottom: var(--help-space-xs); }
+.mb-sm { margin-bottom: var(--help-space-sm); }
+.mb-md { margin-bottom: var(--help-space-md); }
+.mb-lg { margin-bottom: var(--help-space-lg); }
+.mb-xl { margin-bottom: var(--help-space-xl); }
+
+.p-xs { padding: var(--help-space-xs); }
+.p-sm { padding: var(--help-space-sm); }
+.p-md { padding: var(--help-space-md); }
+.p-lg { padding: var(--help-space-lg); }
+.p-xl { padding: var(--help-space-xl); }
+
+/* Text utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-muted { color: var(--help-medium); }
+.text-primary { color: var(--help-primary); }
+.text-success { color: var(--help-success); }
+.text-warning { color: var(--help-warning); }
+.text-danger { color: var(--help-danger); }
+
+/* Font utilities */
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.font-normal { font-weight: 400; }
+
+/* Display utilities */
+.d-none { display: none; }
+.d-block { display: block; }
+.d-flex { display: flex; }
+.d-grid { display: grid; }
+
+/* Flex utilities */
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+.align-start { align-items: flex-start; }
+
+/* Legacy support for existing numbered utilities */
+.mt-1 { margin-top: var(--help-space-sm); }
+.mt-2 { margin-top: var(--help-space-md); }
+.mt-3 { margin-top: var(--help-space-lg); }
+.mt-4 { margin-top: var(--help-space-xl); }
+.mb-1 { margin-bottom: var(--help-space-sm); }
+.mb-2 { margin-bottom: var(--help-space-md); }
+.mb-3 { margin-bottom: var(--help-space-lg); }
+.mb-4 { margin-bottom: var(--help-space-xl); }

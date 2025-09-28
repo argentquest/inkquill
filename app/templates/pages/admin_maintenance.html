@@ -1,0 +1,515 @@
+{# /ai_rag_story_app/app/templates/pages/admin_maintenance.html #}
+{% extends "layouts/base.html" %}
+
+{% block title %}Admin - Maintenance Mode{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .maintenance-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 12px;
+    }
+    
+    .status-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    .status-active {
+        background-color: #ffc107;
+        animation: pulse-warning 2s infinite;
+    }
+    
+    .status-inactive {
+        background-color: #28a745;
+    }
+    
+    @keyframes pulse-warning {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .control-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-maintenance {
+        min-width: 140px;
+    }
+    
+    .maintenance-form {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3">
+                    <i class="fas fa-tools me-3"></i>
+                    Maintenance Mode Control
+                </h1>
+                <div class="page-subtitle text-white mb-4">
+                    Manage system maintenance notifications and service status for all users
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Admin Panel
+                    </span>
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-cog me-1"></i>
+                        System Control
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-bell me-1"></i>
+                        User Notifications
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <a href="/ui/admin/user-email" class="btn btn-light">
+                        <i class="fas fa-envelope me-1"></i>
+                        Send User Email
+                    </a>
+                    <button class="btn btn-light" onclick="refreshStatus()">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('admin_maintenance')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with maintenance controls">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+            <!-- Current Status Card -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card maintenance-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-info-circle text-primary me-2"></i>Current Status
+                            </h5>
+                            <div id="status-display" class="d-flex align-items-center">
+                                <span class="status-indicator status-inactive" id="status-indicator"></span>
+                                <span id="status-text" class="fw-bold">Loading...</span>
+                            </div>
+                            <div id="status-details" class="mt-3" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Message:</strong>
+                                        <p id="status-message" class="mb-2 text-muted">-</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Estimated End:</strong>
+                                        <p id="status-end-time" class="mb-2 text-muted">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="control-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+                        </h5>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button class="btn btn-warning btn-maintenance" onclick="enableMaintenanceQuick(5)">
+                                <i class="fas fa-clock me-1"></i> Enable (5 min)
+                            </button>
+                            <button class="btn btn-warning btn-maintenance" onclick="enableMaintenanceQuick(10)">
+                                <i class="fas fa-clock me-1"></i> Enable (10 min)
+                            </button>
+                            <button class="btn btn-warning btn-maintenance" onclick="enableMaintenanceQuick(30)">
+                                <i class="fas fa-clock me-1"></i> Enable (30 min)
+                            </button>
+                            <button class="btn btn-success btn-maintenance" onclick="disableMaintenance()">
+                                <i class="fas fa-check me-1"></i> Disable Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Maintenance Form -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="maintenance-form">
+                        <h5 class="mb-3">
+                            <i class="fas fa-cog text-primary me-2"></i>Custom Maintenance Setup
+                        </h5>
+                        <form id="maintenance-form">
+                            <div class="mb-3">
+                                <label for="maintenance-message" class="form-label">
+                                    <strong>Maintenance Message</strong>
+                                </label>
+                                <textarea class="form-control" id="maintenance-message" rows="3" 
+                                          placeholder="Enter the message users will see during maintenance..."
+                                          maxlength="500">The application is getting an update and will be back in about 5 minutes.</textarea>
+                                <div class="form-text">This message will appear in toast notifications to all users.</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="maintenance-duration" class="form-label">
+                                        <strong>Duration (minutes)</strong>
+                                    </label>
+                                    <input type="number" class="form-control" id="maintenance-duration" 
+                                           value="5" min="1" max="480" step="1">
+                                    <div class="form-text">How long the maintenance is expected to last.</div>
+                                </div>
+                                <div class="col-md-6 d-flex align-items-end">
+                                    <button type="button" class="btn btn-warning btn-lg w-100" onclick="enableMaintenanceCustom()">
+                                        <i class="fas fa-tools me-2"></i> Start Maintenance Mode
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Help Panel -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-question-circle text-info me-2"></i>How It Works
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="fas fa-bell text-primary me-2"></i>
+                                    <small>Users see toast notifications automatically</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-clock text-warning me-2"></i>
+                                    <small>Shows estimated completion time</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-sync text-success me-2"></i>
+                                    <small>Updates every minute</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-magic text-info me-2"></i>
+                                    <small>Auto-disables when time expires</small>
+                                </li>
+                                <li>
+                                    <i class="fas fa-shield-alt text-secondary me-2"></i>
+                                    <small>Non-blocking - users can still work</small>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Actions -->
+                    <div class="card mt-3 border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Emergency
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="small mb-3">If web interface fails, use command line:</p>
+                            <code class="small d-block mb-2">python maintenance_control.py enable</code>
+                            <code class="small d-block">python maintenance_control.py disable</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Testing Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="control-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-envelope text-info me-2"></i>Email System Testing
+                        </h5>
+                        <p class="text-muted mb-3">Test the email notification system by sending sample emails to verify SMTP configuration and template rendering.</p>
+                        
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="maintenance-form">
+                                    <form id="email-test-form">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="test-email-address" class="form-label">
+                                                    <strong>Test Email Address</strong>
+                                                </label>
+                                                <input type="email" class="form-control" id="test-email-address" 
+                                                       placeholder="test@example.com" required>
+                                                <div class="form-text">Email address to receive the test email</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="email-type" class="form-label">
+                                                    <strong>Email Type</strong>
+                                                </label>
+                                                <select class="form-select" id="email-type">
+                                                    <option value="test">Configuration Test</option>
+                                                    <option value="welcome">Welcome Email</option>
+                                                    <option value="password_reset">Password Reset</option>
+                                                    <option value="story_completion">Story Completion</option>
+                                                    <option value="maintenance">Maintenance Notice</option>
+                                                </select>
+                                                <div class="form-text">Type of email template to test</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <button type="button" class="btn btn-info" onclick="sendTestEmail()">
+                                                <i class="fas fa-paper-plane me-2"></i>Send Test Email
+                                            </button>
+                                            <span id="email-test-status" class="ms-3"></span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>Email Types
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled mb-0 small">
+                                            <li class="mb-2">
+                                                <strong>Configuration Test:</strong> Basic SMTP test with system info
+                                            </li>
+                                            <li class="mb-2">
+                                                <strong>Welcome Email:</strong> New user onboarding template
+                                            </li>
+                                            <li class="mb-2">
+                                                <strong>Password Reset:</strong> Account recovery template
+                                            </li>
+                                            <li class="mb-2">
+                                                <strong>Story Completion:</strong> Milestone notification template
+                                            </li>
+                                            <li>
+                                                <strong>Maintenance Notice:</strong> System maintenance alert
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load initial status
+    refreshStatus();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshStatus, 30000);
+});
+
+async function refreshStatus() {
+    try {
+        const response = await fetch('/api/v1/maintenance/status');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        updateStatusDisplay(data);
+    } catch (error) {
+        console.error('Failed to fetch maintenance status:', error);
+        showToast('Failed to fetch maintenance status', 'error');
+    }
+}
+
+function updateStatusDisplay(data) {
+    const indicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+    const statusDetails = document.getElementById('status-details');
+    const statusMessage = document.getElementById('status-message');
+    const statusEndTime = document.getElementById('status-end-time');
+    
+    if (data.enabled) {
+        indicator.className = 'status-indicator status-active';
+        statusText.textContent = 'MAINTENANCE MODE ACTIVE';
+        statusText.className = 'fw-bold text-warning';
+        
+        statusMessage.textContent = data.message || 'No message specified';
+        
+        if (data.estimated_end_time) {
+            const endTime = new Date(data.estimated_end_time);
+            const now = new Date();
+            const minutesRemaining = Math.max(0, Math.ceil((endTime - now) / (1000 * 60)));
+            statusEndTime.textContent = `${endTime.toLocaleTimeString()} (${minutesRemaining} min remaining)`;
+        } else {
+            statusEndTime.textContent = 'Not specified';
+        }
+        
+        statusDetails.style.display = 'block';
+    } else {
+        indicator.className = 'status-indicator status-inactive';
+        statusText.textContent = 'MAINTENANCE MODE INACTIVE';
+        statusText.className = 'fw-bold text-success';
+        statusDetails.style.display = 'none';
+    }
+}
+
+async function enableMaintenanceQuick(duration) {
+    const message = "The application is getting an update and will be back soon.";
+    await enableMaintenance(message, duration);
+}
+
+async function enableMaintenanceCustom() {
+    const message = document.getElementById('maintenance-message').value.trim();
+    const duration = parseInt(document.getElementById('maintenance-duration').value);
+    
+    if (!message) {
+        showToast('Please enter a maintenance message', 'error');
+        return;
+    }
+    
+    if (duration < 1 || duration > 480) {
+        showToast('Duration must be between 1 and 480 minutes', 'error');
+        return;
+    }
+    
+    await enableMaintenance(message, duration);
+}
+
+async function enableMaintenance(message, duration) {
+    try {
+        const formData = new FormData();
+        formData.append('message', message);
+        formData.append('duration_minutes', duration);
+        
+        const response = await fetch('/api/v1/maintenance/enable', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            showToast(`Maintenance mode enabled for ${duration} minutes`, 'success');
+            setTimeout(refreshStatus, 1000);
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            showToast(`Failed to enable maintenance mode: ${errorData.detail || 'Unknown error'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error enabling maintenance mode:', error);
+        showToast('Error enabling maintenance mode', 'error');
+    }
+}
+
+async function disableMaintenance() {
+    try {
+        const response = await fetch('/api/v1/maintenance/disable', {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            showToast('Maintenance mode disabled', 'success');
+            setTimeout(refreshStatus, 1000);
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            showToast(`Failed to disable maintenance mode: ${errorData.detail || 'Unknown error'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error disabling maintenance mode:', error);
+        showToast('Error disabling maintenance mode', 'error');
+    }
+}
+
+async function sendTestEmail() {
+    const testEmail = document.getElementById('test-email-address').value.trim();
+    const emailType = document.getElementById('email-type').value;
+    const statusElement = document.getElementById('email-test-status');
+    
+    if (!testEmail) {
+        showToast('Please enter a test email address', 'error');
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(testEmail)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    // Show loading state
+    statusElement.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin me-1"></i>Sending...</span>';
+    
+    try {
+        const formData = new FormData();
+        formData.append('test_email', testEmail);
+        formData.append('email_type', emailType);
+        
+        const response = await fetch('/ui/admin/test-email', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            statusElement.innerHTML = '<span class="text-success"><i class="fas fa-check me-1"></i>Email sent successfully!</span>';
+            showToast(data.message, 'success');
+            
+            // Clear the status after 5 seconds
+            setTimeout(() => {
+                statusElement.innerHTML = '';
+            }, 5000);
+        } else {
+            statusElement.innerHTML = '<span class="text-danger"><i class="fas fa-times me-1"></i>Failed to send</span>';
+            showToast(data.message || 'Failed to send test email', 'error');
+        }
+    } catch (error) {
+        console.error('Error sending test email:', error);
+        statusElement.innerHTML = '<span class="text-danger"><i class="fas fa-times me-1"></i>Error occurred</span>';
+        showToast('Error sending test email', 'error');
+    }
+}
+</script>
+{% endblock %}

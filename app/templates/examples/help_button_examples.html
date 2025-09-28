@@ -1,0 +1,288 @@
+{# 
+   HELP BUTTON IMPLEMENTATION EXAMPLES
+   
+   This file shows how to implement help buttons across different page types.
+   Copy the relevant examples to your actual page templates.
+#}
+
+{# ================================================================
+   EXAMPLE 1: DASHBOARD PAGE (index.html)
+   ================================================================ #}
+
+{# Option A: Fixed position help button (recommended for dashboard) #}
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="welcome-dashboard">
+    <!-- Dashboard content here -->
+    
+    <!-- Fixed help button - always visible while scrolling -->
+    {% include 'partials/_help_button.html' with 
+       help_topic='dashboard',
+       position='fixed',
+       tooltip='Get help with the dashboard and getting started'
+    %}
+</div>
+{% endblock %}
+
+{# Option B: Inline help button in welcome header #}
+{% block content %}
+<div class="welcome-dashboard">
+    <div class="welcome-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1>Welcome to Ink and Quill!</h1>
+                <p class="subtitle">Create amazing worlds and stories with AI assistance</p>
+            </div>
+            {% include 'partials/_help_button.html' with 
+               help_topic='dashboard',
+               position='inline',
+               tooltip='Get help getting started'
+            %}
+        </div>
+        <a href="/ui/generator/world" class="main-cta-button">Start World Builder Wizard</a>
+    </div>
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 2: WORLD LIST PAGE (world_list.html)
+   ================================================================ #}
+
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>My Worlds</h1>
+            <p class="text-muted">Manage your creative universes</p>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <!-- Help button in header -->
+            {% include 'partials/_help_button.html' with 
+               help_topic='world_list',
+               position='inline',
+               tooltip='Learn about world management and creation options'
+            %}
+            <a href="/ui/worlds/create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create World
+            </a>
+        </div>
+    </div>
+    
+    <!-- World cards content -->
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 3: WRITING EDITOR (act_editor_ui.html)
+   ================================================================ #}
+
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="editor-container">
+    <div class="editor-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>{{ act.title }}</h2>
+                <span class="text-muted">Act {{ act.number }} - {{ story.title }}</span>
+            </div>
+            <div class="editor-controls d-flex gap-2">
+                <!-- Help button in editor header -->
+                {% include 'partials/_help_button.html' with 
+                   help_topic='act_editor',
+                   size='sm',
+                   tooltip='Get help with the AI writing assistant'
+                %}
+                <button class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="editor-body">
+        <!-- Editor content -->
+    </div>
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 4: FORM PAGES (character_form.html)
+   ================================================================ #}
+
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user"></i>
+                        {% if character %}Edit Character{% else %}Create New Character{% endif %}
+                    </h5>
+                    <!-- Help button in card header -->
+                    {% include 'partials/_help_button.html' with 
+                       help_topic='character_detail',
+                       size='sm',
+                       tooltip='Get help with character creation and AI features'
+                    %}
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <!-- Form fields -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 5: WORLD BUILDER WIZARD (world_builder.html)
+   ================================================================ #}
+
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="world-builder-container">
+    <div class="wizard-header text-center mb-4">
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <div>
+                <h1><i class="fas fa-magic text-primary"></i> World Builder Wizard</h1>
+                <p class="lead">Create a complete world in 20 questions</p>
+            </div>
+            <!-- Help button next to title -->
+            {% include 'partials/_help_button.html' with 
+               help_topic='world_builder',
+               tooltip='Learn how the World Builder Wizard works'
+            %}
+        </div>
+    </div>
+    
+    <div class="wizard-content">
+        <!-- Wizard steps -->
+    </div>
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 6: DOCUMENT MANAGER (document_manager.html)
+   ================================================================ #}
+
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-file-alt"></i> Document Manager</h1>
+            <p class="text-muted">Upload reference materials for AI context</p>
+        </div>
+        
+        <!-- Help button with text label -->
+        {% include 'partials/_help_button.html' with 
+           help_topic='documents',
+           with_text=true,
+           tooltip='Learn about uploading and managing documents for AI assistance'
+        %}
+    </div>
+    
+    <!-- Document management interface -->
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 7: STORY DETAIL PAGE (story_detail.html)
+   ================================================================ #}
+
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="story-detail-container">
+    <div class="story-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1>{{ story.title }}</h1>
+                <p class="text-muted">{{ story.world.name }} • {{ story.acts|length }} Acts</p>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex gap-2 align-items-center">
+                    <!-- Help button in story header -->
+                    {% include 'partials/_help_button.html' with 
+                       help_topic='story_detail',
+                       tooltip='Get help with story management and writing'
+                    %}
+                    <a href="{{ url_for('ui_create_act_form', story_id=story.id) }}" 
+                       class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Act
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Story acts and content -->
+</div>
+{% endblock %}
+
+{# ================================================================
+   EXAMPLE 8: MODAL DIALOGS
+   ================================================================ #}
+
+{# For modals, use absolute positioning #}
+<div class="modal fade" id="exampleModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import from Book</h5>
+                <!-- Help button in modal header -->
+                {% include 'partials/_help_button.html' with 
+                   help_topic='import_book',
+                   position='absolute',
+                   size='sm',
+                   tooltip='Learn about importing worlds from literature'
+                %}
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal content -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ================================================================
+   EXAMPLE 9: RESPONSIVE HELP BUTTON
+   ================================================================ #}
+
+{# Shows text on desktop, icon-only on mobile #}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>AI Character Generator</h2>
+    {% include 'partials/_help_button.html' with 
+       help_topic='character_generator',
+       with_text=true,
+       tooltip='Learn about AI character generation features'
+    %}
+</div>
+
+{# ================================================================
+   EXAMPLE 10: CUSTOM STYLED HELP BUTTON
+   ================================================================ #}
+
+{# With custom classes for special styling #}
+<div class="toolbar">
+    {% include 'partials/_help_button.html' with 
+       help_topic='scene_editor',
+       classes='help-button-primary toolbar-help',
+       size='sm',
+       tooltip='Scene editor help and AI writing tips'
+    %}
+</div>
+
+{# Custom CSS for toolbar-help #}
+{% block styles %}
+<style>
+.toolbar-help {
+    margin-left: auto;
+}
+</style>
+{% endblock %}

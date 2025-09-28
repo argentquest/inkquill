@@ -1,0 +1,421 @@
+{# /ai_rag_story_app/app/templates/pages/document_manager.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Manage RAG Documents - {{ project_name | default('AI App') }}{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Document Manager</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="fas fa-file-upload me-3"></i>
+                    Document Manager
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Upload and manage documents for RAG (Retrieval-Augmented Generation)
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-file-alt me-1"></i>
+                        {{ (documents|length if documents else 0) }} Documents
+                    </span>
+                    {% if selected_world_id and available_worlds %}
+                        {% for world in available_worlds %}
+                            {% if world.id == selected_world_id %}
+                                <span class="badge bg-light text-dark px-3 py-2">
+                                    <i class="fas fa-globe me-1"></i>
+                                    Viewing: {{ world.name }}
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    {% if selected_world_id %}
+                        <a href="{{ url_for('ui_world_detail', world_id=selected_world_id) }}" class="btn btn-light btn-sm" data-bs-toggle="tooltip" title="Return to world details">
+                            <i class="fas fa-arrow-left me-1"></i>Back to World
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('documents')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with document management">
+                        <i class="fas fa-question-circle me-1"></i>Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="document-manager-page">
+    
+    <div class="container-fluid">
+
+        <div class="card mb-4">
+            <div class="card-status-top bg-success"></div>
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>Upload New Document
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if not has_worlds and not selected_world_id %}
+                    <div class="alert alert-azure border-0" role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar avatar-sm bg-azure-lt me-3">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <h4 class="alert-title">Create a world first!</h4>
+                                <div class="text-secondary">
+                                    Documents must be associated with a world to help organize your content and improve search accuracy.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{{ url_for('ui_world_create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Create Your First World
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                <form id="document-upload-form" action="{{ url_for('upload_document_for_rag') }}" method="post" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-lg-8">
+                        <label for="document-file-input" class="form-label fw-medium">Choose File</label>
+                        <input type="file" class="form-control form-control-lg" id="document-file-input" name="file" required
+                               accept=".pdf,.txt,.docx,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Max file size: 50 MB. Allowed types: PDF, TXT, DOCX.
+                        </div>
+                    </div>
+                    {% if selected_world_id %}
+                        {# When uploading from a specific world, hide the dropdown and use a hidden input #}
+                        <input type="hidden" name="world_id" value="{{ selected_world_id }}">
+                        <div class="col-lg-4">
+                            <label class="form-label fw-medium">Associated World</label>
+                            <div class="alert alert-success border-0 py-2">
+                                {% for world_option in available_worlds %}
+                                    {% if world_option.id == selected_world_id %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-success-lt me-2">
+                                                <i class="fas fa-globe"></i>
+                                            </div>
+                                            <strong>{{ world_option.name | e }}</strong>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        {# Show the dropdown when not coming from a specific world - NOW REQUIRED #}
+                        <div class="col-lg-4">
+                            <label for="world_id_upload_select" class="form-label fw-medium">Associate with World *</label>
+                            <select class="form-select form-select-lg" id="world_id_upload_select" name="world_id" required>
+                                <option value="">-- Please select a world --</option>
+                                {% if available_worlds %}
+                                    {% for world_option in available_worlds %}
+                                    <option value="{{ world_option.id }}">{{ world_option.name | e }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="" disabled>You have no worlds created yet.</option>
+                                {% endif %}
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Required to organize content and improve search accuracy.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div id="upload-status-message" class="alert d-none mt-3" role="alert"></div>
+                <div class="mt-4">
+                    <button type="submit" id="upload-button" class="btn btn-primary btn-lg"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                            title="Upload the selected document for processing and RAG indexing">
+                        <i class="fas fa-upload me-1"></i>Upload Document
+                    </button>
+                </div>
+                </form>
+                {% endif %}
+        </div>
+    </div>
+
+        <div class="card">
+            <div class="card-status-top bg-primary"></div>
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-file-alt me-2"></i>Your Uploaded Documents
+                </h3>
+                <div class="card-actions">
+                    <button class="btn btn-outline-primary btn-sm" onclick="location.reload()" data-bs-toggle="tooltip" title="Refresh document list">
+                        <i class="fas fa-refresh me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+            {% if documents %}
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table document-table">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>World</th> 
+                                <th>Status</th>
+                                <th>Timeline</th>
+                                <th class="w-1">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uploaded-documents-list">
+                            {% for doc in documents %}
+                                <tr class="document-item-row" data-document-id="{{ doc.id }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% set file_ext = doc.filename.split('.')[-1].upper() if doc.filename and '.' in doc.filename else 'Unknown' %}
+                                            <div class="avatar avatar-sm bg-{% if file_ext == 'PDF' %}red{% elif file_ext == 'DOCX' %}blue{% elif file_ext == 'TXT' %}secondary{% else %}light{% endif %}-lt me-3">
+                                                <i class="fas fa-{% if file_ext == 'PDF' %}file-pdf{% elif file_ext == 'DOCX' %}file-word{% elif file_ext == 'TXT' %}file-alt{% else %}file{% endif %}"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">{{ doc.filename | e }}</div>
+                                                <div class="text-secondary small">
+                                                    <span class="badge bg-{% if file_ext == 'PDF' %}red{% elif file_ext == 'DOCX' %}blue{% elif file_ext == 'TXT' %}secondary{% else %}light text-dark{% endif %} me-1">{{ file_ext }}</span>
+                                                    {% if doc.source_element_type and doc.source_element_type != 'USER_UPLOADED' %}
+                                                        <span class="badge bg-secondary" title="System-generated RAG document for a world element">
+                                                            {{ doc.source_element_type.replace('_LORE','').replace('_',' ') | title }} RAG
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if doc.world %}
+                                            <a href="{{ url_for('ui_world_detail', world_id=doc.world.id) }}" class="text-decoration-none">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar avatar-xs bg-primary-lt me-2">
+                                                        <i class="fas fa-globe"></i>
+                                                    </div>
+                                                    {{ doc.world.name | e }}
+                                                </div>
+                                            </a>
+                                        {% elif doc.world_id %}
+                                            <span class="text-muted">Unknown World</span>
+                                        {% else %}
+                                            <span class="text-muted">— General —</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if doc.status == 'COMPLETED' %}success{% elif doc.status == 'ERROR' %}danger{% elif doc.status in ['PROCESSING_TEXT', 'CHUNKING', 'GENERATING_EMBEDDINGS', 'INDEXING', 'PENDING', 'UPLOADED'] %}primary{% else %}secondary{% endif %}">
+                                            {{ doc.status.replace('_', ' ') | title if doc.status else 'N/A' }}
+                                        </span>
+                                        {% if doc.status == 'ERROR' and doc.error_message %}
+                                            <div class="text-danger small mt-1" title="{{ doc.error_message | e }}">
+                                                {{ doc.error_message | e | truncate(40, True) }}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="text-secondary small">
+                                            <div><strong>Uploaded:</strong> {{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') if doc.uploaded_at else 'N/A' }}</div>
+                                            {% if doc.processed_at %}
+                                                <div><strong>Processed:</strong> {{ doc.processed_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-list">
+                                            {% if doc.blob_url %}
+                                                <a href="{{ doc.blob_url }}" class="btn btn-sm btn-outline-primary" target="_blank" 
+                                                   data-bs-toggle="tooltip" title="View the original uploaded document">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </a>
+                                            {% endif %}
+                                            <button class="delete-document-btn btn btn-sm btn-outline-danger" data-document-id="{{ doc.id }}"
+                                                    data-bs-toggle="tooltip" title="Permanently delete this document and its RAG data">
+                                                <i class="fas fa-trash-alt me-1"></i>Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <div class="empty">
+                        <div class="empty-img"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNzYgNDBINTJWNzZIOTJWNTJIODhWNDhIODRWNDRIODBWNDBINzZaTTUyIDMySDc2SDgwSDg0SDg4SDkySDk2VjM2VjQwVjQ0VjQ4VjUyVjc2Vjg0SDkySDg4SDg0SDgwSDc2SDUySDQ0VjQwVjM2VjMySDUyWiIgZmlsbD0iIzIwNjA4OSIvPgo8L3N2Zz4K" width="64" height="64" alt=""></div>
+                        <p class="empty-title">No documents uploaded yet</p>
+                        <p class="empty-subtitle text-secondary">
+                            You haven't uploaded any documents yet. Use the form above to upload your first document.
+                        </p>
+                        <div class="empty-action">
+                            <button class="btn btn-primary" onclick="document.getElementById('document-file-input').click()">
+                                <i class="fas fa-upload me-1"></i>Upload Your First Document
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block styles %}
+<style>
+.document-manager-page {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-status-top {
+    height: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+}
+
+.table-vcenter td {
+    vertical-align: middle;
+}
+
+.card-table {
+    margin-bottom: 0;
+}
+
+.card-table th {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-top: none;
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    font-size: 0.875rem;
+}
+
+.card-table tbody tr:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--tblr-purple) 0%, var(--tblr-primary) 100%);
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    border-color: var(--tblr-primary);
+    color: var(--tblr-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--tblr-primary);
+    border-color: var(--tblr-primary);
+    transform: translateY(-1px);
+}
+
+.btn-outline-danger:hover {
+    transform: translateY(-1px);
+}
+
+.card-actions .btn {
+    box-shadow: none;
+}
+
+.form-control-lg {
+    border: 2px dashed var(--tblr-border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control-lg:focus {
+    border-color: var(--tblr-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+}
+
+.form-select-lg {
+    border: 2px solid var(--tblr-border-color);
+}
+
+.document-item-row {
+    transition: all 0.2s ease;
+}
+
+.document-item-row:hover {
+    background-color: var(--tblr-bg-surface-secondary) !important;
+}
+
+.avatar.avatar-xs {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.625rem;
+}
+
+.btn-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.empty {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-img {
+    margin-bottom: 1rem;
+}
+
+.empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-subtitle {
+    margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    <script src="{{ url_for('static', path='/js/document_upload.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/document_crud.js') }}"></script> 
+{% endblock %}

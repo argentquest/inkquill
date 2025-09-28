@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Dashboard - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Billing Dashboard</h1>
+            <p class="help-subtitle">Manage your credits and AI usage efficiently</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"credits\"]').click()">
+                <div class="quick-action-icon">💰</div>
+                <div class="quick-action-text">Credit System</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"usage\"]').click()">
+                <div class="quick-action-icon">📊</div>
+                <div class="quick-action-text">Usage Tracking</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"optimization\"]').click()">
+                <div class="quick-action-icon">⚡</div>
+                <div class="quick-action-text">Cost Optimization</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="credits">Credit System</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="usage">Usage Tracking</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="packages">Credit Packages</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="optimization">Optimization</button></li>
+            </ul>
+        </div>
+
+        <!-- Credits Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="credits">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Understanding the Credit System
+                </h2>
+                <p>The AI Storytelling Assistant uses a credit-based system to manage AI services fairly and sustainably. Credits are consumed only when you use AI-powered features - all basic writing, editing, and organization is completely free.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🆓 Free Operations</h3>
+                        <p class="feature-card-description">Writing, editing, organizing, and managing your content costs nothing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">💳 Credit Operations</h3>
+                        <p class="feature-card-description">AI assistance, content generation, and image creation use credits.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📈 Transparent Pricing</h3>
+                        <p class="feature-card-description">See exactly what each AI operation costs before using it.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🔄 Flexible Purchasing</h3>
+                        <p class="feature-card-description">Buy credits as needed or in bulk packages for better value.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Getting Started:</strong> New users receive free starter credits to explore AI features. You can create unlimited worlds, characters, and stories without spending any credits.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Credit Costs by Feature</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Writing Assistance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Credit Cost</th>
+                                    <th>When Used</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Writing Suggestions</td>
+                                    <td>1-3 credits</td>
+                                    <td>Auto-complete and continuation prompts</td>
+                                </tr>
+                                <tr>
+                                    <td>Paragraph Generation</td>
+                                    <td>5-10 credits</td>
+                                    <td>AI writes full paragraphs from prompts</td>
+                                </tr>
+                                <tr>
+                                    <td>Scene Expansion</td>
+                                    <td>15-25 credits</td>
+                                    <td>Turn outlines into full scenes</td>
+                                </tr>
+                                <tr>
+                                    <td>Dialogue Enhancement</td>
+                                    <td>8-15 credits</td>
+                                    <td>Improve conversation flow and character voice</td>
+                                </tr>
+                                <tr>
+                                    <td>Story Analysis</td>
+                                    <td>10-20 credits</td>
+                                    <td>Plot consistency and character development checks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Content Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Credit Cost</th>
+                                    <th>When Used</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Character Development</td>
+                                    <td>5-15 credits</td>
+                                    <td>Expand personality traits and backstory</td>
+                                </tr>
+                                <tr>
+                                    <td>Location Enhancement</td>
+                                    <td>8-20 credits</td>
+                                    <td>Add atmospheric and sensory details</td>
+                                </tr>
+                                <tr>
+                                    <td>Lore Expansion</td>
+                                    <td>10-25 credits</td>
+                                    <td>Develop world-building systems and history</td>
+                                </tr>
+                                <tr>
+                                    <td>Image Generation</td>
+                                    <td>15-30 credits</td>
+                                    <td>Create character portraits and location art</td>
+                                </tr>
+                                <tr>
+                                    <td>World Consistency Check</td>
+                                    <td>20-40 credits</td>
+                                    <td>Analyze entire world for contradictions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Factors Affecting Credit Costs</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Credit usage varies based on several factors:</p>
+                        <ul>
+                            <li><strong>Content Length:</strong> Longer generations cost more credits</li>
+                            <li><strong>Complexity:</strong> More detailed requests require more processing</li>
+                            <li><strong>Context Size:</strong> Larger worlds provide more context but use more credits</li>
+                            <li><strong>Quality Level:</strong> Higher quality settings increase credit costs</li>
+                            <li><strong>Revision Rounds:</strong> Multiple AI passes on the same content</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost Preview:</strong> The system shows estimated credit costs before executing AI operations, so you're never surprised.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Tracking Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="usage">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Usage Analytics and Tracking
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Dashboard Overview</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Your billing dashboard provides detailed insights:</p>
+                        <ul>
+                            <li><strong>Current Balance:</strong> Available credits and recent transactions</li>
+                            <li><strong>Usage Trends:</strong> Daily, weekly, and monthly credit consumption</li>
+                            <li><strong>Feature Breakdown:</strong> Which AI features you use most</li>
+                            <li><strong>Project Analysis:</strong> Credit usage per world or story</li>
+                            <li><strong>Efficiency Metrics:</strong> Average cost per writing session</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Analyzing Your Usage Patterns</h3>
+                                <span class="recipe-card-time">5 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Review your weekly usage chart for patterns</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Check which features consume the most credits</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Identify your most expensive writing sessions</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Look for optimization opportunities</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Plan future purchases based on usage trends</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Transaction History</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Detailed logs of all credit activities:</p>
+                        <ul>
+                            <li><strong>AI Operations:</strong> Timestamp, feature used, credits consumed</li>
+                            <li><strong>Credit Purchases:</strong> Package type, amount, and payment details</li>
+                            <li><strong>Refunds/Adjustments:</strong> Any credit corrections or refunds</li>
+                            <li><strong>Export Options:</strong> Download transaction history as CSV</li>
+                            <li><strong>Filtering:</strong> View specific time periods or operation types</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Usage Alerts and Budgets</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Set up automatic notifications and spending controls:</p>
+                        <ul>
+                            <li><strong>Low Balance Alerts:</strong> Notifications when credits run low</li>
+                            <li><strong>Daily Spending Limits:</strong> Prevent excessive usage in single sessions</li>
+                            <li><strong>Weekly Budgets:</strong> Track spending against weekly goals</li>
+                            <li><strong>Feature Limits:</strong> Set maximum credits for specific AI features</li>
+                            <li><strong>Auto-Purchase:</strong> Automatically buy credits when balance is low</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">🎯</span>
+                            <div>
+                                <strong>Budget Control:</strong> Setting reasonable daily limits helps prevent accidental overspending while exploring AI features.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Detailed Analytics</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Advanced metrics for power users:</p>
+                        <ul>
+                            <li><strong>Efficiency Trends:</strong> Credits per word generated over time</li>
+                            <li><strong>Feature ROI:</strong> Which AI features provide the most value</li>
+                            <li><strong>Peak Usage Times:</strong> When you write most effectively</li>
+                            <li><strong>Project Costs:</strong> Total credits spent per story or world</li>
+                            <li><strong>Comparative Analysis:</strong> Usage compared to similar writers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Understanding Your Usage Data</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>What It Means</th>
+                            <th>Optimization Opportunity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>High Suggestion Usage</td>
+                            <td>Frequent AI auto-complete</td>
+                            <td>Consider writing more independently, use AI for blocks</td>
+                        </tr>
+                        <tr>
+                            <td>Expensive Generation Sessions</td>
+                            <td>Large content creation requests</td>
+                            <td>Break large requests into smaller, cheaper chunks</td>
+                        </tr>
+                        <tr>
+                            <td>Repeated Analysis</td>
+                            <td>Multiple consistency checks</td>
+                            <td>Develop content more before analyzing</td>
+                        </tr>
+                        <tr>
+                            <td>Image Generation Spikes</td>
+                            <td>Many visual assets created</td>
+                            <td>Batch image requests for efficiency</td>
+                        </tr>
+                        <tr>
+                            <td>Low Efficiency Ratio</td>
+                            <td>High credits per word written</td>
+                            <td>Use AI more selectively, edit suggestions heavily</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Packages Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="packages">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Credit Package Options
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Package Tiers</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Choose the package that fits your writing style:</p>
+
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <h3 class="feature-card-title">🌱 Starter Pack</h3>
+                                <p class="feature-card-description"><strong>500 Credits</strong><br>Perfect for trying AI features and occasional assistance.</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3 class="feature-card-title">✍️ Writer Pack</h3>
+                                <p class="feature-card-description"><strong>2,500 Credits</strong><br>Ideal for regular writers who use AI for creative blocks.</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3 class="feature-card-title">📚 Author Pack</h3>
+                                <p class="feature-card-description"><strong>7,500 Credits</strong><br>Best value for serious authors writing multiple projects.</p>
+                            </div>
+                            <div class="feature-card">
+                                <h3 class="feature-card-title">🏆 Professional Pack</h3>
+                                <p class="feature-card-description"><strong>20,000 Credits</strong><br>For professional writers and content creators.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Package Value Comparison</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Credits</th>
+                                    <th>Cost per Credit</th>
+                                    <th>Savings vs Starter</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Starter Pack</td>
+                                    <td>500</td>
+                                    <td>$0.02</td>
+                                    <td>-</td>
+                                    <td>Exploring features</td>
+                                </tr>
+                                <tr>
+                                    <td>Writer Pack</td>
+                                    <td>2,500</td>
+                                    <td>$0.016</td>
+                                    <td>20% savings</td>
+                                    <td>Regular writing assistance</td>
+                                </tr>
+                                <tr>
+                                    <td>Author Pack</td>
+                                    <td>7,500</td>
+                                    <td>$0.013</td>
+                                    <td>35% savings</td>
+                                    <td>Multiple projects</td>
+                                </tr>
+                                <tr>
+                                    <td>Professional Pack</td>
+                                    <td>20,000</td>
+                                    <td>$0.01</td>
+                                    <td>50% savings</td>
+                                    <td>Heavy AI users</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Package Recommendations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Choose based on your writing habits:</p>
+                        <ul>
+                            <li><strong>Casual Writers (1-2 hours/week):</strong> Starter Pack - enough for occasional AI help</li>
+                            <li><strong>Regular Writers (5-10 hours/week):</strong> Writer Pack - good balance of features and value</li>
+                            <li><strong>Serious Authors (15+ hours/week):</strong> Author Pack - best value for consistent usage</li>
+                            <li><strong>Professional Users:</strong> Professional Pack - maximum savings for heavy AI usage</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">📊</span>
+                            <div>
+                                <strong>Usage Guidance:</strong> Your dashboard shows personalized package recommendations based on your historical usage patterns.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Payment and Billing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Flexible payment options:</p>
+                        <ul>
+                            <li><strong>One-Time Purchases:</strong> Buy credits as needed</li>
+                            <li><strong>Auto-Renewal:</strong> Automatically purchase when credits run low</li>
+                            <li><strong>Payment Methods:</strong> Credit cards, PayPal, and bank transfers</li>
+                            <li><strong>Enterprise Billing:</strong> Invoice options for organizations</li>
+                            <li><strong>Refund Policy:</strong> Unused credits can be refunded within 30 days</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optimization Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="optimization">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Cost Optimization Strategies
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Efficient AI Usage Patterns</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Maximize value from your AI credits:</p>
+                        <ul>
+                            <li><strong>Strategic Timing:</strong> Use AI for creative blocks, not routine writing</li>
+                            <li><strong>Batch Operations:</strong> Process multiple related requests together</li>
+                            <li><strong>Selective Generation:</strong> Request AI help for specific challenges</li>
+                            <li><strong>Edit Don't Regenerate:</strong> Modify AI output rather than requesting new content</li>
+                            <li><strong>Progressive Refinement:</strong> Start with cheaper requests, then enhance selectively</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Cost-Effective Writing Workflow</h3>
+                                <span class="recipe-card-time">Session workflow</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Write independently as much as possible</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Identify specific areas where you're stuck</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Use AI for targeted assistance on problems</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Edit and personalize AI suggestions extensively</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Continue writing independently with AI insights</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Feature-Specific Optimization</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>High-Cost Usage</th>
+                                    <th>Optimized Usage</th>
+                                    <th>Savings</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Writing Suggestions</td>
+                                    <td>Accept every suggestion</td>
+                                    <td>Use only when truly stuck</td>
+                                    <td>60-80%</td>
+                                </tr>
+                                <tr>
+                                    <td>Content Generation</td>
+                                    <td>Generate entire scenes</td>
+                                    <td>Generate outlines, write details yourself</td>
+                                    <td>50-70%</td>
+                                </tr>
+                                <tr>
+                                    <td>Character Development</td>
+                                    <td>Generate everything from scratch</td>
+                                    <td>Expand your existing concepts</td>
+                                    <td>40-60%</td>
+                                </tr>
+                                <tr>
+                                    <td>Story Analysis</td>
+                                    <td>Analyze after every scene</td>
+                                    <td>Analyze completed acts or chapters</td>
+                                    <td>70-90%</td>
+                                </tr>
+                                <tr>
+                                    <td>Image Generation</td>
+                                    <td>Multiple versions of same image</td>
+                                    <td>Detailed prompts for one good image</td>
+                                    <td>50-80%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Quality vs Cost Balance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Find the right balance for your needs:</p>
+                        <ul>
+                            <li><strong>Draft Phase:</strong> Use lower-cost, faster AI for initial content</li>
+                            <li><strong>Revision Phase:</strong> Invest in higher-quality AI for polishing</li>
+                            <li><strong>Experimental Writing:</strong> Try cheaper options when exploring ideas</li>
+                            <li><strong>Final Projects:</strong> Use premium features for publication-ready work</li>
+                            <li><strong>Learning Phase:</strong> Start with basic features, upgrade as you improve</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Common Cost Traps to Avoid</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Expensive habits that drain credits unnecessarily:</p>
+                        <ul>
+                            <li><strong>Over-Generation:</strong> Requesting AI content you don't actually use</li>
+                            <li><strong>Repetitive Analysis:</strong> Running the same consistency checks multiple times</li>
+                            <li><strong>Perfectionism:</strong> Generating multiple versions instead of editing one</li>
+                            <li><strong>Lazy Prompting:</strong> Vague requests that produce poor results</li>
+                            <li><strong>Feature Overlap:</strong> Using multiple features for the same problem</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Avoid Credit Waste:</strong> Always preview credit costs before confirming AI operations. Cancel requests that seem too expensive for the expected value.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Advanced Cost Management</h2>
+                <p>Professional strategies for heavy users:</p>
+                <ul>
+                    <li><strong>Batch Processing:</strong> Group similar requests to improve efficiency</li>
+                    <li><strong>Template Development:</strong> Create reusable prompts for common tasks</li>
+                    <li><strong>Session Planning:</strong> Plan AI usage before starting writing sessions</li>
+                    <li><strong>Credit Budgeting:</strong> Allocate credits per project or writing goal</li>
+                    <li><strong>ROI Tracking:</strong> Measure value gained per credit spent</li>
+                </ul>
+
+                <div class="credit-usage">
+                    💰 <strong>Pro Tip:</strong> Most successful users spend 60-70% of their credits on writing assistance and 30-40% on content development and analysis.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

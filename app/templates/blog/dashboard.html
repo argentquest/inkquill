@@ -1,0 +1,946 @@
+{% extends "blog/base.html" %}
+
+{% block title %}My Blog Dashboard{% endblock %}
+{% block meta_description %}Manage your blog posts, view analytics, and grow your audience.{% endblock %}
+
+{% block head %}
+<style>
+    /* Modern Blog Navigation Styles */
+    .modern-blog-nav {
+        background: linear-gradient(to bottom, #ffffff, #fafafa) !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        padding: 2.25rem 0 !important; /* 3x the original 0.75rem */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(10px) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    .modern-blog-nav::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 1px !important;
+        background: linear-gradient(90deg, transparent, rgba(var(--tblr-primary-rgb), 0.3), transparent) !important;
+        animation: shimmer 3s infinite !important;
+    }
+    
+    @keyframes shimmer {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+    }
+    
+    .modern-blog-nav.scrolled {
+        padding: 0.45rem 0 !important; /* 40% less than original 0.75rem */
+        background: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .blog-logo {
+        height: 90px !important; /* Increased to match 3x nav height */
+        width: auto !important;
+        transition: all 0.3s ease !important;
+        margin-right: 2rem !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
+    }
+    
+    .modern-blog-nav.scrolled .blog-logo {
+        height: 32px !important; /* Smaller when scrolled */
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05)) !important;
+    }
+    
+    .logo-container {
+        display: flex !important;
+        align-items: center !important;
+        text-decoration: none !important;
+        margin-right: 2rem !important;
+        position: relative !important;
+    }
+    
+    .logo-container::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 120% !important;
+        height: 120% !important;
+        background: radial-gradient(circle, rgba(var(--tblr-primary-rgb), 0.1), transparent 70%) !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+        pointer-events: none !important;
+    }
+    
+    .logo-container:hover::after {
+        opacity: 1 !important;
+    }
+    
+    .logo-text {
+        margin-left: 0.75rem !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: var(--tblr-primary) !important;
+        transition: font-size 0.3s ease !important;
+    }
+    
+    .modern-blog-nav.scrolled .logo-text {
+        font-size: 1.25rem !important;
+    }
+    
+    .modern-blog-nav .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .modern-blog-nav .nav-link:hover,
+    .modern-blog-nav .nav-link.active {
+        color: var(--tblr-primary) !important;
+        background: rgba(var(--tblr-primary-rgb), 0.1) !important;
+    }
+    
+    .search-form {
+        position: relative !important;
+    }
+    
+    .search-form .form-control {
+        border-radius: 20px !important;
+        padding-left: 2.5rem !important;
+        border: 1px solid #d1d5db !important;
+    }
+    
+    .search-form .search-icon {
+        position: absolute !important;
+        left: 0.75rem !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        color: #6b7280 !important;
+    }
+    
+    /* Enhanced Hero Header - MANDATORY for all pages */
+    .dashboard-hero {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%) !important;
+        color: white !important;
+        padding: 3rem 0 !important;
+        margin-bottom: 2rem !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .dashboard-hero::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1), transparent 50%), 
+                    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1), transparent 50%) !important;
+        pointer-events: none !important;
+    }
+    
+    /* Tabler Premium card styling */
+    .dashboard-card {
+        background: var(--tblr-bg-surface) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        border-radius: var(--tblr-border-radius) !important;
+        box-shadow: var(--tblr-box-shadow) !important;
+        margin-bottom: 2rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .dashboard-card::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 4px !important;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple)) !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: var(--tblr-box-shadow-lg) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    .dashboard-card:hover::before {
+        transform: translateX(0) !important;
+    }
+    
+    .stat-card {
+        background: var(--tblr-bg-surface) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        border-radius: var(--tblr-border-radius) !important;
+        padding: 1.5rem !important;
+        box-shadow: var(--tblr-box-shadow) !important;
+        margin-bottom: 1rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .stat-card::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 4px !important;
+        height: 100% !important;
+        background: var(--tblr-primary) !important;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: var(--tblr-box-shadow-lg) !important;
+    }
+    
+    .stat-value {
+        font-size: 2rem !important;
+        font-weight: bold !important;
+        color: var(--tblr-primary) !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .stat-label {
+        color: var(--tblr-muted) !important;
+        font-size: 0.875rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        font-weight: 500 !important;
+    }
+    
+    .post-item {
+        border-bottom: 1px solid var(--tblr-border-color) !important;
+        padding: 1rem 0 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .post-item:last-child {
+        border-bottom: none !important;
+    }
+    
+    .post-item:hover {
+        background: var(--tblr-bg-surface-secondary) !important;
+        margin: 0 -1rem !important;
+        padding: 1rem !important;
+        border-radius: var(--tblr-border-radius) !important;
+    }
+    
+    .btn-list {
+        margin-top: 0.5rem !important;
+    }
+    
+    .btn-list .btn {
+        margin-right: 0.5rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem !important;
+        border-radius: 50px !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .status-published { 
+        background: var(--tblr-success) !important; 
+        color: white !important; 
+    }
+    
+    .status-draft { 
+        background: var(--tblr-warning) !important; 
+        color: white !important; 
+    }
+    
+    .status-archived { 
+        background: var(--tblr-secondary) !important; 
+        color: white !important; 
+    }
+    
+    .follower-item {
+        display: flex !important;
+        align-items: center !important;
+        padding: 0.75rem 0 !important;
+        border-bottom: 1px solid var(--tblr-border-color) !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .follower-item:last-child {
+        border-bottom: none !important;
+    }
+    
+    .follower-item:hover {
+        background: var(--tblr-bg-surface-secondary) !important;
+        margin: 0 -1rem !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: var(--tblr-border-radius) !important;
+    }
+    
+    .follower-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(45deg, var(--tblr-primary), var(--tblr-purple)) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: white !important;
+        font-weight: bold !important;
+        margin-right: 1rem !important;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .modern-blog-nav {
+            padding: 1.5rem 0 !important; /* Reduced for mobile */
+        }
+        
+        .modern-blog-nav.scrolled {
+            padding: 0.4rem 0 !important;
+        }
+        
+        .blog-logo {
+            height: 60px !important; /* Adjusted for mobile */
+        }
+        
+        .modern-blog-nav.scrolled .blog-logo {
+            height: 28px !important; /* Smaller on mobile when scrolled */
+        }
+        
+        .logo-text {
+            font-size: 1.25rem !important;
+        }
+        
+        .modern-blog-nav.scrolled .logo-text {
+            font-size: 1rem !important;
+        }
+        
+        .logo-container {
+            margin-right: 1rem !important;
+        }
+        
+        .dashboard-hero {
+            padding: 2rem 0 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Modern Navigation -->
+<nav class="modern-blog-nav" id="blogNav">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <!-- Main Site Link -->
+                <a href="{{ url_for('ui_home') }}" class="nav-link me-3" style="color: var(--tblr-primary) !important; font-weight: 600 !important; border: 1px solid var(--tblr-primary) !important; border-radius: 20px !important; padding: 0.35rem 0.75rem !important;">
+                    <i class="fas fa-arrow-left me-1"></i>Main Site
+                </a>
+                
+                <!-- Logo -->
+                <a href="{{ url_for('blog_home') }}" class="logo-container">
+                    <img src="/static/images/logo.jpeg" alt="Blog Logo" class="blog-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="logo-text" style="display: none;">BlogName</div>
+                </a>
+                
+                <!-- Navigation Links -->
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('blog_home') }}" class="nav-link">Home</a>
+                    <a href="{{ url_for('blog_dashboard') }}" class="nav-link active">Dashboard</a>
+                    <a href="{{ url_for('blog_editor') }}" class="nav-link">Write</a>
+                </div>
+            </div>
+            
+            <div class="search-form">
+                <form method="get" action="{{ url_for('blog_home') }}">
+                    <div class="position-relative">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="q" class="form-control" placeholder="Search posts..." style="width: 300px;">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Enhanced Hero Header - MANDATORY for all pages -->
+<div class="dashboard-hero">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-tachometer-alt me-3"></i>
+                    {% if current_user.is_admin %}Admin Blog Dashboard{% else %}My Blog Dashboard{% endif %}
+                </h1>
+                <p class="lead mb-4">
+                    {% if current_user.is_admin %}
+                    Welcome back, Admin {{ current_user.display_name or current_user.username }}! Here's how all blogs are performing across the platform.
+                    {% else %}
+                    Welcome back, {{ current_user.display_name or current_user.username }}! Here's how your blog is performing.
+                    {% endif %}
+                </p>
+                
+                <!-- Stats Badge in Header -->
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <div class="bg-light text-dark px-3 py-2 rounded">
+                        <strong id="headerTotalPosts">0</strong> <small>Posts</small>
+                    </div>
+                    <div class="bg-light text-dark px-3 py-2 rounded">
+                        <strong id="headerTotalViews">0</strong> <small>Views</small>
+                    </div>
+                    <div class="bg-light text-dark px-3 py-2 rounded">
+                        <strong id="headerFollowerCount">0</strong> <small>Followers</small>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons in Header -->
+                <div class="btn-list flex-wrap">
+                    <a href="{{ url_for('blog_editor') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-plus me-1"></i>
+                        Write New Post
+                    </a>
+                    <a href="{{ url_for('blog_home') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-home me-1"></i>
+                        Back to Blog
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="display-1 opacity-25">
+                    <i class="fas fa-chart-line" style="font-size: 120px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPosts">0</div>
+                <div class="stat-label">Published Posts</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-value" id="totalViews">0</div>
+                <div class="stat-label">Total Views</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-value" id="totalLikes">0</div>
+                <div class="stat-label">Total Likes</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-value" id="followerCount">0</div>
+                <div class="stat-label">Followers</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Posts -->
+        <div class="col-lg-8">
+            <div class="dashboard-card">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            {% if current_user.is_admin %}All Recent Posts{% else %}Recent Posts{% endif %}
+                        </h5>
+                        <a href="{{ url_for('blog_home') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div id="recentPosts">
+                        <!-- Recent posts will be loaded here -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performing Posts -->
+            <div class="dashboard-card">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Top Performing Posts</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div id="topPosts">
+                        <!-- Top posts will be loaded here -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Recent Followers -->
+            <div class="dashboard-card">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Recent Followers</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div id="recentFollowers">
+                        <!-- Recent followers will be loaded here -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Author Profile -->
+            <div class="dashboard-card">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Profile</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div id="authorProfile">
+                        <!-- Profile will be loaded here -->
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <div class="mx-auto" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, var(--tblr-primary), var(--tblr-purple)); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                                    {{ (current_user.display_name or current_user.username)[0].upper() }}
+                                </div>
+                            </div>
+                            <h6 class="fw-bold">{{ current_user.display_name or current_user.username }}</h6>
+                            <p class="text-muted small mb-3">Blog author and storyteller</p>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-3">
+                        <button class="btn btn-outline-primary" id="editProfileBtn">
+                            <i class="fas fa-edit me-1"></i>Edit Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('blog_editor') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Write New Post
+                        </a>
+                        <button class="btn btn-outline-secondary" onclick="exportPosts()">
+                            <i class="fas fa-download me-1"></i>Export Analytics
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="manageSettings()">
+                            <i class="fas fa-cog me-1"></i>Blog Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple)); color: white;">
+                <h5 class="modal-title text-center w-100">
+                    <i class="fas fa-user-edit me-2"></i>Edit Author Profile
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" rows="4" 
+                                  placeholder="Tell readers about yourself..."></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="websiteUrl" class="form-label">Website URL</label>
+                                <input type="url" class="form-control" id="websiteUrl" 
+                                       placeholder="https://yourwebsite.com">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="twitterHandle" class="form-label">Twitter Handle</label>
+                                <input type="text" class="form-control" id="twitterHandle" 
+                                       placeholder="@username">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="instagramHandle" class="form-label">Instagram Handle</label>
+                                <input type="text" class="form-control" id="instagramHandle" 
+                                       placeholder="@username">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="linkedinUrl" class="form-label">LinkedIn URL</label>
+                                <input type="url" class="form-control" id="linkedinUrl" 
+                                       placeholder="https://linkedin.com/in/username">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="allowCommentsDefault">
+                                <label class="form-check-label" for="allowCommentsDefault">
+                                    Allow comments by default
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="autoPublish">
+                                <label class="form-check-label" for="autoPublish">
+                                    Auto-publish posts
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications">
+                                <label class="form-check-label" for="emailNotifications">
+                                    Email notifications
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Blog navigation scroll effect
+document.addEventListener('DOMContentLoaded', function() {
+    const blogNav = document.getElementById('blogNav');
+    let scrolled = false;
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > 0 && !scrolled) {
+            blogNav.classList.add('scrolled');
+            scrolled = true;
+        } else if (scrollTop === 0 && scrolled) {
+            blogNav.classList.remove('scrolled');
+            scrolled = false;
+        }
+    });
+});
+
+// Dashboard data
+let dashboardData = {};
+let authorProfile = {};
+
+// Load dashboard data
+async function loadDashboard() {
+    try {
+        // Load stats
+        const statsResponse = await fetch('/api/blog/author-profile/stats', {
+            credentials: 'include'
+        });
+        if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            updateStats(stats);
+        }
+
+        // Load dashboard data
+        const dashboardResponse = await fetch('/api/blog/author-profile/dashboard', {
+            credentials: 'include'
+        });
+        if (dashboardResponse.ok) {
+            dashboardData = await dashboardResponse.json();
+            updateDashboard(dashboardData);
+        }
+
+        // Load author profile
+        const profileResponse = await fetch('/api/blog/author-profile/', {
+            credentials: 'include'
+        });
+        if (profileResponse.ok) {
+            authorProfile = await profileResponse.json();
+            updateProfileDisplay(authorProfile);
+        }
+
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        showToast('Failed to load dashboard data', 'error');
+    }
+}
+
+function updateStats(stats) {
+    document.getElementById('totalPosts').textContent = stats.total_posts.toLocaleString();
+    document.getElementById('totalViews').textContent = stats.total_views.toLocaleString();
+    document.getElementById('totalLikes').textContent = stats.total_likes.toLocaleString();
+    document.getElementById('followerCount').textContent = stats.follower_count.toLocaleString();
+    
+    // Update header stats
+    document.getElementById('headerTotalPosts').textContent = stats.total_posts.toLocaleString();
+    document.getElementById('headerTotalViews').textContent = stats.total_views.toLocaleString();
+    document.getElementById('headerFollowerCount').textContent = stats.follower_count.toLocaleString();
+}
+
+function updateDashboard(data) {
+    const isAdmin = data.is_admin || false;
+    
+    // Update recent posts
+    const recentPostsHtml = data.recent_posts && data.recent_posts.length > 0 ? 
+        data.recent_posts.map(post => `
+            <div class="post-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${post.title}</h6>
+                        <div class="d-flex align-items-center gap-3 small text-muted mb-1">
+                            <span class="status-badge status-${post.status}">${post.status.toUpperCase()}</span>
+                            <span><i class="fas fa-eye me-1"></i>${post.view_count} views</span>
+                            <span><i class="fas fa-heart me-1"></i>${post.like_count} likes</span>
+                            ${isAdmin && post.author ? `<span><i class="fas fa-user me-1"></i>by ${post.author.display_name || post.author.username}</span>` : ''}
+                        </div>
+                        ${isAdmin ? `
+                            <div class="btn-list">
+                                <a href="{{ url_for('blog_editor') }}?post_id=${post.id}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <a href="/blog/post/${post.id}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <i class="fas fa-external-link-alt me-1"></i>View
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">${formatDate(post.updated_at)}</small>
+                        ${isAdmin && post.author ? `<small class="text-muted">ID: ${post.id}</small>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('') :
+        '<div class="text-center py-4 text-muted">No posts yet. <a href="' + "{{ url_for('blog_editor') }}" + '">Write your first post!</a></div>';
+    
+    document.getElementById('recentPosts').innerHTML = recentPostsHtml;
+
+    // Update top posts
+    const topPostsHtml = data.top_posts && data.top_posts.length > 0 ?
+        data.top_posts.map(post => `
+            <div class="post-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${post.title}</h6>
+                        <div class="d-flex align-items-center gap-3 small text-muted mb-1">
+                            <span><i class="fas fa-eye me-1"></i>${post.view_count} views</span>
+                            <span><i class="fas fa-heart me-1"></i>${post.like_count} likes</span>
+                            ${isAdmin && post.author ? `<span><i class="fas fa-user me-1"></i>by ${post.author.display_name || post.author.username}</span>` : ''}
+                        </div>
+                        ${isAdmin ? `
+                            <div class="btn-list">
+                                <a href="{{ url_for('blog_editor') }}?post_id=${post.id}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <a href="/blog/post/${post.id}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <i class="fas fa-external-link-alt me-1"></i>View
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">${formatDate(post.published_at)}</small>
+                        ${isAdmin && post.author ? `<small class="text-muted">ID: ${post.id}</small>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('') :
+        '<div class="text-center py-4 text-muted">No published posts yet.</div>';
+    
+    document.getElementById('topPosts').innerHTML = topPostsHtml;
+
+    // Update recent followers
+    const followersHtml = data.recent_followers && data.recent_followers.length > 0 ?
+        data.recent_followers.map(follower => `
+            <div class="follower-item">
+                <div class="follower-avatar">
+                    ${(follower.display_name || follower.username)[0].toUpperCase()}
+                </div>
+                <div class="flex-grow-1">
+                    <div class="fw-medium">${follower.display_name || follower.username}</div>
+                    <small class="text-muted">Followed ${formatDate(follower.followed_at)}</small>
+                </div>
+            </div>
+        `).join('') :
+        '<div class="text-center py-4 text-muted">No followers yet.</div>';
+    
+    document.getElementById('recentFollowers').innerHTML = followersHtml;
+}
+
+function updateProfileDisplay(profile) {
+    const profileHtml = `
+        <div class="text-center">
+            <div class="mb-3">
+                <div class="mx-auto" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, var(--tblr-primary), var(--tblr-purple)); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                    {{ (current_user.display_name or current_user.username)[0].upper() }}
+                </div>
+            </div>
+            <h6 class="fw-bold">{{ current_user.display_name or current_user.username }}</h6>
+            <p class="text-muted small mb-3">${profile.bio || 'No bio provided yet.'}</p>
+            <div class="row text-center">
+                <div class="col-6">
+                    <div class="fw-bold">${profile.total_posts || 0}</div>
+                    <small class="text-muted">Posts</small>
+                </div>
+                <div class="col-6">
+                    <div class="fw-bold">${profile.follower_count || 0}</div>
+                    <small class="text-muted">Followers</small>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('authorProfile').innerHTML = profileHtml;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return date.toLocaleDateString();
+}
+
+// Profile management
+function editProfile() {
+    // Populate form with current data
+    document.getElementById('bio').value = authorProfile.bio || '';
+    document.getElementById('websiteUrl').value = authorProfile.website_url || '';
+    document.getElementById('twitterHandle').value = authorProfile.twitter_handle || '';
+    document.getElementById('instagramHandle').value = authorProfile.instagram_handle || '';
+    document.getElementById('linkedinUrl').value = authorProfile.linkedin_url || '';
+    document.getElementById('allowCommentsDefault').checked = authorProfile.allow_comments_default || false;
+    document.getElementById('autoPublish').checked = authorProfile.auto_publish || false;
+    document.getElementById('emailNotifications').checked = authorProfile.email_notifications || false;
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+    modal.show();
+}
+
+async function saveProfile() {
+    try {
+        const formData = {
+            bio: document.getElementById('bio').value,
+            website_url: document.getElementById('websiteUrl').value,
+            twitter_handle: document.getElementById('twitterHandle').value,
+            instagram_handle: document.getElementById('instagramHandle').value,
+            linkedin_url: document.getElementById('linkedinUrl').value,
+            allow_comments_default: document.getElementById('allowCommentsDefault').checked,
+            auto_publish: document.getElementById('autoPublish').checked,
+            email_notifications: document.getElementById('emailNotifications').checked
+        };
+
+        const response = await fetch('/api/blog/author-profile/', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            authorProfile = await response.json();
+            updateProfileDisplay(authorProfile);
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+            modal.hide();
+            
+            showToast('Profile updated successfully!', 'success');
+        } else {
+            showToast('Failed to update profile', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        showToast('Failed to update profile', 'error');
+    }
+}
+
+// Quick actions
+function exportPosts() {
+    showToast('Export functionality coming soon!', 'warning');
+}
+
+function manageSettings() {
+    showToast('Settings functionality coming soon!', 'warning');
+}
+
+// Toast notifications
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast position-fixed top-0 end-0 m-3 ${type === 'error' ? 'bg-danger text-white' : type === 'warning' ? 'bg-warning text-dark' : 'bg-success text-white'}`;
+    toast.innerHTML = `
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboard();
+    
+    document.getElementById('editProfileBtn').addEventListener('click', editProfile);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1071 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Character Generator - {{ world.name | e }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .wizard-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .wizard-step {
+        display: none;
+    }
+    
+    .wizard-step.active {
+        display: block;
+    }
+    
+    /* Enhanced wizard styling */
+    .wizard-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .trait-checkbox {
+        display: none;
+    }
+    
+    .trait-label {
+        display: inline-block;
+        padding: 8px 16px;
+        margin: 4px;
+        background: var(--tblr-gray-100);
+        border: 2px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-pill);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+        font-size: 0.875rem;
+    }
+    
+    .trait-label:hover {
+        background: var(--tblr-primary-lt);
+        border-color: var(--tblr-primary);
+        color: var(--tblr-primary);
+    }
+    
+    .trait-checkbox:checked + .trait-label {
+        background: var(--tblr-primary);
+        color: white;
+        border-color: var(--tblr-primary);
+    }
+    
+    
+    .genre-question {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .result-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .character-preview {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    
+    .physical-attribute-group {
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_list_characters_for_world', world_id=world.id) }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to Characters">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white-50">My Worlds</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50">{{ world.name }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_characters_for_world', world_id=world.id) }}" class="text-white-50">Characters</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Generate Character</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-wand-sparkles me-3"></i>
+                    Character Generator
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Create a new character for {{ world.name }} using AI generation
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-magic me-1"></i>
+                        AI-Powered
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-globe me-1"></i>
+                        {{ world.name }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('character_generator')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Learn how the Character Generator works">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="character-generator-page">
+    <div class="container-fluid pt-3">
+        <div class="wizard-container">
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" data-step="1">1</div>
+                <div class="step" data-step="2">2</div>
+                <div class="step" data-step="3">3</div>
+                <div class="step" data-step="4">4</div>
+                <div class="step" data-step="5">5</div>
+                <div class="step" data-step="6">6</div>
+            </div>
+
+            <!-- Wizard Steps -->
+            
+            <!-- Step 1: Generation Type -->
+            <div class="wizard-step active" id="step-1">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Step 1: Choose Generation Type</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-primary" style="cursor: pointer;" onclick="selectGenerationType('guided')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-edit fa-3x text-primary mb-3"></i>
+                                        <h5>Guided Creation</h5>
+                                        <p class="text-muted">Step through each aspect of your character to create exactly what you envision</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100 border-success" style="cursor: pointer;" onclick="selectGenerationType('random')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-dice fa-3x text-success mb-3"></i>
+                                        <h5>Random Generation</h5>
+                                        <p class="text-muted">Generate a complete character instantly for inspiration</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Basic Info -->
+            <div class="wizard-step" id="step-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Step 2: Basic Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="character-name" class="form-label">Character Name</label>
+                                    <input type="text" class="form-control" id="character-name" placeholder="Enter character name">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="character-gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="character-gender">
+                                        <option value="">Select gender...</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Non-binary">Non-binary</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Unspecified">Unspecified</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="character-species" class="form-label">Species</label>
+                                    <select class="form-select" id="character-species">
+                                        <option value="">Select species...</option>
+                                        <!-- Alphabetically sorted -->
+                                        <option value="Alien">Alien</option>
+                                        <option value="Angel">Angel</option>
+                                        <option value="Bear">Bear</option>
+                                        <option value="Bear-folk">Bear-folk</option>
+                                        <option value="Bird-folk">Bird-folk</option>
+                                        <option value="Cat">Cat</option>
+                                        <option value="Cat-folk">Cat-folk</option>
+                                        <option value="Demon">Demon</option>
+                                        <option value="Dog">Dog</option>
+                                        <option value="Dragon">Dragon</option>
+                                        <option value="Dragonborn">Dragonborn</option>
+                                        <option value="Dwarf">Dwarf</option>
+                                        <option value="Elemental">Elemental</option>
+                                        <option value="Elf">Elf</option>
+                                        <option value="Fairy">Fairy</option>
+                                        <option value="Fox">Fox</option>
+                                        <option value="Fox-folk">Fox-folk</option>
+                                        <option value="Giant">Giant</option>
+                                        <option value="Gnome">Gnome</option>
+                                        <option value="Goblin">Goblin</option>
+                                        <option value="Griffin">Griffin</option>
+                                        <option value="Half-Elf">Half-Elf</option>
+                                        <option value="Half-Orc">Half-Orc</option>
+                                        <option value="Halfling">Halfling</option>
+                                        <option value="Human">Human</option>
+                                        <option value="Lizard-folk">Lizard-folk</option>
+                                        <option value="Orc">Orc</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Phoenix">Phoenix</option>
+                                        <option value="Robot/Android">Robot/Android</option>
+                                        <option value="Spirit">Spirit</option>
+                                        <option value="Tiefling">Tiefling</option>
+                                        <option value="Troll">Troll</option>
+                                        <option value="Undead">Undead</option>
+                                        <option value="Unicorn">Unicorn</option>
+                                        <option value="Vampire">Vampire</option>
+                                        <option value="Werewolf">Werewolf</option>
+                                        <option value="Wolf">Wolf</option>
+                                        <option value="Wolf-folk">Wolf-folk</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Second row for Age Category and Profession -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="character-age-category" class="form-label">Age Category</label>
+                                    <select class="form-select" id="character-age-category">
+                                        <option value="">Select age category...</option>
+                                        {% for age_category in age_categories %}
+                                        <option value="{{ age_category }}">{{ age_category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="character-profession" class="form-label">Profession/Occupation</label>
+                                    <select class="form-select" id="character-profession">
+                                        <option value="">Select profession...</option>
+                                        {% for profession in professions %}
+                                        <option value="{{ profession }}">{{ profession }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-outline-secondary" onclick="previousStep()">
+                                <i class="ti ti-arrow-left me-1"></i>Previous
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep()">
+                                Next<i class="ti ti-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Personality Traits -->
+            <div class="wizard-step" id="step-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Step 3: Personality Traits</h4>
+                        <small class="text-muted">Select 4-8 traits that define your character</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="personality-traits-container">
+                            {% for trait in personality_traits %}
+                            <input type="checkbox" id="trait-{{ loop.index }}" name="personality_traits" value="{{ trait }}" class="trait-checkbox">
+                            <label for="trait-{{ loop.index }}" class="trait-label">{{ trait }}</label>
+                            {% endfor %}
+                        </div>
+                        <div id="trait-count-warning" class="text-warning mt-2" style="display: none;">
+                            Please select between 4-8 personality traits.
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep()">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Core Motivation & Physical Attributes -->
+            <div class="wizard-step" id="step-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Step 4: Motivation & Appearance</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Core Motivations</h5>
+                                <p class="text-muted small">Select 1-3 primary motivations that drive your character</p>
+                                <div id="motivation-container">
+                                    <div class="motivation-group mb-2">
+                                        <select class="form-select motivation-select">
+                                            <option value="">Select primary motivation...</option>
+                                            {% for motivation in core_motivations %}
+                                            <option value="{{ motivation }}">{{ motivation }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMotivation()" id="add-motivation-btn">
+                                    <i class="fas fa-plus"></i> Add Another Motivation
+                                </button>
+                                <div id="motivation-count-warning" class="text-warning mt-2" style="display: none;">
+                                    You can select up to 3 motivations.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Physical Attributes</h5>
+                                <div class="physical-attribute-group">
+                                    <label class="form-label">Hair Color</label>
+                                    <select class="form-select" id="hair-color">
+                                        <option value="">Select...</option>
+                                        {% for color in physical_attributes.hair_colors %}
+                                        <option value="{{ color }}">{{ color }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="physical-attribute-group">
+                                    <label class="form-label">Eye Color</label>
+                                    <select class="form-select" id="eye-color">
+                                        <option value="">Select...</option>
+                                        {% for color in physical_attributes.eye_colors %}
+                                        <option value="{{ color }}">{{ color }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="physical-attribute-group">
+                                    <label class="form-label">Build</label>
+                                    <select class="form-select" id="build">
+                                        <option value="">Select...</option>
+                                        {% for build in physical_attributes.builds %}
+                                        <option value="{{ build }}">{{ build }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="physical-attribute-group">
+                                    <label class="form-label">Height</label>
+                                    <select class="form-select" id="height">
+                                        <option value="">Select...</option>
+                                        {% for height in physical_attributes.heights %}
+                                        <option value="{{ height }}">{{ height }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep()">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Genre Selection -->
+            <div class="wizard-step" id="step-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Step 5: Genre Context</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <h5>Genre Context</h5>
+                                <p class="text-muted">Select the genre that best fits your character's story.</p>
+                                <select class="form-select" id="genre-select" onchange="loadGenreQuestions()">
+                                    <option value="">Select genre...</option>
+                                    {% for genre in available_genres %}
+                                    <option value="{{ genre }}">{{ genre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div id="genre-questions-container" class="mt-3">
+                                    <!-- Genre questions will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep()">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Review & Generate -->
+            <div class="wizard-step" id="step-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Step 6: Review & Generate</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="character-preview" class="character-preview">
+                            <!-- Character preview will be populated here -->
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep()">Previous</button>
+                            <button type="button" class="btn btn-success btn-lg" onclick="generateCharacter()" id="generate-btn">
+                                <i class="fas fa-wand-sparkles"></i> Generate Character
+                            </button>
+                        </div>
+                        <div id="generation-status" class="mt-3" style="display: none;">
+                            <div class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p class="mt-2">Generating your character...</p>
+                            </div>
+                        </div>
+                        <div id="generation-result" class="mt-3" style="display: none;">
+                            <!-- Generation result will be shown here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+let currentStep = 1;
+let generationType = 'guided';
+let worldId = {{ world.id }};
+
+// Step navigation
+function nextStep() {
+    if (validateCurrentStep()) {
+        if (currentStep < 6) {
+            hideStep(currentStep);
+            currentStep++;
+            showStep(currentStep);
+            updateStepIndicator();
+            
+            if (currentStep === 6) {
+                updatePreview();
+            }
+        }
+    }
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        hideStep(currentStep);
+        currentStep--;
+        showStep(currentStep);
+        updateStepIndicator();
+    }
+}
+
+function showStep(step) {
+    document.getElementById(`step-${step}`).classList.add('active');
+}
+
+function hideStep(step) {
+    document.getElementById(`step-${step}`).classList.remove('active');
+}
+
+function updateStepIndicator() {
+    document.querySelectorAll('.step-item').forEach(step => {
+        const stepNum = parseInt(step.getAttribute('data-step'));
+        step.classList.remove('active');
+        
+        if (stepNum === currentStep) {
+            step.classList.add('active');
+        }
+    });
+}
+
+// Generation type selection
+function selectGenerationType(type) {
+    generationType = type;
+    
+    if (type === 'random') {
+        // Skip to random generation
+        generateRandomCharacter();
+    } else {
+        nextStep();
+    }
+}
+
+// Validation
+function validateCurrentStep() {
+    switch (currentStep) {
+        case 2:
+            return validateBasicInfo();
+        case 3:
+            return validatePersonalityTraits();
+        case 4:
+            return validateMotivationAndPhysical();
+        case 5:
+            return validateRelationshipsAndGenre();
+        default:
+            return true;
+    }
+}
+
+function validateBasicInfo() {
+    const name = document.getElementById('character-name').value.trim();
+    const gender = document.getElementById('character-gender').value;
+    const species = document.getElementById('character-species').value;
+    
+    if (!name) {
+        alert('Please enter a character name.');
+        return false;
+    }
+    
+    if (!gender) {
+        alert('Please select a gender.');
+        return false;
+    }
+    
+    if (!species) {
+        alert('Please select a species.');
+        return false;
+    }
+    
+    return true;
+}
+
+function validatePersonalityTraits() {
+    const selectedTraits = document.querySelectorAll('input[name="personality_traits"]:checked');
+    const warning = document.getElementById('trait-count-warning');
+    
+    if (selectedTraits.length < 4 || selectedTraits.length > 8) {
+        warning.style.display = 'block';
+        return false;
+    }
+    
+    warning.style.display = 'none';
+    return true;
+}
+
+function validateMotivationAndPhysical() {
+    const motivationSelects = document.querySelectorAll('.motivation-select');
+    const selectedMotivations = Array.from(motivationSelects).filter(select => select.value !== '');
+    
+    if (selectedMotivations.length === 0) {
+        alert('Please select at least one core motivation.');
+        return false;
+    }
+    
+    return true;
+}
+
+function validateRelationshipsAndGenre() {
+    const genre = document.getElementById('genre-select').value;
+    if (!genre) {
+        alert('Please select a genre.');
+        return false;
+    }
+    return true;
+}
+
+// Personality traits handling
+document.addEventListener('DOMContentLoaded', function() {
+    const traitCheckboxes = document.querySelectorAll('input[name="personality_traits"]');
+    traitCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const selectedCount = document.querySelectorAll('input[name="personality_traits"]:checked').length;
+            const warning = document.getElementById('trait-count-warning');
+            
+            if (selectedCount < 4 || selectedCount > 8) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+        });
+    });
+});
+
+// Core motivations management
+function addMotivation() {
+    const container = document.getElementById('motivation-container');
+    const motivationGroups = container.querySelectorAll('.motivation-group');
+    
+    if (motivationGroups.length >= 3) {
+        document.getElementById('motivation-count-warning').style.display = 'block';
+        return;
+    }
+    
+    const newMotivation = document.createElement('div');
+    newMotivation.className = 'motivation-group mb-2';
+    newMotivation.innerHTML = `
+        <div class="d-flex">
+            <select class="form-select motivation-select me-2">
+                <option value="">Select motivation...</option>
+                {% for motivation in core_motivations %}
+                <option value="{{ motivation }}">{{ motivation }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMotivation(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(newMotivation);
+    
+    updateMotivationUI();
+}
+
+function removeMotivation(btn) {
+    btn.closest('.motivation-group').remove();
+    updateMotivationUI();
+}
+
+function updateMotivationUI() {
+    const container = document.getElementById('motivation-container');
+    const motivationGroups = container.querySelectorAll('.motivation-group');
+    const addBtn = document.getElementById('add-motivation-btn');
+    const warning = document.getElementById('motivation-count-warning');
+    
+    if (motivationGroups.length >= 3) {
+        addBtn.style.display = 'none';
+        warning.style.display = 'block';
+    } else {
+        addBtn.style.display = 'inline-block';
+        warning.style.display = 'none';
+    }
+}
+
+// Genre questions loading
+async function loadGenreQuestions() {
+    const genre = document.getElementById('genre-select').value;
+    const container = document.getElementById('genre-questions-container');
+    
+    if (!genre) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/ui/worlds/${worldId}/api/generator/character/genre-questions/${genre}`);
+        const data = await response.json();
+        
+        container.innerHTML = '';
+        data.questions.forEach((question, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'genre-question';
+            questionDiv.innerHTML = `
+                <h6>${question.question}</h6>
+                <select class="form-select genre-answer" data-question="${question.question}">
+                    <option value="">Select answer...</option>
+                    ${question.options.map(option => `<option value="${option}">${option}</option>`).join('')}
+                </select>
+            `;
+            container.appendChild(questionDiv);
+        });
+    } catch (error) {
+        console.error('Error loading genre questions:', error);
+        container.innerHTML = '<p class="text-danger">Error loading questions for this genre.</p>';
+    }
+}
+
+// Character preview
+function updatePreview() {
+    const preview = document.getElementById('character-preview');
+    const data = collectFormData();
+    
+    let html = `
+        <h5>Character Preview: ${data.name}</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Basic Information</h6>
+                <p><strong>Gender:</strong> ${data.gender || 'Not specified'}</p>
+                <p><strong>Species:</strong> ${data.species || 'Not specified'}</p>
+                <p><strong>Age Category:</strong> ${data.age_category || 'Not specified'}</p>
+                <p><strong>Profession:</strong> ${data.profession || 'Not specified'}</p>
+                
+                <h6>Personality Traits</h6>
+                <p>${data.personality_traits && data.personality_traits.length > 0 ? data.personality_traits.join(', ') : 'None selected'}</p>
+                
+                <h6>Core Motivations</h6>
+                <p>${data.core_motivations && data.core_motivations.length > 0 ? data.core_motivations.join(', ') : 'None selected'}</p>
+                
+                <h6>Genre</h6>
+                <p>${data.genre || 'Not specified'}</p>
+            </div>
+            <div class="col-md-6">
+                <h6>Physical Attributes</h6>
+                <ul class="list-unstyled">
+                    ${data.physical_attributes.hair_color ? `<li><strong>Hair:</strong> ${data.physical_attributes.hair_color}</li>` : ''}
+                    ${data.physical_attributes.eye_color ? `<li><strong>Eyes:</strong> ${data.physical_attributes.eye_color}</li>` : ''}
+                    ${data.physical_attributes.build ? `<li><strong>Build:</strong> ${data.physical_attributes.build}</li>` : ''}
+                    ${data.physical_attributes.height ? `<li><strong>Height:</strong> ${data.physical_attributes.height}</li>` : ''}
+                </ul>
+                
+            </div>
+        </div>
+    `;
+    
+    preview.innerHTML = html;
+}
+
+// Form data collection
+function collectFormData() {
+    const data = {
+        name: document.getElementById('character-name').value.trim(),
+        gender: document.getElementById('character-gender').value,
+        species: document.getElementById('character-species').value,
+        age_category: document.getElementById('character-age-category').value,
+        profession: document.getElementById('character-profession').value,
+        personality_traits: Array.from(document.querySelectorAll('input[name="personality_traits"]:checked')).map(cb => cb.value),
+        core_motivations: Array.from(document.querySelectorAll('.motivation-select')).map(select => select.value).filter(value => value !== ''),
+        physical_attributes: {
+            hair_color: document.getElementById('hair-color').value,
+            eye_color: document.getElementById('eye-color').value,
+            build: document.getElementById('build').value,
+            height: document.getElementById('height').value
+        },
+        key_relationships: [],
+        genre: document.getElementById('genre-select').value,
+        genre_specific_answers: []
+    };
+    
+    // Collect genre answers
+    document.querySelectorAll('.genre-answer').forEach(select => {
+        const question = select.getAttribute('data-question');
+        const answer = select.value;
+        
+        if (question && answer) {
+            data.genre_specific_answers.push({ question, answer });
+        }
+    });
+    
+    return data;
+}
+
+// Random character generation
+async function generateRandomCharacter() {
+    const statusDiv = document.getElementById('generation-status');
+    const resultDiv = document.getElementById('generation-result');
+    
+    statusDiv.style.display = 'block';
+    resultDiv.style.display = 'none';
+    
+    try {
+        const response = await fetch(`/ui/worlds/${worldId}/api/generator/character/random`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        // Skip all steps and go to final step with random data
+        populateFormWithData(data);
+        jumpToStep(6);
+        updatePreview();
+        
+        statusDiv.style.display = 'none';
+        
+    } catch (error) {
+        console.error('Error generating random character:', error);
+        statusDiv.style.display = 'none';
+        alert('Error generating random character. Please try again.');
+    }
+}
+
+// Jump to specific step
+function jumpToStep(step) {
+    hideStep(currentStep);
+    currentStep = step;
+    showStep(currentStep);
+    updateStepIndicator();
+}
+
+// Populate form with data
+function populateFormWithData(data) {
+    document.getElementById('character-name').value = data.name || '';
+    document.getElementById('character-gender').value = data.gender || '';
+    document.getElementById('character-species').value = data.species || '';
+    document.getElementById('character-age-category').value = data.age_category || '';
+    document.getElementById('character-profession').value = data.profession || '';
+    document.getElementById('genre-select').value = data.genre || '';
+    
+    // Populate motivations
+    const motivationContainer = document.getElementById('motivation-container');
+    motivationContainer.innerHTML = '';
+    
+    if (data.core_motivations && data.core_motivations.length > 0) {
+        data.core_motivations.forEach((motivation, index) => {
+            if (index === 0) {
+                // Update the first motivation group
+                const motivationGroup = document.createElement('div');
+                motivationGroup.className = 'motivation-group mb-2';
+                motivationGroup.innerHTML = `
+                    <select class="form-select motivation-select">
+                        <option value="">Select motivation...</option>
+                        {% for motivation in core_motivations %}
+                        <option value="{{ motivation }}">{{ motivation }}</option>
+                        {% endfor %}
+                    </select>
+                `;
+                motivationContainer.appendChild(motivationGroup);
+                motivationGroup.querySelector('.motivation-select').value = motivation;
+            } else {
+                // Add additional motivations
+                addMotivation();
+                const allSelects = document.querySelectorAll('.motivation-select');
+                allSelects[allSelects.length - 1].value = motivation;
+            }
+        });
+    } else {
+        // Add default empty motivation
+        const motivationGroup = document.createElement('div');
+        motivationGroup.className = 'motivation-group mb-2';
+        motivationGroup.innerHTML = `
+            <select class="form-select motivation-select">
+                <option value="">Select primary motivation...</option>
+                {% for motivation in core_motivations %}
+                <option value="{{ motivation }}">{{ motivation }}</option>
+                {% endfor %}
+            </select>
+        `;
+        motivationContainer.appendChild(motivationGroup);
+    }
+    
+    updateMotivationUI();
+    
+    // Physical attributes
+    if (data.physical_attributes) {
+        document.getElementById('hair-color').value = data.physical_attributes.hair_color || '';
+        document.getElementById('eye-color').value = data.physical_attributes.eye_color || '';
+        document.getElementById('build').value = data.physical_attributes.build || '';
+        document.getElementById('height').value = data.physical_attributes.height || '';
+    }
+    
+    // Personality traits
+    document.querySelectorAll('input[name="personality_traits"]').forEach(cb => {
+        cb.checked = data.personality_traits && data.personality_traits.includes(cb.value);
+    });
+    
+    // Load genre questions if genre is selected
+    if (data.genre) {
+        loadGenreQuestions().then(() => {
+            // Populate genre answers
+            if (data.genre_specific_answers) {
+                data.genre_specific_answers.forEach(qa => {
+                    const select = document.querySelector(`[data-question="${qa.question}"]`);
+                    if (select) {
+                        select.value = qa.answer;
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Final character generation
+async function generateCharacter() {
+    const generateBtn = document.getElementById('generate-btn');
+    const statusDiv = document.getElementById('generation-status');
+    const resultDiv = document.getElementById('generation-result');
+    
+    generateBtn.disabled = true;
+    statusDiv.style.display = 'block';
+    resultDiv.style.display = 'none';
+    
+    const formData = collectFormData();
+    
+    try {
+        const response = await fetch(`/ui/worlds/${worldId}/api/generator/character/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        statusDiv.style.display = 'none';
+        
+        if (result.success) {
+            const character = result.character;
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-check-circle"></i> Character Generated Successfully!</h5>
+                    <p>Your character "${character.name}" has been created and added to your world.</p>
+                    
+                    <!-- Generated Content Preview -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6><i class="fas fa-wand-sparkles"></i> AI-Generated Content</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Next Quest Scenario</h6>
+                                    <p class="text-muted small">${character.next_quest_scenario || 'No quest scenario generated'}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>First Meeting Message</h6>
+                                    <p class="text-muted small fst-italic">${character.first_meeting_message || 'No greeting message generated'}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <h6>Short Backstory (50 words)</h6>
+                                    <p class="text-muted small">${character.short_backstory || 'No short backstory generated'}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Visual Prompt</h6>
+                                    <p class="text-muted small fst-italic">${character.visual_prompt || 'No visual prompt generated'}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <h6>Full Character Backstory</h6>
+                                    <p class="text-muted small">${(character.generated_narrative || character.backstory || 'No backstory generated').replace(/\\n/g, '<br>').replace(/\"/g, '')}</p>
+                                </div>
+                            </div>
+                            
+                            ${character.narrative_filter_results ? `
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <h6>Content Filter Results</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Filter Type</th>
+                                                    <th>Status</th>
+                                                    <th>Severity</th>
+                                                    <th>Detected</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="filter-results-table">
+                                                <!-- Filter results will be populated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="${result.redirect_url}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> View Character
+                        </a>
+                        <button type="button" class="btn btn-secondary ms-2" onclick="location.reload()">
+                            <i class="fas fa-plus"></i> Generate Another
+                        </button>
+                    </div>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+            
+            // Populate filter results table if needed
+            if (character.narrative_filter_results && typeof character.narrative_filter_results === 'object') {
+                const tableBody = document.getElementById('filter-results-table');
+                if (tableBody) {
+                    const filterData = character.narrative_filter_results;
+                    
+                    Object.keys(filterData).forEach(filterType => {
+                        const filter = filterData[filterType];
+                        const row = document.createElement('tr');
+                        
+                        const statusClass = filter.filtered ? 'text-danger' : 'text-success';
+                        const statusIcon = filter.filtered ? '❌' : '✅';
+                        
+                        row.innerHTML = 
+                            '<td><strong>' + filterType.charAt(0).toUpperCase() + filterType.slice(1) + '</strong></td>' +
+                            '<td class="' + statusClass + '">' + statusIcon + ' ' + (filter.filtered ? 'Filtered' : 'Passed') + '</td>' +
+                            '<td>' + (filter.severity || 'N/A') + '</td>' +
+                            '<td>' + (filter.detected !== undefined ? (filter.detected ? 'Yes' : 'No') : 'N/A') + '</td>';
+                        tableBody.appendChild(row);
+                    });
+                }
+            }
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Generation Failed</h5>
+                    <p>Error: ${result.error}</p>
+                    <button type="button" class="btn btn-primary" onclick="generateCharacter()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('Error generating character:', error);
+        statusDiv.style.display = 'none';
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle"></i> Generation Failed</h5>
+                <p>An unexpected error occurred. Please try again.</p>
+                <button type="button" class="btn btn-primary" onclick="generateCharacter()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+    } finally {
+        generateBtn.disabled = false;
+    }
+}
+</script>
+{% endblock %}

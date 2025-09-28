@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Story Editor - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">✍️ Basic Story Editor</h1>
+            <p class="help-subtitle">Master the streamlined writing experience designed for immediate creativity</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Navigation -->
+            <div class="help-navigation">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#overview">Editor Overview</a></li>
+                    <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#interface">Interface Tour</a></li>
+                    <li><a href="#writing-tools">Writing Tools</a></li>
+                    <li><a href="#ai-features">AI Features</a></li>
+                    <li><a href="#formatting">Formatting & Style</a></li>
+                    <li><a href="#organization">Story Organization</a></li>
+                    <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
+                    <li><a href="#tips">Tips & Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="closeHelpModal(); window.location.href='/ui/stories/basic/quick-start'">
+                    <div class="quick-action-icon">🚀</div>
+                    <div class="quick-action-text">Quick Start</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); window.location.href='/ui/stories/basic/new'">
+                    <div class="quick-action-icon">📝</div>
+                    <div class="quick-action-text">New Story</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[data-action=ai-assist]')?.click()">
+                    <div class="quick-action-icon">🤖</div>
+                    <div class="quick-action-text">AI Assist</div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="help-content">
+                <section id="overview" class="help-section">
+                    <h2>Editor Overview</h2>
+                    <p>The Basic Story Editor is designed for writers who want to focus purely on storytelling without the complexity of world-building. It provides a clean, distraction-free environment with powerful AI assistance to enhance your creativity.</p>
+                    
+                    <div class="info-box info-box-primary">
+                        <div class="info-box-icon">🎯</div>
+                        <div class="info-box-content">
+                            <h4>Perfect For</h4>
+                            <ul>
+                                <li>Quick story ideas and short fiction</li>
+                                <li>Personal narratives and memoirs</li>
+                                <li>First drafts and creative experiments</li>
+                                <li>Writing practice and exercises</li>
+                                <li>Stories that don't require complex world-building</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="feature-comparison">
+                        <h4>📊 Basic vs Advanced Stories</h4>
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Basic Editor</th>
+                                    <th>Advanced Editor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Setup Time</td>
+                                    <td>✅ Instant</td>
+                                    <td>⏱️ Requires world creation</td>
+                                </tr>
+                                <tr>
+                                    <td>Structure</td>
+                                    <td>✅ Simple acts/scenes</td>
+                                    <td>📚 Full story hierarchy</td>
+                                </tr>
+                                <tr>
+                                    <td>Character Management</td>
+                                    <td>📝 Inline mentions</td>
+                                    <td>🎭 Detailed character profiles</td>
+                                </tr>
+                                <tr>
+                                    <td>AI Assistance</td>
+                                    <td>✅ Text enhancement</td>
+                                    <td>🧠 World-aware suggestions</td>
+                                </tr>
+                                <tr>
+                                    <td>Publishing</td>
+                                    <td>✅ One-click sharing</td>
+                                    <td>📖 Advanced publishing options</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="getting-started" class="help-section">
+                    <h2>Getting Started</h2>
+                    <p>Begin writing your story in minutes with these simple steps:</p>
+                    
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Create a Basic Story</h4>
+                                <p>Click "Quick Start" for instant setup, or "New Basic Story" to customize your title and description.</p>
+                                <div class="code-block">
+                                    Navigation: Stories → Basic Stories → Quick Start
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Enter the Editor</h4>
+                                <p>You'll be taken directly to the writing interface with a clean, ready-to-use editor.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Start Writing</h4>
+                                <p>Begin typing your story. The editor auto-saves your progress every few seconds.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Use AI When Needed</h4>
+                                <p>Select text and use the AI toolbar for suggestions, improvements, or to overcome writer's block.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-box-success">
+                        <div class="info-box-icon">⚡</div>
+                        <div class="info-box-content">
+                            <h4>Instant Writing</h4>
+                            <p>With Quick Start, you can go from idea to first paragraph in under 30 seconds!</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="interface" class="help-section">
+                    <h2>Interface Tour</h2>
+                    <p>Understanding the editor interface helps you write more efficiently:</p>
+                    
+                    <div class="interface-tour">
+                        <div class="interface-section">
+                            <h4>📝 Main Writing Area</h4>
+                            <ul>
+                                <li><strong>Rich Text Editor:</strong> Full-featured writing environment with formatting options</li>
+                                <li><strong>Live Word Count:</strong> Real-time tracking of your progress</li>
+                                <li><strong>Auto-Save Indicator:</strong> Shows when your work is being saved</li>
+                                <li><strong>Focus Mode:</strong> Minimal distractions for concentrated writing</li>
+                            </ul>
+                        </div>
+
+                        <div class="interface-section">
+                            <h4>🎛️ Toolbar</h4>
+                            <ul>
+                                <li><strong>Formatting Tools:</strong> Bold, italic, headings, lists</li>
+                                <li><strong>AI Quick Transform:</strong> Instant text improvements</li>
+                                <li><strong>Insert Tools:</strong> Add special elements like scene breaks</li>
+                                <li><strong>View Options:</strong> Adjust editor appearance</li>
+                            </ul>
+                        </div>
+
+                        <div class="interface-section">
+                            <h4>📋 Story Information Panel</h4>
+                            <ul>
+                                <li><strong>Story Title:</strong> Editable story name</li>
+                                <li><strong>Description:</strong> Brief story summary</li>
+                                <li><strong>Metadata:</strong> Word count, creation date, last updated</li>
+                                <li><strong>Quick Actions:</strong> Save, publish, share options</li>
+                            </ul>
+                        </div>
+
+                        <div class="interface-section">
+                            <h4>🤖 AI Assistant Panel</h4>
+                            <ul>
+                                <li><strong>Writing Suggestions:</strong> Context-aware recommendations</li>
+                                <li><strong>Style Improvements:</strong> Grammar, clarity, and flow enhancements</li>
+                                <li><strong>Creative Prompts:</strong> Ideas to overcome writer's block</li>
+                                <li><strong>Format Assistance:</strong> Help with dialogue, descriptions, etc.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="writing-tools" class="help-section">
+                    <h2>Writing Tools</h2>
+                    <p>The Basic Editor includes essential tools to enhance your writing experience:</p>
+                    
+                    <div class="tool-grid">
+                        <div class="tool-card">
+                            <div class="tool-icon">📊</div>
+                            <h4>Word Count & Statistics</h4>
+                            <ul>
+                                <li>Live word count updates</li>
+                                <li>Character count (with/without spaces)</li>
+                                <li>Reading time estimates</li>
+                                <li>Progress tracking over time</li>
+                            </ul>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">💾</div>
+                            <h4>Auto-Save & Backup</h4>
+                            <ul>
+                                <li>Automatic saves every 30 seconds</li>
+                                <li>Manual save option</li>
+                                <li>Version history tracking</li>
+                                <li>Offline draft protection</li>
+                            </ul>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">🎨</div>
+                            <h4>Formatting Options</h4>
+                            <ul>
+                                <li>Basic text formatting (bold, italic)</li>
+                                <li>Heading levels for structure</li>
+                                <li>Paragraph and line spacing</li>
+                                <li>Scene break insertions</li>
+                            </ul>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">🔍</div>
+                            <h4>Find & Replace</h4>
+                            <ul>
+                                <li>Quick text search</li>
+                                <li>Replace single or all instances</li>
+                                <li>Case-sensitive options</li>
+                                <li>Regular expression support</li>
+                            </ul>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">🔄</div>
+                            <h4>Undo & Redo</h4>
+                            <ul>
+                                <li>Unlimited undo history</li>
+                                <li>Keyboard shortcuts supported</li>
+                                <li>Action-specific undo</li>
+                                <li>Draft restoration</li>
+                            </ul>
+                        </div>
+
+                        <div class="tool-card">
+                            <div class="tool-icon">📤</div>
+                            <h4>Export Options</h4>
+                            <ul>
+                                <li>Plain text export</li>
+                                <li>Markdown format</li>
+                                <li>HTML with formatting</li>
+                                <li>PDF generation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="ai-features" class="help-section">
+                    <h2>AI Features</h2>
+                    <p>Harness the power of AI to enhance your writing without overwhelming complexity:</p>
+                    
+                    <div class="ai-feature-list">
+                        <div class="ai-feature">
+                            <h4>🎯 Quick Transform</h4>
+                            <p>Select any text and use the AI toolbar for instant improvements:</p>
+                            <ul>
+                                <li><strong>Improve:</strong> Enhance clarity and flow</li>
+                                <li><strong>Expand:</strong> Add more detail and description</li>
+                                <li><strong>Summarize:</strong> Condense lengthy passages</li>
+                                <li><strong>Rephrase:</strong> Alternative ways to express ideas</li>
+                                <li><strong>Style:</strong> Adjust tone and voice</li>
+                            </ul>
+                        </div>
+
+                        <div class="ai-feature">
+                            <h4>💡 Writing Suggestions</h4>
+                            <p>Get contextual help based on your current writing:</p>
+                            <ul>
+                                <li>Dialogue improvements</li>
+                                <li>Character development ideas</li>
+                                <li>Plot progression suggestions</li>
+                                <li>Setting descriptions</li>
+                                <li>Conflict escalation</li>
+                            </ul>
+                        </div>
+
+                        <div class="ai-feature">
+                            <h4>🚀 Writer's Block Assistance</h4>
+                            <p>When you're stuck, AI can help you continue:</p>
+                            <ul>
+                                <li>Next sentence suggestions</li>
+                                <li>Plot twist ideas</li>
+                                <li>Character motivation prompts</li>
+                                <li>Scene transition help</li>
+                                <li>Ending possibilities</li>
+                            </ul>
+                        </div>
+
+                        <div class="ai-feature">
+                            <h4>✏️ Grammar & Style</h4>
+                            <p>Polish your writing with AI-powered editing:</p>
+                            <ul>
+                                <li>Grammar and spelling corrections</li>
+                                <li>Sentence structure improvements</li>
+                                <li>Consistency checks</li>
+                                <li>Readability enhancements</li>
+                                <li>Style guide adherence</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-box-warning">
+                        <div class="info-box-icon">💡</div>
+                        <div class="info-box-content">
+                            <h4>Using AI Effectively</h4>
+                            <ul>
+                                <li>Start with your own writing, then enhance with AI</li>
+                                <li>Use AI suggestions as inspiration, not replacement</li>
+                                <li>Review all AI-generated content before accepting</li>
+                                <li>Maintain your unique voice and style</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="formatting" class="help-section">
+                    <h2>Formatting & Style</h2>
+                    <p>Keep your story readable and professionally formatted:</p>
+                    
+                    <div class="formatting-guide">
+                        <div class="format-section">
+                            <h4>📝 Text Formatting</h4>
+                            <ul>
+                                <li><strong>Bold:</strong> Ctrl+B or toolbar button</li>
+                                <li><strong>Italic:</strong> Ctrl+I or toolbar button</li>
+                                <li><strong>Underline:</strong> Ctrl+U or toolbar button</li>
+                                <li><strong>Headers:</strong> Use heading styles for chapters/sections</li>
+                            </ul>
+                        </div>
+
+                        <div class="format-section">
+                            <h4>📋 Paragraph Styles</h4>
+                            <ul>
+                                <li><strong>Normal Text:</strong> Standard story content</li>
+                                <li><strong>Dialogue:</strong> Character conversations</li>
+                                <li><strong>Internal Thought:</strong> Character thoughts (often italicized)</li>
+                                <li><strong>Scene Breaks:</strong> Use *** or ### to separate scenes</li>
+                            </ul>
+                        </div>
+
+                        <div class="format-section">
+                            <h4>🎭 Dialogue Formatting</h4>
+                            <ul>
+                                <li>Use quotation marks for spoken words</li>
+                                <li>Start new paragraph for each speaker</li>
+                                <li>Include action beats between dialogue</li>
+                                <li>Maintain consistent punctuation style</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>✨ Formatting Example</h4>
+                        <div class="example-content">
+                            <p><strong>Chapter 1: The Beginning</strong></p>
+                            <p>The morning sun cast long shadows across the empty street.</p>
+                            <p>"Are you sure about this?" Sarah asked, her voice barely above a whisper.</p>
+                            <p>*This is it,* she thought to herself. *No turning back now.*</p>
+                            <p>***</p>
+                            <p>Hours later, she found herself standing at the crossroads...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="organization" class="help-section">
+                    <h2>Story Organization</h2>
+                    <p>While Basic Stories are simplified, you can still organize your content effectively:</p>
+                    
+                    <div class="organization-method">
+                        <h4>📚 Simple Structure</h4>
+                        <ul>
+                            <li><strong>Single Act:</strong> Your entire story in one document</li>
+                            <li><strong>Scenes:</strong> Use scene breaks (***) to separate major sections</li>
+                            <li><strong>Chapters:</strong> Use heading styles to mark chapter divisions</li>
+                            <li><strong>Parts:</strong> For longer works, use larger headings for major parts</li>
+                        </ul>
+                    </div>
+
+                    <div class="organization-tips">
+                        <h4>🗂️ Organization Tips</h4>
+                        <ul>
+                            <li>Start each chapter with a clear heading</li>
+                            <li>Use consistent scene break markers</li>
+                            <li>Keep related scenes together</li>
+                            <li>Consider time and location when organizing</li>
+                            <li>Use the find feature to navigate quickly</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="shortcuts" class="help-section">
+                    <h2>Keyboard Shortcuts</h2>
+                    <p>Speed up your writing with these essential keyboard shortcuts:</p>
+                    
+                    <div class="shortcut-grid">
+                        <div class="shortcut-category">
+                            <h4>📝 Text Formatting</h4>
+                            <ul>
+                                <li><kbd>Ctrl</kbd> + <kbd>B</kbd> - Bold</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>I</kbd> - Italic</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>U</kbd> - Underline</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd> - Heading</li>
+                            </ul>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>🔄 Editing</h4>
+                            <ul>
+                                <li><kbd>Ctrl</kbd> + <kbd>Z</kbd> - Undo</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>Y</kbd> - Redo</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>C</kbd> - Copy</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>V</kbd> - Paste</li>
+                            </ul>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>🔍 Navigation</h4>
+                            <ul>
+                                <li><kbd>Ctrl</kbd> + <kbd>F</kbd> - Find</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>H</kbd> - Replace</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>A</kbd> - Select All</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>G</kbd> - Go to Line</li>
+                            </ul>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>💾 File Operations</h4>
+                            <ul>
+                                <li><kbd>Ctrl</kbd> + <kbd>S</kbd> - Manual Save</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> - Save As</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Export</li>
+                                <li><kbd>F11</kbd> - Full Screen</li>
+                            </ul>
+                        </div>
+
+                        <div class="shortcut-category">
+                            <h4>🤖 AI Features</h4>
+                            <ul>
+                                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>A</kbd> - AI Assist</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>I</kbd> - Improve Text</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd> - Expand Text</li>
+                                <li><kbd>Tab</kbd> - Accept AI Suggestion</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tips" class="help-section">
+                    <h2>Tips & Best Practices</h2>
+                    
+                    <div class="tip-category">
+                        <h4>🚀 Writing Efficiently</h4>
+                        <ul>
+                            <li><strong>Start Writing First:</strong> Don't perfect the first sentence—get your ideas flowing</li>
+                            <li><strong>Use AI for Enhancement:</strong> Write your draft, then use AI to improve specific sections</li>
+                            <li><strong>Focus on Story:</strong> Don't get distracted by formatting until your first draft is complete</li>
+                            <li><strong>Set Goals:</strong> Use the word count feature to track daily writing targets</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-category">
+                        <h4>📚 Story Development</h4>
+                        <ul>
+                            <li><strong>Start Simple:</strong> Begin with a clear protagonist and conflict</li>
+                            <li><strong>Show Don't Tell:</strong> Use action and dialogue to reveal character and plot</li>
+                            <li><strong>Maintain Pace:</strong> Balance action, dialogue, and description</li>
+                            <li><strong>End Strong:</strong> Ensure your conclusion feels satisfying and complete</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-category">
+                        <h4>🤖 AI Collaboration</h4>
+                        <ul>
+                            <li><strong>Be Specific:</strong> Give AI clear context about what you want to improve</li>
+                            <li><strong>Maintain Voice:</strong> Edit AI suggestions to match your writing style</li>
+                            <li><strong>Use for Inspiration:</strong> AI suggestions can spark new ideas and directions</li>
+                            <li><strong>Review Everything:</strong> Always read and approve AI-generated content</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-category">
+                        <h4>💡 Overcoming Challenges</h4>
+                        <ul>
+                            <li><strong>Writer's Block:</strong> Use AI prompts or write about what happens next</li>
+                            <li><strong>Dialogue Issues:</strong> Read dialogue aloud to test naturalness</li>
+                            <li><strong>Pacing Problems:</strong> Use scene breaks to control story rhythm</li>
+                            <li><strong>Ending Difficulties:</strong> Work backward from your desired conclusion</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box info-box-success">
+                        <div class="info-box-icon">🏆</div>
+                        <div class="info-box-content">
+                            <h4>Success Strategy</h4>
+                            <p>The Basic Story Editor is designed for momentum. Focus on getting your story down first, then use the available tools to polish and perfect your work. Remember: every great story starts with a single sentence!</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

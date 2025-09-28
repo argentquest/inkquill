@@ -1,0 +1,5 @@
+{content_analysis}
+
+{tip_instruction}
+
+Focus on actionable advice that can be applied immediately.

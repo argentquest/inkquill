@@ -1,0 +1,34 @@
+Azure AI Foundry
+| gpt-4.1-mini-2025-04-14
+AI-generated content may be incorrect
+{
+"world": {
+"name": "The Asteroid B-612 Realm",
+"description": "This world is a poetic and introspective cosmic landscape centered around small, intimate planets scattered across the universe, populated by figures embodying deep, universal human truths. It unfolds through the perspective of a young prince journeying from his tiny home asteroid through a series of surreal and symbolic worlds. The atmosphere blends childlike wonder with mature philosophical underpinnings, marked by a tone that is simultaneously whimsical, melancholic, and deeply reflective.\n\nUnique in its minimalistic cosmic scale, the world emphasizes the significance of relationships, love, and the essence of human nature over grandiose adventures or epic battles. Each setting evokes profound allegories about the nature of adulthood, innocence, loneliness, and friendship. The tone encourages readers to look beyond appearances and rediscover the essential, entrusting imagination and heart over rationality.\n\nThe cosmos here is less about vast unknowns and more a series of intimate stages where the characters' encounters peel back layers of meaning about existence. Elements like baobabs, roses, and foxes are imbued with symbolism, transforming this universe into a metaphorical playground and moral classroom."
+},
+"characters": [
+{
+"name": "The Little Prince",
+"description": "A small, golden-haired boy who comes from Asteroid B-612, depicted in a simple, elegant style with a green tunic and a yellow scarf. He is the story's protagonist, whose innocence and sincerity contrast with the absurdities of the adult worlds he visits.",
+"personality_traits": "Innocent, Curious, Thoughtful, Compassionate, Honest, Reflective, Gentle, Lonely",
+"backstory": "The Little Prince leaves his tiny home asteroid, where he cared for a delicate rose and battled baobabs, to explore other planets and learn about life, love, and human nature through encounters with various grown-up characters.",
+"importance_rating": 5,
+"relationships": "Caretaker and friend of the Rose; student and friend to the Fox; visitor to the Narrator on Earth; observer and critic of adult characters on other planets.",
+"image_prompt_definition": "Young golden-haired boy in green tunic and yellow scarf, standing on a small asteroid with a single rose, dreamy expression"
+},
+{
+"name": "The Rose",
+"description": "A beautiful, vain, and delicate rose on the Little Prince’s asteroid, with striking red petals and a proud demeanor. She represents love and vulnerability and is central to the prince's emotional journey.",
+"personality_traits": "Proud, Fragile, Demanding, Loving, Sensitive, Elegant, Honest",
+"backstory": "The Rose grows on the Prince’s asteroid where she becomes the focus of his affection and care, yet her vanity and contradictory demands cause tension, prompting the Prince’s eventual journey.",
+"importance_rating": 5,
+"relationships": "Beloved by the Little Prince; indirectly contrasted with other characters representing love or lack thereof.",
+"image_prompt_definition": "Elegant red rose with delicate petals, resting on a tiny asteroid surface, appearing proud and fragile"
+},
+{
+"name": "The Fox",
+"description": "A russet-colored fox with a sleek body, sharp eyes, and a commanding but warm presence. He teaches the Little Prince about friendship and taming through gentle wisdom and metaphor.",
+"personality_traits": "Wise, Patient, Loyal, Thoughtful, Gentle, Playful, Insightful",
+"backstory": "The Fox lives on Earth and requests to be tamed by the Little Prince, explaining the meaning of bonds, trust, and education, which forever changes the Prince’s understanding of love and uniqueness.",
+"importance_rating": 4,
+"relationships": "Friend and teacher to the Little Prince

@@ -1,0 +1,1649 @@
+{# /ai_rag_story_app/app/templates/pages/scene_editor_ui.html #}
+{% extends "layouts/base.html" %}
+
+{% block title %}
+    Scene Editor - {{ scene.title | e if scene and scene.title else ("New Scene" if act else "Scene") }} 
+    (Act {{ act.act_number if act else 'N/A' }})
+{% endblock %}
+
+{% block styles %}
+{{ super() }} 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="{{ url_for('static', path='/css/modules/ai_quill_toolbar.css') }}" rel="stylesheet">
+<style>
+    /* Scene Editor Page - Tabler Premium Standards */
+    .scene-editor-page {
+        background: var(--tblr-bg-surface-secondary);
+        min-height: 100vh;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Hero Avatar Styling */
+    .scene-editor-page .hero-avatar {
+        background: rgba(255,255,255,0.2) !important;
+        backdrop-filter: blur(10px) !important;
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    .scene-editor-page .hero-avatar i {
+        font-size: 2.5rem !important;
+    }
+    
+    /* Hero Breadcrumb Styling */
+    .scene-editor-page .hero-breadcrumb {
+        background: rgba(255,255,255,0.1) !important;
+        backdrop-filter: blur(10px) !important;
+        border-radius: var(--tblr-border-radius) !important;
+        padding: 0.75rem 1rem !important;
+    }
+    
+    /* Page Title Styling */
+    .scene-editor-page .page-title {
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
+        text-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+        letter-spacing: -0.5px !important;
+    }
+    
+    /* Page Subtitle Styling */
+    .scene-editor-page .page-subtitle {
+        font-size: 1.1rem !important;
+        opacity: 0.8 !important;
+    }
+    
+    /* Gradient animation */
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Add pattern overlay for visual depth */
+    .scene-editor-page .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .scene-editor-page .container-fluid {
+        padding: 0 32px;
+    }
+    
+    /* Page Title and Header Text Styling */
+    .scene-editor-page .page-title {
+        font-size: var(--tblr-font-size-h2) !important;
+        font-weight: var(--tblr-font-weight-bold) !important;
+        color: white !important;
+        margin-bottom: var(--tblr-spacer-2) !important;
+        display: flex;
+        align-items: center;
+        gap: var(--tblr-spacer-2);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .scene-editor-page .page-pretitle {
+        font-size: 14px !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500 !important;
+        margin-bottom: 8px !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Breadcrumb styling on gradient background */
+    .scene-editor-page .breadcrumb {
+        background: transparent !important;
+        padding: 0 !important;
+        margin-top: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .scene-editor-page .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 600;
+    }
+    
+    .scene-editor-page .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+    
+    .scene-editor-page .breadcrumb-item a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+    
+    /* Button styling on gradient background */
+    .scene-editor-page .btn-list {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Floating Focus Mode Toggle */
+    .focus-mode-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: var(--tblr-primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .focus-mode-toggle:hover {
+        background: var(--tblr-primary-darken);
+        transform: translateY(-1px);
+    }
+    
+    /* Auto-save Indicator */
+    .auto-save-indicator {
+        position: fixed;
+        top: 80px;
+        right: 24px;
+        background: #F0FDF4;
+        color: #10B981;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid #BBF7D0;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 999;
+    }
+    
+    .auto-save-indicator.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .auto-save-indicator i {
+        margin-right: 6px;
+    }
+    
+    /* Split title into two lines */
+    .scene-editor-page .page-title-split {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .scene-editor-page .title-label {
+        font-size: 16px !important;
+        color: #64748B !important;
+        font-weight: 500 !important;
+        margin: 0 !important;
+    }
+    
+    .scene-editor-page .title-main {
+        font-size: 28px !important;
+        font-weight: 600 !important;
+        color: #0F172A !important;
+        margin: 0 !important;
+        line-height: 1.2;
+    }
+    
+    /* Context information styling */
+    .scene-editor-page .context-info {
+        font-size: 14px !important;
+        color: #94A3B8 !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .scene-editor-page .context-info a {
+        color: #6366F1 !important;
+        text-decoration: none;
+    }
+    
+    .scene-editor-page .context-info a:hover {
+        color: #4F46E5 !important;
+    }
+    
+    /* 2. Breadcrumb trail styling */
+    .scene-editor-page .breadcrumb {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 14px !important;
+    }
+    
+    .scene-editor-page .breadcrumb-item {
+        color: #94A3B8 !important;
+    }
+    
+    .scene-editor-page .breadcrumb-item a {
+        color: #94A3B8 !important;
+        text-decoration: none;
+    }
+    
+    .scene-editor-page .breadcrumb-item a:hover {
+        color: #64748B !important;
+    }
+    
+    .scene-editor-page .breadcrumb-item.active {
+        color: #64748B !important;
+        font-weight: 500;
+    }
+    
+    .scene-editor-page .breadcrumb-item + .breadcrumb-item::before {
+        content: "›" !important;
+        color: #CBD5E1 !important;
+        font-weight: 600;
+    }
+    
+    /* 3. Enhanced Save button */
+    .scene-editor-page #save-scene-button {
+        background: var(--tblr-primary) !important;
+        color: var(--tblr-primary-fg) !important;
+        border-color: var(--tblr-primary) !important;
+        padding: var(--tblr-spacer-2) var(--tblr-spacer-4) !important;
+        min-height: 44px !important;
+        font-size: var(--tblr-font-size-base) !important;
+        font-weight: var(--tblr-font-weight-medium) !important;
+        border-radius: var(--tblr-border-radius) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--tblr-shadow-input);
+    }
+    
+    .scene-editor-page #save-scene-button:hover {
+        background: var(--tblr-primary-darken) !important;
+        border-color: var(--tblr-primary-darken) !important;
+        transform: translateY(-1px);
+        box-shadow: var(--tblr-shadow-card);
+    }
+    
+    /* Auto-save indicator */
+    .scene-editor-page .auto-save-indicator {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 12px;
+        font-size: 14px;
+        color: #10B981;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .scene-editor-page .auto-save-indicator.show {
+        opacity: 1;
+    }
+    
+    .scene-editor-page .auto-save-indicator.saving {
+        color: #F59E0B;
+    }
+    
+    /* 4. Enhanced Focus Mode Toggle */
+    .scene-editor-page .focus-mode-toggle {
+        background: var(--tblr-bg-surface-secondary) !important;
+        color: var(--tblr-body-color) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        padding: var(--tblr-spacer-2) var(--tblr-spacer-3) !important;
+        min-height: 44px !important;
+        border-radius: var(--tblr-border-radius) !important;
+        margin-right: var(--tblr-spacer-2);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--tblr-shadow-input);
+    }
+    
+    .scene-editor-page .focus-mode-toggle:hover {
+        background: var(--tblr-bg-surface) !important;
+        border-color: var(--tblr-border-color-dark) !important;
+        color: var(--tblr-body-color) !important;
+        box-shadow: var(--tblr-shadow-card);
+    }
+    
+    .scene-editor-page .focus-mode-toggle.active {
+        background: var(--tblr-primary) !important;
+        color: var(--tblr-primary-fg) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    /* 5. Main Layout Container */
+    .scene-editor-page .editor-layout-container {
+        display: flex;
+        gap: 20px;
+        padding: 24px 32px;
+        height: calc(100vh - 120px);
+        min-height: 600px;
+        position: relative;
+    }
+    
+    .scene-editor-page.focus-mode .editor-layout-container {
+        gap: 0;
+    }
+    
+    /* 6. Enhanced Editor Pane */
+    .scene-editor-page .editor-pane {
+        flex: 1;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-shadow-card);
+        border: 1px solid var(--tblr-border-color-light);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        margin-right: var(--tblr-spacer-3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .scene-editor-page .editor-pane:hover {
+        box-shadow: var(--tblr-shadow-card-hover);
+        border-color: var(--tblr-border-color);
+    }
+    
+    .scene-editor-page.focus-mode .editor-pane {
+        margin-right: 0;
+    }
+    
+    /* 7. Quill Toolbar Enhancement */
+    .scene-editor-page .ql-toolbar {
+        background: #F8FAFC !important;
+        padding: 12px 20px !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .scene-editor-page .ql-toolbar .ql-formats {
+        margin-right: 16px;
+    }
+    
+    .scene-editor-page .ql-toolbar button,
+    .scene-editor-page .ql-toolbar .ql-picker {
+        min-width: 40px !important;
+        height: 40px !important;
+        margin-right: 4px !important;
+        border-radius: 6px !important;
+        background: transparent !important;
+        transition: all 0.2s ease !important;
+        border: none !important;
+        font-size: 18px !important;
+    }
+    
+    .scene-editor-page .ql-toolbar button:hover,
+    .scene-editor-page .ql-toolbar .ql-picker:hover {
+        background: #E2E8F0 !important;
+    }
+    
+    .scene-editor-page .ql-toolbar button.ql-active,
+    .scene-editor-page .ql-toolbar .ql-picker.ql-expanded {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* 8. Editor Text Area Enhancement */
+    .scene-editor-page .ql-editor {
+        padding: 32px 40px !important;
+        font-size: 18px !important;
+        line-height: 1.8 !important;
+        color: #1E293B !important;
+        font-family: Georgia, 'Times New Roman', serif !important;
+        min-height: calc(100vh - 300px) !important;
+        border: none !important;
+        background: #FFFFFF;
+        flex: 1;
+        overflow-y: auto;
+    }
+    
+    .scene-editor-page .ql-editor.ql-blank::before {
+        color: #94A3B8 !important;
+        font-style: italic !important;
+        font-size: 18px !important;
+    }
+    
+    .scene-editor-page .ql-editor::selection {
+        background: rgba(99, 102, 241, 0.2) !important;
+    }
+    
+    /* Optional warm background for reduced eye strain */
+    .scene-editor-page.warm-mode .ql-editor {
+        background: #FFFEF9 !important;
+        color: #334155 !important;
+    }
+    
+    /* 9. Word Count */
+    .scene-editor-page .word-count {
+        position: absolute;
+        bottom: 16px;
+        left: 40px;
+        font-size: 13px;
+        color: #94A3B8;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 4px 8px;
+        border-radius: 4px;
+        backdrop-filter: blur(8px);
+    }
+    
+    /* 10. Enhanced AI Panel */
+    .scene-editor-page .ai-pane {
+        width: 400px;
+        flex-shrink: 0;
+        background: var(--tblr-bg-surface-secondary);
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color-light);
+        padding: 0;
+        box-shadow: var(--tblr-shadow-card);
+        overflow-y: auto;
+        max-height: 100%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .scene-editor-page .ai-pane:hover {
+        box-shadow: var(--tblr-shadow-card-hover);
+        border-color: var(--tblr-border-color);
+    }
+    
+    .scene-editor-page.focus-mode .ai-pane {
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .scene-editor-page .ai-pane .card {
+        background: transparent !important;
+        border: none !important;
+        height: 100% !important;
+        border-radius: 0;
+    }
+    
+    /* 11. Tab Navigation Enhancement */
+    .scene-editor-page .ai-pane .card-header {
+        background: #FFFFFF !important;
+        padding: 4px !important;
+        border-radius: 8px 8px 0 0 !important;
+        margin: 16px 16px 0 16px !important;
+        border: none !important;
+    }
+    
+    .scene-editor-page .nav-tabs {
+        border: none !important;
+    }
+    
+    .scene-editor-page .nav-tabs .nav-link {
+        padding: 10px 20px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        border-radius: 6px !important;
+        margin-right: 4px !important;
+        background: transparent !important;
+        color: #64748B !important;
+        border: none !important;
+        transition: all 0.2s ease;
+    }
+    
+    .scene-editor-page .nav-tabs .nav-link.active {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+    }
+    
+    .scene-editor-page .nav-tabs .nav-link:hover:not(.active) {
+        background: #F1F5F9 !important;
+        color: #334155 !important;
+    }
+    
+    /* 12. AI Panel Content */
+    .scene-editor-page .tab-content {
+        padding: 24px !important;
+        background: transparent !important;
+        height: calc(100% - 80px);
+        overflow-y: auto;
+    }
+    
+    /* Section headers */
+    .scene-editor-page .form-label.fw-bold {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+        margin-bottom: 12px !important;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* Option cards for generation modes */
+    .scene-editor-page .form-check {
+        background: #FFFFFF !important;
+        padding: 16px !important;
+        border-radius: 8px !important;
+        border: 2px solid #E2E8F0 !important;
+        margin-bottom: 8px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease;
+    }
+    
+    .scene-editor-page .form-check:hover {
+        border-color: #CBD5E1 !important;
+    }
+    
+    .scene-editor-page .form-check:has(input:checked) {
+        border-color: #6366F1 !important;
+        background: #F0F4FF !important;
+    }
+    
+    /* 13. Form Elements Enhancement */
+    .scene-editor-page .form-select,
+    .scene-editor-page .form-control {
+        background: #FFFFFF !important;
+        padding: 12px 16px !important;
+        font-size: 15px !important;
+        border: 2px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        min-height: 44px !important;
+        transition: all 0.2s ease;
+    }
+    
+    .scene-editor-page .form-select:focus,
+    .scene-editor-page .form-control:focus {
+        border-color: #6366F1 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    }
+    
+    /* Prompt textarea */
+    .scene-editor-page #scene-ai-instruction {
+        background: #FFFFFF !important;
+        padding: 16px !important;
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+        border: 2px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        min-height: 120px !important;
+        resize: vertical !important;
+    }
+    
+    /* 14. Resizer Handle */
+    .scene-editor-page #editor-resizer {
+        width: 4px;
+        background: #E2E8F0;
+        cursor: col-resize;
+        transition: background 0.2s ease;
+        border-radius: 2px;
+        margin: 0 8px;
+    }
+    
+    .scene-editor-page.focus-mode #editor-resizer {
+        display: none;
+    }
+    
+    .scene-editor-page #editor-resizer:hover {
+        background: #6366F1;
+    }
+    
+    /* 15. Responsive Design */
+    @media (max-width: 1024px) {
+        .scene-editor-page .editor-layout-container {
+            flex-direction: column;
+            gap: 16px;
+            height: auto;
+            min-height: auto;
+        }
+        
+        .scene-editor-page .editor-pane {
+            margin-right: 0;
+        }
+        
+        .scene-editor-page .ai-pane {
+            width: 100%;
+            max-height: 400px;
+        }
+        
+        .scene-editor-page #editor-resizer {
+            display: none;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .scene-editor-page .container-fluid {
+            padding: 0 20px;
+        }
+        
+        .scene-editor-page .editor-layout-container {
+            padding: 16px 20px;
+        }
+        
+        .scene-editor-page .ql-editor {
+            padding: 20px !important;
+            font-size: 16px !important;
+        }
+        
+        .scene-editor-page .title-main {
+            font-size: 24px !important;
+        }
+        
+        .scene-editor-page .ai-pane {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 50vh;
+            border-radius: 16px 16px 0 0;
+            z-index: 1000;
+            transform: translateY(calc(100% - 60px));
+            transition: transform 0.3s ease;
+        }
+        
+        .scene-editor-page .ai-pane.expanded {
+            transform: translateY(0);
+        }
+        
+        .scene-editor-page .btn-toolbar {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .scene-editor-page .btn-toolbar .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    /* Legacy support for existing functionality */
+    .scene-editor-page .editor-layout-container {
+        height: auto;
+        min-height: auto;
+    }
+
+    .scene-editor-page .editor-pane,
+    .scene-editor-page .ai-pane {
+        height: auto;
+    }
+
+    .scene-editor-page .ai-pane .tab-content {
+        overflow-y: visible;
+    }
+
+    .scene-editor-page #scene-content-editor-container .ql-container.ql-snow {
+        min-height: 450px;
+    }
+    
+    /* Image Gallery Styles */
+    .scene-editor-page .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .scene-editor-page .gallery-thumbnail {
+        position: relative;
+        border: 2px solid transparent;
+        border-radius: .25rem;
+        overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+    
+    .scene-editor-page .gallery-thumbnail img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
+    
+    .scene-editor-page .gallery-thumbnail:hover {
+        border-color: var(--bs-info);
+    }
+    
+    .scene-editor-page .gallery-thumbnail.active {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 2px var(--bs-primary);
+    }
+    
+    .scene-editor-page .gallery-thumbnail .set-current-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        line-height: 1;
+    }
+    
+    .scene-editor-page .gallery-thumbnail:hover .set-current-btn {
+        opacity: 1;
+        pointer-events: all;
+    }
+    
+    /* Scene Current Image Container - Preserve Aspect Ratios */
+    .scene-image-container {
+        width: 128px;
+        max-width: 128px;
+        position: relative;
+    }
+    
+    .scene-current-image {
+        width: 100% !important;
+        height: auto !important;
+        max-width: 128px;
+        border-radius: 6px;
+        border: 1px solid var(--tblr-border-color);
+        object-fit: cover;
+    }
+    
+    /* Aspect ratio specific sizing */
+    .scene-current-image[data-aspect-ratio="16x9"] {
+        aspect-ratio: 16/9;
+        max-height: 72px; /* 128px * 9/16 */
+    }
+    
+    .scene-current-image[data-aspect-ratio="5x4"] {
+        aspect-ratio: 5/4;
+        max-height: 102px; /* 128px * 4/5 */
+    }
+    
+    .scene-current-image[data-aspect-ratio="1x1"] {
+        aspect-ratio: 1/1;
+        max-height: 128px;
+    }
+    
+    /* Fallback for unknown aspect ratios */
+    .scene-current-image:not([data-aspect-ratio]),
+    .scene-current-image[data-aspect-ratio=""] {
+        aspect-ratio: 1/1;
+        max-height: 128px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="scene-editor-page">
+
+    <!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+    <div class="page-header d-print-none">
+        <div class="container-fluid">
+            <div class="row align-items-center py-4">
+                <div class="col">
+                    <!-- Breadcrumb Navigation -->
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb mb-0 hero-breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}"><i class="fas fa-home me-1"></i>Home</a></li>
+                            {% if story and story.world %}
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=story.world.id) }}"><i class="fas fa-globe-americas me-1"></i>{{ story.world.name | e }}</a></li>
+                            {% endif %}
+                            {% if story %}
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_story_detail', story_id=story.id) }}"><i class="fas fa-book me-1"></i>{{ story.title | e }}</a></li>
+                            {% endif %}
+                            {% if act and story %}
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_act_editor', story_id=story.id, act_id=act.id) }}"><i class="fas fa-theater-masks me-1"></i>Act {{ act.act_number }}</a></li>
+                            {% endif %}
+                            <li class="breadcrumb-item active" aria-current="page"><strong>Scene {{ scene.scene_number if scene and scene.scene_number else 'New' }}</strong></li>
+                        </ol>
+                    </nav>
+                    
+                    <!-- Title Section -->
+                    <div class="text-center mb-3">
+                        <div class="d-inline-flex align-items-center mb-3">
+                            <div class="avatar avatar-xl hero-avatar">
+                                <i class="fas fa-pen-fancy"></i>
+                            </div>
+                        </div>
+                        <h1 class="page-title mb-2">
+                            {% if scene and scene.title %}
+                                {{ scene.title | e }}
+                            {% else %}
+                                New Scene
+                            {% endif %}
+                        </h1>
+                        <p class="page-subtitle mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Scene {{ scene.scene_number if scene and scene.scene_number else '1' }} in 
+                            {% if act %}Act {{ act.act_number }}: {{ act.title | e }}{% else %}Act{% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Primary Action Buttons -->
+                <div class="col-auto">
+                    <div class="d-flex justify-content-center flex-wrap gap-2">
+                        <button id="focus-mode-toggle" class="btn btn-light" type="button"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="bottom" 
+                                title="Toggle Focus Mode - Hide AI panel for distraction-free writing">
+                            <i class="fas fa-eye-slash me-2"></i>Focus Mode
+                        </button>
+                        
+                        <button id="save-scene-button" class="btn btn-light" type="button"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="bottom" 
+                                title="Save all changes to scene title, order, and content">
+                            <i class="fas fa-save me-2"></i>Save Scene
+                        </button>
+                        
+                        <button class="btn btn-warning" 
+                                onclick="openHelpModal('scene_detail')"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="bottom" 
+                                title="Get help with scene creation, editing, and AI features">
+                            <i class="fas fa-question-circle me-2"></i>Help
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Focus Mode Toggle Button -->
+    <button class="focus-mode-toggle" id="focus-mode-toggle-fixed" title="Toggle Focus Mode">
+        <i class="fas fa-expand-alt"></i> Focus
+    </button>
+
+    <!-- Auto-save Indicator -->
+    <div class="auto-save-indicator" id="auto-save-indicator">
+        <i class="fas fa-check-circle"></i>Saved
+    </div>
+
+    <!-- ... (Hidden inputs for IDs remain the same) ... -->
+    <input type="hidden" id="story-id" value="{{ story.id if story and story.id else '' }}">
+    <input type="hidden" id="act-id" value="{{ act.id if act and act.id else '' }}">
+    <input type="hidden" id="scene-id" value="{{ scene.id if scene and scene.id else '' }}">
+    <input type="hidden" id="scene-story-class-id" value="{{ scene.story_class_id if scene and scene.story_class_id else '' }}">
+    {% if current_user and current_user.id %}
+    <input type="hidden" id="current-user-id" value="{{ current_user.id }}">
+    {% endif %}
+
+    <div class="editor-layout-container" id="editor-layout-container">
+
+        <!-- Left Pane: Quill Editor for Scene -->
+        <div class="editor-pane" id="editor-pane" style="flex-basis: 60%;">
+            <!-- Writer Intent Field - Prominently displayed above editor -->
+            <div class="writer-intent-section mb-3" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px;">
+                <label for="scene_summary_prominent" class="form-label fw-bold text-primary" style="margin-bottom: 8px; font-size: 14px;">
+                    <i class="fas fa-lightbulb me-1"></i>Writer's Intent for this Scene:
+                </label>
+                <textarea class="form-control" id="scene_summary_prominent" name="scene_summary_prominent" rows="2" 
+                          placeholder="What is your vision and intent for this scene? What should happen here?" 
+                          style="resize: vertical; font-size: 14px;"
+                          oninput="syncSceneSummaryFields(this.value)">{{ scene.summary | e if scene and scene.summary else '' }}</textarea>
+                <small class="text-muted">This helps guide your writing and can be used by AI assistance.</small>
+            </div>
+            
+            <div id="scene-content-editor-container" style="position: relative;">
+                <div id="scene-content-editor"></div>
+                <!-- Word Count Indicator -->
+                <div class="word-count" id="word-count">0 words</div>
+            </div>
+            <textarea id="scene-content-hidden-textarea" name="content" style="display:none;">{{ scene.content | safe if scene and scene.content else '' }}</textarea>
+        </div>
+
+        <!-- Resizer Handle -->
+        <div id="editor-resizer"></div>
+
+        <!-- Right Pane: AI Assistant and Scene Details -->
+        <div class="ai-pane" id="ai-pane" style="flex-basis: 40%;">
+            <div class="card h-100">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="aiPaneTabs" role="tablist">
+                        <li class="nav-item" role="presentation"><button class="nav-link active" id="details-tab-scene" data-bs-toggle="tab" data-bs-target="#scene-details-pane" type="button" role="tab">Details</button></li>
+                        <li class="nav-item" role="presentation"><button class="nav-link" id="ai-assistant-tab-scene" data-bs-toggle="tab" data-bs-target="#scene-ai-assistant-pane" type="button" role="tab">AI Assistant</button></li>
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Debug</a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#scene-ai-prompt-debug-pane" type="button" role="tab">View AI Gen Prompt</button></li>
+                                <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#rag-details-pane" type="button" role="tab">RAG Details</button></li>
+                                <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#raw-ai-output-pane" type="button" role="tab">Raw AI Output</button></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content flex-grow-1" id="aiPaneTabContent">
+                    <div class="tab-pane fade p-3" id="scene-ai-assistant-pane" role="tabpanel">
+                        <div id="scene-ai-command-center" class="mb-4">
+                            <!-- Generation Mode (Restored) -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">1. Generation Mode: 
+                                    <button type="button" class="btn btn-link btn-sm p-0 ms-1" data-bs-toggle="modal" data-bs-target="#generationModeHelpModal" title="Learn about generation modes">
+                                        <i class="fas fa-question-circle text-info"></i>
+                                    </button>
+                                </label>
+                                <div class="form-check"><input class="form-check-input" type="radio" name="scene_ai_generation_mode" id="scene-mode-continue" value="Continue/Append" checked><label class="form-check-label" for="scene-mode-continue">Continue / Append</label></div>
+                                <div class="form-check"><input class="form-check-input" type="radio" name="scene_ai_generation_mode" id="scene-mode-elaborate" value="Elaborate/Expand"><label class="form-check-label" for="scene-mode-elaborate">Elaborate / Expand <small class="text-muted">(on highlighted text)</small></label></div>
+                                <div class="form-check"><input class="form-check-input" type="radio" name="scene_ai_generation_mode" id="scene-mode-rewrite" value="Rewrite"><label class="form-check-label" for="scene-mode-rewrite">Rewrite <small class="text-muted">(highlighted text)</small></label></div>
+                                <div class="form-check"><input class="form-check-input" type="radio" name="scene_ai_generation_mode" id="scene-mode-generate-new" value="Generate New"><label class="form-check-label" for="scene-mode-generate-new">Generate New <small class="text-muted">(fresh content)</small></label></div>
+                            </div>
+                            
+                            <!-- AI Model Preset (New) -->
+                            <div class="mb-3">
+                                {% with select_id='scene-ai-model-config-select', tooltip_text='Choose from multiple AI models with different capabilities and costs. Premium models offer better quality but cost more per token.', show_label=true, label_text='2. AI Model Preset', select_name='model_config_id', default_model_type='writing_assistant' %}
+                                    {% include 'partials/_ai_model_selector.html' %}
+                                {% endwith %}
+                            </div>
+
+                            <!-- Prompt Library (Restored) & Instruction -->
+                             <div class="mb-3">
+                                <label for="scene-ai-instruction" class="form-label fw-bold">3. Your Specific Instruction:</label>
+                                
+                                <!-- Prompt Type Filter -->
+                                <div class="mb-2">
+                                    <select class="form-select form-select-sm" id="scene-prompt-type-filter-dropdown" name="prompt_type_filter">
+                                        <option value="">-- All Prompt Types --</option>
+                                        <option value="GENERAL">General</option>
+                                        <option value="CHARACTER_DEVELOPMENT">Character Development</option>
+                                        <option value="DIALOGUE">Dialogue</option>
+                                        <option value="SCENE_GENERATION">Scene Generation</option>
+                                        <option value="PLOT_POINT">Plot Point</option>
+                                        <option value="WORLD_BUILDING">World Building</option>
+                                        <option value="ACT">Act</option>
+                                        <option value="STORY">Story</option>
+                                        <option value="OTHER">Other</option>
+                                        <option value="IMAGE_STYLE">Image Style</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Prompt Selection -->
+                                <div class="input-group mb-2">
+                                    <select class="form-select" id="scene-ai-personal-prompt-select" name="personal_prompt_select"><option value="">-- Select a prompt --</option></select>
+                                    <button type="button" class="btn btn-secondary" id="scene-clear-selected-personal-prompt-button" 
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                            title="Clear the selected prompt and reset the instruction field" style="display:none;">Clear</button>
+                                </div>
+                                <div id="scene-no-personal-prompts-message" class="text-muted small" style="display: none;"></div>
+                                <textarea class="form-control" id="scene-ai-instruction" rows="3" placeholder="e.g., 'Elara enters the tavern...'"></textarea>
+                            </div>
+                            <button type="button" id="scene-ai-generate-button" class="btn btn-primary w-100 mb-2"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Generate scene content using AI based on your instructions and selected mode"
+                                    style="background: var(--tblr-primary); border-color: var(--tblr-primary); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
+                                <i class="fas fa-magic me-2"></i> Generate with AI
+                            </button>
+                        </div>
+                        
+                        <!-- AI Suggestion & Metadata Area -->
+                        <div id="scene-ai-suggestion-area-container" class="mt-3"><hr><div class="mt-2 ai-followup-controls d-flex align-items-center"><button type="button" id="scene-use-ai-followup-button" class="btn btn-info btn-sm me-2" disabled
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Use the AI's suggested next instruction for continued generation">Use as Next Instruction</button><span id="scene-ai-commentary-display-area" class="flex-grow-1">AI commentary appears here...</span></div><label for="scene-ai-extracted-content-preview" class="form-label output-box-label mt-3">AI Generated Narrative:</label><div id="scene-ai-extracted-content-preview" class="output-box"></div><div class="mt-2 ai-controls"><button type="button" id="scene-incorporate-suggestion-button" class="btn btn-success btn-sm" disabled
+                                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                   title="Add the AI-generated content to your scene"><i class="fas fa-plus-circle me-1"></i>Incorporate</button><button type="button" id="scene-clear-suggestion-button" class="btn btn-secondary btn-sm" disabled
+                                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                   title="Clear the AI suggestion and start fresh"><i class="fas fa-times-circle me-1"></i>Clear</button></div><div class="mt-4">
+                            <h6 class="h6">AI Suggested Scene Metadata:</h6>
+                            <div id="scene-ai-suggested-metadata-area">
+                                <!-- Story Structure Section -->
+                                <div class="card mb-3"><div class="card-header py-2"><h6 class="mb-0"><i class="fas fa-book me-2"></i>Story Structure</h6></div><div class="card-body py-2"><div class="mb-2"><strong>Summary Points:</strong><div id="scene-ai-suggested-summary-points" class="small text-primary ms-2">N/A</div></div><div class="mb-2"><strong>Conflict Analysis:</strong><div id="scene-ai-conflict-analysis" class="small text-primary ms-2">N/A</div></div><div class="mb-2"><strong>Themes & Motifs:</strong><div id="scene-ai-themes-motifs" class="small text-primary ms-2">N/A</div></div><div class="mb-0"><strong>Foreshadowing Elements:</strong><div id="scene-ai-foreshadowing" class="small text-primary ms-2">N/A</div></div></div></div>
+                                <!-- Character & Dialogue Section --><div class="card mb-3"><div class="card-header py-2"><h6 class="mb-0"><i class="fas fa-users me-2"></i>Character & Dialogue</h6></div><div class="card-body py-2"><div class="mb-2"><strong>Character Developments:</strong><div id="scene-ai-character-developments" class="small text-primary ms-2">N/A</div></div><div class="mb-0"><strong>Dialogue Assessment:</strong><div id="scene-ai-dialogue-assessment" class="small text-primary ms-2">N/A</div></div></div></div>
+                                <!-- Pacing & Setting Section --><div class="card mb-3"><div class="card-header py-2"><h6 class="mb-0"><i class="fas fa-clock me-2"></i>Pacing & Setting</h6></div><div class="card-body py-2"><div class="mb-2"><strong>Tension & Pacing:</strong><div id="scene-ai-tension-pacing" class="small text-primary ms-2">N/A</div></div><div class="mb-0"><strong>Setting Utilization:</strong><div id="scene-ai-setting-utilization" class="small text-primary ms-2">N/A</div></div></div></div>
+                                <!-- Feedback Section --><div class="card mb-3"><div class="card-header py-2"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Feedback & Suggestions</h6></div><div class="card-body py-2"><div class="mb-2"><strong>Narrative Strengths:</strong><div id="scene-ai-narrative-strengths" class="small text-success ms-2">N/A</div></div><div class="mb-0"><strong>Improvement Suggestions:</strong><div id="scene-ai-improvement-suggestions" class="small text-warning ms-2">N/A</div></div></div></div>
+                            </div>
+                        </div></div>
+                    </div>
+                    <div class="tab-pane fade show active p-3" id="scene-details-pane" role="tabpanel">
+                        <div id="scene-details-form-fields">
+                            <div class="mb-3">
+                                <label for="scene_title_main_editor" class="form-label">
+                                    Scene Title
+                                    <i class="fas fa-question-circle ms-1 text-muted" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="The name of this scene. Make it descriptive and memorable to help you navigate your story structure. Example: 'The Knight's Challenge' or 'Midnight Confrontation'."></i>
+                                </label>
+                                <input type="text" class="form-control form-control-sm" id="scene_title_main_editor" value="{{ scene.title | e if scene and scene.title else '' }}" placeholder="Title of this Scene">
+                            </div>
+                            <div class="mb-3">
+                                <label for="scene_order_main_editor" class="form-label">
+                                    Scene Order
+                                    <i class="fas fa-question-circle ms-1 text-muted" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="The sequential position of this scene within the act. Scene 1 comes first, Scene 2 second, etc. This determines the order scenes appear in your story."></i>
+                                </label>
+                                <input type="number" class="form-control form-control-sm" id="scene_order_main_editor" value="{{ scene.scene_number if scene and scene.scene_number else '' }}" min="1" placeholder="e.g., 1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="scene_summary" class="form-label">
+                                    Writer's Summary (Optional)
+                                    <i class="fas fa-question-circle ms-1 text-muted" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="Your personal notes about this scene's purpose, character development, or plot points. This is for your reference and planning - it won't appear in the final story."></i>
+                                </label>
+                                <textarea class="form-control form-control-sm" id="scene_summary" name="scene_summary" rows="3" placeholder="Your intent and summary for this scene...">{{ scene.summary | e if scene and scene.summary else '' }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="scene_ai_summary" class="form-label">
+                                    AI Summary (Read-only)
+                                    <i class="fas fa-question-circle ms-1 text-muted" 
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="Automatically generated summary of this scene's content by AI. This field updates when you use AI assistance features and cannot be edited manually."></i>
+                                </label>
+                                <textarea class="form-control form-control-sm" id="scene_ai_summary" name="scene_ai_summary" rows="3" placeholder="AI-generated summary..." readonly style="background-color: #f8f9fa; cursor: not-allowed;">{{ scene.ai_summary | e if scene and scene.ai_summary else '' }}</textarea>
+                            </div>
+                            
+                            <!-- Image Generation Section -->
+                            <div class="mb-3">
+                                <hr class="my-3">
+                                <h6 class="mb-3"><i class="fas fa-image me-2"></i>Scene Image</h6>
+                                
+                                <!-- Current Image Display -->
+                                {% if scene and scene.current_image and scene.current_image.blob_url %}
+                                <div class="mb-3">
+                                    <label class="form-label">Current Image:</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="scene-image-container">
+                                            <img src="{{ scene.current_image.blob_url }}" alt="Scene image" class="img-thumbnail scene-current-image" 
+                                                 data-aspect-ratio="{{ scene.current_image.aspect_ratio or '1x1' }}">
+                                        </div>
+                                        <div>
+                                            <p class="mb-1 text-muted small">Generated: {{ scene.current_image.created_at.strftime('%Y-%m-%d %H:%M') if scene.current_image.created_at else 'Unknown' }}</p>
+                                            <a href="{{ scene.current_image.blob_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-external-link-alt me-1"></i>View Full Size
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                
+                                <!-- Image Prompt Field -->
+                                <div class="mb-3">
+                                    <label for="scene_image_prompt" class="form-label">
+                                        Image Description Prompt
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Describe the visual scene you want to create. Be specific about characters, setting, mood, and actions. Leave blank to automatically generate a prompt from your scene content. Example: 'A tense confrontation in a moonlit forest clearing between two armed knights'."></i>
+                                        <small class="text-muted d-block">(Leave blank to auto-generate from scene content)</small>
+                                    </label>
+                                    <textarea class="form-control form-control-sm" id="scene_image_prompt" name="scene_image_prompt" rows="3" 
+                                              placeholder="Describe the visual scene you want to generate, e.g., 'A dramatic confrontation in a moonlit forest clearing with two characters facing each other...'">{{ scene.image_prompt_definition | e if scene and scene.image_prompt_definition else '' }}</textarea>
+                                    <small class="text-muted">
+                                        Custom prompts take priority over auto-generated ones. Use descriptive language for better results.
+                                    </small>
+                                </div>
+                                
+                                <!-- Image Style Selection -->
+                                <div class="mb-3">
+                                    <label for="scene_image_style" class="form-label">
+                                        Image Style
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Choose an artistic style to enhance your generated image. Styles affect the visual appearance, mood, and artistic technique used. Popular options include realistic, fantasy art, oil painting, or cinematic styles."></i>
+                                        <small class="text-muted d-block">(Optional artistic style enhancement)</small>
+                                    </label>
+                                    <select class="form-select form-select-sm" id="scene_image_style" name="scene_image_style">
+                                        <option value="">-- Default Style --</option>
+                                    </select>
+                                    <small class="text-muted">
+                                        The selected style will enhance your image generation with specific artistic qualities.
+                                    </small>
+                                </div>
+                                
+                                <!-- Generate Image Button -->
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-primary btn-sm" id="generate-scene-image-btn" 
+                                            data-scene-id="{{ scene.id if scene and scene.id else '0' }}"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                            title="Generate a new image for this scene using AI">
+                                        <i class="fas fa-magic me-1"></i>Generate Scene Image
+                                    </button>
+                                    <div id="image-generation-status" class="mt-2" style="display: none;">
+                                        <small class="text-info">
+                                            <i class="fas fa-spinner fa-spin me-1"></i>
+                                            Generating image... This may take a few minutes.
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Image Version History -->
+                                <div class="mt-4" id="image-gallery-section" {% if not scene %}style="display: none;"{% endif %}>
+                                    <h6 class="h6">Version History</h6>
+                                    <div id="image-gallery-container" class="image-gallery">
+                                        <p class="text-muted small">Loading image versions...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade p-3" id="scene-ai-prompt-debug-pane" role="tabpanel"><pre id="scene-ai-full-prompt-preview-area">No AI generation request made yet.</pre></div>
+                    <div class="tab-pane fade p-3" id="rag-details-pane" role="tabpanel"><pre id="scene-ai-rag-context-full-details-area">No RAG context retrieved yet.</pre></div>
+                    <div class="tab-pane fade p-3" id="raw-ai-output-pane" role="tabpanel"><pre id="scene-ai-full-response-display-area">No AI generation completed yet.</pre></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Generation Mode Help Modal -->
+<div class="modal fade" id="generationModeHelpModal" tabindex="-1" aria-labelledby="generationModeHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generationModeHelpModalLabel">
+                    <i class="fas fa-magic me-2 text-primary"></i>AI Generation Modes Explained
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="fas fa-plus-circle text-success me-2"></i>Continue / Append
+                                </h6>
+                                <p class="card-text mb-0">
+                                    AI continues writing from where you left off, adding new content to the end of your existing text. 
+                                    Perfect for when you have a good start and want the AI to keep the story flowing.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-info">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="fas fa-expand-arrows-alt text-info me-2"></i>Elaborate / Expand
+                                </h6>
+                                <p class="card-text mb-0">
+                                    <strong>Requires highlighted text.</strong> AI takes your selected text and expands it with more detail, 
+                                    depth, and richness. Great for turning brief descriptions into vivid, detailed scenes.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-warning">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="fas fa-edit text-warning me-2"></i>Rewrite
+                                </h6>
+                                <p class="card-text mb-0">
+                                    <strong>Requires highlighted text.</strong> AI rewrites your selected text in a different style, 
+                                    tone, or perspective while preserving the core meaning. Useful for improving clarity or changing voice.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="fas fa-lightbulb text-success me-2"></i>Generate New
+                                </h6>
+                                <p class="card-text mb-0">
+                                    AI creates completely fresh content based on your instruction, ignoring existing text. 
+                                    Perfect for brainstorming new ideas, alternative scenes, or starting from scratch.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-light mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Tip:</strong> For "Elaborate/Expand" and "Rewrite" modes, highlight the text you want to work with before clicking Generate.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-1"></i>Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="{{ url_for('static', path='/js/scene_quill_manager.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/scene_websocket_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/scene_ai_processor.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/scene_ui_updater.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/ai_model_selector.js') }}"></script> <!-- NEW -->
+    <script src="{{ url_for('static', path='/js/scene_prompt_selector.js') }}"></script> <!-- RESTORED -->
+    <script src="{{ url_for('static', path='/js/scene_save_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/modules/ai_quill_toolbar.js') }}"></script> <!-- AI Toolbar Module -->
+    <script src="{{ url_for('static', path='/js/scene_editor_main.js') }}"></script>
+    
+    <!-- Enhanced Scene Editor Functionality -->
+    <script>
+        console.log("Scene Editor: MINIMAL TEST VERSION");
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("Scene Editor: DOMContentLoaded listener fired");
+            console.log("Scene Editor: About to call loadImageStylePrompts()");
+            loadImageStylePrompts();
+            
+            // Load image gallery on page load if scene exists
+            const sceneId = document.getElementById('scene-id')?.value;
+            if (sceneId && sceneId !== '0') {
+                fetchAndRenderGallery();
+            }
+            
+            // Setup gallery click handler
+            setupGalleryClickHandler();
+            
+            // Setup image generation button handler
+            setupImageGenerationHandler();
+        });
+        
+        // Function to load image style prompts from the prompts API
+        async function loadImageStylePrompts() {
+            const imageStyleSelect = document.getElementById('scene_image_style');
+            if (!imageStyleSelect) {
+                console.log("Scene Editor: No image style select element found.");
+                return;
+            }
+            console.log("Scene Editor: Loading image style prompts...");
+            console.log("Scene Editor: Image style select element found:", imageStyleSelect);
+
+            try {
+                const [myStylesRes, sharedStylesRes] = await Promise.all([
+                    fetch('/api/v1/prompts/my-prompts?filter_prompt_type=IMAGE_STYLE&filter_is_active=true', { credentials: 'include' }),
+                    fetch('/api/v1/prompts/shared?filter_prompt_type=IMAGE_STYLE&filter_is_active=true', { credentials: 'include' })
+                ]);
+
+                const myStyles = myStylesRes.ok ? await myStylesRes.json() : [];
+                const sharedStyles = sharedStylesRes.ok ? await sharedStylesRes.json() : [];
+                
+                console.log("Scene Editor: My styles response:", myStylesRes.status, myStyles.length || 0);
+                console.log("Scene Editor: Shared styles response:", sharedStylesRes.status, sharedStyles.length || 0);
+                
+                const combinedStyles = [];
+                const seenIds = new Set();
+                
+                myStyles.forEach(p => {
+                    if (p && p.id && !seenIds.has(p.id)) { combinedStyles.push(p); seenIds.add(p.id); }
+                });
+                sharedStyles.forEach(p => {
+                    if (p && p.id && !seenIds.has(p.id)) { combinedStyles.push(p); }
+                });
+
+                // Clear existing options except the default
+                while (imageStyleSelect.children.length > 1) {
+                    imageStyleSelect.removeChild(imageStyleSelect.lastChild);
+                }
+                
+                // Add style options sorted by title
+                console.log("Scene Editor: Combined styles count:", combinedStyles.length);
+                combinedStyles.sort((a,b) => a.title.localeCompare(b.title)).forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style.prompt_content;
+                    option.textContent = style.title;
+                    imageStyleSelect.appendChild(option);
+                    console.log("Scene Editor: Added style option:", style.title);
+                });
+
+            } catch (error) {
+                console.error("Error loading image style prompts:", error);
+                if (window.showToast) {
+                    showToast("Could not load image style prompts.", "warning");
+                }
+            }
+        }
+        
+        // Function to fetch and render the image gallery
+        async function fetchAndRenderGallery() {
+            const galleryContainer = document.getElementById('image-gallery-container');
+            const sceneId = document.getElementById('scene-id')?.value;
+            
+            if (!galleryContainer || !sceneId || sceneId === '0') return;
+            
+            galleryContainer.innerHTML = '<div class="text-muted small">Loading versions...</div>';
+            
+            try {
+                const response = await fetch(`/api/v1/scenes/${sceneId}/images`, { credentials: 'include' });
+                if (!response.ok) throw new Error('Failed to fetch image gallery.');
+                
+                const images = await response.json();
+                const currentImageContainer = document.querySelector('#scene-details-pane .img-thumbnail');
+                const currentImageSrc = currentImageContainer ? currentImageContainer.src : '';
+                
+                if (images.length > 0) {
+                    galleryContainer.innerHTML = images.map(img => {
+                        const isActive = currentImageSrc && img.url && currentImageSrc === img.url;
+                        return `
+                            <div class="gallery-thumbnail ${isActive ? 'active' : ''}" data-image-id="${img.id}">
+                                <img src="${img.url}" alt="Generated scene image version" loading="lazy">
+                                <button class="btn btn-sm btn-primary set-current-btn" title="Set as current image" ${isActive ? 'disabled' : ''}>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    galleryContainer.innerHTML = '<p class="text-muted small">No image versions found.</p>';
+                }
+            } catch (error) {
+                console.error("Error fetching image gallery:", error);
+                galleryContainer.innerHTML = '<p class="text-danger small">Could not load versions.</p>';
+            }
+        }
+        
+        // Function to update the main image display
+        function updateImageDisplay(imageUrl) {
+            // Update the current image display section
+            const imageSection = document.querySelector('#scene-details-pane .mb-3');
+            if (imageSection && imageUrl) {
+                // Find or create the current image display
+                let currentImageDiv = imageSection.querySelector('.mb-3');
+                if (!currentImageDiv || !currentImageDiv.querySelector('img')) {
+                    // Create new image display section if it doesn't exist
+                    const newImageHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">Current Image:</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="scene-image-container">
+                                    <img src="${imageUrl}" alt="Scene image" class="img-thumbnail scene-current-image" data-aspect-ratio="1x1">
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-muted small">Generated: Just now</p>
+                                    <a href="${imageUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-external-link-alt me-1"></i>View Full Size
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    // Insert after the h6 Scene Image title
+                    const titleElement = imageSection.querySelector('h6');
+                    if (titleElement) {
+                        titleElement.insertAdjacentHTML('afterend', newImageHtml);
+                    }
+                } else {
+                    // Update existing image
+                    const img = currentImageDiv.querySelector('img');
+                    const link = currentImageDiv.querySelector('a');
+                    if (img) img.src = imageUrl;
+                    if (link) link.href = imageUrl;
+                }
+            }
+        }
+        
+        // Function to handle setting current image
+        async function handleSetCurrentImage(imageId) {
+            const sceneId = document.getElementById('scene-id')?.value;
+            
+            if (!sceneId || sceneId === '0') return;
+            
+            showToast("Setting new current image...", "info");
+            
+            try {
+                const response = await fetch(`/api/v1/scenes/${sceneId}/set-current-image/${imageId}`, { 
+                    method: 'POST', 
+                    credentials: 'include' 
+                });
+                
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Failed to set current image.');
+                }
+                
+                const updatedScene = await response.json();
+                
+                if (updatedScene.image_url) {
+                    updateImageDisplay(updatedScene.image_url);
+                }
+                
+                showToast("Current image updated successfully!", "success");
+                fetchAndRenderGallery();
+                
+            } catch (error) {
+                console.error("Error setting current image:", error);
+                showToast(error.message, "error");
+            }
+        }
+        
+        // Function to setup gallery click handler
+        function setupGalleryClickHandler() {
+            const galleryContainer = document.getElementById('image-gallery-container');
+            if (galleryContainer) {
+                galleryContainer.addEventListener('click', (event) => {
+                    const setCurrentBtn = event.target.closest('.set-current-btn');
+                    if (setCurrentBtn && !setCurrentBtn.disabled) {
+                        const galleryItem = setCurrentBtn.closest('.gallery-thumbnail');
+                        const imageId = galleryItem.dataset.imageId;
+                        if (imageId) {
+                            handleSetCurrentImage(imageId);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Override window.updateImageDisplay if it exists from other scripts
+        window.updateImageDisplay = updateImageDisplay;
+        
+        // Function to save the auto-generated prompt back to the scene
+        async function savePromptToScene(sceneId, prompt) {
+            try {
+                console.log("Scene Editor: Saving auto-generated prompt to scene:", prompt);
+                const response = await fetch(`/api/v1/scenes/${sceneId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        image_prompt_definition: prompt
+                    }),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    console.log("Scene Editor: Successfully saved prompt to scene");
+                } else {
+                    console.warn("Scene Editor: Failed to save prompt to scene:", response.status);
+                }
+            } catch (error) {
+                console.warn("Scene Editor: Error saving prompt to scene:", error);
+            }
+        }
+        
+        // Function to setup image generation handler
+        function setupImageGenerationHandler() {
+            const generateImageBtn = document.getElementById('generate-scene-image-btn');
+            if (generateImageBtn) {
+                generateImageBtn.addEventListener('click', async function() {
+                    const sceneId = this.dataset.sceneId;
+                    if (!sceneId || sceneId === '0') {
+                        showToast("Scene ID not found. Please save the scene first.", "error");
+                        return;
+                    }
+                    
+                    const imagePromptTextarea = document.getElementById('scene_image_prompt');
+                    const imageStyleSelect = document.getElementById('scene_image_style');
+                    const statusDiv = document.getElementById('image-generation-status');
+                    
+                    // Update UI for loading state
+                    generateImageBtn.disabled = true;
+                    generateImageBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generating...';
+                    if (statusDiv) {
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerHTML = '<small class="text-info"><i class="fas fa-spinner fa-spin me-1"></i>Submitting image generation request...</small>';
+                    }
+                    
+                    try {
+                        // Save current image prompt to scene before generating
+                        if (imagePromptTextarea && window.SceneSaveHandler) {
+                            await window.SceneSaveHandler.saveScene();
+                        }
+                        
+                        // Get custom prompt or use empty string for auto-generation
+                        const customPrompt = imagePromptTextarea ? imagePromptTextarea.value.trim() : '';
+                        const selectedStyle = imageStyleSelect ? imageStyleSelect.value : '';
+                        
+                        const payload = {
+                            element_type: 'scene',
+                            element_id: parseInt(sceneId, 10),
+                            prompt_override: customPrompt || null,
+                            style_prompt: selectedStyle
+                        };
+                        
+                        const response = await fetch('/api/v1/generate-image/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
+                            credentials: 'include'
+                        });
+                        
+                        const result = await response.json();
+                        if (!response.ok) {
+                            throw new Error(result.detail || 'Failed to submit image generation job.');
+                        }
+                        
+                        const jobId = result.job_id;
+                        showToast("Image generation started! This may take a few minutes.", "info");
+                        
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '<small class="text-info"><i class="fas fa-hourglass-half me-1"></i>Image generation in progress... (Job ID: ' + jobId + ')</small>';
+                        }
+                        
+                        // Track this job if monitor is available
+                        if (window.imageJobMonitor) {
+                            window.imageJobMonitor.addTrackedJob(jobId, 'scene', sceneId);
+                        }
+                        
+                        // Poll for completion
+                        pollImageGenerationStatus(jobId, sceneId, customPrompt, imagePromptTextarea, statusDiv);
+                        
+                    } catch (error) {
+                        console.error("Scene image generation error:", error);
+                        showToast("Error: " + error.message, "error");
+                        
+                        // Reset button
+                        generateImageBtn.disabled = false;
+                        generateImageBtn.innerHTML = '<i class="fas fa-magic me-1"></i>Generate Scene Image';
+                        
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '<small class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Error: ' + error.message + '</small>';
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Function to poll image generation status
+        function pollImageGenerationStatus(jobId, sceneId, customPrompt, imagePromptTextarea, statusDiv) {
+            const generateImageBtn = document.getElementById('generate-scene-image-btn');
+            
+            const pollInterval = setInterval(async () => {
+                try {
+                    const statusResponse = await fetch(`/api/v1/generate-image/job/${jobId}/status`, { 
+                        credentials: 'include' 
+                    });
+                    
+                    if (statusResponse.ok) {
+                        const statusResult = await statusResponse.json();
+                        
+                        if (statusResult.state === 'COMPLETED') {
+                            clearInterval(pollInterval);
+                            showToast("Scene image generated successfully!", "success");
+                            
+                            // Reset button
+                            if (generateImageBtn) {
+                                generateImageBtn.disabled = false;
+                                generateImageBtn.innerHTML = '<i class="fas fa-magic me-1"></i>Generate Scene Image';
+                            }
+                            
+                            // Handle the completed result
+                            if (statusResult.result && statusResult.result.image_url) {
+                                // Update the current image display
+                                updateImageDisplay(statusResult.result.image_url);
+                                
+                                // Refresh the gallery
+                                fetchAndRenderGallery();
+                                
+                                // Update the prompt field if it was auto-generated or empty
+                                if (imagePromptTextarea && (!customPrompt || customPrompt === '')) {
+                                    try {
+                                        // First, check if the job result contains the prompt that was used
+                                        if (statusResult.result && statusResult.result.prompt_used) {
+                                            console.log("Scene Editor: Using prompt from job result:", statusResult.result.prompt_used);
+                                            imagePromptTextarea.value = statusResult.result.prompt_used;
+                                            
+                                            // Also save it back to the scene
+                                            await savePromptToScene(sceneId, statusResult.result.prompt_used);
+                                        } else {
+                                            // Fallback: fetch the updated scene data
+                                            console.log("Scene Editor: Fetching updated scene data for prompt...");
+                                            const sceneResponse = await fetch(`/api/v1/scenes/${sceneId}`, { 
+                                                credentials: 'include' 
+                                            });
+                                            if (sceneResponse.ok) {
+                                                const sceneData = await sceneResponse.json();
+                                                if (sceneData.image_prompt_definition) {
+                                                    console.log("Scene Editor: Updated prompt from scene data:", sceneData.image_prompt_definition);
+                                                    imagePromptTextarea.value = sceneData.image_prompt_definition;
+                                                }
+                                            }
+                                        }
+                                    } catch (fetchError) {
+                                        console.warn("Could not fetch updated scene data:", fetchError);
+                                    }
+                                }
+                                
+                                if (statusDiv) {
+                                    statusDiv.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Image generated successfully!</small>';
+                                    setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+                                }
+                            }
+                            
+                            // Remove from global tracking
+                            if (window.imageJobMonitor) {
+                                window.imageJobMonitor.removeTrackedJob(jobId);
+                            }
+                            
+                        } else if (statusResult.state === 'FAILED') {
+                            clearInterval(pollInterval);
+                            showToast("Image generation failed. Please try again.", "error");
+                            
+                            if (statusDiv) {
+                                statusDiv.innerHTML = '<small class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Image generation failed.</small>';
+                            }
+                            
+                            // Reset button
+                            if (generateImageBtn) {
+                                generateImageBtn.disabled = false;
+                                generateImageBtn.innerHTML = '<i class="fas fa-magic me-1"></i>Generate Scene Image';
+                            }
+                            
+                            // Remove from global tracking
+                            if (window.imageJobMonitor) {
+                                window.imageJobMonitor.removeTrackedJob(jobId);
+                            }
+                        }
+                    }
+                } catch (pollError) {
+                    console.warn("Error polling job status:", pollError);
+                }
+            }, 5000); // Poll every 5 seconds
+            
+            // Stop polling after 10 minutes
+            setTimeout(() => {
+                clearInterval(pollInterval);
+                if (generateImageBtn && generateImageBtn.disabled) {
+                    generateImageBtn.disabled = false;
+                    generateImageBtn.innerHTML = '<i class="fas fa-magic me-1"></i>Generate Scene Image';
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '<small class="text-warning"><i class="fas fa-clock me-1"></i>Generation taking longer than expected. Check back later.</small>';
+                    }
+                }
+            }, 600000); // 10 minutes
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Email Configuration Test - {{ app_name }}{% endblock %}
+
+{% block content %}
+{% if custom_subject and custom_message %}
+<h1>📧 {{ custom_subject }}</h1>
+
+<div class="custom-message-box">
+    {{ custom_message | replace('\n', '<br>') | safe }}
+</div>
+
+<div class="spacer"></div>
+
+<div class="info-box">
+    <h2>📧 Email Details</h2>
+    <p><strong>Sent to:</strong> {{ test_email }}</p>
+    <p><strong>From:</strong> {{ app_name }}</p>
+    <p><strong>Time:</strong> {{ "now" | strftime('%B %d, %Y at %I:%M %p') }}</p>
+</div>
+{% else %}
+<h1>🧪 Email Configuration Test</h1>
+
+<p>Congratulations! This test email was sent successfully from {{ app_name }}.</p>
+
+<div class="success-box">
+    <h2>✅ Email System Working</h2>
+    <p>If you're reading this email, it means our email notification system is properly configured and working correctly.</p>
+</div>
+
+<h2>📧 Configuration Details</h2>
+<div class="info-box">
+    <p><strong>Test Email Sent To:</strong> {{ test_email }}</p>
+    <p><strong>SMTP Server:</strong> {{ smtp_server }}</p>
+    <p><strong>SMTP Port:</strong> {{ smtp_port }}</p>
+    <p><strong>From Address:</strong> {{ smtp_username }}</p>
+    <p><strong>Test Time:</strong> {{ "now" | strftime('%B %d, %Y at %I:%M %p') }}</p>
+</div>
+
+<h2>🎯 What This Means</h2>
+<p>This successful test indicates that:</p>
+<ul>
+    <li><strong>SMTP connection is working</strong> - We can connect to the email server</li>
+    <li><strong>Authentication is successful</strong> - Credentials are correct</li>
+    <li><strong>Email delivery is functional</strong> - Messages can be sent and received</li>
+    <li><strong>Templates are rendering</strong> - HTML email formatting is working</li>
+</ul>
+
+<div class="info-box">
+    <h2>🚀 Ready for Production</h2>
+    <p>Your email notification system is now ready to send:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Welcome emails</strong> for new user registrations</li>
+        <li><strong>Password reset emails</strong> for account recovery</li>
+        <li><strong>Story completion notifications</strong> for milestones</li>
+        <li><strong>System maintenance notifications</strong> for important updates</li>
+    </ul>
+</div>
+
+<h2>⚙️ Next Steps</h2>
+<p>Now that email is working:</p>
+<ul>
+    <li><strong>Enable email notifications</strong> in your application settings</li>
+    <li><strong>Test user registration</strong> to verify welcome emails</li>
+    <li><strong>Test password reset</strong> functionality</li>
+    <li><strong>Monitor email delivery</strong> logs for any issues</li>
+</ul>
+
+<div class="text-center">
+    <a href="{{ app_url }}" class="btn btn-primary">
+        🏠 Back to {{ app_name }}
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<p>Email system test completed successfully!</p>
+<p><strong>The {{ app_name }} Development Team</strong></p>
+
+<div class="spacer"></div>
+
+<p class="text-muted">
+    <em>This is an automated test email. If you received this unexpectedly, please contact support.</em>
+</p>
+{% endif %}
+{% endblock %}

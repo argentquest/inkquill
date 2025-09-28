@@ -1,0 +1,430 @@
+{
+  "interview_id": "story_brainstorm",
+  "interview_title": "Let's brainstorm your story ideas",
+  "interview_description": "This interview helps us understand your story preferences so we can generate personalized story synopses for you",
+  "show_progress": true,
+  "questions": [
+    {
+      "id": "genre_selection",
+      "order": 1,
+      "question": "Which genres interest you the most?",
+      "subtitle": "Select up to 3 genres to focus on",
+      "purpose": "This helps us provide genre-specific tools, prompts, and story elements tailored to your interests.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards_with_tooltip",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "scifi",
+          "label": "Sci-fi",
+          "value": "scifi",
+          "tooltip": "Stories set in the future or alternate realities, featuring advanced technology, space exploration, or scientific concepts"
+        },
+        {
+          "id": "romance",
+          "label": "Romance",
+          "value": "romance",
+          "tooltip": "Stories centered on romantic relationships and emotional connections between characters"
+        },
+        {
+          "id": "fantasy",
+          "label": "Fantasy",
+          "value": "fantasy",
+          "tooltip": "Stories with magical elements, mythical creatures, and imaginary worlds beyond reality"
+        },
+        {
+          "id": "mystery",
+          "label": "Mystery",
+          "value": "mystery",
+          "tooltip": "Stories focused on solving puzzles, crimes, or unexplained events through investigation"
+        },
+        {
+          "id": "horror",
+          "label": "Horror",
+          "value": "horror",
+          "tooltip": "Stories designed to frighten, unsettle, or create suspense through supernatural or psychological elements"
+        },
+        {
+          "id": "adventure",
+          "label": "Adventure",
+          "value": "adventure",
+          "tooltip": "Action-packed stories featuring quests, exploration, and exciting challenges"
+        },
+        {
+          "id": "historical_fiction",
+          "label": "Historical Fiction",
+          "value": "historical_fiction",
+          "tooltip": "Stories set in the past that blend historical facts with fictional characters and events"
+        },
+        {
+          "id": "thriller_suspense",
+          "label": "Thriller/Suspense",
+          "value": "thriller_suspense",
+          "tooltip": "Fast-paced stories with high stakes, danger, and constant tension"
+        },
+        {
+          "id": "literary_fiction",
+          "label": "Literary Fiction",
+          "value": "literary_fiction",
+          "tooltip": "Character-driven stories focusing on theme, style, and psychological depth"
+        },
+        {
+          "id": "dystopian",
+          "label": "Dystopian",
+          "value": "dystopian",
+          "tooltip": "Stories set in imagined societies with oppressive control or post-apocalyptic settings"
+        },
+        {
+          "id": "young_adult",
+          "label": "Young Adult (YA)",
+          "value": "young_adult",
+          "tooltip": "Stories for teens and young adults, often featuring coming-of-age themes"
+        },
+        {
+          "id": "urban_fantasy",
+          "label": "Urban Fantasy",
+          "value": "urban_fantasy",
+          "tooltip": "Fantasy stories set in modern cities where magic exists alongside everyday life"
+        }
+      ]
+    },
+    {
+      "id": "story_tone",
+      "order": 2,
+      "question": "What tone are you aiming for in your story?",
+      "purpose": "This helps our AI adjust its suggestions to match your desired mood and atmosphere.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "dark_gritty",
+          "label": "Dark & gritty",
+          "value": "dark_gritty"
+        },
+        {
+          "id": "light_humorous",
+          "label": "Light & humorous",
+          "value": "light_humorous"
+        },
+        {
+          "id": "epic_grand",
+          "label": "Epic & grand",
+          "value": "epic_grand"
+        },
+        {
+          "id": "intimate_personal",
+          "label": "Intimate & personal",
+          "value": "intimate_personal"
+        },
+        {
+          "id": "mysterious_atmospheric",
+          "label": "Mysterious & atmospheric",
+          "value": "mysterious_atmospheric"
+        },
+        {
+          "id": "fast_paced_action",
+          "label": "Fast-paced & action-oriented",
+          "value": "fast_paced_action"
+        },
+        {
+          "id": "philosophical_thoughtful",
+          "label": "Philosophical & thoughtful",
+          "value": "philosophical_thoughtful"
+        },
+        {
+          "id": "romantic_emotional",
+          "label": "Romantic & emotional",
+          "value": "romantic_emotional"
+        },
+        {
+          "id": "whimsical_fantastical",
+          "label": "Whimsical & fantastical",
+          "value": "whimsical_fantastical"
+        },
+        {
+          "id": "realistic_grounded",
+          "label": "Realistic & grounded",
+          "value": "realistic_grounded"
+        }
+      ]
+    },
+    {
+      "id": "character1_role",
+      "order": 3,
+      "question": "What type of character will be central to your story?",
+      "subtitle": "Character 1",
+      "purpose": "This helps us understand the main character type you want to focus on in your story.",
+      "ui_type": "single_choice",
+      "display_type": "button_cards_with_tooltip",
+      "required": true,
+      "options": [
+        {
+          "id": "protagonist",
+          "label": "Protagonist",
+          "value": "protagonist",
+          "tooltip": "The main character whose journey we follow throughout the story"
+        },
+        {
+          "id": "antagonist",
+          "label": "Antagonist",
+          "value": "antagonist",
+          "tooltip": "The primary opposing force or villain that creates conflict for the main character"
+        },
+        {
+          "id": "anti_hero",
+          "label": "Anti-hero",
+          "value": "anti_hero",
+          "tooltip": "A flawed main character who lacks traditional heroic qualities but is still sympathetic"
+        },
+        {
+          "id": "supporting_character",
+          "label": "Supporting Character",
+          "value": "supporting_character",
+          "tooltip": "An important secondary character who helps or influences the main story"
+        },
+        {
+          "id": "ensemble_character",
+          "label": "Ensemble Character",
+          "value": "ensemble_character",
+          "tooltip": "One of multiple equally important characters in a group-focused story"
+        },
+        {
+          "id": "mentor_figure",
+          "label": "Mentor Figure",
+          "value": "mentor_figure",
+          "tooltip": "A wise character who guides and teaches the main character"
+        },
+        {
+          "id": "comic_relief",
+          "label": "Comic Relief",
+          "value": "comic_relief",
+          "tooltip": "A character who provides humor and lightens tense moments"
+        },
+        {
+          "id": "love_interest",
+          "label": "Love Interest",
+          "value": "love_interest",
+          "tooltip": "A character central to a romantic subplot or main plot"
+        }
+      ]
+    },
+    {
+      "id": "character1_name",
+      "order": 4,
+      "question": "What would you like to name this character?",
+      "subtitle": "Character 1 Name",
+      "purpose": "Give your character a name to make them feel more real and personal to your story.",
+      "ui_type": "text_input",
+      "display_type": "textarea",
+      "required": true,
+      "max_length": 100,
+      "rows": 1,
+      "placeholder": "Enter character name..."
+    },
+    {
+      "id": "character1_background",
+      "order": 5,
+      "question": "Tell us about this character's background",
+      "subtitle": "Character 1 Background",
+      "purpose": "This background information helps create story samples that feel authentic to your character.",
+      "ui_type": "text_input",
+      "display_type": "textarea",
+      "required": true,
+      "max_length": 1000,
+      "rows": 5,
+      "placeholder": "Describe their personality, history, motivations, appearance, or anything that makes them unique..."
+    },
+    {
+      "id": "character2_role",
+      "order": 6,
+      "question": "What type of character will be your second character?",
+      "subtitle": "Character 2",
+      "purpose": "This helps us understand the second main character type you want to include in your story.",
+      "ui_type": "single_choice",
+      "display_type": "button_cards_with_tooltip",
+      "required": true,
+      "options": [
+        {
+          "id": "protagonist",
+          "label": "Protagonist",
+          "value": "protagonist",
+          "tooltip": "The main character whose journey we follow throughout the story"
+        },
+        {
+          "id": "antagonist",
+          "label": "Antagonist",
+          "value": "antagonist",
+          "tooltip": "The primary opposing force or villain that creates conflict for the main character"
+        },
+        {
+          "id": "anti_hero",
+          "label": "Anti-hero",
+          "value": "anti_hero",
+          "tooltip": "A flawed main character who lacks traditional heroic qualities but is still sympathetic"
+        },
+        {
+          "id": "supporting_character",
+          "label": "Supporting Character",
+          "value": "supporting_character",
+          "tooltip": "An important secondary character who helps or influences the main story"
+        },
+        {
+          "id": "ensemble_character",
+          "label": "Ensemble Character",
+          "value": "ensemble_character",
+          "tooltip": "One of multiple equally important characters in a group-focused story"
+        },
+        {
+          "id": "mentor_figure",
+          "label": "Mentor Figure",
+          "value": "mentor_figure",
+          "tooltip": "A wise character who guides and teaches the main character"
+        },
+        {
+          "id": "comic_relief",
+          "label": "Comic Relief",
+          "value": "comic_relief",
+          "tooltip": "A character who provides humor and lightens tense moments"
+        },
+        {
+          "id": "love_interest",
+          "label": "Love Interest",
+          "value": "love_interest",
+          "tooltip": "A character central to a romantic subplot or main plot"
+        }
+      ]
+    },
+    {
+      "id": "character2_name",
+      "order": 7,
+      "question": "What would you like to name this second character?",
+      "subtitle": "Character 2 Name",
+      "purpose": "Give your second character a name to make them feel more real and personal to your story.",
+      "ui_type": "text_input",
+      "display_type": "textarea",
+      "required": true,
+      "max_length": 100,
+      "rows": 1,
+      "placeholder": "Enter character name..."
+    },
+    {
+      "id": "character2_background",
+      "order": 8,
+      "question": "Tell us about this second character's background",
+      "subtitle": "Character 2 Background",
+      "purpose": "This background information helps create story samples that feel authentic to your second character.",
+      "ui_type": "text_input",
+      "display_type": "textarea",
+      "required": true,
+      "max_length": 1000,
+      "rows": 5,
+      "placeholder": "Describe their personality, history, motivations, appearance, or anything that makes them unique..."
+    },
+    {
+      "id": "story_elements",
+      "order": 9,
+      "question": "What elements would you like to see in your story?",
+      "subtitle": "Check all that apply",
+      "purpose": "These elements help us generate diverse story synopses that include the aspects you're most interested in exploring.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "action_sequences",
+          "label": "Action sequences",
+          "value": "action_sequences"
+        },
+        {
+          "id": "romance",
+          "label": "Romance",
+          "value": "romance"
+        },
+        {
+          "id": "mystery",
+          "label": "Mystery",
+          "value": "mystery"
+        },
+        {
+          "id": "magic",
+          "label": "Magic",
+          "value": "magic"
+        },
+        {
+          "id": "technology",
+          "label": "Technology",
+          "value": "technology"
+        },
+        {
+          "id": "political_intrigue",
+          "label": "Political intrigue",
+          "value": "political_intrigue"
+        },
+        {
+          "id": "family_drama",
+          "label": "Family drama",
+          "value": "family_drama"
+        },
+        {
+          "id": "humor",
+          "label": "Humor",
+          "value": "humor"
+        },
+        {
+          "id": "dark_themes",
+          "label": "Dark themes",
+          "value": "dark_themes"
+        },
+        {
+          "id": "friendship",
+          "label": "Friendship",
+          "value": "friendship"
+        },
+        {
+          "id": "betrayal",
+          "label": "Betrayal",
+          "value": "betrayal"
+        },
+        {
+          "id": "redemption",
+          "label": "Redemption",
+          "value": "redemption"
+        },
+        {
+          "id": "coming_of_age",
+          "label": "Coming of age",
+          "value": "coming_of_age"
+        },
+        {
+          "id": "survival",
+          "label": "Survival",
+          "value": "survival"
+        },
+        {
+          "id": "exploration",
+          "label": "Exploration",
+          "value": "exploration"
+        },
+        {
+          "id": "time_travel",
+          "label": "Time travel",
+          "value": "time_travel"
+        },
+        {
+          "id": "supernatural",
+          "label": "Supernatural",
+          "value": "supernatural"
+        },
+        {
+          "id": "war_conflict",
+          "label": "War/Conflict",
+          "value": "war_conflict"
+        }
+      ]
+    }
+  ]
+}

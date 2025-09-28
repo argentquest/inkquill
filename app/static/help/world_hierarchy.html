@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Hierarchy - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">World Hierarchy</h1>
+            <p class="help-subtitle">Visual tree view of your world's structure</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"navigation\"]').click()">
+                <div class="quick-action-icon">🧭</div>
+                <div class="quick-action-text">Navigation</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"associations\"]').click()">
+                <div class="quick-action-icon">🔗</div>
+                <div class="quick-action-text">Associations</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"context-menu\"]').click()">
+                <div class="quick-action-icon">⚡</div>
+                <div class="quick-action-text">Quick Actions</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="navigation">Navigation</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="associations">Associations</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="context-menu">Context Menu</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="advanced">Advanced</button></li>
+            </ul>
+        </div>
+
+        <!-- Navigation Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="navigation">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Understanding the Hierarchy
+                </h2>
+                <p>The World Hierarchy provides a bird's-eye view of your entire world structure. It shows how stories, acts, scenes, characters, locations, and lore items connect and organize within your creative universe.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Stories</h3>
+                        <p class="feature-card-description">Top-level containers for your narratives. Each story can have multiple acts and scenes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎭 Acts & Scenes</h3>
+                        <p class="feature-card-description">Story structure elements. Acts contain scenes, providing narrative organization.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">👥 Characters</h3>
+                        <p class="feature-card-description">People and beings in your world. Can be associated with any story element.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🏰 Locations</h3>
+                        <p class="feature-card-description">Places in your world. Can have hierarchical relationships (city > building > room).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📜 Lore Items</h3>
+                        <p class="feature-card-description">World knowledge like magic systems, artifacts, history, and customs.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">First Time Navigation</h3>
+                        <span class="recipe-card-time">3 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Start by expanding story nodes to see acts and scenes</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Click on any element to view its details</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Use the search box to find specific elements quickly</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Right-click elements for context actions</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Tree View Controls</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Meaning</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>▶️</td>
+                            <td>Collapsed node</td>
+                            <td>Click to expand and show children</td>
+                        </tr>
+                        <tr>
+                            <td>▼</td>
+                            <td>Expanded node</td>
+                            <td>Click to collapse and hide children</td>
+                        </tr>
+                        <tr>
+                            <td>📄</td>
+                            <td>Leaf node</td>
+                            <td>No children available</td>
+                        </tr>
+                        <tr>
+                            <td>🔗</td>
+                            <td>Has associations</td>
+                            <td>Element has connections to other elements</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Pro Tip:</strong> Use Ctrl+Click to expand/collapse multiple levels at once, or Shift+Click to select ranges of elements.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Associations Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="associations">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Managing Element Associations
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🔗 Role-Based Association System</h3>
+                    <p class="ai-feature-description">Create meaningful connections between elements with specific roles and context. This helps AI understand relationships for better content generation.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Association Types</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>You can create associations between any elements:</p>
+                        <ul>
+                            <li><strong>Story ↔ Character:</strong> Define character roles in stories (protagonist, antagonist, mentor)</li>
+                            <li><strong>Story ↔ Location:</strong> Specify which places appear in stories and their significance</li>
+                            <li><strong>Story ↔ Lore:</strong> Connect relevant world knowledge to narratives</li>
+                            <li><strong>Act ↔ Elements:</strong> Associate elements with specific story acts</li>
+                            <li><strong>Scene ↔ Elements:</strong> Define what appears in individual scenes</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Example Character Roles:\n- Protagonist: Main character driving the story\n- Antagonist: Opposition or conflict source\n- Mentor: Guide providing wisdom\n- Love Interest: Romantic subplot\n- Comic Relief: Provides humor and levity')">Copy</button>
+                            <pre>Example Character Roles:
+- Protagonist: Main character driving the story
+- Antagonist: Opposition or conflict source  
+- Mentor: Guide providing wisdom
+- Love Interest: Romantic subplot
+- Comic Relief: Provides humor and levity</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Creating Associations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Adding Element Associations</h3>
+                                <span class="recipe-card-time">2 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Right-click on any story, act, or scene element</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Select "Manage Associations" from the context menu</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Choose the element type you want to associate</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Select specific elements and define their roles</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Add notes explaining the relationship context</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">6</div>
+                                    <div class="recipe-step-content">Save to create bidirectional connections</div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">✨</span>
+                            <div>
+                                <strong>Best Practice:</strong> Be specific with roles and notes. Instead of just "character appears in story," use "protagonist seeking revenge for family death."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Benefits of Associations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Well-defined associations help AI provide:</p>
+                        <ul>
+                            <li><strong>Context-Aware Writing:</strong> AI knows which characters are available in scenes</li>
+                            <li><strong>Consistent Characterization:</strong> Maintains character roles across scenes</li>
+                            <li><strong>Location-Appropriate Content:</strong> Suggests actions fitting the current setting</li>
+                            <li><strong>Lore Integration:</strong> Weaves relevant world knowledge into narratives</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Free Feature:</strong> Creating associations doesn't cost credits. AI benefits come when generating content.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Association Examples</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Element Type</th>
+                            <th>Role Example</th>
+                            <th>Context Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Character in Story</td>
+                            <td>Reluctant Hero</td>
+                            <td>Chosen against their will, struggles with destiny</td>
+                        </tr>
+                        <tr>
+                            <td>Location in Scene</td>
+                            <td>Conflict Setting</td>
+                            <td>Where the final confrontation takes place</td>
+                        </tr>
+                        <tr>
+                            <td>Lore in Act</td>
+                            <td>Power Source</td>
+                            <td>Ancient magic system discovered in Act 2</td>
+                        </tr>
+                        <tr>
+                            <td>Character in Scene</td>
+                            <td>Emotional Support</td>
+                            <td>Provides comfort after traumatic event</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Context Menu Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="context-menu">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Right-Click Context Actions
+                </h2>
+                <p>Right-clicking on any element in the hierarchy reveals a context menu with quick actions relevant to that element type.</p>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story Context Menu</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>View Details:</strong> Open story detail page</li>
+                            <li><strong>Edit Story:</strong> Modify story information</li>
+                            <li><strong>Add Act:</strong> Create new act in this story</li>
+                            <li><strong>Manage Associations:</strong> Connect characters, locations, lore</li>
+                            <li><strong>Generate Synopsis:</strong> AI-powered story summary</li>
+                            <li><strong>Delete Story:</strong> Remove story and all its content</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Act Context Menu</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>View/Edit Act:</strong> Open act editor with AI assistance</li>
+                            <li><strong>Add Scene:</strong> Create new scene in this act</li>
+                            <li><strong>Manage Associations:</strong> Connect elements to this act</li>
+                            <li><strong>AI Review:</strong> Get AI feedback on act structure</li>
+                            <li><strong>Move Up/Down:</strong> Reorder act within story</li>
+                            <li><strong>Duplicate Act:</strong> Create copy for alternate versions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Context Menu</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>Edit Scene:</strong> Open scene editor with AI writing assistance</li>
+                            <li><strong>Manage Associations:</strong> Define which characters/locations appear</li>
+                            <li><strong>Scene Analysis:</strong> AI breakdown of scene elements</li>
+                            <li><strong>Split Scene:</strong> Divide into multiple scenes</li>
+                            <li><strong>Merge with Next:</strong> Combine with following scene</li>
+                            <li><strong>Set as Favorite:</strong> Mark for quick access</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Element Context Menus</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Characters, Locations, and Lore Items:</strong></p>
+                        <ul>
+                            <li><strong>View Details:</strong> Open detailed element page</li>
+                            <li><strong>Quick Edit:</strong> Modify basic information inline</li>
+                            <li><strong>Generate Image:</strong> AI-powered visual creation</li>
+                            <li><strong>Expand Description:</strong> AI-enhanced details</li>
+                            <li><strong>Find Associations:</strong> Show where element is used</li>
+                            <li><strong>Add to Story:</strong> Quick association with existing stories</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Batch Operations</h2>
+                <p>Select multiple elements (Ctrl+Click or Shift+Click) to access batch operations:</p>
+                <ul>
+                    <li><strong>Bulk Associate:</strong> Connect multiple elements to a story/act/scene</li>
+                    <li><strong>Batch Export:</strong> Download selected elements as JSON/CSV</li>
+                    <li><strong>Mass Tag:</strong> Apply tags to multiple elements at once</li>
+                    <li><strong>Group Delete:</strong> Remove multiple elements (with confirmation)</li>
+                </ul>
+
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div>
+                        <strong>Caution:</strong> Batch delete operations cannot be undone. Always double-check your selection before confirming.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="advanced">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Power User Features
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Hierarchy Customization</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Customize the hierarchy view:</p>
+                        <ul>
+                            <li><strong>Filter by Type:</strong> Show only specific element types</li>
+                            <li><strong>Sort Options:</strong> Alphabetical, creation date, or custom order</li>
+                            <li><strong>Depth Limits:</strong> Control how many levels expand automatically</li>
+                            <li><strong>Color Coding:</strong> Visual indicators for completion status</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'View Settings (Gear Icon):\n- Show Associations: Toggle connection indicators\n- Compact Mode: Reduce spacing for large hierarchies\n- Auto Expand: Set default expansion depth\n- Color Scheme: Choose visual theme')">Copy</button>
+                            <pre>View Settings (Gear Icon):
+- Show Associations: Toggle connection indicators
+- Compact Mode: Reduce spacing for large hierarchies
+- Auto Expand: Set default expansion depth
+- Color Scheme: Choose visual theme</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Drag and Drop Operations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Move elements by dragging:</p>
+                        <ul>
+                            <li><strong>Reorder Scenes:</strong> Drag scenes within acts</li>
+                            <li><strong>Move Acts:</strong> Reorganize story structure</li>
+                            <li><strong>Nest Locations:</strong> Create parent-child relationships</li>
+                            <li><strong>Quick Associate:</strong> Drag elements onto stories/acts/scenes</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">✨</span>
+                            <div>
+                                <strong>Visual Feedback:</strong> Drop zones highlight when dragging compatible elements. Invalid drops are prevented automatically.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Search and Navigation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Advanced search capabilities:</p>
+                        <ul>
+                            <li><strong>Fuzzy Search:</strong> Find elements with partial/misspelled names</li>
+                            <li><strong>Property Search:</strong> Search within descriptions and notes</li>
+                            <li><strong>Association Search:</strong> Find elements by their connections</li>
+                            <li><strong>Recent Items:</strong> Quick access to recently modified elements</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Search Syntax:\nname:John - Find by exact name\ntype:character - Filter by element type\nrole:protagonist - Find by association role\ntag:important - Search by tags\nmodified:today - Recently changed items')">Copy</button>
+                            <pre>Search Syntax:
+name:John - Find by exact name
+type:character - Filter by element type
+role:protagonist - Find by association role
+tag:important - Search by tags
+modified:today - Recently changed items</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Export and Import</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Data portability options:</p>
+                        <ul>
+                            <li><strong>Selective Export:</strong> Choose specific branches of the hierarchy</li>
+                            <li><strong>Format Options:</strong> JSON, CSV, or custom formats</li>
+                            <li><strong>Include Associations:</strong> Export with relationship data</li>
+                            <li><strong>Merge Import:</strong> Combine with existing world data</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Keyboard Shortcuts</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-shortcut">F2</span></td>
+                            <td>Rename selected element</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Delete</span></td>
+                            <td>Delete selected element</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + D</span></td>
+                            <td>Duplicate selected element</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Space</span></td>
+                            <td>Expand/collapse selected node</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + F</span></td>
+                            <td>Focus search box</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + A</span></td>
+                            <td>Manage associations for selected element</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Arrow Keys</span></td>
+                            <td>Navigate tree structure</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Arrow</span></td>
+                            <td>Jump to first/last sibling</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Final Tip -->
+        <div class="final-tip">
+            <h4>🗺️ Final Tip</h4>
+            <p>The hierarchy view becomes more powerful as your world grows. Regular use of associations creates a web of connections that helps AI provide increasingly intelligent suggestions. Think of it as training your creative assistant to understand your unique world.</p>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

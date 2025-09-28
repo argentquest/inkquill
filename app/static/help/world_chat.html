@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Gallery - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">💭 AI Chat Gallery</h1>
+            <p class="help-subtitle">Explore and interact with AI-powered worlds through immersive chat experiences</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Navigation -->
+            <div class="help-navigation">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#overview">Gallery Overview</a></li>
+                    <li><a href="#browsing">Browsing Worlds</a></li>
+                    <li><a href="#starting-chat">Starting a Chat</a></li>
+                    <li><a href="#chat-features">Chat Features</a></li>
+                    <li><a href="#tips">Tips & Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="closeHelpModal(); window.location.href='/ui/chat-gallery'">
+                    <div class="quick-action-icon">🌍</div>
+                    <div class="quick-action-text">Browse Gallery</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('.filter-btn')?.click()">
+                    <div class="quick-action-icon">🔍</div>
+                    <div class="quick-action-text">Filter Worlds</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); window.location.href='/ui/worlds'">
+                    <div class="quick-action-icon">🔧</div>
+                    <div class="quick-action-text">Create World</div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="help-content">
+                <section id="overview" class="help-section">
+                    <h2>Gallery Overview</h2>
+                    <p>The AI Chat Gallery is a curated collection of interactive worlds where you can engage in immersive conversations with AI characters, explore locations, and learn about rich lore. Each world has been created by community members and offers unique experiences.</p>
+                    
+                    <div class="info-box info-box-primary">
+                        <div class="info-box-icon">💡</div>
+                        <div class="info-box-content">
+                            <h4>What You Can Do</h4>
+                            <ul>
+                                <li>Browse publicly available worlds</li>
+                                <li>Start conversations with AI characters</li>
+                                <li>Explore world locations through chat</li>
+                                <li>Learn about world lore and history</li>
+                                <li>Experience different storytelling styles</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="browsing" class="help-section">
+                    <h2>Browsing Worlds</h2>
+                    <p>The gallery presents worlds in an easy-to-browse card format with key information at a glance:</p>
+                    
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>World Cards</h4>
+                                <p>Each card displays:</p>
+                                <ul>
+                                    <li><strong>World Image:</strong> Visual representation of the world</li>
+                                    <li><strong>Title & Creator:</strong> World name and author</li>
+                                    <li><strong>Description:</strong> Brief overview of the world</li>
+                                    <li><strong>Element Count:</strong> Number of characters, locations, and lore items</li>
+                                    <li><strong>Chat Stats:</strong> Active chats and popularity indicators</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Filtering Options</h4>
+                                <p>Use filters to find worlds that interest you:</p>
+                                <ul>
+                                    <li><strong>Genre:</strong> Fantasy, Sci-Fi, Mystery, etc.</li>
+                                    <li><strong>Complexity:</strong> Simple to complex worlds</li>
+                                    <li><strong>Popularity:</strong> Most active or trending</li>
+                                    <li><strong>Element Count:</strong> Rich vs. focused worlds</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Search Function</h4>
+                                <p>Search for specific themes, settings, or creators using the search bar at the top of the gallery.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="starting-chat" class="help-section">
+                    <h2>Starting a Chat</h2>
+                    <p>Begin your interactive journey with any available world:</p>
+                    
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Select a World</h4>
+                                <p>Click on any world card that interests you or use the "Start Chat" button.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Choose Your Experience</h4>
+                                <p>Select how you want to interact:</p>
+                                <ul>
+                                    <li><strong>Character Chat:</strong> Talk directly with world characters</li>
+                                    <li><strong>Location Explorer:</strong> Visit and explore locations</li>
+                                    <li><strong>Lore Master:</strong> Learn about world history and lore</li>
+                                    <li><strong>Free Exploration:</strong> Open-ended interaction</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Set Your Preferences</h4>
+                                <p>Customize your chat experience:</p>
+                                <ul>
+                                    <li>Choose conversation style (casual, formal, narrative)</li>
+                                    <li>Set content preferences</li>
+                                    <li>Select starting scenario (if available)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="chat-features" class="help-section">
+                    <h2>Chat Features</h2>
+                    <p>Once in a chat session, you have access to powerful features:</p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎭</div>
+                            <h4>Dynamic Characters</h4>
+                            <p>AI characters respond based on their personality, background, and current situation in the world.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🗺️</div>
+                            <h4>World Navigation</h4>
+                            <p>Move between locations, meet different characters, and discover hidden areas through conversation.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📚</div>
+                            <h4>Context Awareness</h4>
+                            <p>The AI remembers your conversation history and maintains continuity throughout your session.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🎨</div>
+                            <h4>Rich Descriptions</h4>
+                            <p>Experience vivid descriptions of locations, characters, and events as you explore.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">💾</div>
+                            <h4>Save Progress</h4>
+                            <p>Save interesting conversations or bookmark specific moments to revisit later.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔄</div>
+                            <h4>Multiple Paths</h4>
+                            <p>Explore different conversation branches and see how choices affect the narrative.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-box-warning">
+                        <div class="info-box-icon">⚠️</div>
+                        <div class="info-box-content">
+                            <h4>Chat Limitations</h4>
+                            <ul>
+                                <li>Sessions may have time limits for free users</li>
+                                <li>Some worlds may have content restrictions</li>
+                                <li>Complex requests might require premium access</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tips" class="help-section">
+                    <h2>Tips & Best Practices</h2>
+                    
+                    <div class="tip-box">
+                        <h4>🎯 Getting the Most from Your Chat</h4>
+                        <ul>
+                            <li><strong>Be Specific:</strong> Ask detailed questions to get richer responses</li>
+                            <li><strong>Stay in Character:</strong> Engage with the world as if you're part of it</li>
+                            <li><strong>Explore Actively:</strong> Don't be afraid to ask about locations, items, or characters</li>
+                            <li><strong>Use Context:</strong> Reference previous conversations for deeper interactions</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>💡 Pro Tips</h4>
+                        <ul>
+                            <li><strong>Start Simple:</strong> Begin with basic questions to understand the world</li>
+                            <li><strong>Take Notes:</strong> Keep track of important information revealed in chat</li>
+                            <li><strong>Try Different Approaches:</strong> Each character may respond differently to various conversation styles</li>
+                            <li><strong>Check World Info:</strong> Review the world details before chatting for better context</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box info-box-success">
+                        <div class="info-box-icon">✨</div>
+                        <div class="info-box-content">
+                            <h4>Creating Your Own World</h4>
+                            <p>Inspired by what you see? You can create your own world and make it available in the gallery for others to explore!</p>
+                            <a href="#" onclick="closeHelpModal(); window.location.href='/ui/worlds/new'" class="btn btn-primary">Create a World</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

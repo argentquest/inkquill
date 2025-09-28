@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location List - AI Storytelling Assistanthfhg</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <!-- Header with gradient background -->
+        <div class="help-header centered">
+            <h1 class="help-title">🗺️ Location List</h1>
+            <p class="help-subtitle">Browse and orgtfhgations in your world with advanced sorting and categorization tools</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Quick Navigation -->
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#organization">Organization Tools</a></li>
+                    <li><a href="#filtering-sorting">Filtering & Sorting</a></li>
+                    <li><a href="#map-integration">Map Integration</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="window.parent.closeHelpModal(); window.parent.createNewLocation?.()">
+                    <div class="quick-action-icon">➕</div>
+                    <div class="quick-action-text">Add Location</div>
+                </div>
+                <div class="quick-action" onclick="window.parent.closeHelpModal(); window.parent.showMapView?.()">
+                    <div class="quick-action-icon">🌍</div>
+                    <div class="quick-action-text">Map View</div>
+                </div>
+                <div class="quick-action" onclick="window.parent.closeHelpModal(); window.parent.exportLocationList?.()">
+                    <div class="quick-action-icon">📥</div>
+                    <div class="quick-action-text">Export List</div>
+                </div>
+            </div>
+
+            <!-- Main Content Sections -->
+            <section id="getting-started" class="help-section">
+                <h2 class="help-section-title">Getting Started</h2>
+                <p>The Location List is your command center for managing all the places in your world, from sprawling cities to hidden dungeons.</p>
+                
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Browse Locations</div>
+                            <div class="help-step-description">View all locations in your world with thumbnail images, types, and quick descriptions.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Filter by Type</div>
+                            <div class="help-step-description">Narrow down locations by type: cities, buildings, natural areas, dungeons, and more.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Sort & Organize</div>
+                            <div class="help-step-description">Sort by importance, size, alphabetical order, or creation date to find what you need.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Use Map View</div>
+                            <div class="help-step-description">Visualize spatial relationships and geographical connections between locations.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="organization" class="help-section">
+                <h2 class="help-section-title">Organization Tools</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">Location Types</div>
+                        <div class="feature-card-description">Categorize locations as cities, buildings, natural areas, dungeons, or custom types for easy organization.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">Hierarchy Support</div>
+                        <div class="feature-card-description">Organize locations by geographical relationships: continent > country > city > district.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">Quick Search</div>
+                        <div class="feature-card-description">Find locations instantly by name, type, or any text in their description.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">Batch Operations</div>
+                        <div class="feature-card-description">Select multiple locations to edit properties, tags, or categories simultaneously.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">Custom Tags</div>
+                        <div class="feature-card-description">Add custom tags to locations for flexible organization and filtering.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">Favorites</div>
+                        <div class="feature-card-description">Mark important locations as favorites for quick access during writing sessions.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="filtering-sorting" class="help-section">
+                <h2 class="help-section-title">Filtering & Sorting</h2>
+                <p>Use powerful filtering and sorting options to quickly find the locations you need.</p>
+                
+                <h3 class="help-section-subtitle">Filter Options:</h3>
+                <ul>
+                    <li><strong>Location Type:</strong> Cities, buildings, natural areas, dungeons, etc.</li>
+                    <li><strong>Size:</strong> Small, medium, large, or massive locations</li>
+                    <li><strong>Importance:</strong> Major, minor, or background locations</li>
+                    <li><strong>Tags:</strong> Custom tags you've applied to locations</li>
+                    <li><strong>Creation Date:</strong> Recently added or older locations</li>
+                    <li><strong>Has Image:</strong> Locations with or without generated images</li>
+                </ul>
+                
+                <h3 class="help-section-subtitle">Sort Options:</h3>
+                <ul>
+                    <li><strong>Alphabetical:</strong> A-Z or Z-A by name</li>
+                    <li><strong>Creation Date:</strong> Newest first or oldest first</li>
+                    <li><strong>Last Modified:</strong> Recently updated locations</li>
+                    <li><strong>Importance:</strong> Most important locations first</li>
+                    <li><strong>Size:</strong> Largest to smallest or vice versa</li>
+                </ul>
+            </section>
+
+            <section id="map-integration" class="help-section">
+                <h2 class="help-section-title">Map Integration</h2>
+                <p>Visualize your world's geography with interactive map features that show location relationships.</p>
+                
+                <div class="help-alert help-alert-info">
+                    <div class="help-alert-icon">🗺️</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">World Map</div>
+                        <div class="help-alert-text">The map view shows spatial relationships between locations, helping you maintain geographical consistency in your world.</div>
+                    </div>
+                </div>
+                
+                <h3 class="help-section-subtitle">Map Features:</h3>
+                <ul>
+                    <li><strong>Location Markers:</strong> See all locations placed on your world map</li>
+                    <li><strong>Connection Lines:</strong> Visual links between related locations</li>
+                    <li><strong>Zoom Controls:</strong> Focus on specific regions or view the entire world</li>
+                    <li><strong>Layer Toggle:</strong> Show/hide different types of locations</li>
+                    <li><strong>Distance Measuring:</strong> Calculate distances between locations</li>
+                </ul>
+            </section>
+
+            <section id="best-practices" class="help-section">
+                <h2 class="help-section-title">Best Practices</h2>
+                
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">🏠</i>
+                        Location Hierarchy
+                    </div>
+                    <div class="help-tip-content">
+                        Establish clear relationships between locations. A tavern should belong to a city, which belongs to a region. This creates a logical world structure.
+                    </div>
+                </div>
+                
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">⚠️</i>
+                        Consistency Check
+                    </div>
+                    <div class="help-tip-content">
+                        Keep location sizes and distances realistic relative to each other. A village shouldn't be larger than a city in the same region.
+                    </div>
+                </div>
+                
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">📝</i>
+                        Naming Conventions
+                    </div>
+                    <div class="help-tip-content">
+                        Use consistent naming patterns for similar location types. This helps readers navigate your world and creates a cohesive feel.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recipe Card -->
+            <div class="recipe-card">
+                <div class="recipe-card-header">
+                    <div class="recipe-card-title">Quick Recipe: Organize Your World's Locations</div>
+                    <div class="recipe-card-time">⏱️ 15 minutes</div>
+                </div>
+                <ol class="recipe-steps">
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">1</div>
+                        <div class="recipe-step-content">Review all locations and assign appropriate types</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">2</div>
+                        <div class="recipe-step-content">Create a hierarchy: continents > countries > cities > districts</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">3</div>
+                        <div class="recipe-step-content">Add custom tags for themes (dangerous, magical, political)</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">4</div>
+                        <div class="recipe-step-content">Mark important locations as favorites</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">5</div>
+                        <div class="recipe-step-content">Use map view to check spatial relationships</div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Final tip -->
+            <div class="help-tip mb-xl">
+                <div class="help-tip-title">
+                    <i class="help-tip-icon">🎯</i>
+                    Final Tip
+                </div>
+                <div class="help-tip-content">
+                    A well-organized location list becomes a powerful reference tool during writing. Take time to set up your system properly - it will save hours later.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

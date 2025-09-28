@@ -1,0 +1,308 @@
+/* /ai_rag_story_app/app/static/css/modules/ai_quill_toolbar.css */
+
+/* AI Quill Toolbar Styles */
+.ql-toolbar .ql-ai-transform {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+}
+
+.ql-toolbar .ql-ai-transform:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.ql-toolbar .ql-ai-transform.ql-active {
+    background: var(--tblr-primary, #206bc4);
+    color: white;
+}
+
+.ql-toolbar .ql-ai-transform:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ql-toolbar .ql-ai-transform i {
+    font-size: 14px;
+}
+
+/* Operations Dropdown */
+.ai-operations-dropdown {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    min-width: 220px;
+    max-height: 320px;
+    overflow-y: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+}
+
+.ai-operations-dropdown .dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: block;
+    color: #374151;
+    text-decoration: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    background: none;
+    transition: background-color 0.15s ease;
+    line-height: 1.3;
+}
+
+.ai-operations-dropdown .dropdown-item:hover {
+    background-color: #f8fafc;
+}
+
+.ai-operations-dropdown .dropdown-item:active {
+    background-color: #e2e8f0;
+}
+
+.ai-operations-dropdown .dropdown-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--tblr-primary, #206bc4);
+}
+
+.ai-operations-dropdown .dropdown-item small {
+    color: #6b7280;
+    font-size: 0.7rem;
+    line-height: 1.1;
+    margin-top: 1px;
+    display: block;
+}
+
+/* Context Menu */
+.ai-quill-context-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+    min-width: 180px;
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+}
+
+.ai-quill-context-menu .context-menu-item {
+    padding: 7px 12px;
+    cursor: pointer;
+    display: block;
+    color: #374151;
+    transition: background-color 0.15s ease;
+    line-height: 1.3;
+}
+
+.ai-quill-context-menu .context-menu-item:hover {
+    background-color: #f8fafc;
+}
+
+.ai-quill-context-menu .context-menu-item:active {
+    background-color: #e2e8f0;
+}
+
+.ai-quill-context-menu .context-menu-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--tblr-primary, #206bc4);
+}
+
+/* Preview Modal Enhancements */
+#ai-transform-preview-modal .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+#ai-transform-preview-modal .modal-header {
+    background: linear-gradient(135deg, var(--tblr-primary, #206bc4) 0%, var(--tblr-purple, #a855f7) 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 1.5rem;
+}
+
+#ai-transform-preview-modal .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+#ai-transform-preview-modal .modal-body {
+    padding: 2rem;
+}
+
+#ai-transform-preview-modal .modal-body h6 {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#ai-transform-preview-modal #original-text-preview,
+#ai-transform-preview-modal #transformed-text-preview {
+    min-height: 120px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#ai-transform-preview-modal #original-text-preview {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+#ai-transform-preview-modal #transformed-text-preview {
+    background-color: #f0fdf4 !important;
+    border-color: #bbf7d0 !important;
+}
+
+#ai-transform-preview-modal .alert {
+    border-radius: 8px;
+    border: none;
+}
+
+#ai-transform-preview-modal .modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+#ai-transform-preview-modal .modal-footer .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+/* Loading States */
+.ai-quill-toolbar-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.ai-quill-toolbar-loading .ql-ai-transform {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ai-operations-dropdown {
+        min-width: 200px;
+        max-height: 280px;
+    }
+    
+    .ai-operations-dropdown .dropdown-item {
+        padding: 7px 10px;
+    }
+    
+    .ai-quill-context-menu {
+        min-width: 160px;
+    }
+    
+    .ai-quill-context-menu .context-menu-item {
+        padding: 6px 10px;
+    }
+    
+    #ai-transform-preview-modal .modal-body {
+        padding: 1.5rem;
+    }
+    
+    #ai-transform-preview-modal .modal-body .row {
+        margin: 0;
+    }
+    
+    #ai-transform-preview-modal .modal-body .col-md-6 {
+        padding: 0 0 1rem 0;
+    }
+    
+    #ai-transform-preview-modal .modal-body .col-md-6:last-child {
+        padding-bottom: 0;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .ai-operations-dropdown,
+    .ai-quill-context-menu {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+    
+    .ai-operations-dropdown .dropdown-item,
+    .ai-quill-context-menu .context-menu-item {
+        color: #f9fafb;
+    }
+    
+    .ai-operations-dropdown .dropdown-item:hover,
+    .ai-quill-context-menu .context-menu-item:hover {
+        background-color: #374151;
+    }
+    
+    .ai-operations-dropdown .dropdown-item small {
+        color: #9ca3af;
+    }
+    
+    #ai-transform-preview-modal #original-text-preview {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #f9fafb;
+    }
+    
+    #ai-transform-preview-modal #transformed-text-preview {
+        background-color: #065f46 !important;
+        border-color: #047857 !important;
+        color: #f9fafb;
+    }
+}
+
+/* Accessibility */
+.ai-operations-dropdown .dropdown-item:focus,
+.ai-quill-context-menu .context-menu-item:focus {
+    outline: 2px solid var(--tblr-primary, #206bc4);
+    outline-offset: -2px;
+}
+
+.ql-toolbar .ql-ai-transform:focus {
+    outline: 2px solid var(--tblr-primary, #206bc4);
+    outline-offset: 2px;
+}
+
+/* Animation for dropdown appearance */
+.ai-operations-dropdown {
+    animation: fadeInDown 0.2s ease-out;
+}
+
+.ai-quill-context-menu {
+    animation: fadeInDown 0.15s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PAGE_TITLE}} - AI Storytelling Assistant</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <!-- Header with gradient background -->
+        <div class="help-header centered">
+            <h1 class="help-title">{{HEADER_ICON}} {{PAGE_TITLE}}</h1>
+            <p class="help-subtitle">{{PAGE_SUBTITLE}}</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Optional: Quick Navigation -->
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#section1">Section 1</a></li>
+                    <li><a href="#section2">Section 2</a></li>
+                    <li><a href="#section3">Section 3</a></li>
+                </ul>
+            </div>
+
+            <!-- Optional: Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="scrollToSection('getting-started')">
+                    <div class="quick-action-icon">🌟</div>
+                    <div class="quick-action-text">Getting Started</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('features')">
+                    <div class="quick-action-icon">⚙️</div>
+                    <div class="quick-action-text">Features</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('advanced')">
+                    <div class="quick-action-icon">🚀</div>
+                    <div class="quick-action-text">Advanced</div>
+                </div>
+            </div>
+
+            <!-- Main Content Sections -->
+            <section id="section1" class="help-section">
+                <h2 class="help-section-title">Section Title</h2>
+                <p>Section content goes here...</p>
+                
+                <h3 class="help-section-subtitle">Subsection Title</h3>
+                <p>Subsection content...</p>
+                
+                <!-- Example Alert -->
+                <div class="help-alert help-alert-info">
+                    <div class="help-alert-icon">ℹ️</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">Information</div>
+                        <div class="help-alert-text">This is an informational alert.</div>
+                    </div>
+                </div>
+                
+                <!-- Example Tip -->
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">💡</i>
+                        Pro Tip
+                    </div>
+                    <div class="help-tip-content">
+                        This is a helpful tip for users.
+                    </div>
+                </div>
+            </section>
+
+            <section id="section2" class="help-section">
+                <h2 class="help-section-title">Another Section</h2>
+                
+                <!-- Example Steps -->
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Step Title</div>
+                            <div class="help-step-description">Step description goes here.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Another Step</div>
+                            <div class="help-step-description">Another step description.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example Feature Grid -->
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">Feature Name</div>
+                        <div class="feature-card-description">Description of the feature and how it helps users.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">Another Feature</div>
+                        <div class="feature-card-description">Description of another feature.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Example Recipe Card -->
+            <div class="recipe-card">
+                <div class="recipe-card-header">
+                    <div class="recipe-card-title">Quick Recipe: Create Your First World</div>
+                    <div class="recipe-card-time">⏱️ 5 minutes</div>
+                </div>
+                <ol class="recipe-steps">
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">1</div>
+                        <div class="recipe-step-content">Go to "My Worlds" and click "Create New World"</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">2</div>
+                        <div class="recipe-step-content">Enter a name and description for your universe</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">3</div>
+                        <div class="recipe-step-content">Start adding characters, locations, and lore items</div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Final tip -->
+            <div class="help-tip mb-xl">
+                <div class="help-tip-title">
+                    <i class="help-tip-icon">🎯</i>
+                    Final Tip
+                </div>
+                <div class="help-tip-content">
+                    Remember to save your work frequently and experiment with different AI instructions to find what works best for your writing style.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

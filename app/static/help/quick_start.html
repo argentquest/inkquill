@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start Guide - AI Storytelling Assistant</title>
+    <link rel="stylesheet" href="help-styles.css">
+    <style>
+        /* Path Comparison Styling */
+        .path-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 24px 0;
+        }
+        
+        .path-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 24px;
+            background: #f9f9f9;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .path-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .path-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .path-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .path-time {
+            font-size: 14px;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .path-features {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+        
+        .path-features li {
+            padding: 4px 0;
+            font-size: 15px;
+        }
+        
+        .path-action {
+            margin-top: 20px;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .basic-path {
+            border-color: #28a745;
+        }
+        
+        .advanced-path {
+            border-color: #007bff;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .path-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header centered">
+            <h1 class="help-title">🚀 Quick Start Guide</h1>
+            <p class="help-subtitle">Choose your path: Basic Stories for instant writing or Advanced Stories for world-building</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Quick Navigation -->
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#choose-path">Choose Your Path</a></li>
+                    <li><a href="#basic-path">Basic Story Path</a></li>
+                    <li><a href="#advanced-path">Advanced Story Path</a></li>
+                    <li><a href="#tips">Pro Tips</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="scrollToSection('basic-path')">
+                    <div class="quick-action-icon">🏃</div>
+                    <div class="quick-action-text">Basic Story (2 min)</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('advanced-path')">
+                    <div class="quick-action-icon">🌍</div>
+                    <div class="quick-action-text">Advanced Story (30 min)</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('tips')">
+                    <div class="quick-action-icon">💡</div>
+                    <div class="quick-action-text">Pro Tips</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('choose-path')">
+                    <div class="quick-action-icon">🔀</div>
+                    <div class="quick-action-text">Compare Paths</div>
+                </div>
+            </div>
+
+            <div class="help-alert help-alert-success">
+                <div class="help-alert-icon">🚀</div>
+                <div class="help-alert-content">
+                    <div class="help-alert-title">Welcome!</div>
+                    <div class="help-alert-text">Choose your path: Basic Stories for instant writing (2 minutes) or Advanced Stories for world-building (30 minutes).</div>
+                </div>
+            </div>
+
+            <section id="choose-path" class="help-section">
+                <h2 class="help-section-title">Choose Your Story Path</h2>
+                
+                <div class="path-comparison">
+                    <div class="path-card basic-path">
+                        <div class="path-header">
+                            <h3><span class="badge badge-success">Basic Story</span></h3>
+                            <div class="path-time">⏱️ 2 minutes</div>
+                        </div>
+                        <div class="path-content">
+                            <p><strong>Perfect for:</strong> New writers, quick ideas, focused writing</p>
+                            <ul class="path-features">
+                                <li>✅ Instant story creation</li>
+                                <li>✅ No world-building required</li>
+                                <li>✅ AI writing assistance</li>
+                                <li>✅ Start writing immediately</li>
+                                <li>✅ Upgrade to Advanced anytime</li>
+                            </ul>
+                            <div class="path-action">
+                                <a href="#basic-path" class="help-action-button">🏃 Start Basic Story</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="path-card advanced-path">
+                        <div class="path-header">
+                            <h3><span class="badge badge-primary">Advanced Story</span></h3>
+                            <div class="path-time">⏱️ 30 minutes</div>
+                        </div>
+                        <div class="path-content">
+                            <p><strong>Perfect for:</strong> Complex narratives, series, detailed worlds</p>
+                            <ul class="path-features">
+                                <li>✅ Full world-building tools</li>
+                                <li>✅ Character development</li>
+                                <li>✅ Location management</li>
+                                <li>✅ Lore & mythology</li>
+                                <li>✅ World-aware AI assistance</li>
+                            </ul>
+                            <div class="path-action">
+                                <a href="#advanced-path" class="help-action-button">🌍 Start Advanced Story</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="basic-path" class="help-section">
+                <h2 class="help-section-title"><span class="badge badge-success">Basic Story</span> Quick Start (2 Minutes)</h2>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">🏃 Basic Story Process</div>
+                        <div class="recipe-card-time">⏱️ 2 minutes</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Click "Start Writing":</strong> Find the prominent "Start Writing" button on the home page
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Enter Title & Description:</strong> Just the basics - "My Adventure" and a brief description
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Start Writing:</strong> You're automatically taken to Act 1 - begin writing your story
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Use AI Help:</strong> Get writing assistance focused on craft and storytelling
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">💡</i>
+                        Basic Story Benefits
+                    </div>
+                    <div class="help-tip-content">
+                        <strong>No complexity:</strong> Focus purely on writing without world-building overhead<br>
+                        <strong>AI assistance:</strong> Get help with pacing, dialogue, and story structure<br>
+                        <strong>Upgrade path:</strong> Add world-building features when you're ready
+                    </div>
+                </div>
+                
+                <div class="help-actions mt-lg">
+                    <a href="/" class="help-action-button">
+                        🚀 Start Writing Now
+                    </a>
+                    <a href="/help/basic_story/basic_story_creation.html" class="help-action-button-secondary">
+                        📚 Learn More
+                    </a>
+                </div>
+            </section>
+
+            <section id="advanced-path" class="help-section">
+                <h2 class="help-section-title"><span class="badge badge-primary">Advanced Story</span> Full Setup (30 Minutes)</h2>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">🌍 Advanced Story Process</div>
+                        <div class="recipe-card-time">⏱️ 30 minutes</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Create Your World:</strong> Go to "My Worlds" and create or import a world (e.g., "Wonderland")
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Add Characters:</strong> Create main characters with personalities and backgrounds
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Build Locations:</strong> Add key locations where your story takes place
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Start Advanced Story:</strong> Create story and link it to your world
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">
+                                <strong>Write with Context:</strong> AI knows your characters, locations, and world details
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">🎯</i>
+                        Advanced Story Benefits
+                    </div>
+                    <div class="help-tip-content">
+                        <strong>World-aware AI:</strong> AI knows your characters, locations, and lore<br>
+                        <strong>Consistency:</strong> AI helps maintain world consistency across scenes<br>
+                        <strong>Rich context:</strong> Characters act according to their established personalities
+                    </div>
+                </div>
+                
+                <div class="help-actions mt-lg">
+                    <a href="/ui/worlds" class="help-action-button">
+                        🌍 Create World
+                    </a>
+                    <a href="/ui/generator/world" class="help-action-button-secondary">
+                        ✨ World Builder Wizard
+                    </a>
+                </div>
+            </section>
+
+            <section id="detailed-steps" class="help-section">
+                <h2 class="help-section-title">Detailed Step-by-Step Instructions</h2>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">🌍 Step 1: World Creation - Detailed</div>
+                        <div class="recipe-card-time">⏱️ 5-10 minutes</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Navigate to Worlds:</strong> Click "My Worlds" in the sidebar navigation
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Choose Import Method:</strong> Click "Import from Book" button
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Enter Book Title:</strong> Type "Alice's Adventures in Wonderland" in the text field
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Wait for Processing:</strong> The AI will analyze the book and extract world elements (2-3 minutes)
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">
+                                <strong>Review Results:</strong> Check the generated characters, locations, and lore items
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="recipe-card mt-lg">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">📖 Step 2: Story Creation - Detailed</div>
+                        <div class="recipe-card-time">⏱️ 3-5 minutes</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Navigate to Stories:</strong> Click "My Stories" in the sidebar
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Start Creation:</strong> Click "Create New Story" button
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Fill Basic Info:</strong> Enter story title, description, and target audience
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Link Your World:</strong> <em>Most Important!</em> Select "Wonderland" from the world dropdown
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">
+                                <strong>Create Initial Structure:</strong> Add your first Act with a descriptive name
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="troubleshooting" class="help-section">
+                <h2 class="help-section-title">Troubleshooting Common Issues</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">🚫 World Import Issues</div>
+                        <div class="feature-card-description">
+                            <strong>Problem:</strong> "Import from Book" doesn't work or takes too long<br><br>
+                            <strong>Solutions:</strong>
+                            <ul>
+                                <li>Try a different public domain book title</li>
+                                <li>Use "World Builder Wizard" instead for AI-guided creation</li>
+                                <li>Create a manual world and add elements one by one</li>
+                                <li>Check your internet connection and try again</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🔗 Story-World Linking Issues</div>
+                        <div class="feature-card-description">
+                            <strong>Problem:</strong> AI doesn't seem to know about my world elements<br><br>
+                            <strong>Solutions:</strong>
+                            <ul>
+                                <li>Verify the world is selected in the story settings</li>
+                                <li>Check that characters/locations exist in your world</li>
+                                <li>Wait a moment for the AI context to load</li>
+                                <li>Explicitly mention character names in your writing</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🤖 AI Assistant Issues</div>
+                        <div class="feature-card-description">
+                            <strong>Problem:</strong> AI responses are generic or unhelpful<br><br>
+                            <strong>Solutions:</strong>
+                            <ul>
+                                <li>Be more specific in your prompts</li>
+                                <li>Mention specific characters or locations from your world</li>
+                                <li>Use the world chat feature to discuss ideas first</li>
+                                <li>Check your credit balance - low credits affect AI quality</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tips" class="help-section">
+                <h2 class="help-section-title">Pro Tips for Success</h2>
+                
+                <div class="help-alert help-alert-info">
+                    <div class="help-alert-icon">💡</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">Quick Start Success Tips</div>
+                        <div class="help-alert-text">These tips will help you get the most out of your AI storytelling experience from day one.</div>
+                    </div>
+                </div>
+                
+                <ul>
+                    <li><strong>Start Small:</strong> Begin with a simple story idea before attempting complex narratives</li>
+                    <li><strong>Rich Worlds = Better AI:</strong> The more detailed your world, the smarter the AI assistance</li>
+                    <li><strong>Use Document Manager:</strong> Upload reference materials for additional AI context</li>
+                    <li><strong>Experiment with Prompts:</strong> Try different ways of asking the AI for help</li>
+                    <li><strong>Save Frequently:</strong> Use Ctrl+S or rely on auto-save in the editors</li>
+                    <li><strong>Join the Community:</strong> Visit the forum for tips and inspiration from other writers</li>
+                    <li><strong>Monitor Credits:</strong> Keep track of AI usage in your billing dashboard</li>
+                </ul>
+                
+                <div class="help-actions mt-lg">
+                    <a href="/ui/worlds" class="help-action-button">
+                        🌍 Start Creating Worlds
+                    </a>
+                    <a href="/ui/documents" class="help-action-button-secondary">
+                        📄 Document Manager
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // Add copy functionality for code elements
+        document.querySelectorAll('code').forEach(code => {
+            code.style.cursor = 'pointer';
+            code.title = 'Click to copy';
+            code.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = '✓ Copied!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

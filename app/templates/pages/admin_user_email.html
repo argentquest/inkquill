@@ -1,0 +1,493 @@
+{# /ai_rag_story_app/app/templates/pages/admin_user_email.html #}
+{% extends "layouts/base.html" %}
+
+{% block title %}Admin - Send User Email{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .user-email-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 12px;
+    }
+    
+    .user-selector {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .user-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .user-card:hover {
+        border-color: var(--tblr-primary);
+        background-color: #f8f9fa;
+    }
+    
+    .user-card.selected {
+        border-color: var(--tblr-primary);
+        background-color: var(--tblr-primary-lt);
+    }
+    
+    .user-info {
+        display: flex;
+        align-items: center;
+        justify-content: between;
+    }
+    
+    .user-details {
+        flex: 1;
+    }
+    
+    .user-status {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .status-active {
+        background-color: #28a745;
+    }
+    
+    .status-inactive {
+        background-color: #dc3545;
+    }
+    
+    .email-form {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .email-preview {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+    
+    .custom-fields {
+        display: none;
+    }
+    
+    .custom-fields.show {
+        display: block;
+    }
+    
+    .user-search {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        margin: -20px -20px 20px -20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Enhanced Hero Header with Gradient Background -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); position: relative; overflow: hidden;">
+                <!-- Background Pattern -->
+                <div style="position: absolute; top: 0; right: 0; width: 300px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;"></div>
+                
+                <div class="card-body text-white" style="position: relative; z-index: 2;">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="h2 mb-2">
+                                <i class="fas fa-envelope-open-text me-2"></i>
+                                Send User Email
+                            </h1>
+                            <p class="mb-3 opacity-75">
+                                Send targeted email notifications to specific users in your system
+                            </p>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-users me-1"></i>
+                                    <span id="total-users-count">Loading...</span> Users
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Admin Only
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="/ui/admin/maintenance" class="btn btn-light me-2">
+                                <i class="fas fa-cog me-1"></i> Maintenance
+                            </a>
+                            <button class="btn btn-light" onclick="refreshUsers()">
+                                <i class="fas fa-sync-alt me-1"></i> Refresh Users
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Selection Panel -->
+        <div class="col-lg-6">
+            <div class="card user-email-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users text-primary me-2"></i>Select User
+                    </h5>
+                </div>
+                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    <div class="user-search">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="user-search" 
+                                   placeholder="Search users by name, username, or email...">
+                        </div>
+                    </div>
+                    
+                    <div id="users-list">
+                        <div class="text-center text-muted">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                            <p>Loading users...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Email Composition Panel -->
+        <div class="col-lg-6">
+            <div class="card user-email-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Compose Email
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="no-user-selected" class="text-center text-muted py-5">
+                        <i class="fas fa-user-plus fa-3x mb-3 opacity-50"></i>
+                        <h6>No User Selected</h6>
+                        <p class="small">Please select a user from the list to compose an email.</p>
+                    </div>
+                    
+                    <div id="email-composition" style="display: none;">
+                        <div class="email-preview mb-3">
+                            <strong>Sending to:</strong>
+                            <div id="selected-user-info" class="mt-2"></div>
+                        </div>
+                        
+                        <form id="user-email-form">
+                            <div class="mb-3">
+                                <label for="email-type" class="form-label">
+                                    <strong>Email Type</strong>
+                                </label>
+                                <select class="form-select" id="email-type" onchange="toggleCustomFields()">
+                                    <option value="">Select email type...</option>
+                                    <option value="welcome">Welcome Email</option>
+                                    <option value="maintenance">Maintenance Notice</option>
+                                    <option value="custom">Custom Message</option>
+                                </select>
+                                <div class="form-text">Choose the type of email to send</div>
+                            </div>
+                            
+                            <div id="custom-fields" class="custom-fields">
+                                <div class="mb-3">
+                                    <label for="custom-subject" class="form-label">
+                                        <strong>Subject</strong>
+                                    </label>
+                                    <input type="text" class="form-control" id="custom-subject" 
+                                           placeholder="Enter email subject...">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="custom-message" class="form-label">
+                                        <strong>Message</strong>
+                                    </label>
+                                    <textarea class="form-control" id="custom-message" rows="4"
+                                              placeholder="Enter your message..."></textarea>
+                                    <div class="form-text">For maintenance emails, this will be the maintenance description</div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" onclick="sendUserEmail()">
+                                    <i class="fas fa-paper-plane me-1"></i>Send Email
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearSelection()">
+                                    <i class="fas fa-times me-1"></i>Clear
+                                </button>
+                            </div>
+                            
+                            <div id="email-send-status" class="mt-3"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Panel -->
+            <div class="card mt-3">
+                <div class="card-header bg-light">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle text-info me-2"></i>Email Types
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0 small">
+                        <li class="mb-2">
+                            <strong>Welcome Email:</strong> Standard onboarding message for new users
+                        </li>
+                        <li class="mb-2">
+                            <strong>Maintenance Notice:</strong> Notify users about scheduled maintenance
+                        </li>
+                        <li>
+                            <strong>Custom Message:</strong> Send a personalized message with custom subject
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedUserId = null;
+let allUsers = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadUsers();
+    
+    // Setup search functionality
+    document.getElementById('user-search').addEventListener('input', function() {
+        filterUsers(this.value);
+    });
+});
+
+async function loadUsers() {
+    try {
+        const response = await fetch('/ui/admin/api/users');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.success) {
+            allUsers = data.users;
+            displayUsers(allUsers);
+            document.getElementById('total-users-count').textContent = data.total;
+        } else {
+            throw new Error(data.message || 'Failed to load users');
+        }
+    } catch (error) {
+        console.error('Failed to load users:', error);
+        document.getElementById('users-list').innerHTML = `
+            <div class="text-center text-danger">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <p>Failed to load users</p>
+                <button class="btn btn-outline-primary btn-sm" onclick="loadUsers()">
+                    <i class="fas fa-retry me-1"></i>Retry
+                </button>
+            </div>
+        `;
+        showToast('Failed to load users', 'error');
+    }
+}
+
+function displayUsers(users) {
+    const usersList = document.getElementById('users-list');
+    
+    if (users.length === 0) {
+        usersList.innerHTML = `
+            <div class="text-center text-muted">
+                <i class="fas fa-users fa-2x mb-3 opacity-50"></i>
+                <p>No users found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    usersList.innerHTML = users.map(user => `
+        <div class="user-card" data-user-id="${user.id}" onclick="selectUser(${user.id})">
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="user-status status-${user.is_active ? 'active' : 'inactive'} me-2"></span>
+                        <strong>${user.username}</strong>
+                        ${user.full_name ? `<span class="text-muted ms-1">(${user.full_name})</span>` : ''}
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-envelope me-1"></i>${user.email}
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-calendar me-1"></i>Joined ${new Date(user.created_at).toLocaleDateString()}
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge ${user.is_active ? 'bg-success' : 'bg-secondary'}">
+                        ${user.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterUsers(searchTerm) {
+    const filtered = allUsers.filter(user => 
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    displayUsers(filtered);
+}
+
+function selectUser(userId) {
+    // Remove previous selection
+    document.querySelectorAll('.user-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Select new user
+    const userCard = document.querySelector(`[data-user-id="${userId}"]`);
+    if (userCard) {
+        userCard.classList.add('selected');
+    }
+    
+    const user = allUsers.find(u => u.id === userId);
+    if (user) {
+        selectedUserId = userId;
+        showEmailComposition(user);
+    }
+}
+
+function showEmailComposition(user) {
+    document.getElementById('no-user-selected').style.display = 'none';
+    document.getElementById('email-composition').style.display = 'block';
+    
+    document.getElementById('selected-user-info').innerHTML = `
+        <div class="d-flex align-items-center">
+            <span class="user-status status-${user.is_active ? 'active' : 'inactive'} me-2"></span>
+            <div>
+                <strong>${user.username}</strong>
+                ${user.full_name ? `<span class="text-muted">(${user.full_name})</span>` : ''}
+                <br>
+                <small class="text-muted">${user.email}</small>
+            </div>
+        </div>
+    `;
+}
+
+function toggleCustomFields() {
+    const emailType = document.getElementById('email-type').value;
+    const customFields = document.getElementById('custom-fields');
+    
+    if (emailType === 'custom' || emailType === 'maintenance') {
+        customFields.classList.add('show');
+        
+        // Set placeholder text based on type
+        const subjectField = document.getElementById('custom-subject');
+        const messageField = document.getElementById('custom-message');
+        
+        if (emailType === 'maintenance') {
+            subjectField.placeholder = 'e.g., Scheduled System Maintenance';
+            messageField.placeholder = 'Describe the maintenance work and expected duration...';
+        } else {
+            subjectField.placeholder = 'Enter email subject...';
+            messageField.placeholder = 'Enter your message...';
+        }
+    } else {
+        customFields.classList.remove('show');
+    }
+}
+
+async function sendUserEmail() {
+    if (!selectedUserId) {
+        showToast('Please select a user first', 'error');
+        return;
+    }
+    
+    const emailType = document.getElementById('email-type').value;
+    if (!emailType) {
+        showToast('Please select an email type', 'error');
+        return;
+    }
+    
+    const customSubject = document.getElementById('custom-subject').value.trim();
+    const customMessage = document.getElementById('custom-message').value.trim();
+    
+    if ((emailType === 'custom' || emailType === 'maintenance') && (!customSubject || !customMessage)) {
+        showToast('Please fill in both subject and message for custom/maintenance emails', 'error');
+        return;
+    }
+    
+    const statusElement = document.getElementById('email-send-status');
+    statusElement.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin me-1"></i>Sending email...</span>';
+    
+    try {
+        const formData = new FormData();
+        formData.append('user_id', selectedUserId);
+        formData.append('email_type', emailType);
+        if (customSubject) formData.append('custom_subject', customSubject);
+        if (customMessage) formData.append('custom_message', customMessage);
+        
+        const response = await fetch('/ui/admin/send-user-email', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            statusElement.innerHTML = '<span class="text-success"><i class="fas fa-check me-1"></i>Email sent successfully!</span>';
+            showToast(data.message, 'success');
+            
+            // Clear form after successful send
+            setTimeout(() => {
+                clearSelection();
+            }, 3000);
+        } else {
+            statusElement.innerHTML = '<span class="text-danger"><i class="fas fa-times me-1"></i>Failed to send email</span>';
+            showToast(data.message || 'Failed to send email', 'error');
+        }
+    } catch (error) {
+        console.error('Error sending email:', error);
+        statusElement.innerHTML = '<span class="text-danger"><i class="fas fa-times me-1"></i>Error occurred</span>';
+        showToast('Error sending email', 'error');
+    }
+}
+
+function clearSelection() {
+    selectedUserId = null;
+    document.querySelectorAll('.user-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.getElementById('no-user-selected').style.display = 'block';
+    document.getElementById('email-composition').style.display = 'none';
+    document.getElementById('user-email-form').reset();
+    document.getElementById('custom-fields').classList.remove('show');
+    document.getElementById('email-send-status').innerHTML = '';
+}
+
+function refreshUsers() {
+    document.getElementById('total-users-count').textContent = 'Loading...';
+    loadUsers();
+}
+</script>
+{% endblock %}

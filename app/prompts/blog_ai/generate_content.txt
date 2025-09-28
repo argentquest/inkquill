@@ -1,0 +1,13 @@
+Generate a blog post about: {topic}
+Writing style: {style}
+Length: {length_guide}
+{category_focus}
+{existing_content}
+{context}
+
+Requirements:
+- Use engaging headlines and subheadings
+- Include actionable insights
+- Write in markdown format
+- Make it SEO-friendly
+- End with a clear conclusion or call-to-action

@@ -1,0 +1,178 @@
+<!-- /ai_rag_story_app/app/templates/pages/story_class_list.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Story Classes{% endblock %}
+
+{% block content %}
+<div class="story-classes-page">
+
+    <!-- Page Header -->
+    <div class="bg-light border-bottom mb-4" style="padding: 1rem 0;">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2" style="font-size: 1.75rem; font-weight: 600; color: var(--dark-color);">
+                        <i class="fas fa-tags me-2" style="font-size: 1.5rem;"></i>
+                        Story Classes
+                    </h1>
+                    <p class="mb-0 text-muted" style="font-size: 0.9rem;">
+                        <i class="fas fa-palette me-1"></i>
+                        Create and manage categorization tags for your acts and scenes
+                        {% if context_info %}
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-info-circle me-1"></i>
+                            {{ context_info }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#storyClassModal"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                            title="Create a new story class for organizing acts and scenes">
+                        <i class="fas fa-plus me-2"></i>Create New Class
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            </div>
+
+            <!-- Story Classes Grid -->
+            <div class="row" id="story-classes-grid">
+                <!-- Story classes will be loaded here dynamically -->
+            </div>
+
+            <!-- No Classes Message -->
+            <div id="no-classes-message" class="text-center py-5" style="display: none;">
+                <i class="fas fa-palette fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Story Classes Yet</h4>
+                <p class="text-muted mb-4">Create your first story class to organize and color-code your acts and scenes.</p>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#storyClassModal"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Create your first story class to organize acts and scenes">
+                    <i class="fas fa-plus me-2"></i>Create Your First Class
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Story Class Modal -->
+<div class="modal fade" id="storyClassModal" tabindex="-1" aria-labelledby="storyClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="storyClassModalLabel">Create Story Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="story-class-form">
+                <div class="modal-body">
+                    <input type="hidden" id="story-class-id" name="id">
+                    
+                    <!-- Name Field -->
+                    <div class="mb-3">
+                        <label for="story-class-name" class="form-label">
+                            Class Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="story-class-name" name="name" 
+                               placeholder="e.g., Action, Dialog, Emotional" required maxlength="100">
+                        <div class="form-text">Short, descriptive name for this story class</div>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="mb-3">
+                        <label for="story-class-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="story-class-description" name="description" 
+                                  rows="3" maxlength="500" 
+                                  placeholder="Describe what this class represents..."></textarea>
+                        <div class="form-text">Optional description to help you remember when to use this class</div>
+                    </div>
+
+                    <!-- Color Picker -->
+                    <div class="mb-3">
+                        <label for="story-class-color" class="form-label">
+                            Color <span class="text-danger">*</span>
+                        </label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="color" class="form-control form-control-color" 
+                                   id="story-class-color" name="color" value="#007bff" 
+                                   title="Choose a color for this class">
+                            <input type="text" class="form-control" id="story-class-color-text" 
+                                   placeholder="#007bff" maxlength="7" style="width: 100px;">
+                        </div>
+                        <div class="form-text">This color will be used as the background for acts and scenes assigned to this class</div>
+                    </div>
+
+                    <!-- Color Preview -->
+                    <div class="mb-3">
+                        <label class="form-label">Preview</label>
+                        <div class="card" id="color-preview-card" style="background-color: #007bff;">
+                            <div class="card-body text-white">
+                                <h6 class="card-title mb-1">Sample Act Card</h6>
+                                <p class="card-text small mb-0">This is how your acts and scenes will look with this color</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                            title="Close without saving changes">Cancel</button>
+                    <button type="submit" class="btn btn-primary"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                            title="Save the new story class">
+                        <span class="button-text">Create Class</span>
+                        <span class="spinner-border spinner-border-sm ms-2" style="display: none;" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteClassModal" tabindex="-1" aria-labelledby="deleteClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteClassModalLabel">Delete Story Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the story class "<strong id="delete-class-name"></strong>"?</p>
+                <p class="text-warning small">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Acts and scenes using this class will no longer have color coding, but won't be deleted.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Cancel deletion and keep the story class">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-class"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Permanently delete this story class">
+                    Delete Class
+                    <span class="spinner-border spinner-border-sm ms-2" style="display: none;" role="status" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Pass world context to JavaScript
+    window.storyClassContext = {
+        worldId: {{ world_id if world_id else 'null' }},
+        storyId: {{ story_id if story_id else 'null' }},
+        worldName: {{ ("'" + world.name + "'") if world else 'null' }}
+    };
+</script>
+<script src="{{ url_for('static', path='js/story_class_crud.js') }}"></script>
+{% endblock %}

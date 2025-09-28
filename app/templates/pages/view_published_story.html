@@ -1,0 +1,640 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ published_story.title }} - Published Story{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ published_story.title }}{% endblock %}
+{% block og_description %}{{ published_story.description if published_story.description else "Read this engaging story published on our AI storytelling platform." }}{% endblock %}
+{% block og_image %}{% if published_story.story and published_story.story.image_url %}{{ published_story.story.image_url }}{% elif published_story.story and published_story.story.world and published_story.story.world.image_url %}{{ published_story.story.world.image_url }}{% elif published_story %}{{ request.url_for('generate_social_preview', content_type='published_story', content_id=published_story.id) if request else '/api/v1/social/preview/published_story/' + published_story.id|string + '.jpg' }}{% else %}{{ request.url_for('static', path='/images/logo.jpeg') if request else '/static/images/logo.jpeg' }}{% endif %}{% endblock %}
+{% block og_url %}{{ request.url if request else '' }}{% endblock %}
+
+{% block twitter_card %}summary_large_image{% endblock %}
+{% block meta_keywords %}published story, {{ published_story.title }}, creative writing, AI storytelling{% if published_story.story and published_story.story.world %}, {{ published_story.story.world.name }}{% endif %}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Published Story View Page */
+    .published-story-view {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    /* Story Header */
+    .story-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+    
+    /* Story Image */
+    .story-header-image {
+        flex-shrink: 0;
+        width: 256px;
+        height: 256px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .story-header-image img {
+        width: 256px;
+        height: 256px;
+        object-fit: cover;
+    }
+    
+    .story-header-image-placeholder {
+        color: #94a3b8;
+        font-size: 4rem;
+    }
+    
+    /* Story Header Content */
+    .story-header-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .story-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+    }
+    
+    .story-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .story-meta-item {
+        display: flex;
+        align-items: center;
+    }
+    
+    .story-meta-item i {
+        margin-right: 0.5rem;
+    }
+    
+    .story-description {
+        font-size: 1.125rem;
+        color: #4b5563;
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+    
+    /* Story Actions */
+    .story-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    /* Rating Section */
+    .rating-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+    
+    .rating-stars {
+        font-size: 2rem;
+        color: #d1d5db;
+        cursor: pointer;
+    }
+    
+    .rating-stars .fas.fa-star {
+        color: #fbbf24;
+    }
+    
+    .rating-stars i:hover,
+    .rating-stars i.hover {
+        color: #fbbf24;
+    }
+    
+    /* Comments Section */
+    .comments-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .comment-form {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .comment {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .comment:last-child {
+        border-bottom: none;
+    }
+    
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .comment-author {
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .comment-date {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .comment-content {
+        color: #374151;
+        line-height: 1.6;
+    }
+    
+    /* Empty State */
+    .empty-comments {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+    
+    .empty-comments i {
+        font-size: 3rem;
+        color: #d1d5db;
+        margin-bottom: 1rem;
+    }
+    
+    /* Story Popup Modal */
+    .story-popup-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+    
+    .story-popup-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 90vw;
+        max-height: 90vh;
+        width: 1000px;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .story-popup-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9fafb;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .story-popup-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+    }
+    
+    .story-popup-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .story-popup-close:hover {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .story-popup-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0;
+    }
+    
+    .story-popup-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: white;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .story-header {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .story-header-image {
+            width: 200px;
+            height: 200px;
+            align-self: center;
+        }
+        
+        .story-header-image img {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .story-popup-content {
+            width: 95vw;
+            height: 85vh;
+        }
+        
+        .story-popup-header {
+            padding: 1rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="published-story-view">
+    <!-- Story Header -->
+    <div class="story-header">
+        <!-- Story Image -->
+        <div class="story-header-image">
+            {% if published_story.story and published_story.story.image_url %}
+            <img src="{{ published_story.story.image_url }}" alt="{{ published_story.title }}">
+            {% else %}
+            <i class="fas fa-book-open story-header-image-placeholder"></i>
+            {% endif %}
+        </div>
+        
+        <!-- Story Content -->
+        <div class="story-header-content">
+            <h1 class="story-title">{{ published_story.title }}</h1>
+            
+            <div class="story-meta">
+                <div class="story-meta-item">
+                    <i class="fas fa-user"></i>
+                    <span>By 
+                        <a href="{{ url_for('user_published_stories', username=published_story.publisher.username) }}" 
+                           class="text-decoration-none">
+                            {{ published_story.publisher.display_name or published_story.publisher.username }}
+                        </a>
+                    </span>
+                </div>
+                
+                <div class="story-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Published {{ published_story.published_at.strftime('%B %d, %Y') }}</span>
+                </div>
+                
+                <div class="story-meta-item">
+                    <i class="fas fa-eye"></i>
+                    <span>{{ published_story.view_count }} views</span>
+                </div>
+                
+                {% if published_story.word_count %}
+                <div class="story-meta-item">
+                    <i class="fas fa-file-word"></i>
+                    <span>{{ "{:,}".format(published_story.word_count) }} words</span>
+                </div>
+                {% endif %}
+                
+                {% if published_story.story and published_story.story.world %}
+                <div class="story-meta-item">
+                    <i class="fas fa-globe-americas"></i>
+                    <span>World: {{ published_story.story.world.name }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if published_story.description %}
+            <div class="story-description">
+                {{ published_story.description }}
+            </div>
+            {% endif %}
+            
+            <div class="story-actions">
+                <button type="button" 
+                        class="btn btn-primary"
+                        onclick="openStoryPopup()">
+                    <i class="fas fa-book-open me-2"></i>Read Full Story
+                </button>
+                
+                <a href="{{ published_story.published_url }}" 
+                   target="_blank"
+                   class="btn btn-outline-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
+                </a>
+                
+                {% if current_user and current_user.id == published_story.user_id %}
+                <a href="{{ url_for('ui_story_detail', story_id=published_story.story_id) }}" 
+                   class="btn btn-outline-secondary">
+                    <i class="fas fa-edit me-2"></i>Edit Story
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Social Sharing Section -->
+    {% set share_config = {
+        'content_type': 'published_story',
+        'content_id': published_story.id|string,
+        'content_title': published_story.title,
+        'content_description': published_story.description or (published_story.title + ' - A captivating story published on our platform'),
+        'content_url': request.url,
+        'content_image': published_story.story.image_url if published_story.story else None,
+        'hashtags': '#AIStory #CreativeWriting #PublishedStory'
+    } %}
+    {% include 'partials/_social_sharing.html' %}
+    
+    <!-- Rating Section -->
+    <div class="rating-section">
+        <h3 class="mb-3">Rate This Story</h3>
+        
+        {% if current_user %}
+        <div class="d-flex align-items-center gap-3">
+            <div class="rating-stars" id="rating-stars">
+                {% for i in range(1, 6) %}
+                <i class="far fa-star" data-rating="{{ i }}"></i>
+                {% endfor %}
+            </div>
+            
+            <div class="ms-3">
+                {% if published_story.average_rating %}
+                <strong>{{ "%.1f"|format(published_story.average_rating) }}</strong> / 5.0
+                ({{ published_story.like_count }} ratings)
+                {% else %}
+                <span class="text-muted">No ratings yet</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if user_rating %}
+        <div class="mt-2 text-muted">
+            You rated this story {{ user_rating }} star{% if user_rating != 1 %}s{% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <p class="text-muted mb-0">
+            <a href="{{ url_for('ui_login_form') }}">Log in</a> to rate this story
+        </p>
+        {% endif %}
+    </div>
+    
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h3 class="mb-4">Comments ({{ published_story.comment_count }})</h3>
+        
+        <!-- Comment Form -->
+        {% if current_user %}
+        <div class="comment-form">
+            <form id="comment-form">
+                <div class="mb-3">
+                    <textarea class="form-control" 
+                              id="comment-content" 
+                              rows="3" 
+                              placeholder="Share your thoughts about this story..."
+                              maxlength="5000"
+                              required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-comment me-2"></i>Post Comment
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <a href="{{ url_for('ui_login_form') }}">Log in</a> to leave a comment
+        </div>
+        {% endif %}
+        
+        <!-- Comments List -->
+        <div id="comments-list">
+            {% if comments %}
+                {% for comment in comments %}
+                <div class="comment">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            {{ comment.commenter.display_name or comment.commenter.username }}
+                        </div>
+                        <div class="comment-date">
+                            {{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </div>
+                    </div>
+                    <div class="comment-content">
+                        {{ comment.content }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-comments">
+                    <i class="fas fa-comments"></i>
+                    <p>No comments yet. Be the first to share your thoughts!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Story Popup Modal -->
+<div class="story-popup-modal" id="storyPopupModal">
+    <div class="story-popup-content">
+        <div class="story-popup-header">
+            <h4 class="story-popup-title">{{ published_story.title }}</h4>
+            <button type="button" class="story-popup-close" onclick="closeStoryPopup()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="story-popup-body">
+            <iframe id="storyIframe" class="story-popup-iframe" src=""></iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Story popup functions
+function openStoryPopup() {
+    const modal = document.getElementById('storyPopupModal');
+    const iframe = document.getElementById('storyIframe');
+    const storyUrl = '{{ published_story.published_url }}';
+    
+    // Set the iframe source
+    iframe.src = storyUrl;
+    
+    // Show the modal
+    modal.style.display = 'flex';
+    
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+}
+
+function closeStoryPopup() {
+    const modal = document.getElementById('storyPopupModal');
+    const iframe = document.getElementById('storyIframe');
+    
+    // Hide the modal
+    modal.style.display = 'none';
+    
+    // Clear iframe source to stop loading
+    iframe.src = '';
+    
+    // Restore body scrolling
+    document.body.style.overflow = 'auto';
+}
+
+// Close popup when clicking outside the content
+document.getElementById('storyPopupModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeStoryPopup();
+    }
+});
+
+// Close popup with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeStoryPopup();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const storyId = {{ published_story.id }};
+    
+    {% if current_user %}
+    // Rating functionality
+    const ratingStars = document.querySelectorAll('#rating-stars i');
+    let currentRating = {{ user_rating or 0 }};
+    
+    // Display current rating
+    updateStarDisplay(currentRating);
+    
+    ratingStars.forEach((star, index) => {
+        star.addEventListener('mouseenter', () => {
+            updateStarDisplay(index + 1);
+        });
+        
+        star.addEventListener('click', async () => {
+            const rating = index + 1;
+            try {
+                const response = await fetch(`/api/v1/published-stories/${storyId}/rate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        published_story_id: storyId,
+                        rating: rating
+                    }),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    currentRating = rating;
+                    showToast('Rating saved!', 'success');
+                    // Reload page to update average rating
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Failed to save rating', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving rating:', error);
+                showToast('Error saving rating', 'error');
+            }
+        });
+    });
+    
+    document.getElementById('rating-stars').addEventListener('mouseleave', () => {
+        updateStarDisplay(currentRating);
+    });
+    
+    function updateStarDisplay(rating) {
+        ratingStars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('far');
+                star.classList.add('fas');
+            } else {
+                star.classList.remove('fas');
+                star.classList.add('far');
+            }
+        });
+    }
+    
+    // Comment functionality
+    const commentForm = document.getElementById('comment-form');
+    if (commentForm) {
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const content = document.getElementById('comment-content').value.trim();
+            if (!content) return;
+            
+            try {
+                const response = await fetch(`/api/v1/published-stories/${storyId}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        published_story_id: storyId,
+                        content: content
+                    }),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    showToast('Comment posted!', 'success');
+                    // Reload page to show new comment
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Failed to post comment', 'error');
+                }
+            } catch (error) {
+                console.error('Error posting comment:', error);
+                showToast('Error posting comment', 'error');
+            }
+        });
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

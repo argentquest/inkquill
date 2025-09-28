@@ -1,0 +1,626 @@
+{# /app/templates/pages/welcome_interview.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Welcome Interview - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced Tabler Premium Styles for Welcome Interview */
+    .welcome-hero {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        position: relative;
+        padding: 3rem 2rem;
+        margin-bottom: 1.4rem;
+        margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+    
+    .welcome-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23ffffff08'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e");
+        pointer-events: none;
+    }
+    
+    .welcome-hero .page-pretitle {
+        position: relative;
+        z-index: 2;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .welcome-hero .page-title {
+        position: relative;
+        z-index: 2;
+        color: #ffffff;
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    
+    .welcome-hero .page-subtitle {
+        position: relative;
+        z-index: 2;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.125rem;
+        font-weight: 400;
+        line-height: 1.5;
+        max-width: 600px;
+        margin: 0 auto;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-content {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Enhanced card hover effects for Tabler premium */
+    .card-sm {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-sm:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tblr-box-shadow-lg);
+    }
+    
+    .card-sm:hover .card-status-top {
+        height: 4px;
+    }
+    
+    /* Results section styling */
+    .results-section {
+        margin-top: 2rem;
+        padding: 2rem;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color);
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .writer-score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin: 0 auto 1rem;
+    }
+    
+    .score-1-3 { background: linear-gradient(135deg, #f87171, #ef4444); }
+    .score-4-6 { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+    .score-7-8 { background: linear-gradient(135deg, #34d399, #10b981); }
+    .score-9-10 { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+    
+    .recommendation-card {
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .recommendation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .book-card {
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .book-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        border-radius: var(--tblr-border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .strength-improvement-card {
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .strength-card {
+        border-left: 4px solid var(--tblr-success);
+    }
+    
+    .improvement-card {
+        border-left: 4px solid var(--tblr-info);
+    }
+    
+    .genre-analysis-card {
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary), var(--tblr-bg-surface));
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .results-hidden {
+        display: none;
+    }
+    
+    .loading-spinner {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    /* Animation for results reveal */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .results-section.show {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 250px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="text-center">
+                    <h2 class="page-pretitle text-white mb-2">
+                        Welcome to Your Writing Journey
+                    </h2>
+                    <h1 class="page-title text-white mb-3">
+                        <i class="fas fa-hand-paper me-3"></i>
+                        Let's Get to Know You
+                    </h1>
+                    <div class="page-subtitle text-white mb-4" style="max-width: 600px; margin: 0 auto;">
+                        This personalized interview helps us understand your writing background and provide tailored recommendations to enhance your storytelling skills.
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-user me-1"></i>
+                            Personalized
+                        </span>
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-comments me-1"></i>
+                            Interactive
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-magic me-1"></i>
+                            AI Guided
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+        <!-- Interview Section -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-md">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h3 class="card-title">Writing Assessment Interview</h3>
+                            <p class="text-muted">
+                                Answer a few questions about your writing experience and goals. 
+                                We'll analyze your responses and provide personalized recommendations.
+                            </p>
+                        </div>
+                        
+                        <!-- Start Interview Button -->
+                        <div class="text-center" id="start-section">
+                            <button type="button" class="btn btn-primary btn-lg" id="startInterviewBtn">
+                                <i class="fas fa-play me-2"></i>Begin Interview
+                            </button>
+                        </div>
+                        
+                        <!-- Loading Section -->
+                        <div class="loading-spinner results-hidden" id="loading-section">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Analyzing your responses...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section results-hidden" id="results-section">
+            <div class="row">
+                <div class="col-12 text-center mb-4">
+                    <h2>Your Personalized Writing Assessment</h2>
+                    <p class="text-muted">Based on your interview responses, here's our analysis and recommendations</p>
+                </div>
+            </div>
+            
+            <!-- Writer Score -->
+            <div class="row mb-4">
+                <div class="col-md-6 offset-md-3 text-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-3">Your Writer Score</h4>
+                            <div class="writer-score-circle" id="score-circle">
+                                <span id="score-number">-</span>
+                            </div>
+                            <p class="text-muted" id="score-description">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h4 class="card-title"><i class="fas fa-lightbulb me-2"></i>Recommendations</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="recommendations-list">
+                                <!-- Recommendations will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Book Suggestions -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h4 class="card-title"><i class="fas fa-book me-2"></i>Recommended Reading</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="books-list">
+                                <!-- Books will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Strengths and Areas for Improvement -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h4 class="card-title"><i class="fas fa-star me-2"></i>Your Strengths</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="strengths-list">
+                                        <!-- Strengths will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h4 class="card-title"><i class="fas fa-target me-2"></i>Areas for Growth</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="improvements-list">
+                                        <!-- Areas for improvement will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Genre Analysis -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="genre-analysis-card">
+                        <h4><i class="fas fa-tags me-2"></i>Genre Analysis</h4>
+                        <p id="genre-analysis" class="mb-0">-</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="row">
+                <div class="col-12 text-center">
+                    <a href="/ui" class="btn btn-primary me-2">
+                        <i class="fas fa-home me-1"></i>Go to Dashboard
+                    </a>
+                    <button type="button" class="btn btn-outline-primary" id="retake-interview-btn">
+                        <i class="fas fa-redo me-1"></i>Retake Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Interview Component -->
+{% include "partials/interview_full.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Include Interview Component JavaScript -->
+<script src="/static/js/interview.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Start interview button handler
+    document.getElementById('startInterviewBtn').addEventListener('click', function() {
+        startWelcomeInterview();
+    });
+    
+    // Retake interview button handler
+    document.getElementById('retake-interview-btn').addEventListener('click', function() {
+        resetInterview();
+        startWelcomeInterview();
+    });
+    
+    // Listen for interview completion
+    document.addEventListener('interviewCompleted', function(event) {
+        console.log('Welcome interview completed:', event.detail);
+        
+        if (event.detail.interviewId === 'new_user_onboarding') {
+            // Store the response ID for later use
+            window.latestInterviewResponseId = event.detail.responseId;
+            
+            // Hide the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('interviewModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Show loading and process results
+            showLoading();
+            processInterviewResults();
+        }
+    });
+});
+
+async function startWelcomeInterview() {
+    console.log('Starting welcome interview...');
+    
+    try {
+        // Show the interview modal
+        const modal = new bootstrap.Modal(document.getElementById('interviewModal'));
+        modal.show();
+        
+        // Initialize the interview component with new_user_onboarding
+        const interviewComponent = new InterviewComponent('new_user_onboarding');
+        await interviewComponent.init();
+        
+    } catch (error) {
+        console.error('Error starting welcome interview:', error);
+        alert('Error starting interview. Please try again.');
+    }
+}
+
+function showLoading() {
+    document.getElementById('start-section').classList.add('results-hidden');
+    document.getElementById('loading-section').classList.remove('results-hidden');
+}
+
+function resetInterview() {
+    document.getElementById('results-section').classList.add('results-hidden');
+    document.getElementById('loading-section').classList.add('results-hidden');
+    document.getElementById('start-section').classList.remove('results-hidden');
+}
+
+async function processInterviewResults() {
+    try {
+        console.log('Processing interview results...');
+        
+        // Use the stored response ID from the interview completion
+        if (!window.latestInterviewResponseId) {
+            throw new Error('No interview response ID available');
+        }
+        
+        // Call the AI analysis API
+        const response = await fetch('/ui/welcome-interview/api/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                interview_response_id: window.latestInterviewResponseId
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const analysisData = await response.json();
+        console.log('Analysis completed:', analysisData);
+        
+        // Display results
+        displayResults(analysisData);
+        
+    } catch (error) {
+        console.error('Error processing interview results:', error);
+        document.getElementById('loading-section').classList.add('results-hidden');
+        alert('Error analyzing your responses. Please try again.');
+        resetInterview();
+    }
+}
+
+function displayResults(data) {
+    // Hide loading
+    document.getElementById('loading-section').classList.add('results-hidden');
+    
+    // Show results section
+    const resultsSection = document.getElementById('results-section');
+    resultsSection.classList.remove('results-hidden');
+    resultsSection.classList.add('show');
+    
+    // Trigger coin celebration animation (Step 1 bonus)
+    setTimeout(() => {
+        showStepBonus(1, 150);
+    }, 500); // Delay slightly to let results appear first
+    
+    // Display writer score
+    displayWriterScore(data.writer_score);
+    
+    // Display recommendations
+    displayRecommendations(data.recommendations);
+    
+    // Display book suggestions
+    displayBookSuggestions(data.book_suggestions);
+    
+    // Display strengths
+    displayStrengths(data.strengths);
+    
+    // Display areas for improvement
+    displayImprovements(data.areas_for_improvement);
+    
+    // Display genre analysis
+    document.getElementById('genre-analysis').textContent = data.genre_analysis;
+}
+
+function displayWriterScore(score) {
+    const scoreElement = document.getElementById('score-number');
+    const circleElement = document.getElementById('score-circle');
+    const descriptionElement = document.getElementById('score-description');
+    
+    scoreElement.textContent = score;
+    
+    // Remove existing score classes
+    circleElement.classList.remove('score-1-3', 'score-4-6', 'score-7-8', 'score-9-10');
+    
+    // Add appropriate score class and description
+    if (score <= 3) {
+        circleElement.classList.add('score-1-3');
+        descriptionElement.textContent = 'Beginning Writer - You\'re just starting your writing journey!';
+    } else if (score <= 6) {
+        circleElement.classList.add('score-4-6');
+        descriptionElement.textContent = 'Developing Writer - You\'re building solid foundations!';
+    } else if (score <= 8) {
+        circleElement.classList.add('score-7-8');
+        descriptionElement.textContent = 'Skilled Writer - You have strong writing abilities!';
+    } else {
+        circleElement.classList.add('score-9-10');
+        descriptionElement.textContent = 'Master Writer - You have exceptional writing skills!';
+    }
+}
+
+function displayRecommendations(recommendations) {
+    const container = document.getElementById('recommendations-list');
+    container.innerHTML = '';
+    
+    recommendations.forEach(recommendation => {
+        const div = document.createElement('div');
+        div.className = 'recommendation-card';
+        div.innerHTML = `
+            <i class="fas fa-arrow-right me-2 text-primary"></i>
+            ${recommendation}
+        `;
+        container.appendChild(div);
+    });
+}
+
+function displayBookSuggestions(books) {
+    const container = document.getElementById('books-list');
+    container.innerHTML = '';
+    
+    books.forEach(book => {
+        const div = document.createElement('div');
+        div.className = 'book-card';
+        div.innerHTML = `
+            <div class="book-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="book-content">
+                <h6 class="mb-1">${book.title}</h6>
+                <p class="text-muted mb-1">by ${book.author}</p>
+                <p class="mb-0 small">${book.reason}</p>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function displayStrengths(strengths) {
+    const container = document.getElementById('strengths-list');
+    container.innerHTML = '';
+    
+    strengths.forEach(strength => {
+        const div = document.createElement('div');
+        div.className = 'strength-improvement-card strength-card';
+        div.innerHTML = `
+            <h6 class="mb-2">${strength.title}</h6>
+            <p class="mb-0">${strength.description}</p>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function displayImprovements(improvements) {
+    const container = document.getElementById('improvements-list');
+    container.innerHTML = '';
+    
+    improvements.forEach(improvement => {
+        const div = document.createElement('div');
+        div.className = 'strength-improvement-card improvement-card';
+        div.innerHTML = `
+            <h6 class="mb-2">${improvement.title}</h6>
+            <p class="mb-0">${improvement.description}</p>
+        `;
+        container.appendChild(div);
+    });
+}
+</script>
+{% endblock %}

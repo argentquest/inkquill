@@ -1,0 +1,331 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Explore Worlds{% endblock %}
+
+{% block og_title %}Explore AI Worlds - {{ project_name | default('AI App') }}{% endblock %}
+{% block twitter_title %}Explore AI Worlds - {{ project_name | default('AI App') }}{% endblock %}
+{% block og_description %}Discover imaginative AI-created worlds and chat with AI about their stories. Explore characters, locations, and lore through interactive conversations.{% endblock %}
+{% block twitter_description %}Discover imaginative AI-created worlds and chat with AI about their stories. Explore characters, locations, and lore through interactive conversations.{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Explore AI Worlds Page */
+    .explore-ai-worlds-page {
+        background: #FAFBFC;
+        min-height: 100vh;
+        padding: 0 24px;
+    }
+    
+    .explore-ai-worlds-page .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Consistent card image styling (matches character/location/world cards) */
+    .card-img-square-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio for a square */
+        background-color: #f8f9fa; /* Placeholder color */
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .card-img-square-container .card-img-top,
+    .card-img-square-container .card-img-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* This will cover the area, cropping if necessary */
+    }
+
+    .card-img-square-container .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+    }
+
+    .card-img-square-container .card-img-placeholder .fas {
+        font-size: 4rem;
+    }
+
+    /* World card specific styling */
+    .world-item .card-title {
+        font-weight: 600;
+    }
+
+    .world-item .actions .btn {
+        font-size: 0.875rem;
+    }
+    
+    /* Filter Controls */
+    .filter-controls {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .filter-controls h6 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 16px;
+    }
+    
+    .filter-controls .form-select,
+    .filter-controls .form-control {
+        border: 1px solid #D1D5DB;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+    }
+    
+    .filter-controls .form-select:focus,
+    .filter-controls .form-control:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Gallery Grid */
+    .gallery-grid {
+        margin-top: 32px;
+    }
+    
+    /* No Results Message */
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6B7280;
+    }
+    
+    .no-results .fas {
+        font-size: 48px;
+        margin-bottom: 16px;
+        color: #D1D5DB;
+    }
+    
+    .no-results h5 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #374151;
+    }
+    
+    .no-results p {
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-comments me-3"></i>
+                    Explore AI Worlds
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Discover imaginative worlds and chat with AI about their stories
+                </div>
+                <div class="mt-3">
+                    {% if worlds %}
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-list me-1"></i>
+                        {{ worlds|length }} Worlds Available
+                    </span>
+                    {% endif %}
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-robot me-1"></i>
+                        AI Powered
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-globe-americas me-1"></i>
+                        Free to Explore
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    {% if current_user and current_user.is_authenticated %}
+                        <span class="badge bg-success me-2 px-3 py-2" style="font-size: 0.9rem;">
+                            <i class="fas fa-coins me-1"></i>{{ current_user.credits }} Credits
+                        </span>
+                        <a href="{{ url_for('pricing') }}" class="btn btn-light">
+                            <i class="fas fa-plus me-1"></i> Add Credits
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('ui_login_form') }}" class="btn btn-light"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Login to save chat history and use credits">
+                            <i class="fas fa-sign-in-alt me-1"></i>
+                            Login
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('world_chat')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with AI world chat">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="explore-ai-worlds-page">
+    
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="filter-controls">
+            <h6><i class="fas fa-filter me-2"></i>Filter and Search</h6>
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" id="search-input" class="form-control" placeholder="🔍 Search worlds by name or description...">
+                </div>
+                <div class="col-md-4">
+                    <select id="sort-select" class="form-select">
+                        <option value="recent">📅 Recently Created</option>
+                        <option value="popular">🔥 Most Popular</option>
+                        <option value="alphabetical">🔤 Alphabetical</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Gallery Grid -->
+        <div class="gallery-grid">
+            <div id="worlds-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                <!-- World cards will be populated here -->
+                {% for world in worlds %}
+                    <div class="col world-card-col" 
+                         data-world-name="{{ world.name|lower }}" 
+                         data-world-description="{{ world.description|lower if world.description }}" 
+                         data-world-category="general">
+                        
+                        <div class="card h-100 shadow-sm world-item" style="cursor: pointer;" onclick="window.location.href='{{ url_for('public_world_chat', world_id=world.id) }}'">
+                            
+                            <!-- Square image container (consistent with other cards) -->
+                            <div class="card-img-square-container">
+                                {% if world.image_url %}
+                                    <img src="{{ world.image_url }}" class="card-img-top" alt="{{ world.name | e }}">
+                                {% else %}
+                                    <div class="card-img-placeholder">
+                                        <i class="fas fa-globe-americas"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ world.name | e }}</h5>
+                                {% if world.description %}
+                                    <p class="card-text text-muted small flex-grow-1">{{ world.description | e | truncate(120, True) }}</p>
+                                {% else %}
+                                    <p class="card-text text-muted small flex-grow-1"><em>No description available.</em></p>
+                                {% endif %}
+                                
+                                <!-- Action buttons removed - entire card is now clickable -->
+                                <div class="actions mt-auto">
+                                    <div class="text-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-mouse-pointer me-1"></i>Click to start chatting
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="no-results" class="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h5>No worlds found</h5>
+                <p>Try adjusting your search or filters to find more worlds.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        // Search and Filter Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const sortSelect = document.getElementById('sort-select');
+            const worldsContainer = document.getElementById('worlds-container');
+            const noResultsMessage = document.getElementById('no-results');
+            
+            function filterAndSortWorlds() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const sortBy = sortSelect.value;
+                
+                const worldCards = Array.from(worldsContainer.querySelectorAll('.world-card-col'));
+                let visibleCards = [];
+                
+                // Filter cards
+                worldCards.forEach(card => {
+                    const worldName = card.getAttribute('data-world-name') || '';
+                    const worldDescription = card.getAttribute('data-world-description') || '';
+                    
+                    const matchesSearch = worldName.includes(searchTerm) || worldDescription.includes(searchTerm);
+                    
+                    if (matchesSearch) {
+                        card.style.display = 'block';
+                        visibleCards.push(card);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Sort visible cards (basic implementation)
+                if (sortBy === 'alphabetical') {
+                    visibleCards.sort((a, b) => {
+                        const nameA = a.getAttribute('data-world-name') || '';
+                        const nameB = b.getAttribute('data-world-name') || '';
+                        return nameA.localeCompare(nameB);
+                    });
+                    
+                    // Re-append sorted cards
+                    visibleCards.forEach(card => {
+                        worldsContainer.appendChild(card);
+                    });
+                }
+                
+                // Show/hide no results message
+                if (visibleCards.length === 0) {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                }
+            }
+            
+            // Event listeners
+            searchInput.addEventListener('input', filterAndSortWorlds);
+            sortSelect.addEventListener('change', filterAndSortWorlds);
+            
+        });
+    </script>
+{% endblock %}

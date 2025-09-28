@@ -1,0 +1,388 @@
+{# /ai_rag_story_app/app/templates/pages/character_list_for_world.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Characters in {{ world.name | e }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced Tabler Premium Hero Header - NOT USED (hero is in page_header block) */
+    .characters-hero {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        position: relative;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    }
+    
+    .characters-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23ffffff15'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e");
+        pointer-events: none;
+    }
+    
+    .characters-hero .page-title {
+        position: relative;
+        z-index: 1;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .characters-hero .page-subtitle {
+        position: relative;
+        z-index: 1;
+        color: rgba(255,255,255,0.9);
+        font-size: 1rem;
+        margin-bottom: 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .characters-hero .hero-actions {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .characters-hero .btn {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .characters-hero .btn:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.4);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Enhanced Tabler Premium Character Cards */
+    .character-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface);
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    .character-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1;
+    }
+    
+    .character-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tblr-box-shadow-lg);
+        border-color: var(--tblr-primary);
+    }
+    
+    .character-card:hover::before {
+        transform: translateX(0);
+    }
+
+    .character-card .card-img-square-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+        border-bottom: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+        overflow: hidden;
+    }
+
+    .character-card .card-img-top,
+    .character-card .card-img-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .character-card .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tblr-text-muted);
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+    }
+
+    .character-card .card-img-placeholder .fas {
+        font-size: 3rem;
+        opacity: 0.6;
+    }
+    
+    .character-card .card-title {
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .character-card .actions .btn {
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        border-radius: var(--tblr-border-radius);
+        font-weight: 500;
+    }
+    
+    .character-card .btn-primary {
+        background: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+    }
+    
+    .character-card .btn-danger:hover {
+        background: var(--tblr-red);
+        border-color: var(--tblr-red);
+    }
+    
+    .character-card .actions {
+        gap: 0.5rem;
+    }
+    
+    /* Enhanced Grid with Fade-in Animation */
+    .character-item-container {
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .character-item-container:nth-child(1) { animation-delay: 0.1s; }
+    .character-item-container:nth-child(2) { animation-delay: 0.2s; }
+    .character-item-container:nth-child(3) { animation-delay: 0.3s; }
+    .character-item-container:nth-child(4) { animation-delay: 0.4s; }
+    .character-item-container:nth-child(5) { animation-delay: 0.5s; }
+    .character-item-container:nth-child(6) { animation-delay: 0.6s; }
+    .character-item-container:nth-child(n+7) { animation-delay: 0.7s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Enhanced Tabler Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color);
+        margin-top: 2rem;
+    }
+    
+    .empty-state .empty-icon {
+        width: 4rem;
+        height: 4rem;
+        background: var(--tblr-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        color: var(--tblr-body-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--tblr-text-muted);
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Fade-in Animations per UI Standards */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .character-item-container {
+        animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        opacity: 0;
+    }
+    
+    .character-item-container:nth-child(1) { animation-delay: 0.1s; }
+    .character-item-container:nth-child(2) { animation-delay: 0.2s; }
+    .character-item-container:nth-child(3) { animation-delay: 0.3s; }
+    .character-item-container:nth-child(4) { animation-delay: 0.4s; }
+    .character-item-container:nth-child(5) { animation-delay: 0.5s; }
+    .character-item-container:nth-child(6) { animation-delay: 0.6s; }
+    .character-item-container:nth-child(7) { animation-delay: 0.7s; }
+    .character-item-container:nth-child(8) { animation-delay: 0.8s; }
+    .character-item-container:nth-child(9) { animation-delay: 0.9s; }
+    .character-item-container:nth-child(n+10) { animation-delay: 1s; }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay for Visual Depth -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to {{ world.name }}">
+                        <i class="fas fa-arrow-left me-1"></i>Back to World
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white-50">Worlds</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50">{{ world.name }}</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Characters</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="fas fa-users me-3"></i>
+                    Characters
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Manage the characters in {{ world.name }}
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-user me-1"></i>
+                        {{ characters|length }} Character{{ 's' if characters|length != 1 else '' }}
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-globe me-1"></i>
+                        {{ world.name }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-warning" 
+                            onclick="openHelpModal('character_list')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with managing characters">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_create_character_for_world_form', world_id=world.id) }}" class="btn btn-light">
+                        <i class="fas fa-plus me-1"></i>
+                        New Character
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Main Content with Full Width Container per UI Standards -->
+<div class="container-fluid">
+
+    {% if characters %}
+        <div class="row row-cards">
+            {% for character in characters %}
+                <div class="col-sm-6 col-lg-4 character-item-container">
+                    <div class="character-card card h-100">
+                        
+                        <!-- FIX: Use the new square container for the image -->
+                        <div class="card-img-square-container">
+                            {% if character.image_url %}
+                                <img src="{{ character.image_url }}" class="card-img-top" alt="{{ character.name | e }}">
+                            {% else %}
+                                <div class="card-img-placeholder">
+                                    <i class="fas fa-user-secret"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- END FIX -->
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ character.name | e }}</h5>
+                            <p class="card-text text-muted small flex-grow-1">
+                                {{ character.description | e | truncate(120, True) if character.description else 'No description available.' }}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-list">
+                                <a href="{{ url_for('ui_edit_character_form', character_id=character.id) }}" 
+                                   class="btn btn-primary"
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top" 
+                                   title="Edit character details, appearance, and placement">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <button class="delete-character-btn btn btn-danger" 
+                                        data-character-id="{{ character.id }}" 
+                                        data-character-name="{{ character.name | e }}"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" 
+                                        title="Permanently delete '{{ character.name | e }}'">
+                                    <i class="fas fa-trash-alt me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3>No characters yet</h3>
+            <p>This world doesn't have any characters yet. Create your first character to start building your cast!</p>
+            <div class="btn-list justify-content-center">
+                <a href="{{ url_for('ui_character_generator', world_id=world.id) }}" class="btn btn-success">
+                    <i class="fas fa-wand-sparkles me-1"></i>Generate Character
+                </a>
+                <a href="{{ url_for('ui_create_character_for_world_form', world_id=world.id) }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-1"></i>Create Character
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/character_crud.js') }}"></script>
+{% endblock %}

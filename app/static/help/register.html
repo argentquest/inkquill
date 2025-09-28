@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Registration</h1>
+            <p class="help-subtitle">Join the AI Storytelling Community</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"signup\"]').click()">
+                <div class="quick-action-icon">📝</div>
+                <div class="quick-action-text">Sign Up Process</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"verification\"]').click()">
+                <div class="quick-action-icon">✅</div>
+                <div class="quick-action-text">Account Verification</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"getting-started\"]').click()">
+                <div class="quick-action-icon">🚀</div>
+                <div class="quick-action-text">First Steps</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="signup">Sign Up</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="verification">Verification</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="getting-started">Getting Started</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="troubleshooting">Troubleshooting</button></li>
+            </ul>
+        </div>
+
+        <!-- Sign Up Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="signup">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Creating Your Account
+                </h2>
+                <p>Join thousands of writers using AI to enhance their storytelling. Registration is free and gives you immediate access to world-building tools plus starter credits for AI features.</p>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Registration Process</h3>
+                        <span class="recipe-card-time">3 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Click "Register" on the login page</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Enter your email address and choose a secure password</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Provide your display name (this appears in community features)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Accept the terms of service and privacy policy</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Complete email verification to activate your account</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">🎁</span>
+                    <div>
+                        <strong>Welcome Bonus:</strong> New users receive 100 free AI credits to explore the platform's AI-powered features!
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Registration Requirements</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Account Information</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Requirements</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Email Address</td>
+                                    <td>Valid email, unique to platform</td>
+                                    <td>Account verification and important notifications</td>
+                                </tr>
+                                <tr>
+                                    <td>Password</td>
+                                    <td>8+ characters, mix of letters/numbers</td>
+                                    <td>Secure account access</td>
+                                </tr>
+                                <tr>
+                                    <td>Display Name</td>
+                                    <td>3-50 characters, appropriate content</td>
+                                    <td>Public identity in forums and shared content</td>
+                                </tr>
+                                <tr>
+                                    <td>Age Confirmation</td>
+                                    <td>13+ years old</td>
+                                    <td>Legal compliance (COPPA)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Password Security Guidelines</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create a strong password to protect your creative work:</p>
+                        <ul>
+                            <li><strong>Length:</strong> At least 8 characters (12+ recommended)</li>
+                            <li><strong>Complexity:</strong> Mix uppercase, lowercase, numbers, and symbols</li>
+                            <li><strong>Uniqueness:</strong> Don't reuse passwords from other sites</li>
+                            <li><strong>Avoid:</strong> Personal information, common words, or predictable patterns</li>
+                            <li><strong>Consider:</strong> Using a password manager for unique, secure passwords</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Strong Password Examples:\n✅ Good: MyStory2024!Write\n✅ Good: Dragon$Quest#47\n✅ Good: Creative&Mind88\n\n❌ Avoid: password123\n❌ Avoid: yourname2024\n❌ Avoid: 12345678')">Copy</button>
+                            <pre>Strong Password Examples:
+✅ Good: MyStory2024!Write
+✅ Good: Dragon$Quest#47
+✅ Good: Creative&Mind88
+
+❌ Avoid: password123
+❌ Avoid: yourname2024
+❌ Avoid: 12345678</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Privacy and Data Protection</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>We protect your personal information and creative content:</p>
+                        <ul>
+                            <li><strong>Account Data:</strong> Email and profile information kept secure</li>
+                            <li><strong>Creative Content:</strong> Your stories and worlds remain private by default</li>
+                            <li><strong>AI Processing:</strong> Content used for AI assistance is not stored permanently</li>
+                            <li><strong>Data Rights:</strong> You can export or delete your data at any time</li>
+                            <li><strong>Third Parties:</strong> We never sell personal information</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="verification">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Email Verification Process
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Verification Steps</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>After registration, you'll need to verify your email address:</p>
+                        <ol>
+                            <li><strong>Check Your Email:</strong> Look for a message from the AI Storytelling Assistant</li>
+                            <li><strong>Click Verification Link:</strong> Click the link in the email to confirm your address</li>
+                            <li><strong>Return to Platform:</strong> You'll be redirected back to complete setup</li>
+                            <li><strong>Access Granted:</strong> Your account is now fully activated</li>
+                        </ol>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">📧</span>
+                            <div>
+                                <strong>Check Spam Folder:</strong> Verification emails sometimes end up in spam. Check all folders if you don't see the email within 5 minutes.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Verification Issues</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Common verification problems and solutions:</p>
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Problem</th>
+                                    <th>Cause</th>
+                                    <th>Solution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>No verification email</td>
+                                    <td>Email in spam or wrong address</td>
+                                    <td>Check spam folder, request new email</td>
+                                </tr>
+                                <tr>
+                                    <td>Link expired</td>
+                                    <td>Waited too long to verify</td>
+                                    <td>Request new verification email</td>
+                                </tr>
+                                <tr>
+                                    <td>Link doesn't work</td>
+                                    <td>Email client altered link</td>
+                                    <td>Copy/paste full URL into browser</td>
+                                </tr>
+                                <tr>
+                                    <td>Wrong email used</td>
+                                    <td>Typo during registration</td>
+                                    <td>Contact support to update email</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Account Security Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Additional security options available after verification:</p>
+                        <ul>
+                            <li><strong>Two-Factor Authentication:</strong> Add extra security with phone or app</li>
+                            <li><strong>Login Notifications:</strong> Get alerts about account access</li>
+                            <li><strong>Session Management:</strong> View and control active login sessions</li>
+                            <li><strong>Password Changes:</strong> Regular password updates recommended</li>
+                            <li><strong>Account Recovery:</strong> Set up backup recovery methods</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Getting Started Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="getting-started">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Your First Steps
+                </h2>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">New User Onboarding</h3>
+                        <span class="recipe-card-time">15 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content"><strong>Complete your profile</strong> - Add a profile picture and bio</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content"><strong>Take the tutorial</strong> - Interactive guide to key features</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content"><strong>Create your first world</strong> - Start with a simple concept</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content"><strong>Try AI assistance</strong> - Use your free credits to explore AI features</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content"><strong>Join the community</strong> - Explore public worlds and forums</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🌍 World Building</h3>
+                        <p class="feature-card-description">Create characters, locations, and lore items to populate your creative universe.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">✍️ AI Writing</h3>
+                        <p class="feature-card-description">Get intelligent suggestions and assistance while writing your stories.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">👥 Community</h3>
+                        <p class="feature-card-description">Share your work, get feedback, and collaborate with other writers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Organization</h3>
+                        <p class="feature-card-description">Keep your creative projects organized with powerful management tools.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Account Types and Benefits</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Free Account Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Everything you need to start storytelling:</p>
+                        <ul>
+                            <li><strong>Unlimited Worlds:</strong> Create as many creative universes as you want</li>
+                            <li><strong>Unlimited Content:</strong> No limits on characters, locations, or stories</li>
+                            <li><strong>Basic Collaboration:</strong> Share worlds and get feedback</li>
+                            <li><strong>Community Access:</strong> Participate in forums and discussions</li>
+                            <li><strong>Starter Credits:</strong> 100 AI credits to try intelligent features</li>
+                            <li><strong>Export Options:</strong> Download your work in multiple formats</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Premium Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Enhanced features available through credit purchases:</p>
+                        <ul>
+                            <li><strong>AI Writing Assistance:</strong> Smart suggestions and content generation</li>
+                            <li><strong>Image Generation:</strong> Create visual assets for characters and locations</li>
+                            <li><strong>Advanced Analysis:</strong> Story consistency and character development tools</li>
+                            <li><strong>Priority Support:</strong> Faster response times for technical issues</li>
+                            <li><strong>Beta Features:</strong> Early access to new AI capabilities</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="troubleshooting">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Registration Troubleshooting
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Common Registration Issues</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Issue</th>
+                                    <th>Likely Cause</th>
+                                    <th>Solution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>"Email already exists"</td>
+                                    <td>Account already created</td>
+                                    <td>Try logging in or use password reset</td>
+                                </tr>
+                                <tr>
+                                    <td>"Invalid email format"</td>
+                                    <td>Email address format error</td>
+                                    <td>Check for typos, ensure proper format</td>
+                                </tr>
+                                <tr>
+                                    <td>"Password too weak"</td>
+                                    <td>Password doesn't meet requirements</td>
+                                    <td>Use 8+ characters with numbers/symbols</td>
+                                </tr>
+                                <tr>
+                                    <td>"Display name taken"</td>
+                                    <td>Username already in use</td>
+                                    <td>Try variations or add numbers</td>
+                                </tr>
+                                <tr>
+                                    <td>Registration form won't submit</td>
+                                    <td>Browser or network issue</td>
+                                    <td>Try different browser, check connection</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Browser and Technical Requirements</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Ensure your browser supports all platform features:</p>
+                        <ul>
+                            <li><strong>Supported Browsers:</strong> Chrome 90+, Firefox 88+, Safari 14+, Edge 90+</li>
+                            <li><strong>JavaScript:</strong> Must be enabled for full functionality</li>
+                            <li><strong>Cookies:</strong> Required for login and session management</li>
+                            <li><strong>Internet Connection:</strong> Stable connection recommended for AI features</li>
+                            <li><strong>Screen Resolution:</strong> 1024x768 minimum, responsive on mobile</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Account Recovery Options</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>If you're having trouble accessing your account:</p>
+                        <ul>
+                            <li><strong>Password Reset:</strong> Use "Forgot Password" link on login page</li>
+                            <li><strong>Email Issues:</strong> Contact support to update email address</li>
+                            <li><strong>Account Lockout:</strong> Wait 15 minutes or contact support</li>
+                            <li><strong>Technical Problems:</strong> Try incognito/private browsing mode</li>
+                            <li><strong>Account Deletion:</strong> Contact support to restore deleted accounts</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Contact Support</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>When to contact support and what information to include:</p>
+                        <ul>
+                            <li><strong>Email Issues:</strong> Include attempted email address</li>
+                            <li><strong>Technical Errors:</strong> Include browser type and error messages</li>
+                            <li><strong>Account Problems:</strong> Include display name and registration date</li>
+                            <li><strong>Feature Issues:</strong> Include steps to reproduce the problem</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">📧</span>
+                            <div>
+                                <strong>Support Response:</strong> We typically respond to registration issues within 24 hours. Check your spam folder for our reply.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Tip -->
+        <div class="final-tip">
+            <h4>💡 Final Tip</h4>
+            <p>Registration is just the beginning! After creating your account, spend a few minutes completing your profile and exploring the tutorial. The AI works better when it understands your writing preferences and goals.</p>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

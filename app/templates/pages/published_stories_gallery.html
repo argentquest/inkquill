@@ -1,0 +1,547 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Published Stories{% endblock %}
+
+{% block og_title %}Published Stories Gallery - {{ project_name | default('AI App') }}{% endblock %}
+{% block twitter_title %}Published Stories Gallery - {{ project_name | default('AI App') }}{% endblock %}
+{% block og_description %}Discover amazing AI-generated stories created by our community of writers. Browse engaging narratives and find your next great read.{% endblock %}
+{% block twitter_description %}Discover amazing AI-generated stories created by our community of writers. Browse engaging narratives and find your next great read.{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced Gallery Container */
+    .gallery-container {
+        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--tblr-bg-surface);
+        min-height: calc(100vh - var(--tblr-navbar-height));
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Enhanced Cards with Staggered Animation */
+    .story-item-container {
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .story-item-container:nth-child(1) { animation-delay: 0.1s; }
+    .story-item-container:nth-child(2) { animation-delay: 0.2s; }
+    .story-item-container:nth-child(3) { animation-delay: 0.3s; }
+    .story-item-container:nth-child(4) { animation-delay: 0.4s; }
+    .story-item-container:nth-child(5) { animation-delay: 0.5s; }
+    .story-item-container:nth-child(6) { animation-delay: 0.6s; }
+    .story-item-container:nth-child(n+7) { animation-delay: 0.7s; }
+    
+    /* Enhanced Story Cards */
+    .story-card {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .story-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1;
+    }
+    
+    .story-card:hover::before {
+        transform: translateX(0);
+    }
+    
+    /* Pagination Card */
+    .pagination {
+        margin-bottom: 0;
+    }
+    
+    .page-link {
+        color: var(--tblr-primary);
+        border-color: var(--tblr-border-color);
+        transition: all 0.2s ease;
+    }
+    
+    .page-link:hover {
+        background-color: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+    }
+    
+    .page-item.disabled .page-link {
+        color: var(--tblr-text-muted);
+        background-color: var(--tblr-bg-surface-secondary);
+        border-color: var(--tblr-border-color);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .story-card .card-body {
+            padding: 1rem;
+            flex-direction: column;
+        }
+        
+        .story-image-container img,
+        .story-image-placeholder {
+            width: 100% !important;
+            height: 200px !important;
+            max-width: 256px;
+            margin: 0 auto;
+        }
+        
+        .story-title {
+            font-size: 1.125rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay for Visual Depth -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Published Stories</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="fas fa-globe me-3"></i>
+                    Published Stories Gallery
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Discover amazing stories created by our community of writers
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if total_stories %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-list me-1"></i>{{ total_stories }} Stories
+                        {% if total_pages > 1 %}
+                        <span class="text-muted">({{ total_pages }} pages)</span>
+                        {% endif %}
+                    </span>
+                    {% endif %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-users me-1"></i>Community Gallery
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-warning" 
+                            onclick="openHelpModal('published_stories')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            title="Get help with browsing published stories">
+                        <i class="fas fa-question-circle me-1"></i>Help
+                    </button>
+                    {% if current_user %}
+                    <a href="{{ url_for('ui_list_stories') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Go to your stories to publish new ones">
+                        <i class="fas fa-plus me-1"></i>Publish Your Story
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="gallery-container">
+    
+    <!-- Main Content -->
+    <div class="page-body">
+        <div class="container-fluid">
+            <!-- Enhanced Search and Filter Section -->
+            <div class="card search-filter-section mb-4" style="border: 1px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); box-shadow: var(--tblr-box-shadow); transition: all 0.3s ease;">
+                <div class="card-status-top bg-primary"></div>
+                <div class="card-header" style="background: var(--tblr-bg-surface); border-bottom: 1px solid var(--tblr-border-color);">
+                    <h3 class="card-title">
+                        <i class="fas fa-filter me-2 text-primary"></i>
+                        Search & Filter Stories
+                    </h3>
+                </div>
+                <div class="card-body" style="background: var(--tblr-bg-surface);">
+                    <form method="get" action="{{ url_for('published_stories_gallery') }}" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Search Stories</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: var(--tblr-bg-surface-secondary); border-color: var(--tblr-border-color);">
+                                    <i class="fas fa-search text-primary"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="search" 
+                                       placeholder="Search by title, description, or author..." 
+                                       value="{{ search or '' }}"
+                                       style="border-color: var(--tblr-border-color);">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">Sort By</label>
+                            <select class="form-select" name="sort_by" style="border-color: var(--tblr-border-color);">
+                                <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>
+                                    📅 Most Recent
+                                </option>
+                                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>
+                                    📈 Most Popular
+                                </option>
+                                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>
+                                    ⭐ Highest Rated
+                                </option>
+                                <option value="title" {% if sort_by == 'title' %}selected{% endif %}>
+                                    🔤 Alphabetical
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100" style="background: var(--tblr-primary); border-color: var(--tblr-primary);">
+                                <i class="fas fa-filter me-2"></i>Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% if search %}
+                    <div class="mt-3 alert alert-azure border-0" role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar avatar-sm bg-azure-lt me-3">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <h4 class="alert-title">Search Results</h4>
+                                <div class="text-secondary">Showing results for: <strong>{{ search }}</strong></div>
+                            </div>
+                            <a href="{{ url_for('published_stories_gallery') }}" 
+                               class="btn btn-azure btn-sm ms-3">
+                                <i class="fas fa-times me-1"></i> Clear Search
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        
+            <!-- Enhanced Stories Grid -->
+            {% if stories %}
+            <div class="row row-cols-1 row-cols-lg-2 g-4">
+                {% for story_data in stories %}
+                {% set story = story_data.story %}
+                {% set first_words = story_data.first_words %}
+                <div class="col story-item-container">
+                    <div class="card story-card h-100" style="border: 1px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); box-shadow: var(--tblr-box-shadow); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; cursor: pointer;" onclick="location.href='{{ url_for('view_published_story', story_id=story.id) }}'">
+                        <div class="card-status-top bg-primary"></div>
+                        <div class="card-body d-flex" style="padding: 1.5rem; gap: 1rem;">
+                            <!-- Story Image -->
+                            <div class="story-image-container" style="flex-shrink: 0;">
+                                {% if story.story and story.story.image_url %}
+                                    <img src="{{ story.story.image_url }}" 
+                                         alt="{{ story.title }}" 
+                                         class="story-image"
+                                         style="width: 256px; height: 256px; object-fit: cover; border-radius: var(--tblr-border-radius); border: 1px solid var(--tblr-border-color);">
+                                {% else %}
+                                    <div class="story-image-placeholder" 
+                                         style="width: 256px; height: 256px; background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%); border-radius: var(--tblr-border-radius); border: 1px solid var(--tblr-border-color); display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-book-open text-muted" style="font-size: 4rem; opacity: 0.6;"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Story Content -->
+                            <div class="story-content d-flex flex-column" style="flex-grow: 1; min-width: 0;">
+                                <!-- Story Meta -->
+                                <div class="story-meta mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-sm bg-primary-lt me-2">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <a href="{{ url_for('user_published_stories', username=story.publisher.username) }}" 
+                                           class="fw-medium text-decoration-none"
+                                           style="color: var(--tblr-text-muted); transition: color 0.15s ease;"
+                                           onclick="event.stopPropagation();">
+                                            {{ story.publisher.display_name or story.publisher.username }}
+                                        </a>
+                                        {% if story.story and story.story.world %}
+                                        <span class="text-muted mx-2">•</span>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-globe me-1 text-primary"></i>
+                                            <span class="text-muted">{{ story.story.world.name }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Story Title -->
+                                <h3 class="story-title mb-3">
+                                    <span class="text-decoration-none"
+                                          style="color: var(--tblr-body-color); font-weight: 600; font-size: 1.25rem; line-height: 1.4; transition: color 0.15s ease;">
+                                        {{ story.title }}
+                                    </span>
+                                    <div class="mt-2">
+                                        {% if story.story and story.story.story_type == 'basic' %}
+                                        <span class="badge bg-success" 
+                                              data-bs-toggle="tooltip" 
+                                              title="Basic Story - Quick narrative format">
+                                            <i class="fas fa-rocket me-1"></i>Basic
+                                        </span>
+                                        {% elif story.story and story.story.story_type == 'advanced' %}
+                                        <span class="badge bg-primary" 
+                                              data-bs-toggle="tooltip" 
+                                              title="Advanced Story - Rich world-building format">
+                                            <i class="fas fa-globe me-1"></i>Advanced
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </h3>
+                                
+                                <!-- Story Description -->
+                                <div class="story-description flex-grow-1 mb-3" style="color: var(--tblr-text-muted); line-height: 1.5; font-size: 0.875rem;">
+                                    {% if story.description %}
+                                        {{ story.description | truncate(150) }}
+                                    {% else %}
+                                        <em class="text-muted">No description available</em>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- First 50 Words Preview -->
+                                <div class="story-preview mb-3" style="padding: 0.75rem; background: var(--tblr-bg-surface-secondary); border-radius: var(--tblr-border-radius); border-left: 3px solid var(--tblr-primary);">
+                                    <small class="text-muted fw-medium d-block mb-1">
+                                        <i class="fas fa-eye me-1"></i>Story Preview:
+                                    </small>
+                                    <div style="font-style: italic; color: var(--tblr-text-muted); font-size: 0.8rem; line-height: 1.4;">
+                                        {% if first_words and first_words|length > 0 %}
+                                            "{{ first_words }}..."
+                                        {% else %}
+                                            <em class="text-muted">Preview not available - check back soon!</em>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Story Stats -->
+                                <div class="story-stats mb-3" style="padding-top: 0.75rem; border-top: 1px solid var(--tblr-border-color);">
+                                    <div class="d-flex gap-3 flex-wrap" style="font-size: 0.875rem; color: var(--tblr-text-muted);">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-eye me-1 text-primary"></i>
+                                            <span>{{ story.view_count }} views</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-comment me-1 text-primary"></i>
+                                            <span>{{ story.comment_count }} comments</span>
+                                        </div>
+                                        {% if story.average_rating %}
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-star me-1 text-warning"></i>
+                                            <span>{{ "%.1f"|format(story.average_rating) }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Button -->
+                                <div class="mt-auto">
+                                    <a href="{{ url_for('view_published_story', story_id=story.id) }}" 
+                                       class="btn btn-primary"
+                                       style="background: var(--tblr-primary); border-color: var(--tblr-primary);"
+                                       onclick="event.stopPropagation();">
+                                        <i class="fas fa-eye me-2"></i>
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer" style="background: var(--tblr-bg-surface-secondary); border-top: 1px solid var(--tblr-border-color); font-size: 0.875rem; color: var(--tblr-text-muted);">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1 text-primary"></i>
+                                    Published {{ story.published_at.strftime('%B %d, %Y') }}
+                                </small>
+                                {% if story.word_count %}
+                                <small class="text-muted">
+                                    <i class="fas fa-file-text me-1 text-primary"></i>
+                                    {{ "{:,}".format(story.word_count) }} words
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        
+            <!-- Enhanced Pagination -->
+            {% if total_pages > 1 %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <nav aria-label="Story pagination">
+                        <ul class="pagination justify-content-center mb-0">
+                            <!-- Previous -->
+                            <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                                <a class="page-link" 
+                                   href="{{ url_for('published_stories_gallery') }}?page={{ page-1 }}{% if search %}&search={{ search|urlencode }}{% endif %}&sort_by={{ sort_by }}"
+                                   {% if page <= 1 %}tabindex="-1" aria-disabled="true"{% endif %}>
+                                    <i class="ti ti-chevron-left me-1"></i> Previous
+                                </a>
+                            </li>
+                            
+                            <!-- Page numbers -->
+                            {% for p in range(1, total_pages + 1) %}
+                                {% if p == page %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ p }}</span>
+                                    </li>
+                                {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+                                    <li class="page-item">
+                                        <a class="page-link" 
+                                           href="{{ url_for('published_stories_gallery') }}?page={{ p }}{% if search %}&search={{ search|urlencode }}{% endif %}&sort_by={{ sort_by }}">
+                                            {{ p }}
+                                        </a>
+                                    </li>
+                                {% elif p == page - 3 or p == page + 3 %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <!-- Next -->
+                            <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                                <a class="page-link" 
+                                   href="{{ url_for('published_stories_gallery') }}?page={{ page+1 }}{% if search %}&search={{ search|urlencode }}{% endif %}&sort_by={{ sort_by }}"
+                                   {% if page >= total_pages %}tabindex="-1" aria-disabled="true"{% endif %}>
+                                    Next <i class="ti ti-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+        
+            {% else %}
+            <!-- Enhanced Empty State -->
+            <div class="empty-state" style="text-align: center; padding: 3rem 1rem; background: var(--tblr-bg-surface); border-radius: var(--tblr-border-radius-lg); border: 1px solid var(--tblr-border-color);">
+                <div class="empty-icon" style="width: 4rem; height: 4rem; background: var(--tblr-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 1.5rem;">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3 class="empty-title" style="color: var(--tblr-body-color); margin-bottom: 0.5rem;">
+                    {% if search %}
+                        No Stories Found
+                    {% else %}
+                        No Published Stories Yet
+                    {% endif %}
+                </h3>
+                <p class="empty-subtitle text-muted" style="margin-bottom: 1.5rem;">
+                    {% if search %}
+                        No stories found matching your search criteria. Try adjusting your filters or search terms.
+                    {% else %}
+                        Be the first to publish a story and share your creativity with the community!
+                    {% endif %}
+                </p>
+                <div class="empty-action">
+                    {% if search %}
+                    <a href="{{ url_for('published_stories_gallery') }}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        View All Stories
+                    </a>
+                    {% endif %}
+                    {% if current_user %}
+                    <a href="{{ url_for('ui_list_stories') }}" 
+                       class="btn btn-primary" style="background: var(--tblr-primary); border-color: var(--tblr-primary);">
+                        <i class="fas fa-plus me-2"></i>
+                        Publish Your Story
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Enhanced card interactions
+    const storyCards = document.querySelectorAll('.story-card');
+    storyCards.forEach(card => {
+        // Add subtle animation on hover
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Auto-submit search on input (with debounce)
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.length > 2 || this.value.length === 0) {
+                    this.form.submit();
+                }
+            }, 500);
+        });
+    }
+    
+    // Analytics tracking for story interactions
+    document.querySelectorAll('a[href*="published_url"]').forEach(link => {
+        link.addEventListener('click', function() {
+            // Track story view event
+            if (window.gtag) {
+                gtag('event', 'story_view', {
+                    'story_title': this.closest('.story-card').querySelector('.story-title a').textContent.trim()
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

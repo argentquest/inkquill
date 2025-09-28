@@ -1,0 +1,141 @@
+{
+"world": {
+"name": "Asteroid Worlds of The Little Prince",
+"description": "The Asteroid Worlds of The Little Prince are a whimsical collection of tiny planets and vast desert landscapes, a cosmos where wonder and melancholy intermingle. Each asteroid forms a microcosm, inhabited by singular adults whose peculiar obsessions and character quirks contain gentle parables about life. The spaces between asteroids and stars are infinite and mysterious, conveying a sense of both enchanting possibility and poignant solitude. The rose-dappled home of the Little Prince is at once a place of innocence and longing, while the endless Sahara Desert grounds his story in the realities of human existence.\n\nInhabitants of this universe follow the logic of dreams—animals speak with sincerity, baobab trees threaten with silent persistence, and a fox can impart the most profound lessons about friendship and love. The Adult characters, absorbed by their own concerns, reflect the folly and blindness that comes with grown-up preoccupations. In contrast, the world’s magic emerges when seen through the eyes of a gentle child or someone willing to be tamed by friendship and awe.\n\nAtmosphere lingers somewhere between nostalgia and hope, lightly sketched with allegorical depth. The night sky glimmers with possibilities, and every encounter brings a moral lesson wrapped in simplicity. The world is both metaphysical, dealing with the invisible and the essential, and tangible, filled with simple sketches, starry vistas, and lonely sunsets. What makes this world memorable is its exquisite blend of innocence, bittersweet wisdom, and the ever-present invitation to see with the heart, not just the eyes."
+},
+"characters": [
+{
+"name": "The Little Prince",
+"description": "A golden-haired boy from a tiny asteroid, the Little Prince has a gentle, androgynous appearance and is often depicted in a green tunic or blue coat with a scarf. His thoughtful gaze and delicate stature convey both youth and wisdom. He is the main protagonist, traveling from planet to planet in search of understanding and meaningful connection.",
+"personality_traits": "Innocent, Curious, Thoughtful, Sensitive, Honest, Earnest, Imaginative, Compassionate",
+"backstory": "Originating from Asteroid B-612, the Little Prince cares for his beloved rose and leaves his world to explore the universe. His journey takes him to various planets, each with a unique adult, before reaching Earth where he reflects on friendship, love, and loss. The central arc of his story is the quest for true understanding and the reconciliation of longing and attachment.",
+"importance_rating": "5",
+"relationships": "Deeply attached to his Rose, guided by the Fox on Earth, meets the Aviator and various adult archetypes on other asteroids.",
+"image_prompt_definition": "Small, golden-haired boy with scarf, green tunic, standing on a tiny star-shaped planet, looking wistful under a starry sky"
+},
+{
+"name": "The Aviator",
+"description": "An adult man who crash-lands his plane in the Sahara Desert, the Aviator has a gentle demeanor and is resourceful, wearing practical clothing suited for flight and desert survival. He is both narrator and participant, sketched with simple lines and often shown tinkering with his plane or interacting with the Little Prince.",
+"personality_traits": "Reflective, Patient, Imaginative, Melancholic, Kind, Practical, Nostalgic",
+"backstory": "A former child dreamer who became a pilot, the Aviator is lost in the desert due to engine trouble. His encounter with the Little Prince reconnects him with the lost clarity of childhood and the importance of seeing beneath the surface. Through their conversations, he comes to terms with his loneliness and the value of invisible connections.",
+"importance_rating": "5",
+"relationships": "Forms a deep, transformative friendship with the Little Prince; interacts with mechanics and adults in his memories.",
+"image_prompt_definition": "Gentle adult man in a worn pilot’s outfit, with goggles, beside a broken biplane in the golden sands of the Sahara, thoughtful expression"
+},
+{
+"name": "The Rose",
+"description": "A beautiful, fragile flower with delicate petals, often depicted with a small bell jar for protection. The Rose is proud and sensitive, exuding charm and grace. Though physically delicate, her emotional presence is profound and central to the Little Prince's heart.",
+"personality_traits": "Vain, Lovable, Sensitive, Coy, Proud, Vulnerable, Demanding, Grateful",
+"backstory": "Sprouting mysteriously on the Little Prince’s planet, the Rose is unique among flowers, requiring care and protection. Her contradictory behaviors lead to misunderstandings that prompt the Little Prince’s journey. Ultimately, her sincerity and vulnerability deeply affect the Prince, teaching him about love and responsibility.",
+"importance_rating": "4",
+"relationships": "Beloved and cherished by the Little Prince; symbolizes love, loss, and care for others.",
+"image_prompt_definition": "Elegant, single red rose with dewdrops on petals, standing alone on a tiny green planet under a glass dome, bathed in warm light"
+},
+{
+"name": "The Fox",
+"description": "A small wild animal with bright, intelligent eyes and russet fur, the Fox is endearing and wise. He is cautious but also inviting, portrayed in a natural setting and sometimes sitting attentively, inviting trust.",
+"personality_traits": "Wise, Patient, Gentle, Yearning, Caring, Philosophical, Reserved",
+"backstory": "Living on Earth, in the fields near the meeting place of the Little Prince and the Aviator, the Fox desires to be 'tamed.' Through his friendship with the Prince, he introduces the core lesson that 'one sees clearly only with the heart.'",
+"importance_rating": "4",
+"relationships": "Forms a close, transformative bond with the Little Prince; symbolic tie to the Prince’s Rose.",
+"image_prompt_definition": "Small, graceful fox with bright eyes and bushy orange tail, sitting in golden grass, gazing up at a star-filled sky with gentle curiosity"
+},
+{
+"name": "The King",
+"description": "An adult man who sits on a throne that seems far too large for his tiny asteroid. He sports kingly attire, including a luxurious robe and crown but rules over a world with no real subjects. His regal pose is contrasted by the emptiness of his domain.",
+"personality_traits": "Authoritative, Absurd, Lonely, Expectant, Polite, Deluded, Commanding",
+"backstory": "Occupant of one of the Little Prince’s visited asteroids, the King represents the adult obsession with power and control. Though he commands endlessly, he has no real people to reign over, exposing the futility and vanity behind empty rule.",
+"importance_rating": "3",
+"relationships": "Interacts briefly with the Little Prince; connected loosely to other archetypal adults in the Prince's journey.",
+"image_prompt_definition": "Regal man with oversized crown and grand purple robe, seated on a large throne atop a tiny planet, issuing commands grandly to empty space"
+},
+{
+"name": "The Lamplighter",
+"description": "A solitary figure dressed in work clothes, the Lamplighter tirelessly lights and extinguishes a single lamp on his small world. He is depicted with a pole for the lamp and an air of perpetual fatigue.",
+"personality_traits": "Dedicated, Dutiful, Resigned, Earnest, Habitual, Stoic",
+"backstory": "Living alone on his ever-rotating asteroid, he is bound by a routine forced by the increasingly rapid day-night cycle. His endless work embodies the sacrifice of self to duty, persisting even as his actions are rendered absurd.",
+"importance_rating": "3",
+"relationships": "Encountered by the Little Prince; symbolic tie to adults and their occupations.",
+"image_prompt_definition": "Tired lamplighter in humble clothes, lighting a tall streetlamp on a tiny round asteroid, bathed in the warm glow of twilight"
+}
+],
+"locations": [
+{
+"name": "Asteroid B-612",
+"description": "A minuscule, idyllic world floating in the cosmic void, Asteroid B-612 is home to the Little Prince and his Rose. The surface is barely large enough for a few baobab seedlings, a single Rose, three volcanoes, and the Prince’s daily explorations.",
+"atmosphere": "Whimsical, Serene, Intimate, Melancholic",
+"scale": "REGION",
+"geography": "Tiny, spherical asteroid with soft soil, three miniature volcanoes (one extinct), the Rose’s spot, and constant starlight hovering above.",
+"cultural_context": "World revolves around the Prince’s routines—volcano sweeping, baobab weeding, and the care of the Rose. The culture is one of gentle, loving stewardship.",
+"significance": "Central to the Prince’s identity, relationships, and sense of belonging; the narrative’s emotional anchor.",
+"importance_rating": "5",
+"connected_elements": "Home of the Little Prince; location of the Rose, baobabs, and volcanoes; cherished in the Prince's heart throughout his journey.",
+"image_prompt_definition": "Tiny green sphere with three miniature volcanoes, a solitary red rose under a glass dome, and golden-haired boy standing, ethereal starry background"
+},
+{
+"name": "The Sahara Desert",
+"description": "An endless, stark expanse of golden sand dunes, the Sahara is both bleak and beautiful. By day, it glimmers with parching heat and emptiness; by night, the stars hang low and bright, creating a sense of vast isolation.",
+"atmosphere": "Lonely, Reflective, Dreamlike",
+"scale": "REGION",
+"geography": "Vast flat plains of fine sand, occasional rocky outcrops, with no visible vegetation or signs of civilization.",
+"cultural_context": "A place for encounters and revelations, entirely separate from the mundane world. It is inhabited by neither people nor animals, with rare visits by aviators.",
+"significance": "Meeting place of the Little Prince and the Aviator; a canvas for memory, transformation, and the search for water and meaning.",
+"importance_rating": "5",
+"connected_elements": "Where the Aviator’s plane crashes; setting for the Prince’s Earthly encounters and final moments.",
+"image_prompt_definition": "Vast undulating sand dunes under a blazing sky, wrecked biplane in the distance, faint silhouette of a small boy and a man, twilight stars above"
+},
+{
+"name": "The Lamplighter’s Asteroid",
+"description": "A small, solitary world with a single, tall streetlamp standing at its center. The surface spins rapidly, casting alternating light and shadow with frantic speed. The lamplighter’s tireless efforts give the place a sense of cyclical urgency.",
+"atmosphere": "Routine, Hectic, Isolated, Bittersweet",
+"scale": "REGION",
+"geography": "Smooth, round asteroid with one lamp; horizon constantly shifting due to rapid rotation.",
+"cultural_context": "Culture of unending duty and mechanical repetition, one man bound forever to his lonely task.",
+"significance": "Highlights the futility of meaningless work, persistence in face of absurdity; a key lesson for the Prince.",
+"importance_rating": "3",
+"connected_elements": "Inhabited by the Lamplighter; visited by the Little Prince during his travels.",
+"image_prompt_definition": "Tiny swiftly spinning planet with a single lamppost in the center, tired man lighting the lamp, swirling stars around in the darkness"
+}
+],
+"lore_items": [
+{
+"title": "The Baobabs",
+"description": "Baobabs are massive, potentially destructive trees whose unchecked growth would tear apart Asteroid B-612. They begin as innocuous saplings but become threatening if neglected. Their presence symbolizes looming dangers and life's pressing responsibilities.",
+"category": "CREATURE",
+"importance_rating": "4",
+"related_elements": "Asteroid B-612, Little Prince, Rose; emblematic of the Prince's daily routines.",
+"image_prompt_definition": "Whimsical sketch of gigantic tree roots cracking open a tiny planet, baobab sprouts emerging among volcanoes, worried little boy nearby"
+},
+{
+"title": "The Rose’s Glass Dome",
+"description": "A delicate, transparent bell-jar used by the Little Prince to protect his Rose from cold winds and threats. It highlights the Rose’s vulnerability and the Prince’s loving, if sometimes overbearing, care.",
+"category": "ARTIFACT",
+"importance_rating": "3",
+"related_elements": "Rose, Little Prince, Asteroid B-612.",
+"image_prompt_definition": "Crystal-clear glass dome covering a single vibrant red rose, sitting serenely on green grass of a tiny planet"
+},
+{
+"title": "The Drawing of the Boa Constrictor",
+"description": "A simple child’s drawing depicting a boa constrictor swallowing an elephant—often mistaken by adults for a hat. The drawing is central to the Aviator’s reflections on childhood creativity and the incomprehension of adults.",
+"category": "ARTIFACT",
+"importance_rating": "3",
+"related_elements": "Aviator, Little Prince; often recounted as pivotal in the narration.",
+"image_prompt_definition": "Simple crayon sketch of an oval pile resembling a hat, with cross-section revealing an elephant inside a boa constrictor"
+},
+{
+"title": "The Fox’s Lesson",
+"description": "The Fox shares a profound lesson with the Little Prince: 'One sees clearly only with the heart. What is essential is invisible to the eye.' This concept, rooted in their taming ritual, shapes the emotional core of the narrative.",
+"category": "OTHER_LORE",
+"importance_rating": "5",
+"related_elements": "Little Prince, Fox, Rose; central to the story's message of love and connection.",
+"image_prompt_definition": "Gentle fox and small boy sitting close together in golden wheat field, soft light, suggestion of invisible bond between them"
+}
+]
+}
+
+
+
+
+
+
+

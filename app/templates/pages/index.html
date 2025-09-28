@@ -1,0 +1,3337 @@
+{# /ai_rag_story_app/app/templates/pages/index.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Home - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- Include Social Sharing CSS -->
+<link rel="stylesheet" href="/static/css/components/social-sharing.css">
+<style>
+    /* Welcome Dashboard High Priority Fixes */
+    .welcome-dashboard {
+        max-width: 100%;
+        margin: 0;
+        padding: 8px 4px;
+    }
+    
+    /* CRITICAL FIX: Override the main-content margin when sidebar is expanded */
+    body.sidebar-expanded .main-content {
+        margin-left: 0 !important;
+    }
+    
+    /* Instead, add proper margin to account for sidebar width + some breathing room */
+    body.sidebar-expanded .welcome-dashboard {
+        margin-left: 300px !important;  /* 280px sidebar + 20px breathing room */
+    }
+    
+    /* Top navigation layout adjustments - full width */
+    .topbar-layout .welcome-dashboard {
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+        padding: 20px 24px !important;
+    }
+    
+    /* Sidebar layout adjustments - now much simpler since we fixed the root margin issue */
+    @media (min-width: 768px) {
+        /* Normal spacing for sidebar layout since we removed the 280px margin */
+        body:not(.topbar-layout) .welcome-dashboard {
+            padding: 16px 12px;
+        }
+    }
+    
+    /* Tabler Premium Published Stories Layout */
+    .published-story-card-horizontal {
+        display: flex !important;
+        align-items: flex-start !important;
+        background: var(--tblr-bg-surface) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        border-radius: var(--tblr-border-radius) !important;
+        padding: 1rem !important;
+        margin-bottom: 1rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: var(--tblr-box-shadow) !important;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .published-story-card-horizontal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .published-story-card-horizontal:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: var(--tblr-box-shadow-lg) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    .published-story-card-horizontal:hover::before {
+        transform: translateX(0);
+    }
+    
+    .story-card-image-left {
+        flex-shrink: 0 !important;
+        width: 120px !important;
+        height: 120px !important;
+        margin-right: 1rem !important;
+        border-radius: var(--tblr-border-radius) !important;
+        overflow: hidden !important;
+        background: var(--tblr-bg-surface-secondary) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: relative;
+    }
+    
+    .story-card-image-left img {
+        max-width: 120px !important;
+        max-height: 120px !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        border-radius: 6px !important;
+    }
+    
+    .story-card-placeholder {
+        width: 120px !important;
+        height: 120px !important;
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: var(--tblr-border-radius) !important;
+    }
+    
+    .story-card-placeholder i {
+        font-size: 2rem !important;
+        color: var(--tblr-text-muted) !important;
+        opacity: 0.6;
+    }
+    
+    .story-card-content-right {
+        flex: 1 !important;
+        min-width: 0 !important; /* Prevents overflow */
+    }
+    
+    .story-card-content-right .story-card-title {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+        line-height: 1.3 !important;
+    }
+    
+    .story-card-content-right .story-card-title a {
+        color: #1E293B !important;
+        text-decoration: none !important;
+    }
+    
+    .story-card-content-right .story-card-title a:hover {
+        color: #6366F1 !important;
+    }
+    
+    .story-card-content-right .story-card-description {
+        font-size: 14px !important;
+        color: #64748B !important;
+        margin-bottom: 8px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .story-card-content-right .story-card-meta {
+        font-size: 12px !important;
+        color: #94A3B8 !important;
+    }
+    
+    .story-card-content-right .story-card-meta i {
+        color: #6366F1 !important;
+    }
+    
+    /* Story Preview Styles */
+    .story-card-preview {
+        background: #F8FAFC !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 6px !important;
+        padding: 12px !important;
+        margin: 12px 0 !important;
+    }
+    
+    .story-preview-label {
+        margin-bottom: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    .story-preview-label i {
+        color: #6366F1 !important;
+        font-size: 12px !important;
+    }
+    
+    .story-preview-text {
+        font-size: 13px !important;
+        color: #374151 !important;
+        line-height: 1.5 !important;
+        margin: 0 !important;
+        font-style: italic !important;
+        border-left: 3px solid #6366F1 !important;
+        padding-left: 8px !important;
+    }
+    
+    /* Star Rating Styles */
+    .story-card-rating {
+        margin-bottom: 8px !important;
+    }
+    
+    .star-rating {
+        display: flex !important;
+        align-items: center !important;
+        gap: 2px !important;
+    }
+    
+    .star-rating i {
+        font-size: 14px !important;
+    }
+    
+    .star-rating .rating-text {
+        font-size: 12px !important;
+        color: #64748B !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Publish Date Styles */
+    .story-card-date {
+        margin-top: 4px !important;
+    }
+    
+    .story-card-date small {
+        font-size: 11px !important;
+        color: #94A3B8 !important;
+    }
+    
+    .story-card-date i {
+        color: #6366F1 !important;
+    }
+    
+    /* Make entire card clickable */
+    .published-story-card-horizontal {
+        cursor: pointer !important;
+        display: flex !important;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    
+    .published-story-card-horizontal:hover {
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    
+    /* Prevent title from having double link styling since whole card is now a link */
+    .story-card-content-right .story-card-title {
+        color: #1E293B !important;
+    }
+    
+    .published-story-card-horizontal:hover .story-card-content-right .story-card-title {
+        color: #6366F1 !important;
+    }
+    
+    /* Tabler Premium Welcome Header */
+    .welcome-header {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        padding: 2rem;
+        border-radius: var(--tblr-border-radius-lg);
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23ffffff15'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e");
+        pointer-events: none;
+    }
+    
+    .welcome-header h1 {
+        font-size: 2rem !important;
+        font-weight: 700 !important;
+        color: white !important;
+        margin-bottom: 1rem !important;
+        line-height: 1.2;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Larger font on wider screens */
+    @media (min-width: 1200px) {
+        .welcome-header h1 {
+            font-size: 32px !important;
+        }
+    }
+    
+    .welcome-header .subtitle {
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+        max-width: 100% !important;
+        margin: 0 auto 1rem auto !important;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Larger subtitle on wider screens */
+    @media (min-width: 1200px) {
+        .welcome-header .subtitle {
+            font-size: 18px !important;
+        }
+    }
+    
+    /* New subtitle sections styling */
+    .welcome-header .subtitle-features {
+        font-size: 1.1rem !important;
+        line-height: 1.7 !important;
+        color: var(--tblr-white) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        padding: 1rem !important;
+        border-radius: var(--tblr-border-radius) !important;
+        margin: 1rem 0 !important;
+        border-left: 4px solid var(--tblr-white) !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    
+    .welcome-header .subtitle-bonus {
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
+        color: var(--tblr-white) !important;
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2)) !important;
+        padding: 1.2rem !important;
+        border-radius: var(--tblr-border-radius-lg) !important;
+        margin: 1rem 0 !important;
+        border: 2px solid rgba(255, 193, 7, 0.4) !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2) !important;
+    }
+    
+    .welcome-header .subtitle-features strong,
+    .welcome-header .subtitle-bonus strong {
+        color: var(--tblr-white) !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    /* Tabler Premium CTA Button */
+    .main-cta-button {
+        background: var(--tblr-white) !important;
+        color: var(--tblr-primary) !important;
+        padding: 1rem 2rem !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        border-radius: var(--tblr-border-radius) !important;
+        min-height: 56px !important;
+        box-shadow: var(--tblr-box-shadow) !important;
+        border: 1px solid var(--tblr-white) !important;
+        position: relative;
+        z-index: 1;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .main-cta-button:hover {
+        background: var(--tblr-gray-50) !important;
+        color: var(--tblr-primary) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: var(--tblr-box-shadow-lg) !important;
+    }
+    
+    .main-cta-button i {
+        margin-left: 8px !important;
+    }
+    
+    /* Tabler Premium News Section */
+    .news-section {
+        background: var(--tblr-bg-surface) !important;
+        padding: 1.5rem !important;
+        border-radius: var(--tblr-border-radius-lg) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        margin-bottom: 1.5rem !important;
+        box-shadow: var(--tblr-box-shadow) !important;
+    }
+    
+    .news-section .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .news-section h3 {
+        font-size: 1.25rem !important;
+        font-weight: 600 !important;
+        color: var(--tblr-body-color) !important;
+        margin: 0 !important;
+    }
+    
+    .news-section .view-all-btn {
+        background: transparent !important;
+        color: #6366F1 !important;
+        font-size: 14px !important;
+        padding: 8px 16px !important;
+        border: 1px solid #6366F1 !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .news-section .view-all-btn:hover {
+        background: #F8FAFC !important;
+        color: #6366F1 !important;
+    }
+    
+    /* Enhanced news cards */
+    .news-card {
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 12px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    }
+    
+    .news-card:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    }
+    
+    /* 4. Quick-Start Guide Section */
+    .quickstart-section {
+        margin: 20px 0;
+    }
+    
+    .quickstart-title {
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #0F172A !important;
+        text-align: center !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* 5. Step Cards Grid - Single column in narrow layout */
+    .steps-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .step-card {
+        background: #FFFFFF !important;
+        padding: 16px !important;
+        border-radius: 8px !important;
+        border: 1px solid #E2E8F0 !important;
+        min-height: 250px !important;
+        transition: all 0.3s ease !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    
+    .step-card:hover {
+        border-color: #6366F1 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+        transform: scale(1.02) !important;
+    }
+    
+    /* 6. Step Icons */
+    .step-icon {
+        width: 64px !important;
+        height: 64px !important;
+        background: #EEF2FF !important;
+        padding: 16px !important;
+        border-radius: 16px !important;
+        margin-bottom: 24px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .step-icon i {
+        font-size: 24px !important;
+        color: #6366F1 !important;
+    }
+    
+    /* 7. Step Content */
+    .step-title {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+        margin-bottom: 12px !important;
+        line-height: 1.3;
+    }
+    
+    .step-description {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        color: #64748B !important;
+        margin-bottom: 16px !important;
+        flex-grow: 1;
+    }
+    
+    /* 8. Feature Tags/Chips */
+    .feature-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+    
+    .feature-tag {
+        background: #F1F5F9 !important;
+        padding: 8px 16px !important;
+        border-radius: 20px !important;
+        font-size: 14px !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+        border: 1px solid #E2E8F0;
+    }
+    
+    .feature-tag strong {
+        color: #1E293B !important;
+    }
+    
+    /* 9. Step Action Buttons */
+    .step-action {
+        margin-top: auto;
+    }
+    
+    .step-btn-primary {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+        padding: 12px 24px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        border: none !important;
+        text-decoration: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .step-btn-primary:hover {
+        background: #4F46E5 !important;
+        color: #FFFFFF !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    .step-btn-secondary {
+        background: transparent !important;
+        border: 2px solid #6366F1 !important;
+        color: #6366F1 !important;
+        padding: 12px 24px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        text-decoration: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .step-btn-secondary:hover {
+        background: #F8FAFC !important;
+        color: #6366F1 !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Tabler Premium Quick Actions Section */
+    .quick-actions-section {
+        background: var(--tblr-bg-surface) !important;
+        padding: 1.5rem !important;
+        border-radius: var(--tblr-border-radius-lg) !important;
+        margin-top: 1.5rem !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        box-shadow: var(--tblr-box-shadow) !important;
+    }
+    
+    .quick-actions-title {
+        font-size: 1.25rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        margin-bottom: 1rem !important;
+        padding: 12px 16px !important;
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        display: inline-block !important;
+    }
+    
+    .quick-actions-title::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 60%) !important;
+        pointer-events: none !important;
+    }
+    
+    .quick-actions-title i {
+        color: white !important;
+        opacity: 0.95 !important;
+    }
+    
+    .quick-actions-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    /* Tabler Premium Quick Action Cards */
+    .quick-action-btn,
+    .quick-start-help-btn,
+    .quick-action-nav-btn {
+        background: var(--tblr-bg-surface) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        padding: 1.25rem !important;
+        border-radius: var(--tblr-border-radius) !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        color: var(--tblr-body-color) !important;
+        min-height: 64px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        text-decoration: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .quick-action-btn::before,
+    .quick-start-help-btn::before,
+    .quick-action-nav-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .quick-action-btn:hover::before,
+    .quick-start-help-btn:hover::before,
+    .quick-action-nav-btn:hover::before {
+        transform: translateX(0);
+    }
+    
+    .quick-action-btn:hover,
+    .quick-start-help-btn:hover,
+    .quick-action-nav-btn:hover {
+        border-color: var(--tblr-primary) !important;
+        background: var(--tblr-bg-surface-secondary) !important;
+        color: var(--tblr-body-color) !important;
+        transform: translateY(-4px) !important;
+        box-shadow: var(--tblr-box-shadow-lg) !important;
+    }
+    
+    .quick-action-btn i {
+        font-size: 20px !important;
+        margin-right: 8px !important;
+        color: #6366F1 !important;
+    }
+    
+    /* 12. Responsive Design */
+    @media (max-width: 768px) {
+        .welcome-dashboard {
+            padding: 24px 16px;
+        }
+        
+        .welcome-header {
+            padding: 32px 16px;
+        }
+        
+        .welcome-header h1 {
+            font-size: 32px !important;
+        }
+        
+        .welcome-header .subtitle {
+            font-size: 16px !important;
+        }
+        
+        .steps-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+        }
+        
+        .step-card {
+            padding: 24px !important;
+            min-height: auto !important;
+        }
+        
+        .quickstart-title {
+            font-size: 24px !important;
+        }
+        
+        .step-title {
+            font-size: 20px !important;
+        }
+        
+        .quick-actions-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .news-section .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+    
+    /* Legacy support for existing functionality */
+    .icon-link {
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .icon-link > .fas {
+        transition: transform .2s ease-in-out;
+    }
+    .icon-link:hover > .fas {
+        transform: translateX(4px);
+    }
+    
+    /* Text truncation utilities */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+        max-height: 2.8em;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+        max-height: 4.2em;
+    }
+    
+    /* Column spacing and boundaries - Updated for 2-column layout */
+    .col-lg-7 {
+        padding-left: 0;
+        padding-right: 12px;
+    }
+    
+    .col-lg-5 {
+        padding-left: 12px;
+        padding-right: 0;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar-content {
+        padding: 0;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    /* Ensure main content is contained within column */
+    .main-content {
+        width: 100%;
+        display: block;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+    
+    .sidebar-section {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .sidebar-title {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: white !important;
+        margin-bottom: 16px !important;
+        padding: 12px 16px !important;
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .sidebar-title::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 60%) !important;
+        pointer-events: none !important;
+    }
+    
+    .sidebar-title i {
+        color: white !important;
+        opacity: 0.95 !important;
+    }
+    
+    /* Published Stories Cards */
+    .published-story-card {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+    
+    .published-story-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .story-card-image {
+        width: 100%;
+        height: 120px;
+        overflow: hidden;
+    }
+    
+    .story-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .story-card-content {
+        padding: 12px;
+    }
+    
+    .story-card-title {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+        line-height: 1.3;
+    }
+    
+    .story-card-title a {
+        color: #1E293B !important;
+        text-decoration: none;
+    }
+    
+    .story-card-title a:hover {
+        color: #6366F1 !important;
+    }
+    
+    .story-card-description {
+        font-size: 12px !important;
+        color: #64748B !important;
+        margin-bottom: 8px !important;
+        line-height: 1.4;
+    }
+    
+    .story-card-meta {
+        font-size: 11px !important;
+    }
+    
+    /* Generated Images Styles - Enhanced Card Layout */
+    .recent-images-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+    
+    .generated-image-card {
+        display: flex !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    }
+    
+    .generated-image-card:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        border-color: #6366F1 !important;
+    }
+    
+    .generated-image-card:active {
+        transform: translateY(0) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+    }
+    
+    .generated-image-thumbnail {
+        flex-shrink: 0 !important;
+        width: 160px !important;
+        height: 160px !important;
+        border-radius: 6px !important;
+        overflow: hidden !important;
+        margin-right: 12px !important;
+    }
+    
+    .generated-image-thumbnail img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+    
+    .generated-image-content {
+        flex: 1 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+    
+    .generated-image-title {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+        margin-bottom: 4px !important;
+        line-height: 1.3 !important;
+    }
+    
+    .generated-image-context {
+        font-size: 12px !important;
+        color: #64748B !important;
+        margin-bottom: 4px !important;
+    }
+    
+    .generated-image-meta {
+        font-size: 11px !important;
+        color: #94A3B8 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+    
+    .generated-image-date {
+        font-size: 11px !important;
+        color: #94A3B8 !important;
+        margin-top: 2px !important;
+    }
+    
+    /* Image Popup Modal */
+    .image-popup-modal {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.8) !important;
+        z-index: 9999 !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .image-popup-modal.show {
+        display: flex !important;
+        opacity: 1 !important;
+    }
+    
+    .image-popup-content {
+        position: relative !important;
+        max-width: min(95vw, 1200px) !important;  /* Increased width, but capped at viewport/max size */
+        max-height: 90% !important;
+        background: white !important;
+        border-radius: 12px !important;
+        overflow: auto !important;  /* Changed from hidden to auto to allow scrolling */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .image-popup-header {
+        padding: 16px 20px !important;
+        background: #F8FAFC !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    
+    .image-popup-title {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+        margin: 0 !important;
+    }
+    
+    .image-popup-close {
+        background: none !important;
+        border: none !important;
+        font-size: 20px !important;
+        color: #64748B !important;
+        cursor: pointer !important;
+        padding: 4px !important;
+        line-height: 1 !important;
+    }
+    
+    .image-popup-close:hover {
+        color: #1E293B !important;
+    }
+    
+    .image-popup-body {
+        padding: 20px !important;  /* Added padding for better spacing */
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 300px !important;  /* Ensure minimum height */
+    }
+    
+    .image-popup-body img {
+        max-width: 100% !important;
+        max-height: 50vh !important;  /* Reduced from 70vh to ensure room for social sharing */
+        object-fit: contain !important;
+        margin: 0 auto !important;  /* Center the image */
+        display: block !important;
+    }
+    
+    .image-popup-info {
+        padding: 16px 20px !important;
+        background: #F8FAFC !important;
+        border-top: 1px solid #E2E8F0 !important;
+        text-align: left !important;
+    }
+    
+    .image-popup-context {
+        font-size: 14px !important;
+        color: #64748B !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .image-popup-meta {
+        font-size: 12px !important;
+        color: #94A3B8 !important;
+        display: flex !important;
+        gap: 16px !important;
+    }
+    
+    .image-popup-meta span {
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+    
+    .image-popup-meta i {
+        color: #6366F1 !important;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        /* Adjust for smaller screens even with sidebar */
+        body.sidebar-expanded .welcome-dashboard {
+            max-width: 100%;
+            padding: 16px 8px;
+        }
+        
+        body.sidebar-expanded .col-lg-7 {
+            padding-right: 8px;
+        }
+        
+        body.sidebar-expanded .col-lg-5 {
+            padding-left: 8px;
+        }
+    }
+    
+    @media (max-width: 991px) {
+        .sidebar-content {
+            padding-left: 0;
+            margin-top: 24px;
+        }
+        
+        .recent-images-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        /* Stack columns vertically on tablet and below */
+        .welcome-dashboard .row {
+            flex-direction: column;
+        }
+        
+        .welcome-dashboard .col-lg-7,
+        .welcome-dashboard .col-lg-5 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        /* Reset padding when stacked */
+        .welcome-dashboard .col-lg-7,
+        .welcome-dashboard .col-lg-5 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .recent-images-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .welcome-dashboard {
+            padding: 16px;
+        }
+        
+        .sidebar-content {
+            margin-top: 16px;
+        }
+    }
+    
+    
+    /* Quick Start Help Button Styling */
+    .quick-start-help-btn {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .quick-start-help-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .quick-start-help-btn:hover::before {
+        left: 100%;
+    }
+    
+    .quick-start-help-btn:hover {
+        border-color: #6366f1;
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .quick-start-help-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+    
+    .quick-start-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+    }
+    
+    .quick-start-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .quick-start-help-btn:hover .quick-start-icon {
+        transform: scale(1.1);
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+    
+    .quick-start-text {
+        text-align: left;
+        flex: 1;
+    }
+    
+    .quick-start-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 4px 0;
+        line-height: 1.2;
+    }
+    
+    .quick-start-subtitle {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.3;
+    }
+    
+    .quick-start-help-btn::after {
+        content: '\f054';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 14px;
+        color: #6366f1;
+        transition: transform 0.3s ease;
+    }
+    
+    .quick-start-help-btn:hover::after {
+        transform: translateX(4px);
+    }
+    
+    /* Dark mode support */
+    :root[data-theme="dark"] .quick-start-help-btn {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border-color: #6b7280;
+        color: #f9fafb;
+    }
+    
+    :root[data-theme="dark"] .quick-start-help-btn:hover {
+        background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+        border-color: #6366f1;
+        color: #f9fafb;
+    }
+    
+    :root[data-theme="dark"] .quick-start-title {
+        color: #f9fafb;
+    }
+    
+    :root[data-theme="dark"] .quick-start-subtitle {
+        color: #d1d5db;
+    }
+    
+    /* Responsive design for mobile */
+    @media (max-width: 768px) {
+        .quick-start-help-btn {
+            padding: 12px 16px;
+        }
+        
+        .quick-start-content {
+            gap: 12px;
+        }
+        
+        .quick-start-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+        
+        .quick-start-title {
+            font-size: 14px;
+        }
+        
+        .quick-start-subtitle {
+            font-size: 12px;
+        }
+    }
+    
+    /* Quick Action Navigation Button Styling - Different color for page navigation */
+    .quick-action-nav-btn {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #10b981;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .quick-action-nav-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .quick-action-nav-btn:hover::before {
+        left: 100%;
+    }
+    
+    .quick-action-nav-btn:hover {
+        border-color: #10b981;
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .quick-action-nav-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    
+    .quick-action-nav-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-nav-btn:hover .quick-action-nav-icon {
+        transform: scale(1.1);
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+    }
+    
+    .quick-action-nav-btn::after {
+        content: '\f054';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 14px;
+        color: #10b981;
+        transition: transform 0.3s ease;
+    }
+    
+    .quick-action-nav-btn:hover::after {
+        transform: translateX(4px);
+    }
+    
+    /* Dark mode support for nav buttons */
+    :root[data-theme="dark"] .quick-action-nav-btn {
+        background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+        border-color: #10b981;
+        color: #f9fafb;
+    }
+    
+    :root[data-theme="dark"] .quick-action-nav-btn:hover {
+        background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+        border-color: #10b981;
+        color: #f9fafb;
+    }
+    
+    .quick-action-nav-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #064e3b;
+        margin: 0 0 4px 0;
+        line-height: 1.2;
+    }
+    
+    .quick-action-nav-subtitle {
+        font-size: 14px;
+        color: #059669;
+        margin: 0;
+        line-height: 1.3;
+    }
+    
+    :root[data-theme="dark"] .quick-action-nav-title {
+        color: #f9fafb;
+    }
+    
+    :root[data-theme="dark"] .quick-action-nav-subtitle {
+        color: #6ee7b7;
+    }
+    
+    /* Responsive design for nav buttons */
+    @media (max-width: 768px) {
+        .quick-action-nav-btn {
+            padding: 12px 16px;
+        }
+        
+        .quick-action-nav-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+        
+        .quick-action-nav-title {
+            font-size: 14px;
+        }
+        
+        .quick-action-nav-subtitle {
+            font-size: 12px;
+        }
+    }
+    
+    /* Story Type Selection Cards */
+    .story-type-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .story-type-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .story-type-card:hover .card-title {
+        transform: scale(1.05);
+    }
+    
+    .story-type-card .card-body .fas {
+        transition: transform 0.3s ease;
+    }
+    
+    .story-type-card:hover .fas {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-dashboard">
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="main-content">
+                <!-- Home Main Top CTAs -->
+                {% if home_ctas and home_ctas.home_main_top %}
+                    {% for cta in home_ctas.home_main_top %}
+                        <div class="mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Welcome Section Top CTAs -->
+                {% if home_ctas and home_ctas.home_welcome_top %}
+                    {% for cta in home_ctas.home_welcome_top %}
+                        <div class="mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+    <div class="welcome-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1>Welcome to Ink and Quill!</h1>
+                <p class="subtitle">
+                    Transform your creative ideas into captivating stories with the power of AI! Whether you're a seasoned writer or just starting your journey, Ink and Quill makes storytelling accessible and enjoyable for everyone.
+                </p>
+                <p class="subtitle-features">
+                    <strong>What you can do:</strong><br>
+                    • Create immersive worlds with detailed characters and rich lore<br>
+                    • Write engaging stories, acts, and scenes with AI assistance<br>
+                    • Get instant feedback and suggestions to improve your writing<br>
+                    • Manage all your creative projects in one organized workspace
+                </p>
+                <p class="subtitle-bonus">
+                    <strong>🎁 New User Bonus!</strong> Register now and complete our simple 3-step process to earn bonus coins that you can use for premium AI features. Start your storytelling adventure today!
+                </p>
+            </div>
+            {% set help_topic = 'dashboard' %}
+            {% set position = 'inline' %}
+            {% set tooltip = 'Get help with the dashboard and getting started' %}
+            {% include 'partials/_help_button.html' %}
+        </div>
+        <!-- Always show the registered user version with progress steps -->
+        <div style="margin-top: 24px;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 24px; position: relative;">
+                <!-- Step 1 -->
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
+                    <div id="step1-indicator" style="width: 40px; height: 40px; background: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 18px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                        <i id="step1-icon" class="fas fa-circle" style="font-size: 10px;"></i>
+                    </div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: white; text-align: center; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">Intro Interview</h2>
+                    <div id="step1-coins" style="display: flex; align-items: center; margin-bottom: 8px; padding: 3px 8px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border-radius: 12px; border: 1px solid #D97706; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);">
+                        <i class="fas fa-coins" style="color: white; font-size: 12px; margin-right: 4px;"></i>
+                        <span id="step1-coins-text" style="font-size: 11px; font-weight: 700; color: white;">
+                            {% if current_user and current_user.bonus1 %}
+                                250 Earned
+                            {% else %}
+                                250 Bonus
+                            {% endif %}
+                        </span>
+                    </div>
+                    <button id="step1-btn" class="step-action-btn" data-step="1" style="background: #10B981; color: white; border: none; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
+                        Start Interview
+                    </button>
+                </div>
+                
+                <!-- Connection Line 1-2 -->
+                <div id="line1-2" style="flex: 1; height: 3px; background: #E5E7EB; margin: 0 20px; position: relative; top: -20px;"></div>
+                
+                <!-- Step 2 -->
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
+                    <div id="step2-indicator" style="width: 40px; height: 40px; background: #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-weight: 700; font-size: 18px; margin-bottom: 8px;">
+                        <i id="step2-icon" class="fas fa-circle" style="font-size: 10px;"></i>
+                    </div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: white; text-align: center; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">Story Brainstorm</h2>
+                    <div id="step2-coins" style="display: flex; align-items: center; margin-bottom: 8px; padding: 3px 8px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border-radius: 12px; border: 1px solid #D97706; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2); opacity: 0.5;">
+                        <i class="fas fa-coins" style="color: white; font-size: 12px; margin-right: 4px;"></i>
+                        <span style="font-size: 11px; font-weight: 700; color: white;">250 Bonus</span>
+                    </div>
+                    <button id="step2-btn" class="step-action-btn" data-step="2" style="background: {% if current_user %}#E5E7EB{% else %}#3B82F6{% endif %}; color: {% if current_user %}#9CA3AF{% else %}white{% endif %}; border: none; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: {% if current_user %}not-allowed{% else %}pointer{% endif %}; transition: all 0.2s ease;" {% if current_user %}disabled{% endif %}>
+                        {% if current_user %}Locked{% else %}Sign Up{% endif %}
+                    </button>
+                </div>
+                
+                <!-- Connection Line 2-3 -->
+                <div id="line2-3" style="flex: 1; height: 3px; background: #E5E7EB; margin: 0 20px; position: relative; top: -20px;"></div>
+                
+                <!-- Step 3 -->
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
+                    <div id="step3-indicator" style="width: 40px; height: 40px; background: #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-weight: 700; font-size: 18px; margin-bottom: 8px;">
+                        <i id="step3-icon" class="fas fa-circle" style="font-size: 10px;"></i>
+                    </div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: white; text-align: center; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">Start Writing</h2>
+                    <div id="step3-coins" style="display: flex; align-items: center; margin-bottom: 8px; padding: 4px 8px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border-radius: 12px; border: 1px solid #D97706; opacity: 0.5; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);">
+                        <i class="fas fa-coins" style="color: white; font-size: 12px; margin-right: 4px;"></i>
+                        <span style="font-size: 11px; font-weight: 700; color: white;">400 Bonus</span>
+                    </div>
+                    <button id="step3-btn" class="step-action-btn" data-step="3" style="background: {% if current_user %}#E5E7EB{% else %}#3B82F6{% endif %}; color: {% if current_user %}#9CA3AF{% else %}white{% endif %}; border: none; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: {% if current_user %}not-allowed{% else %}pointer{% endif %}; transition: all 0.2s ease;" {% if current_user %}disabled{% endif %}>
+                        {% if current_user %}Locked{% else %}Sign Up{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+                <!-- Welcome Section Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_welcome_bottom %}
+                    {% for cta in home_ctas.home_welcome_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Quick Actions Top CTAs -->
+                {% if home_ctas and home_ctas.home_quick_actions_top %}
+                    {% for cta in home_ctas.home_quick_actions_top %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+    <div class="quick-actions-section">
+        {% if current_user %}
+        <h3 class="sidebar-title">
+            <i class="fas fa-bolt me-2"></i>
+            Quick Actions
+        </h3>
+        <p style="margin-bottom: 24px; color: #64748B;">Welcome back, {{ current_user.display_name or current_user.username }}! What would you like to do?</p>
+        {% else %}
+        <h3 class="sidebar-title">
+            <i class="fas fa-bolt me-2"></i>
+            Quick Actions
+        </h3>
+        <p style="margin-bottom: 24px; color: #64748B;">Get started with AI storytelling!</p>
+        {% endif %}
+        
+        <div class="quick-actions-grid">
+            <!-- Referral Program - Available for all users -->
+            <a href="{{ url_for('ui_referrals_intro') }}" class="quick-start-help-btn"
+               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+               title="Learn about our referral program and start earning coins by sharing with friends">
+                <div class="quick-start-content">
+                    <div class="quick-start-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 6l4 6l5 -4l-2 10l-8 -2l-8 2l-2 -10l5 4z"/>
+                        </svg>
+                    </div>
+                    <div class="quick-start-text">
+                        <div class="quick-start-title">Referral Program</div>
+                        <div class="quick-start-subtitle">Earn coins by sharing with friends</div>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 1. Intro Interview - Available for all users -->
+            <button id="introInterviewBtn" class="quick-start-help-btn"
+               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+               title="Complete a personalized interview to get writing recommendations">
+                <div class="quick-start-content">
+                    <div class="quick-start-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="quick-start-text">
+                        <div class="quick-start-title">Intro Interview</div>
+                        <div class="quick-start-subtitle">Get personalized writing recommendations</div>
+                    </div>
+                </div>
+            </button>
+            
+            <!-- 2. Story Brainstorm - Available for all users -->
+            <button id="storyBrainstormBtnQuick" class="quick-start-help-btn"
+               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+               title="Brainstorm story ideas with AI assistance">
+                <div class="quick-start-content">
+                    <div class="quick-start-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="quick-start-text">
+                        <div class="quick-start-title">Story Brainstorm</div>
+                        <div class="quick-start-subtitle">Generate creative story ideas with AI</div>
+                    </div>
+                </div>
+            </button>
+            
+            <!-- 3. Start Writing: Visible for all -->
+            <button onclick="showStoryCreationModal()" class="quick-start-help-btn"
+               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+               title="Choose between Basic or Advanced story creation">
+                <div class="quick-start-content">
+                    <div class="quick-start-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="quick-start-text">
+                        <div class="quick-start-title">Start Writing</div>
+                        <div class="quick-start-subtitle">Begin a new story with basic or advanced editor</div>
+                    </div>
+                </div>
+            </button>
+            
+            
+            <!-- 3. Published Stories: Always visible - THIRD ROW -->
+            <a href="{{ url_for('published_stories_gallery') }}" class="quick-action-nav-btn"
+               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+               title="Browse published stories from the community">
+                <div class="quick-start-content">
+                    <div class="quick-action-nav-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="quick-start-text">
+                        <div class="quick-action-nav-title">Story Gallery</div>
+                        <div class="quick-action-nav-subtitle">Read and rate stories from the community</div>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 4. Introduction: Hidden for anonymous, Hidden if you only have Basic Stories -->
+            <div id="introduction-btn" style="display: none;">
+                <button onclick="openHelpPanel('introduction')" class="quick-start-help-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Follow our step-by-step guide to create your first story">
+                    <div class="quick-start-content">
+                        <div class="quick-start-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="quick-start-text">
+                            <div class="quick-start-title">Getting Started</div>
+                            <div class="quick-start-subtitle">Learn the basics in a 3-step interactive tutorial</div>
+                        </div>
+                        <div class="quick-start-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            
+            <!-- 5. Build My First World: Hidden for anonymous, Hidden if you only have Basic Stories -->
+            <div id="build-world-btn" style="display: none;">
+                <button onclick="openHelpPanel('quick_start')" class="quick-start-help-btn"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Step-by-step guide to building your first world">
+                    <div class="quick-start-content">
+                        <div class="quick-start-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <div class="quick-start-text">
+                            <div class="quick-start-title">World Building Tutorial</div>
+                            <div class="quick-start-subtitle">Interactive guide to create your first fictional world</div>
+                        </div>
+                        <div class="quick-start-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            
+            <!-- 6. View Your Stories: Hidden for anonymous, Visible if you have stories -->
+            <div id="view-stories-btn" style="display: none;">
+                <a href="{{ url_for('ui_list_stories') }}" class="quick-action-nav-btn"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   title="View and manage all your stories">
+                    <div class="quick-start-content">
+                        <div class="quick-action-nav-icon">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                        <div class="quick-start-text">
+                            <div class="quick-action-nav-title">My Stories</div>
+                            <div class="quick-action-nav-subtitle">View, edit, and organize all your story projects</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- 7. World Builder Wizard: Anonymous hidden, Visible for all logged in -->
+            {% if current_user %}
+            <a href="{{ url_for('ui_world_builder_wizard') }}?help=world_builder_wizard" class="quick-action-nav-btn"
+               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+               title="Create a new world using AI-guided questions - Help will open automatically">
+                <div class="quick-start-content">
+                    <div class="quick-action-nav-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <div class="quick-start-text">
+                        <div class="quick-action-nav-title">World Builder</div>
+                        <div class="quick-action-nav-subtitle">AI wizard to design rich fictional universes</div>
+                    </div>
+                </div>
+            </a>
+            {% endif %}
+            
+            <!-- 8. Manage My Worlds: HIDDEN PER USER REQUEST -->
+            <div id="manage-worlds-btn" style="display: none;">
+                <a href="{{ url_for('ui_list_worlds') }}" class="quick-action-nav-btn"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   title="Create and manage your story worlds">
+                    <div class="quick-start-content">
+                        <div class="quick-action-nav-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="quick-start-text">
+                            <div class="quick-action-nav-title">My Worlds</div>
+                            <div class="quick-action-nav-subtitle">Manage characters, locations, and lore items</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- 9. Manage RAG Documents: HIDDEN PER USER REQUEST -->
+            <div id="manage-documents-btn" style="display: none;">
+                <a href="{{ url_for('ui_document_manager') }}" class="quick-action-nav-btn"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   title="Upload and manage documents for AI knowledge">
+                    <div class="quick-start-content">
+                        <div class="quick-action-nav-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="quick-start-text">
+                            <div class="quick-action-nav-title">Knowledge Base</div>
+                            <div class="quick-action-nav-subtitle">Upload PDFs and docs to enhance AI context</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+                <!-- Quick Actions Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_quick_actions_bottom %}
+                    {% for cta in home_ctas.home_quick_actions_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    
+    {% if not current_user %}
+                <!-- Login/Register Section Top CTAs -->
+                {% if home_ctas and home_ctas.home_login_register_top %}
+                    {% for cta in home_ctas.home_login_register_top %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+    <!-- Anonymous user login/register section -->
+    <div class="quick-actions-section" style="margin-top: 32px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div style="background: #6366F1; color: white; padding: 32px; border-radius: 12px;">
+                <h2 style="color: white; margin-bottom: 16px;">Login</h2>
+                <p style="color: rgba(255,255,255,0.9); margin-bottom: 24px;">Already have an account? Log in to access your stories and continue your creative journey.</p>
+                <a href="{{ url_for('ui_login_form') }}" class="step-btn-secondary" style="border-color: white; color: white;"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   title="Sign in to your account"><i class="fas fa-sign-in-alt me-1"></i> Login Now</a>
+            </div>
+            <div style="background: #F8FAFC; padding: 32px; border-radius: 12px; border: 1px solid #E2E8F0;">
+                <h2 style="color: #1E293B; margin-bottom: 16px;">Register</h2>
+                <p style="color: rgba(255,255,255,0.9); margin-bottom: 24px;">New here? Create an account to start crafting your narratives with powerful AI assistance.</p>
+                <a href="{{ url_for('ui_register_form') }}" class="step-btn-primary"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   title="Create a new account and start writing"><i class="fas fa-user-plus me-1"></i> Register Today</a>
+            </div>
+        </div>
+    </div>
+    
+                <!-- Login/Register Section Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_login_register_bottom %}
+                    {% for cta in home_ctas.home_login_register_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    {% endif %}
+    
+    <!-- BLOG POSTS SECTION -->
+                <!-- Blog Posts Section Top CTAs -->
+                {% if home_ctas and home_ctas.home_blog_section_top %}
+                    {% for cta in home_ctas.home_blog_section_top %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+    {% if blog_posts %}
+    <div class="sidebar-section" style="margin-top: 32px;">
+        <h3 class="sidebar-title">
+            <i class="fas fa-edit me-2"></i>
+            Latest Blog Posts
+        </h3>
+        <div class="published-stories-cards">
+            {% for post in blog_posts[:5] %}
+            <a href="/blog/post/{{ post.slug }}" class="published-story-card-horizontal" style="text-decoration: none; color: inherit;">
+                <div class="story-card-image-left">
+                    {% if post.featured_image_url %}
+                    <img src="{{ post.featured_image_url }}" alt="{{ post.title }}" loading="lazy">
+                    {% else %}
+                    <div class="story-card-placeholder">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="story-card-content-right" style="flex: 1; min-width: 0;">
+                    <h5 class="story-card-title">
+                        {{ post.title }}
+                        {% if post.is_featured %}
+                        <span class="badge bg-warning text-dark ms-1" style="font-size: 0.7em;">
+                            <i class="fas fa-star"></i>
+                        </span>
+                        {% endif %}
+                    </h5>
+                    <p class="story-card-description">
+                        {{ (post.excerpt|striptags)[:80] + "..." if (post.excerpt|striptags)|length > 80 else (post.excerpt|striptags) }}
+                    </p>
+                    
+                    <!-- Blog Post Meta -->
+                    <div class="story-card-meta">
+                        <small class="text-muted">
+                            <span class="me-2">
+                                <i class="fas fa-user me-1"></i>{{ post.author.display_name or post.author.username }}
+                            </span>
+                            <span class="me-2">
+                                <i class="fas fa-eye me-1"></i>{{ post.view_count or 0 }} views
+                            </span>
+                        </small>
+                    </div>
+                    
+                    <!-- Publish Date -->
+                    <div class="story-card-date mt-1">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ post.published_at.strftime('%B %d, %Y') if post.published_at else post.created_at.strftime('%B %d, %Y') }}
+                        </small>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('blog_home') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-arrow-right me-1"></i>View All Blog Posts
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- Fallback content when no blog posts exist -->
+    <div class="sidebar-section" style="margin-top: 32px;">
+        <h3 class="sidebar-title">
+            <i class="fas fa-edit me-2"></i>
+            Latest Blog Posts
+        </h3>
+        <div class="text-center py-4">
+            <i class="fas fa-edit text-muted mb-3" style="font-size: 2rem;"></i>
+            <p class="text-muted">No blog posts yet. Be the first to share your story!</p>
+            <a href="{{ url_for('blog_home') }}" class="btn btn-outline-primary btn-sm me-2">
+                <i class="fas fa-arrow-right me-1"></i>Visit Blog
+            </a>
+            {% if current_user %}
+            <a href="{{ url_for('blog_editor') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Write First Post
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+                <!-- Blog Posts Section Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_blog_section_bottom %}
+                    {% for cta in home_ctas.home_blog_section_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    
+                <!-- Home Main Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_main_bottom %}
+                    {% for cta in home_ctas.home_main_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    
+            </div> <!-- Close main-content -->
+        </div> <!-- Close col-lg-7 -->
+        
+        <!-- Right Column - AI Chat Worlds, Published Stories, and Generated Images -->
+        <div class="col-lg-5">
+            <div class="sidebar-content">
+                <!-- Home Sidebar Top CTAs -->
+                {% if home_ctas and home_ctas.home_sidebar_top %}
+                    {% for cta in home_ctas.home_sidebar_top %}
+                        {% include 'partials/cta_display.html' %}
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- AI Chat Worlds Section Top CTAs -->
+                {% if home_ctas and home_ctas.home_ai_chat_worlds_top %}
+                    {% for cta in home_ctas.home_ai_chat_worlds_top %}
+                        <div class="mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- AI Chat Worlds Section -->
+                {% if ai_chat_worlds %}
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-comments me-2"></i>
+                        AI Chat Worlds
+                    </h3>
+                    <div class="published-stories-cards">
+                        {% for world in ai_chat_worlds %}
+                        <a href="{{ url_for('public_world_chat', world_id=world.id) }}" class="published-story-card-horizontal" style="text-decoration: none; color: inherit;">
+                            <div class="story-card-image-left">
+                                {% if world.image_url %}
+                                <img src="{{ world.image_url }}" alt="{{ world.name }}" loading="lazy">
+                                {% else %}
+                                <div class="story-card-placeholder">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="story-card-content-right">
+                                <h5 class="story-card-title">
+                                    {{ world.name }}
+                                </h5>
+                                {% if world.description %}
+                                <p class="story-card-description">
+                                    {{ (world.description|striptags)[:80] + "..." if (world.description|striptags)|length > 80 else (world.description|striptags) }}
+                                </p>
+                                {% endif %}
+                                
+                                <!-- World Elements Count -->
+                                <div class="story-card-meta">
+                                    <small class="text-muted">
+                                        {% if world.element_count %}
+                                            {% if world.element_count.characters > 0 %}
+                                            <span class="me-2">
+                                                <i class="fas fa-users me-1"></i>{{ world.element_count.characters }} character{{ 's' if world.element_count.characters != 1 else '' }}
+                                            </span>
+                                            {% endif %}
+                                            {% if world.element_count.locations > 0 %}
+                                            <span class="me-2">
+                                                <i class="fas fa-map-marker-alt me-1"></i>{{ world.element_count.locations }} location{{ 's' if world.element_count.locations != 1 else '' }}
+                                            </span>
+                                            {% endif %}
+                                            {% if world.element_count.lore_items > 0 %}
+                                            <span>
+                                                <i class="fas fa-scroll me-1"></i>{{ world.element_count.lore_items }} lore item{{ 's' if world.element_count.lore_items != 1 else '' }}
+                                            </span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                
+                                <!-- Created Date -->
+                                <div class="story-card-date mt-1">
+                                    <small class="text-muted">
+                                        <i class="fas fa-sparkles me-1"></i>
+                                        Chat with AI about this world
+                                    </small>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('public_world_gallery') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-arrow-right me-1"></i>Explore All AI Chat Worlds
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-comments me-2"></i>
+                        AI Chat Worlds
+                    </h3>
+                    <div class="text-center py-4">
+                        <i class="fas fa-globe text-muted mb-3" style="font-size: 2rem;"></i>
+                        <p class="text-muted">No AI Chat Worlds available yet. Check back soon!</p>
+                        <a href="{{ url_for('public_world_gallery') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-arrow-right me-1"></i>View Gallery
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- AI Chat Worlds Section Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_ai_chat_worlds_bottom %}
+                    {% for cta in home_ctas.home_ai_chat_worlds_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Published Stories Section Top CTAs -->
+                {% if home_ctas and home_ctas.home_published_stories_top %}
+                    {% for cta in home_ctas.home_published_stories_top %}
+                        <div class="mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- RECENT PUBLISHED STORIES SECTION -->
+                {% if recent_published_stories %}
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-book-open me-2"></i>
+                        Recent Published Stories
+                    </h3>
+                    <div class="published-stories-cards">
+                        {% for story in recent_published_stories %}
+                        <a href="{{ url_for('view_published_story', story_id=story.id) }}" class="published-story-card-horizontal" style="text-decoration: none; color: inherit;">
+                            <div class="story-card-image-left">
+                                {% if story.image_url %}
+                                <img src="{{ story.image_url }}" alt="{{ story.title }}" loading="lazy">
+                                {% else %}
+                                <div class="story-card-placeholder">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="story-card-content-right">
+                                <h5 class="story-card-title">
+                                    {{ story.title }}
+                                    <!-- Story Type Badge -->
+                                    {% if story.story and story.story.story_type == 'basic' %}
+                                    <span class="badge bg-success ms-2" title="Basic Story">
+                                        <i class="fas fa-rocket me-1"></i>Basic
+                                    </span>
+                                    {% elif story.story and story.story.story_type == 'advanced' %}
+                                    <span class="badge bg-primary ms-2" title="Advanced Story">
+                                        <i class="fas fa-globe me-1"></i>Advanced
+                                    </span>
+                                    {% endif %}
+                                </h5>
+                                {% if story.description %}
+                                <p class="story-card-description line-clamp-2">
+                                    {{ story.description|striptags }}
+                                </p>
+                                {% endif %}
+                                
+                                <!-- Story Preview/Excerpt -->
+                                {% if story.preview or story.content %}
+                                <div class="story-card-preview">
+                                    <div class="story-preview-label">
+                                        <i class="fas fa-book-open me-1"></i>
+                                        <small class="text-secondary fw-medium">Story Preview:</small>
+                                    </div>
+                                    <p class="story-preview-text">
+                                        {{ (story.preview|striptags)[:200] + "..." if story.preview and (story.preview|striptags)|length > 200 else (story.preview|striptags if story.preview else (story.content|striptags)[:200] + "..." if story.content and (story.content|striptags)|length > 200 else (story.content|striptags if story.content else "No preview available")) }}
+                                    </p>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Rating Display -->
+                                {% if story.average_rating %}
+                                <div class="story-card-rating">
+                                    <div class="star-rating">
+                                        {% for i in range(1, 6) %}
+                                            {% if i <= story.average_rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% elif i - 0.5 <= story.average_rating %}
+                                                <i class="fas fa-star-half-alt text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="rating-text ms-1">
+                                            {{ "%.1f"|format(story.average_rating) }} 
+                                            {% if story.rating_count %}
+                                                ({{ story.rating_count }})
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Story Meta -->
+                                <div class="story-card-meta">
+                                    <small class="text-muted">
+                                        <span class="me-2">
+                                            <i class="fas fa-user me-1"></i>{{ story.author }}
+                                        </span>
+                                        {% if story.word_count %}
+                                        <span class="me-2">
+                                            <i class="fas fa-file-alt me-1"></i>{{ "{:,}".format(story.word_count) }} words
+                                        </span>
+                                        {% endif %}
+                                        <span>
+                                            <i class="fas fa-eye me-1"></i>{{ story.view_count }} views
+                                        </span>
+                                    </small>
+                                </div>
+                                
+                                <!-- Publish Date -->
+                                <div class="story-card-date">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ story.published_at.strftime('%B %d, %Y') if story.published_at else 'Unknown' }}
+                                    </small>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Show "View All" button if we have the maximum number of stories (likely more exist) -->
+                    {% if recent_published_stories|length >= 5 %}
+                    <div class="text-center mt-3">
+                            <a href="{{ url_for('published_stories_gallery') }}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-chevron-down me-1"></i>
+                                View All Published Stories
+                            </a>
+                        </div>
+                        {% endif %}
+                </div>
+                {% elif current_user %}
+                <!-- Fallback content for logged-in users when no published stories exist -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-book-open me-2"></i>
+                        Recent Published Stories
+                    </h3>
+                    <div class="text-center py-4">
+                        <i class="fas fa-book-open text-muted mb-3" style="font-size: 2rem;"></i>
+                        <p class="text-muted mb-3">No Published Stories Yet!</p>
+                        <p class="text-muted mb-4">
+                            Be the first to publish your story and inspire others. Check out the gallery to see how it works.
+                        </p>
+                        <a href="{{ url_for('published_stories_gallery') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-book-open me-1"></i>
+                            View Gallery
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Published Stories Section Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_published_stories_bottom %}
+                    {% for cta in home_ctas.home_published_stories_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Generated Images Section Top CTAs -->
+                {% if home_ctas and home_ctas.home_generated_images_top %}
+                    {% for cta in home_ctas.home_generated_images_top %}
+                        <div class="mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Recent Generated Images Section -->
+                {% if recent_images %}
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-images me-2"></i>
+                        Recent Generated Images
+                    </h3>
+                    <div class="recent-images-grid">
+                        {% for image in recent_images[:10] %}
+                        <div class="generated-image-card" 
+                             data-image-url="{{ image.image_url }}" 
+                             data-title="{{ image.element_title|e }}" 
+                             data-context="{{ image.element_context|e if image.element_context else '' }}" 
+                             data-type="{{ image.element_type|title }}" 
+                             data-owner="{{ image.owner|e }}" 
+                             data-date="{{ image.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
+                            <div class="generated-image-thumbnail">
+                                <img src="{{ image.image_url }}" alt="Generated {{ image.element_type }}" loading="lazy">
+                            </div>
+                            <div class="generated-image-content">
+                                <div class="generated-image-title">{{ image.element_title }}</div>
+                                {% if image.element_context %}
+                                <div class="generated-image-context">{{ image.element_context }}</div>
+                                {% endif %}
+                                <div class="generated-image-meta">
+                                    <span>{{ image.element_type|title }}</span>
+                                    <span>{{ image.owner }}</span>
+                                </div>
+                                <div class="generated-image-date">
+                                    Generated {{ image.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if recent_images|length > 10 %}
+                    <div class="text-center mt-3">
+                        <small class="text-muted">Showing 10 of {{ recent_images|length }} recent images</small>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-images me-2"></i>
+                        Recent Generated Images
+                    </h3>
+                    <div class="text-center py-4">
+                        <i class="fas fa-images text-muted mb-3" style="font-size: 2rem;"></i>
+                        <p class="text-muted">No generated images yet. Start creating world elements to see AI-generated images here!</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Generated Images Section Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_generated_images_bottom %}
+                    {% for cta in home_ctas.home_generated_images_bottom %}
+                        <div class="mt-4 mb-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Home Sidebar Bottom CTAs -->
+                {% if home_ctas and home_ctas.home_sidebar_bottom %}
+                    {% for cta in home_ctas.home_sidebar_bottom %}
+                        <div class="mt-4">
+                            {% include 'partials/cta_display.html' %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div> <!-- Close col-lg-5 -->
+    </div> <!-- Close row -->
+</div>
+
+<!-- Image Popup Modal -->
+<div class="image-popup-modal" id="imagePopupModal">
+    <div class="image-popup-content">
+        <div class="image-popup-header">
+            <h5 class="image-popup-title" id="imagePopupTitle">Image Preview</h5>
+            <button class="image-popup-close" onclick="hideImagePopup()">&times;</button>
+        </div>
+        <div class="image-popup-body">
+            <img id="imagePopupImage" src="" alt="Generated Image">
+        </div>
+        <div class="image-popup-info">
+            <div class="image-popup-context" id="imagePopupContext"></div>
+            <div class="image-popup-meta">
+                <span id="imagePopupType"><i class="fas fa-tag"></i></span>
+                <span id="imagePopupOwner"><i class="fas fa-user"></i></span>
+                <span id="imagePopupDate"><i class="fas fa-calendar"></i></span>
+            </div>
+            
+            <!-- Social Sharing Section -->
+            <div class="image-popup-sharing" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #E2E8F0;">
+                <div class="social-sharing-container" data-content-type="image_preview" data-content-id="modal">
+                    <div class="social-sharing-header" style="text-align: center; margin-bottom: 12px;">
+                        <h6 class="social-sharing-title" style="font-size: 14px; margin: 0 0 4px 0;">
+                            <i class="fas fa-share-alt me-1"></i>
+                            Share this Image
+                        </h6>
+                        <p class="social-sharing-subtitle text-muted" style="font-size: 12px; margin: 0;">
+                            Share and earn 1 coin (up to 10 times daily)
+                        </p>
+                    </div>
+                    
+                    <div class="social-sharing-buttons" style="display: flex !important; justify-content: center !important; gap: 8px !important; flex-wrap: wrap !important;">
+                        <!-- Facebook -->
+                        <button class="social-share-btn facebook" 
+                                data-platform="facebook"
+                                data-url=""
+                                data-title=""
+                                data-description=""
+                                data-image=""
+                                title="Share on Facebook"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-facebook-f" style="color: #1877f2 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- Twitter/X -->
+                        <button class="social-share-btn twitter" 
+                                data-platform="twitter"
+                                data-url=""
+                                data-title=""
+                                data-hashtags="#AIArt #GeneratedImage #AICreativity"
+                                title="Share on Twitter/X"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-twitter" style="color: #1da1f2 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- LinkedIn -->
+                        <button class="social-share-btn linkedin" 
+                                data-platform="linkedin"
+                                data-url=""
+                                data-title=""
+                                data-description=""
+                                title="Share on LinkedIn"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-linkedin-in" style="color: #0077b5 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- Pinterest -->
+                        <button class="social-share-btn pinterest" 
+                                data-platform="pinterest"
+                                data-url=""
+                                data-title=""
+                                data-description=""
+                                data-image=""
+                                title="Share on Pinterest"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-pinterest-p" style="color: #bd081c !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- Copy Link -->
+                        <button class="social-share-btn copy-link" 
+                                data-platform="copy_link"
+                                data-url=""
+                                title="Copy Link"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fas fa-link" style="color: #6b7280 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- WhatsApp -->
+                        <button class="social-share-btn whatsapp" 
+                                data-platform="whatsapp"
+                                data-url=""
+                                data-title=""
+                                title="Share on WhatsApp"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-whatsapp" style="color: #25d366 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- Email -->
+                        <button class="social-share-btn email" 
+                                data-platform="email"
+                                data-url=""
+                                data-title=""
+                                data-description=""
+                                title="Share via Email"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fas fa-envelope" style="color: #4b5563 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- Reddit -->
+                        <button class="social-share-btn reddit" 
+                                data-platform="reddit"
+                                data-url=""
+                                data-title=""
+                                title="Share on Reddit"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-reddit-alien" style="color: #ff4500 !important; font-size: 16px !important;"></i>
+                        </button>
+                        
+                        <!-- Telegram -->
+                        <button class="social-share-btn telegram" 
+                                data-platform="telegram"
+                                data-url=""
+                                data-title=""
+                                title="Share on Telegram"
+                                style="display: inline-flex !important; width: 40px !important; height: 40px !important; background: #f8f9fa !important; border: none !important; border-radius: 8px !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; transition: all 0.2s ease !important;">
+                            <i class="fab fa-telegram-plane" style="color: #0088cc !important; font-size: 16px !important;"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Share feedback message -->
+                    <div class="social-sharing-feedback" style="display: none; margin-top: 8px;">
+                        <div class="alert alert-success" role="alert" style="margin: 0; padding: 8px 12px; font-size: 12px;">
+                            <i class="fas fa-check-circle me-1"></i>
+                            <span class="feedback-message"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interview Modal -->
+{% include 'partials/interview_full.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <!-- Include Social Sharing JavaScript -->
+    <script src="/static/js/social-sharing.js"></script>
+    <!-- Include Interview Component JavaScript -->
+    <script src="/static/js/interview.js"></script>
+    <script>
+        // Add click event listeners to image cards when the page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Setting up image card click handlers...');
+            
+            // Setup interview test button
+            await setupInterviewTestButton();
+            
+            // Add page focus event to refresh bonus status when user returns to tab
+            window.addEventListener('focus', async function() {
+                console.log('Page focused - refreshing bonus status from database...');
+                try {
+                    cachedBonusStatus = null;
+                    await getBonusStatus(true);
+                    await updateStepVisuals();
+                } catch (error) {
+                    console.error('Error refreshing bonus status on page focus:', error);
+                }
+            });
+            
+            // Check if user needs to complete welcome interview
+            // checkAndShowWelcomeInterview(); // Disabled automatic popup
+            const imageCards = document.querySelectorAll('.generated-image-card');
+            console.log('Found', imageCards.length, 'image cards');
+            
+            imageCards.forEach((card, index) => {
+                console.log('Setting up click handler for card', index + 1);
+                card.style.cursor = 'pointer'; // Make sure cards look clickable
+                
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Image card clicked!', this);
+                    
+                    const imageUrl = this.dataset.imageUrl;
+                    const title = this.dataset.title;
+                    const context = this.dataset.context;
+                    const type = this.dataset.type;
+                    const owner = this.dataset.owner;
+                    const date = this.dataset.date;
+                    
+                    console.log('Card data:', { imageUrl, title, context, type, owner, date });
+                    
+                    if (!imageUrl) {
+                        console.error('No image URL found on card');
+                        return;
+                    }
+                    
+                    showImagePopup(imageUrl, title, context, type, owner, date);
+                });
+            });
+        });
+        
+        function showImagePopup(imageUrl, title, context, type, owner, date) {
+            console.log('showImagePopup called with:', { imageUrl, title, context, type, owner, date });
+            
+            const modal = document.getElementById('imagePopupModal');
+            const image = document.getElementById('imagePopupImage');
+            const titleEl = document.getElementById('imagePopupTitle');
+            const contextEl = document.getElementById('imagePopupContext');
+            const typeEl = document.getElementById('imagePopupType');
+            const ownerEl = document.getElementById('imagePopupOwner');
+            const dateEl = document.getElementById('imagePopupDate');
+            
+            if (!modal) {
+                console.error('Modal element not found!');
+                return;
+            }
+            
+            if (!image || !titleEl || !contextEl || !typeEl || !ownerEl || !dateEl) {
+                console.error('One or more modal elements not found!');
+                return;
+            }
+            
+            // Set content with proper error handling
+            try {
+                image.src = imageUrl || '';
+                image.alt = title || 'Generated Image';
+                titleEl.textContent = title || 'Image Preview';
+                contextEl.textContent = context || '';
+                contextEl.style.display = context ? 'block' : 'none';
+                typeEl.innerHTML = '<i class="fas fa-tag"></i> ' + (type || 'Unknown');
+                ownerEl.innerHTML = '<i class="fas fa-user"></i> ' + (owner || 'Unknown');
+                dateEl.innerHTML = '<i class="fas fa-calendar"></i> ' + (date || 'Unknown');
+                
+                // Generate composite image URL for social sharing (includes image + metadata)
+                const imageId = 'img_' + Date.now();
+                const compositeImageUrl = '/api/v1/social/composite-image/' + imageId + '.jpg?' + new URLSearchParams({
+                    title: title || 'AI Generated Image',
+                    description: context || 'Beautiful AI-generated artwork created with advanced AI models',
+                    image_type: type || 'AI Art',
+                    owner: owner || 'Creator',
+                    date: date || 'Recently created',
+                    original_url: imageUrl
+                }).toString();
+                
+                const fullCompositeUrl = window.location.origin + compositeImageUrl;
+                
+                // Create a shareable page URL using existing public image endpoint
+                const sharePageUrl = '/public/image?' + new URLSearchParams({
+                    url: fullCompositeUrl,
+                    title: title || 'AI Generated Image',
+                    description: context || 'Beautiful AI-generated artwork created with advanced AI models'
+                }).toString();
+                
+                const fullSharePageUrl = window.location.origin + sharePageUrl;
+                const shareTitle = title || 'AI Generated Image';
+                const shareDescription = context ? 
+                    `${context} - Beautiful AI-generated artwork created with advanced AI` : 
+                    'Beautiful AI-generated artwork created with advanced AI models';
+                
+                // Update social sharing buttons with shareable page URL
+                // The page has Open Graph meta tags that point to the composite image
+                console.log('Generated URLs for sharing:', {
+                    compositeImageUrl: fullCompositeUrl,
+                    sharePageUrl: fullSharePageUrl,
+                    title: shareTitle,
+                    description: shareDescription
+                });
+                
+                const shareButtons = modal.querySelectorAll('.social-share-btn');
+                shareButtons.forEach(button => {
+                    button.setAttribute('data-url', fullSharePageUrl); // Share the page with OG tags
+                    button.setAttribute('data-title', shareTitle);
+                    button.setAttribute('data-description', shareDescription);
+                    button.setAttribute('data-image', fullCompositeUrl); // Composite image for preview
+                });
+                
+                // Update container data attributes for tracking
+                const container = modal.querySelector('.social-sharing-container');
+                if (container) {
+                    container.setAttribute('data-content-id', 'modal-' + Date.now());
+                }
+                
+                // Show the modal by adding the 'show' class
+                modal.classList.add('show');
+                
+                // Prevent body scroll
+                document.body.style.overflow = 'hidden';
+                
+                console.log('Modal displayed successfully');
+                console.log('Share page URL for Facebook:', fullSharePageUrl);
+                console.log('Composite image URL:', fullCompositeUrl);
+                console.log('This composite image includes the original image + metadata overlay');
+            } catch (error) {
+                console.error('Error showing modal:', error);
+            }
+        }
+        
+        function hideImagePopup() {
+            const modal = document.getElementById('imagePopupModal');
+            
+            if (!modal) {
+                console.error('Modal element not found when trying to hide!');
+                return;
+            }
+            
+            try {
+                // Remove the 'show' class to hide modal
+                modal.classList.remove('show');
+                
+                // Restore body scroll immediately
+                document.body.style.overflow = 'auto';
+                
+                console.log('Modal hidden successfully');
+            } catch (error) {
+                console.error('Error hiding modal:', error);
+                // Fallback: remove class
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Close modal when clicking outside - set up after modal is available
+        function setupModalClickListener() {
+            const modal = document.getElementById('imagePopupModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        hideImagePopup();
+                    }
+                });
+                console.log('Modal click-outside listener set up successfully');
+            } else {
+                console.log('Modal not yet available, retrying...');
+                setTimeout(setupModalClickListener, 100);
+            }
+        }
+        
+        // Set up click listener after DOM is loaded
+        document.addEventListener('DOMContentLoaded', setupModalClickListener);
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideImagePopup();
+            }
+        });
+        
+        // Add test function for debugging (can be removed in production)
+        window.testImageModal = function() {
+            console.log('Testing image modal...');
+            showImagePopup(
+                'https://via.placeholder.com/800x600/6366F1/FFFFFF?text=Test+Image',
+                'Test Image Modal',
+                'This is a test to verify the modal functionality works correctly.',
+                'Test',
+                'System',
+                new Date().toLocaleDateString()
+            );
+        };
+        
+        // Debug function to check modal state
+        window.debugModal = function() {
+            const modal = document.getElementById('imagePopupModal');
+            if (modal) {
+                console.log('Modal element exists');
+                console.log('Modal classes:', modal.className);
+                console.log('Modal inline styles:', modal.style.cssText);
+                console.log('Computed display:', window.getComputedStyle(modal).display);
+                console.log('Computed opacity:', window.getComputedStyle(modal).opacity);
+                console.log('Computed z-index:', window.getComputedStyle(modal).zIndex);
+            } else {
+                console.log('Modal element not found in DOM');
+            }
+        };
+
+        // Story Creation Modal
+        function showStoryCreationModal() {
+            const modalHtml = `
+                <div class="modal fade" id="storyCreationModal" tabindex="-1" aria-labelledby="storyCreationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="storyCreationModalLabel">
+                                    <i class="fas fa-pen-nib me-2"></i>Choose Your Story Type
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="card h-100 story-type-card" onclick="createBasicStory()">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-rocket fa-3x text-success"></i>
+                                                </div>
+                                                <h4 class="card-title text-success">Basic Story</h4>
+                                                <p class="card-text">Start writing immediately with a simple, distraction-free interface. Perfect for quick ideas and focused writing.</p>
+                                                <div class="mb-3">
+                                                    <span class="badge bg-success me-1">Instant Start</span>
+                                                    <span class="badge bg-success me-1">AI Assistance</span>
+                                                    <span class="badge bg-success">Publishing</span>
+                                                </div>
+                                                <ul class="list-unstyled text-start small">
+                                                    <li><i class="fas fa-check text-success me-2"></i>Quick setup (just title needed)</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Focus purely on writing</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>AI writing assistance</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Acts and scenes support</li>
+                                                    <li><i class="fas fa-check text-success me-2"></i>Full publishing features</li>
+                                                    <li><i class="fas fa-times text-muted me-2"></i>No character management</li>
+                                                    <li><i class="fas fa-times text-muted me-2"></i>No world-building tools</li>
+                                                </ul>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button class="btn btn-success w-100">
+                                                    <i class="fas fa-rocket me-2"></i>Start Writing Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="card h-100 story-type-card" onclick="createAdvancedStory()">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-globe fa-3x text-primary"></i>
+                                                </div>
+                                                <h4 class="card-title text-primary">Advanced Story</h4>
+                                                <p class="card-text">Full-featured storytelling with world-building, character management, and advanced AI assistance.</p>
+                                                <div class="mb-3">
+                                                    <span class="badge bg-primary me-1">World Building</span>
+                                                    <span class="badge bg-primary me-1">Characters</span>
+                                                    <span class="badge bg-primary">Full Features</span>
+                                                </div>
+                                                <ul class="list-unstyled text-start small">
+                                                    <li><i class="fas fa-check text-primary me-2"></i>Complete world-building</li>
+                                                    <li><i class="fas fa-check text-primary me-2"></i>Character management</li>
+                                                    <li><i class="fas fa-check text-primary me-2"></i>Location tracking</li>
+                                                    <li><i class="fas fa-check text-primary me-2"></i>Advanced AI with context</li>
+                                                    <li><i class="fas fa-check text-primary me-2"></i>Story hierarchy view</li>
+                                                    <li><i class="fas fa-check text-primary me-2"></i>All publishing features</li>
+                                                </ul>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button class="btn btn-primary w-100">
+                                                    <i class="fas fa-globe me-2"></i>Create World & Story
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-12">
+                                        <div class="card h-100 story-type-card" onclick="startWorldBuilder()">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-magic fa-3x text-warning"></i>
+                                                </div>
+                                                <h4 class="card-title text-warning">Build My World First</h4>
+                                                <p class="card-text">Use our World Builder Wizard to define and create the perfect world for your story. Then create stories within that world.</p>
+                                                <div class="mb-3">
+                                                    <span class="badge bg-warning text-dark me-1">World Wizard</span>
+                                                    <span class="badge bg-warning text-dark me-1">Guided Setup</span>
+                                                    <span class="badge bg-warning text-dark">Reusable</span>
+                                                </div>
+                                                <ul class="list-unstyled text-start small">
+                                                    <li><i class="fas fa-check text-warning me-2"></i>Guided world creation wizard</li>
+                                                    <li><i class="fas fa-check text-warning me-2"></i>Define world rules & physics</li>
+                                                    <li><i class="fas fa-check text-warning me-2"></i>Create detailed settings</li>
+                                                    <li><i class="fas fa-check text-warning me-2"></i>Build rich background lore</li>
+                                                    <li><i class="fas fa-check text-warning me-2"></i>Reuse for multiple stories</li>
+                                                    <li><i class="fas fa-info text-info me-2"></i>Create stories later in this world</li>
+                                                </ul>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button class="btn btn-warning w-100">
+                                                    <i class="fas fa-magic me-2"></i>Start World Builder
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-center">
+                                    <div class="alert alert-info" role="alert">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Don't worry!</strong> You can upgrade a Basic Story to Advanced at any time.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if present
+            const existingModal = document.getElementById('storyCreationModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('storyCreationModal'));
+            modal.show();
+            
+            // Clean up modal after it's hidden
+            document.getElementById('storyCreationModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function createBasicStory() {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('storyCreationModal'));
+            modal.hide();
+            
+            // Award Step 3 bonus for choosing Basic story type
+            await markStepCompleted(3);
+            
+            try {
+                // Show loading indicator
+                const loadingToast = document.createElement('div');
+                loadingToast.className = 'toast-notification';
+                loadingToast.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating your story...';
+                document.body.appendChild(loadingToast);
+                
+                // Create basic story via API
+                const response = await fetch('/api/v1/stories/basic/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: 'Untitled',
+                        short_description: null
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Redirect to the basic story editor
+                    window.location.href = `/ui/stories/basic/${data.id}/editor`;
+                } else {
+                    throw new Error('Failed to create story');
+                }
+            } catch (error) {
+                console.error('Error creating basic story:', error);
+                // Fallback to the form page
+                window.location.href = '{{ url_for("ui_create_basic_story_form") }}';
+            }
+        }
+
+        async function createAdvancedStory() {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('storyCreationModal'));
+            modal.hide();
+            
+            // Award Step 3 bonus for choosing Advanced story type
+            await markStepCompleted(3);
+            
+            // Redirect to Advanced Story creation
+            window.location.href = '{{ url_for("ui_create_story_form_generic") }}';
+        }
+
+        async function startWorldBuilder() {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('storyCreationModal'));
+            modal.hide();
+            
+            // Award Step 3 bonus for choosing world builder
+            await markStepCompleted(3);
+            
+            // Redirect to World Builder Wizard
+            window.location.href = '{{ url_for("ui_world_builder_wizard") }}';
+        }
+        
+        // Check for OAuth welcome parameter
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const welcomeParam = urlParams.get('welcome');
+            
+            if (welcomeParam === 'oauth') {
+                // Show welcome modal for new OAuth users
+                setTimeout(function() {
+                    showOAuthWelcomeModal();
+                }, 500);
+            }
+            // Removed auto-help trigger - help is now only available via manual click
+        });
+        
+        function showOAuthWelcomeModal() {
+            const modalHtml = `
+                <div class="modal fade" id="oauthWelcomeModal" tabindex="-1" aria-labelledby="oauthWelcomeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="oauthWelcomeModalLabel">
+                                    <i class="fas fa-party-horn me-2"></i>Welcome to {{ project_name }}!
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="mb-4">
+                                    <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                                </div>
+                                <h4 class="mb-3">Account Created Successfully!</h4>
+                                <p class="mb-3">Thank you for signing up with Google! Your account has been created and you've received <strong>10 coins</strong> to get started.</p>
+                                <p class="mb-4">You can now:</p>
+                                <ul class="list-unstyled text-start">
+                                    <li><i class="fas fa-feather-alt text-primary me-2"></i> Create stories and characters</li>
+                                    <li><i class="fas fa-robot text-primary me-2"></i> Use AI-powered writing assistance</li>
+                                    <li><i class="fas fa-globe text-primary me-2"></i> Build detailed fictional worlds</li>
+                                    <li><i class="fas fa-users text-primary me-2"></i> Join our creative community</li>
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Explore Later</button>
+                                <button type="button" class="btn btn-primary" onclick="startGettingStarted()">Get Started!</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('oauthWelcomeModal'));
+            modal.show();
+            
+            // Clean up modal after it's hidden
+            document.getElementById('oauthWelcomeModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+                // Clean up URL parameter
+                const url = new URL(window.location);
+                url.searchParams.delete('welcome');
+                window.history.replaceState({}, '', url);
+            });
+        }
+        
+        // Cookie utility functions
+        function setCookie(name, value, days = 30) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+        }
+        
+        function getCookie(name) {
+            return document.cookie.split('; ').reduce((r, v) => {
+                const parts = v.split('=');
+                return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+            }, '');
+        }
+        
+        // Step management functions
+        let cachedBonusStatus = null;
+        
+        async function getBonusStatus(forceRefresh = false) {
+            // Use cached result if available and not forcing refresh
+            if (cachedBonusStatus && !forceRefresh) {
+                return cachedBonusStatus;
+            }
+            
+            try {
+                console.log('Fetching bonus status from database...');
+                const response = await fetch('/ui/welcome-interview/api/bonus-status');
+                if (response.ok) {
+                    cachedBonusStatus = await response.json();
+                    console.log('Database bonus status:', cachedBonusStatus);
+                    return cachedBonusStatus;
+                } else {
+                    console.error('Failed to get bonus status:', response.status);
+                    // Return server-side values as fallback
+                    return {
+                        bonus1: {{ 'true' if current_user and current_user.bonus1 else 'false' }},
+                        bonus2: {{ 'true' if current_user and current_user.bonus2 else 'false' }},
+                        bonus3: {{ 'true' if current_user and current_user.bonus3 else 'false' }}
+                    };
+                }
+            } catch (error) {
+                console.error('Error getting bonus status:', error);
+                // Return server-side values as fallback
+                return {
+                    bonus1: {{ 'true' if current_user and current_user.bonus1 else 'false' }},
+                    bonus2: {{ 'true' if current_user and current_user.bonus2 else 'false' }},
+                    bonus3: {{ 'true' if current_user and current_user.bonus3 else 'false' }}
+                };
+            }
+        }
+        
+        async function getCompletedSteps() {
+            const bonusStatus = await getBonusStatus();
+            const completed = [];
+            
+            // Convert bonus status to completed steps array
+            if (bonusStatus.bonus1) completed.push(1);
+            if (bonusStatus.bonus2) completed.push(2);
+            if (bonusStatus.bonus3) completed.push(3);
+            
+            return completed;
+        }
+        
+        async function markStepCompleted(step) {
+            try {
+                // Check if already completed
+                const completed = await getCompletedSteps();
+                if (completed.includes(step)) {
+                    console.log(`Step ${step} already completed`);
+                    return;
+                }
+                
+                // Claim the bonus via API
+                const response = await fetch('/ui/welcome-interview/api/claim-bonus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        bonus_number: step
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    if (result.success && !result.already_claimed) {
+                        console.log(`Successfully claimed bonus ${step}: ${result.coins_awarded} coins`);
+                        showCoinReward(step, result.coins_awarded);
+                        
+                        // Clear cache and force fresh fetch from database
+                        cachedBonusStatus = null;
+                        await getBonusStatus(true);
+                        
+                        // Update visuals based on fresh database data
+                        await updateStepVisuals();
+                    } else if (result.already_claimed) {
+                        console.log(`Bonus ${step} already claimed`);
+                    }
+                } else {
+                    console.error(`Failed to claim bonus ${step}:`, response.status);
+                }
+                
+            } catch (error) {
+                console.error(`Error claiming bonus for step ${step}:`, error);
+            }
+        }
+        
+        function showCoinReward(step, coinAmount) {
+            // Use the reusable coin animation system
+            showStepBonus(step, coinAmount);
+        }
+        
+        async function updateStepVisuals() {
+            const completed = await getCompletedSteps();
+            console.log('Updating step visuals. Completed steps:', completed);
+            
+            // Update Step 1
+            updateStep(1, completed.includes(1), true); // Always available
+            
+            // Update Step 2 - available if step 1 is completed
+            updateStep(2, completed.includes(2), completed.includes(1));
+            
+            // Update Step 3 - available if step 2 is completed
+            updateStep(3, completed.includes(3), completed.includes(2));
+            
+            // Update connection lines
+            updateConnectionLine('line1-2', completed.includes(1));
+            updateConnectionLine('line2-3', completed.includes(2));
+        }
+        
+        // Manual refresh function for debugging or external calls
+        async function refreshBonusStatusFromDatabase() {
+            console.log('Manual refresh triggered - checking database...');
+            cachedBonusStatus = null;
+            await getBonusStatus(true);
+            await updateStepVisuals();
+            console.log('Manual refresh completed');
+        }
+        
+        // Expose function globally for debugging
+        window.refreshBonusStatus = refreshBonusStatusFromDatabase;
+        
+        function updateStep(stepNum, isCompleted, isAvailable) {
+            const indicator = document.getElementById(`step${stepNum}-indicator`);
+            const icon = document.getElementById(`step${stepNum}-icon`);
+            const btn = document.getElementById(`step${stepNum}-btn`);
+            const coins = document.getElementById(`step${stepNum}-coins`);
+            
+            if (!indicator || !icon || !btn) return;
+            
+            if (isCompleted) {
+                // Completed state
+                indicator.style.background = '#10B981';
+                indicator.style.color = 'white';
+                indicator.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                icon.className = 'fas fa-check';
+                icon.style.fontSize = '14px';
+                btn.style.background = '#10B981';
+                btn.style.color = 'white';
+                btn.style.cursor = 'pointer';
+                btn.textContent = 'Completed ✨';
+                btn.disabled = false;
+                
+                // Make coin bonus fully visible and add earned effect
+                if (coins) {
+                    coins.style.opacity = '1';
+                    coins.style.background = 'rgba(16, 185, 129, 0.1)';
+                    coins.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                    
+                    // Update coin text to show "Earned" for each step
+                    const coinAmounts = { 1: 150, 2: 50, 3: 50 };
+                    const amount = coinAmounts[stepNum] || 0;
+                    coins.innerHTML = `<i class="fas fa-coins" style="color: #10B981; font-size: 12px; margin-right: 4px;"></i><span style="font-size: 11px; font-weight: 600; color: #10B981;">${amount} Earned</span>`;
+                }
+            } else if (isAvailable) {
+                // Available state
+                indicator.style.background = '#6366F1';
+                indicator.style.color = 'white';
+                indicator.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)';
+                icon.className = 'fas fa-circle';
+                icon.style.fontSize = '10px';
+                btn.style.background = '#6366F1';
+                btn.style.color = 'white';
+                btn.style.cursor = 'pointer';
+                btn.disabled = false;
+                
+                // Make coin bonus fully visible for available steps
+                if (coins) {
+                    coins.style.opacity = '1';
+                }
+                
+                // Set button text based on step
+                if (stepNum === 1) btn.textContent = 'Start Interview';
+                else if (stepNum === 2) btn.textContent = 'Brainstorm';
+                else if (stepNum === 3) btn.textContent = 'Start Writing';
+            } else {
+                // Locked state
+                indicator.style.background = '#E5E7EB';
+                indicator.style.color = '#9CA3AF';
+                indicator.style.boxShadow = 'none';
+                icon.className = 'fas fa-lock';
+                icon.style.fontSize = '12px';
+                btn.style.background = '#E5E7EB';
+                btn.style.color = '#9CA3AF';
+                btn.style.cursor = 'not-allowed';
+                btn.textContent = 'Locked';
+                btn.disabled = true;
+                
+                // Keep coin bonus dimmed for locked steps
+                if (coins) {
+                    coins.style.opacity = '0.5';
+                }
+            }
+        }
+        
+        function updateConnectionLine(lineId, isActive) {
+            const line = document.getElementById(lineId);
+            if (!line) return;
+            
+            if (isActive) {
+                line.style.background = '#10B981';
+            } else {
+                line.style.background = '#E5E7EB';
+            }
+        }
+        
+        // Setup interview test button
+        async function setupInterviewTestButton() {
+            // Initialize step visuals based on current database status
+            console.log('Initializing step visuals from database...');
+            await updateStepVisuals();
+            
+            // Set up periodic sync with database (every 30 seconds)
+            setInterval(async () => {
+                try {
+                    console.log('Periodic sync: Checking database for bonus status updates...');
+                    const freshStatus = await getBonusStatus(true);
+                    await updateStepVisuals();
+                } catch (error) {
+                    console.error('Error during periodic sync:', error);
+                }
+            }, 30000);
+            
+            // Setup step action buttons
+            const step1Btn = document.getElementById('step1-btn');
+            if (step1Btn) {
+                step1Btn.addEventListener('click', function() {
+                    console.log('Step 1 button clicked');
+                    triggerInterviewWithCompletion();
+                });
+            }
+            
+            const step2Btn = document.getElementById('step2-btn');
+            if (step2Btn) {
+                step2Btn.addEventListener('click', function() {
+                    if (!step2Btn.disabled) {
+                        console.log('Step 2 button clicked');
+                        {% if current_user %}
+                        triggerStoryBrainstormWithCompletion();
+                        {% else %}
+                        // Redirect to register page with return URL for step 2
+                        window.location.href = "{{ url_for('ui_register_form') }}?next=step2";
+                        {% endif %}
+                    }
+                });
+            }
+            
+            const step3Btn = document.getElementById('step3-btn');
+            if (step3Btn) {
+                step3Btn.addEventListener('click', function() {
+                    if (!step3Btn.disabled) {
+                        console.log('Step 3 button clicked');
+                        {% if current_user %}
+                        triggerStartWritingWithCompletion();
+                        {% else %}
+                        // Redirect to register page with return URL for step 3
+                        window.location.href = "{{ url_for('ui_register_form') }}?next=step3";
+                        {% endif %}
+                    }
+                });
+            }
+            
+            // Setup intro interview button in Quick Actions
+            const introBtn = document.getElementById('introInterviewBtn');
+            if (introBtn) {
+                introBtn.addEventListener('click', function() {
+                    console.log('Intro interview button clicked');
+                    triggerInterviewWithCompletion();
+                });
+                console.log('Intro interview button setup complete');
+            }
+            
+            // Setup story brainstorm button in Quick Actions
+            const brainstormBtnQuick = document.getElementById('storyBrainstormBtnQuick');
+            if (brainstormBtnQuick) {
+                brainstormBtnQuick.addEventListener('click', function() {
+                    console.log('Story brainstorm button clicked');
+                    triggerStoryBrainstormWithCompletion();
+                });
+                console.log('Story brainstorm button setup complete');
+            }
+        }
+        
+        // Enhanced trigger functions that mark steps as completed
+        async function triggerInterviewWithCompletion() {
+            try {
+                await triggerInterview();
+                // Listen for interview completion
+                document.addEventListener('interviewCompleted', async function handleInterviewCompletion(event) {
+                    if (event.detail.interviewId === 'new_user_onboarding') {
+                        console.log('Interview completed! Marking step 1 as done and refreshing from database...');
+                        
+                        // Force refresh from database to ensure we have the latest status
+                        cachedBonusStatus = null;
+                        await getBonusStatus(true);
+                        
+                        await markStepCompleted(1);
+                        document.removeEventListener('interviewCompleted', handleInterviewCompletion);
+                    }
+                });
+            } catch (error) {
+                console.error('Error triggering interview:', error);
+            }
+        }
+        
+        async function triggerStoryBrainstormWithCompletion() {
+            try {
+                await triggerStoryBrainstormInterview();
+                // Step 2 completion is now handled automatically when user marks a favorite
+                // No need to mark it completed here - it happens in the brainstorm page
+            } catch (error) {
+                console.error('Error triggering story brainstorm:', error);
+            }
+        }
+        
+        async function triggerStartWritingWithCompletion() {
+            try {
+                showStoryCreationModal();
+                // Step 3 completion is now handled when user chooses Basic or Advanced
+                // No need to mark it completed here - it happens when they make their choice
+            } catch (error) {
+                console.error('Error triggering start writing:', error);
+            }
+        }
+        
+        // Trigger interview modal
+        async function triggerInterview() {
+            try {
+                console.log('Redirecting to welcome interview page...');
+                
+                // Redirect to the new welcome interview page
+                window.location.href = '/ui/welcome-interview';
+                
+            } catch (error) {
+                console.error('Error redirecting to welcome interview:', error);
+                alert('Error loading welcome interview. Please try again.');
+            }
+        }
+        
+        // Redirect to story brainstorm page
+        function triggerStoryBrainstormInterview() {
+            console.log('Redirecting to Story Brainstorm page...');
+            window.location.href = '/ui/brainstorm';
+        }
+
+        // Show welcome interview (removed completion check)
+        async function checkAndShowWelcomeInterview() {
+            try {
+                console.log('Showing welcome interview...');
+                
+                // Check if user is logged in
+                const response = await fetch('/api/v1/interview/status/new_user_onboarding');
+                if (!response.ok) {
+                    console.log('User not logged in, skipping interview');
+                    return;
+                }
+                
+                console.log('User is logged in, showing interview modal...');
+                
+                // Show the interview modal
+                const modal = new bootstrap.Modal(document.getElementById('interviewModal'));
+                modal.show();
+                
+                // Initialize the interview component
+                const interviewComponent = new InterviewComponent('new_user_onboarding');
+                await interviewComponent.init();
+                
+                // Listen for completion
+                document.addEventListener('interviewCompleted', function(event) {
+                    console.log('Interview completed:', event.detail);
+                });
+                
+            } catch (error) {
+                console.error('Error showing interview:', error);
+            }
+        }
+        
+        function startGettingStarted() {
+            // Close welcome modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('oauthWelcomeModal'));
+            modal.hide();
+            
+            // Show help panel after modal closes
+            setTimeout(function() {
+                if (window.openHelpPanel) {
+                    window.openHelpPanel('introduction');
+                }
+            }, 300);
+        }
+    </script>
+{% endblock %}

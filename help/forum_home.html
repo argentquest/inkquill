@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion Forum - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Discussion Forum</h1>
+            <p class="help-subtitle">Connect with the storytelling community</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"overview\"]').click()">
+                <div class="quick-action-icon">💬</div>
+                <div class="quick-action-text">Forum Overview</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"participation\"]').click()">
+                <div class="quick-action-icon">🤝</div>
+                <div class="quick-action-text">Participation</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"moderation\"]').click()">
+                <div class="quick-action-icon">🛡️</div>
+                <div class="quick-action-text">Community Rules</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="overview">Overview</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="participation">Participation</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="moderation">Community Rules</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="features">Features</button></li>
+            </ul>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="overview">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Forum Structure and Purpose
+                </h2>
+                <p>The Discussion Forum is the heart of our storytelling community. Here, writers share ideas, get feedback, discuss writing techniques, and support each other's creative journeys.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">💭 General Discussion</h3>
+                        <p class="feature-card-description">Writing tips, industry news, and general conversation about storytelling.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Story Feedback</h3>
+                        <p class="feature-card-description">Share excerpts, get constructive criticism, and offer feedback to others.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🤖 AI Discussion</h3>
+                        <p class="feature-card-description">Tips for using AI assistance, sharing prompts, and discussing AI writing ethics.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🌍 World Showcase</h3>
+                        <p class="feature-card-description">Present your worlds, get inspiration, and collaborate on world-building.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Making Your First Forum Post</h3>
+                        <span class="recipe-card-time">5 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Browse existing categories to find the right fit</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Read recent threads to understand community tone</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Click "New Thread" in appropriate category</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Write a clear, descriptive title</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Compose your post with context and specific questions</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">6</div>
+                            <div class="recipe-step-content">Preview, then submit your post</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Forum Categories</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Main Discussion Areas</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Purpose</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>General Writing</td>
+                                    <td>Broad writing discussions and advice</td>
+                                    <td>Writing techniques, motivation, industry news</td>
+                                </tr>
+                                <tr>
+                                    <td>Story Critiques</td>
+                                    <td>Constructive feedback on written work</td>
+                                    <td>Chapter reviews, plot analysis, character development</td>
+                                </tr>
+                                <tr>
+                                    <td>World Building</td>
+                                    <td>Creating rich fictional universes</td>
+                                    <td>Character design, location creation, lore development</td>
+                                </tr>
+                                <tr>
+                                    <td>AI Assistance</td>
+                                    <td>Using AI tools effectively</td>
+                                    <td>Prompt sharing, AI ethics, technique discussions</td>
+                                </tr>
+                                <tr>
+                                    <td>Genre Specific</td>
+                                    <td>Discussions focused on particular genres</td>
+                                    <td>Fantasy magic systems, sci-fi technology, romance tropes</td>
+                                </tr>
+                                <tr>
+                                    <td>Community Events</td>
+                                    <td>Writing challenges and collaborative projects</td>
+                                    <td>Writing prompts, contests, group projects</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Thread Types and Tags</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Use tags to help others find and respond to your posts:</p>
+                        <ul>
+                            <li><strong>[Question]:</strong> Seeking advice or information</li>
+                            <li><strong>[Feedback]:</strong> Requesting critique on your work</li>
+                            <li><strong>[Discussion]:</strong> Starting a conversation about a topic</li>
+                            <li><strong>[Resource]:</strong> Sharing useful tools, links, or information</li>
+                            <li><strong>[Showcase]:</strong> Displaying your work for appreciation</li>
+                            <li><strong>[Collaboration]:</strong> Looking for writing partners or co-authors</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participation Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="participation">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Effective Forum Participation
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Writing Quality Posts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Guidelines for posts that generate helpful responses:</p>
+                        <ul>
+                            <li><strong>Clear Titles:</strong> Specific, descriptive titles get more responses</li>
+                            <li><strong>Context:</strong> Provide background information relevant to your question</li>
+                            <li><strong>Specific Questions:</strong> Ask concrete questions rather than vague requests</li>
+                            <li><strong>Examples:</strong> Include relevant excerpts or examples when appropriate</li>
+                            <li><strong>Format:</strong> Use paragraphs, bullet points, and proper formatting</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Good vs Poor Post Examples:\n\n❌ Poor: \"Help with my story\"\n✅ Good: \"[Feedback] Need help with pacing in action scenes\"\n\n❌ Poor: \"My character is boring\"\n✅ Good: \"[Question] How do I make my introverted protagonist more engaging?\"\n\n❌ Poor: \"Magic system ideas?\"\n✅ Good: \"[Discussion] Balancing magic system limitations in fantasy\"')">Copy</button>
+                            <pre>Good vs Poor Post Examples:
+
+❌ Poor: "Help with my story"
+✅ Good: "[Feedback] Need help with pacing in action scenes"
+
+❌ Poor: "My character is boring"
+✅ Good: "[Question] How do I make my introverted protagonist more engaging?"
+
+❌ Poor: "Magic system ideas?"
+✅ Good: "[Discussion] Balancing magic system limitations in fantasy"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Giving Constructive Feedback</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>How to provide valuable feedback to other writers:</p>
+                        <ul>
+                            <li><strong>Read Completely:</strong> Read the entire piece before commenting</li>
+                            <li><strong>Start Positive:</strong> Mention what works well first</li>
+                            <li><strong>Be Specific:</strong> Point to exact passages when giving feedback</li>
+                            <li><strong>Offer Solutions:</strong> Suggest improvements, not just problems</li>
+                            <li><strong>Stay Respectful:</strong> Critique the work, not the writer</li>
+                            <li><strong>Ask Questions:</strong> Help the writer think through issues</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Feedback Structure Template</h3>
+                                <span class="recipe-card-time">Per response</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content"><strong>Overall Impression:</strong> What struck you most about the piece?</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content"><strong>Strengths:</strong> What did the writer do well?</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content"><strong>Areas for Improvement:</strong> Specific suggestions with examples</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content"><strong>Questions:</strong> Clarifying questions or points to consider</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Building Your Reputation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Earn recognition and trust in the community:</p>
+                        <ul>
+                            <li><strong>Consistent Participation:</strong> Regular, thoughtful contributions</li>
+                            <li><strong>Quality Over Quantity:</strong> Fewer, well-thought-out posts are better</li>
+                            <li><strong>Help Others:</strong> Answer questions and provide feedback</li>
+                            <li><strong>Share Knowledge:</strong> Post useful resources and techniques</li>
+                            <li><strong>Follow Through:</strong> Respond to feedback on your own posts</li>
+                            <li><strong>Positive Attitude:</strong> Encourage and support other writers</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Collaboration Opportunities</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Ways to work with other community members:</p>
+                        <ul>
+                            <li><strong>Writing Partners:</strong> Find accountability partners for regular writing</li>
+                            <li><strong>Beta Readers:</strong> Exchange feedback on longer works</li>
+                            <li><strong>Co-Writing:</strong> Collaborate on shared stories or worlds</li>
+                            <li><strong>Writing Groups:</strong> Form small groups for regular critique</li>
+                            <li><strong>Challenges:</strong> Participate in community writing challenges</li>
+                            <li><strong>Skill Exchange:</strong> Trade expertise (writing for art, editing for plotting)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Rules Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="moderation">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Community Guidelines
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Core Community Values</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Our community is built on these principles:</p>
+                        <ul>
+                            <li><strong>Respect:</strong> Treat all members with courtesy and consideration</li>
+                            <li><strong>Constructive Feedback:</strong> Criticism should be helpful, not harmful</li>
+                            <li><strong>Inclusivity:</strong> Welcome writers of all backgrounds and skill levels</li>
+                            <li><strong>Creative Support:</strong> Encourage experimentation and growth</li>
+                            <li><strong>Ethical AI Use:</strong> Responsible use of AI tools in creative work</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Prohibited Content and Behavior</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Violation</th>
+                                    <th>Examples</th>
+                                    <th>Consequence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Personal Attacks</td>
+                                    <td>Insulting users, discriminatory language</td>
+                                    <td>Warning, temporary ban, permanent ban</td>
+                                </tr>
+                                <tr>
+                                    <td>Spam</td>
+                                    <td>Repetitive posts, irrelevant content</td>
+                                    <td>Post removal, account review</td>
+                                </tr>
+                                <tr>
+                                    <td>Inappropriate Content</td>
+                                    <td>Explicit sexual content, graphic violence</td>
+                                    <td>Content removal, account warning</td>
+                                </tr>
+                                <tr>
+                                    <td>Copyright Violation</td>
+                                    <td>Posting others' work without permission</td>
+                                    <td>Content removal, legal notice</td>
+                                </tr>
+                                <tr>
+                                    <td>Self-Promotion Abuse</td>
+                                    <td>Excessive advertising, commercial posts</td>
+                                    <td>Post removal, posting restrictions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Content Guidelines</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Standards for posted creative content:</p>
+                        <ul>
+                            <li><strong>Original Work:</strong> Only post content you created or have permission to share</li>
+                            <li><strong>Appropriate Rating:</strong> Clearly mark mature content with warnings</li>
+                            <li><strong>Length Limits:</strong> Excerpts of 1000-2000 words for feedback posts</li>
+                            <li><strong>Formatting:</strong> Use proper paragraph breaks and basic formatting</li>
+                            <li><strong>Context:</strong> Provide background when sharing story excerpts</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Content Warnings:</strong> Please mark posts containing mature themes, violence, or adult content with appropriate warnings in the title.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Reporting and Moderation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>How to report problems and how moderation works:</p>
+                        <ul>
+                            <li><strong>Report Button:</strong> Use the report feature on problematic posts</li>
+                            <li><strong>Specific Reports:</strong> Explain what rule was violated</li>
+                            <li><strong>Response Time:</strong> Moderators typically respond within 24 hours</li>
+                            <li><strong>Appeals Process:</strong> Contact moderators to appeal decisions</li>
+                            <li><strong>Anonymous Reporting:</strong> Reports are confidential</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">AI and Ethics Guidelines</h2>
+                <p>Responsible use of AI in our creative community:</p>
+                <ul>
+                    <li><strong>Disclosure:</strong> Mention when significant portions were AI-generated</li>
+                    <li><strong>Human Creativity:</strong> AI should enhance, not replace, human creativity</li>
+                    <li><strong>Original Ideas:</strong> Use AI to develop your concepts, not copy others'</li>
+                    <li><strong>Learning Tool:</strong> Focus on AI as an educational and inspirational aid</li>
+                    <li><strong>Fair Feedback:</strong> When critiquing, consider both human and AI contributions</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Features Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="features">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Advanced Forum Features
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Voting and Recognition System</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Show appreciation and highlight quality content:</p>
+                        <ul>
+                            <li><strong>Upvoting:</strong> Promote helpful posts and good feedback</li>
+                            <li><strong>Downvoting:</strong> Flag unhelpful or inappropriate content</li>
+                            <li><strong>Best Answer:</strong> Thread authors can mark the most helpful response</li>
+                            <li><strong>Community Choice:</strong> Highly upvoted posts get special recognition</li>
+                            <li><strong>Reputation Points:</strong> Earn points for valuable contributions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Subscription and Notifications</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Stay updated on conversations that matter to you:</p>
+                        <ul>
+                            <li><strong>Thread Subscriptions:</strong> Get notified of new replies</li>
+                            <li><strong>Category Following:</strong> Monitor entire forum categories</li>
+                            <li><strong>User Following:</strong> Track posts by favorite community members</li>
+                            <li><strong>Email Digest:</strong> Weekly summary of forum activity</li>
+                            <li><strong>Mobile Notifications:</strong> Real-time alerts on mobile devices</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Search and Discovery</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Find relevant discussions and information:</p>
+                        <ul>
+                            <li><strong>Advanced Search:</strong> Filter by author, date, category, tags</li>
+                            <li><strong>Topic Suggestions:</strong> Related threads based on your interests</li>
+                            <li><strong>Popular Posts:</strong> Trending discussions and highly rated content</li>
+                            <li><strong>Archive Search:</strong> Find older discussions on specific topics</li>
+                            <li><strong>Bookmark System:</strong> Save important posts for later reference</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Integration with Platform Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Connect forum discussions with your creative work:</p>
+                        <ul>
+                            <li><strong>World Linking:</strong> Reference your worlds in forum posts</li>
+                            <li><strong>Story Sharing:</strong> Link to public stories for feedback</li>
+                            <li><strong>Character Galleries:</strong> Show character images in discussions</li>
+                            <li><strong>Collaboration Tools:</strong> Invite forum members to shared projects</li>
+                            <li><strong>Portfolio Integration:</strong> Display forum contributions in your profile</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Mobile and Accessibility</h2>
+                <p>Forum features work across all devices:</p>
+                <ul>
+                    <li><strong>Responsive Design:</strong> Optimized for phones, tablets, and desktops</li>
+                    <li><strong>Offline Reading:</strong> Cache recent posts for offline viewing</li>
+                    <li><strong>Screen Reader Support:</strong> Compatible with assistive technologies</li>
+                    <li><strong>Keyboard Navigation:</strong> Full forum navigation without mouse</li>
+                    <li><strong>High Contrast Mode:</strong> Enhanced visibility options</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

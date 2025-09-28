@@ -1,0 +1,378 @@
+{# /ai_rag_story_app/app/templates/pages/world_chat.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Chat with {{ world.name | e if world else "World" }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/world_chat.css') }}">
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                {% if world %}
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to World">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white-50">My Worlds</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50">{{ world.name | e }}</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Chat</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-comments me-3"></i>
+                    Chat with {{ world.name | e }}
+                </h1>
+                
+                {% if world.description %}
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    {{ world.description | e | truncate(200, True) }}
+                </div>
+                {% endif %}
+                
+                <div class="mt-3">
+                    {% if world.genre %}
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-tag me-1"></i>
+                        {{ world.genre | e }}
+                    </span>
+                    {% endif %}
+                    {% if world.setting %}
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-map me-1"></i>
+                        {{ world.setting | e }}
+                    </span>
+                    {% endif %}
+                    {% if world.tone %}
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-palette me-1"></i>
+                        {{ world.tone | e }}
+                    </span>
+                    {% endif %}
+                </div>
+                {% else %}
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-comments me-3"></i>
+                    World Chat
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Chat about your world with AI assistance
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('world_chat')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with world chat">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="world-chat-page">
+
+    <!-- Hidden inputs for context -->
+    <input type="hidden" id="world-id" value="{{ world.id if world else '' }}">
+    <input type="hidden" id="current-session-id" value="">
+    {% if current_user and current_user.id %}
+    <input type="hidden" id="current-user-id" value="{{ current_user.id }}">
+    {% endif %}
+
+    <!-- Main Chat Interface -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            
+            <!-- Chat Area -->
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-robot me-2"></i>
+                            <span id="session-title">New Conversation</span>
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <!-- AI Model Selector -->
+                            <div class="me-3" style="min-width: 200px;">
+                                {% with select_id='ai-model-config-select', tooltip_text='Choose which AI model to use for responses', show_label=false, select_class='form-select-sm', default_model_type='generation' %}
+                                    {% include 'partials/_ai_model_selector.html' %}
+                                {% endwith %}
+                            </div>
+                            <!-- Session Info -->
+                            <small class="text-muted" id="session-info">
+                                <i class="fas fa-clock me-1"></i>
+                                <span id="session-timestamp">Just started</span>
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Messages Container -->
+                    <div class="card-body d-flex flex-column" style="height: 600px;">
+                        <div id="chat-messages" class="flex-grow-1 overflow-auto mb-3" style="max-height: 500px;">
+                            <!-- Welcome message -->
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-magic fa-3x mb-3"></i>
+                                <h5>Welcome to World Chat!</h5>
+                                <p>Ask me anything about {{ world.name | e if world else "your world" }}. I can help you explore characters, locations, lore, and stories.</p>
+                                <p class="small">Examples: "Tell me about the main character" or "What are the most important locations?"</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Chat Suggestions -->
+                        <div class="border-top px-3 py-2" id="suggestions-area">
+                            <div class="d-flex flex-wrap gap-2" id="chat-suggestions">
+                                <!-- Suggestions will be loaded dynamically -->
+                            </div>
+                        </div>
+                        
+                        <!-- Message Input -->
+                        <div id="message-input-area">
+                            <div class="input-group">
+                                <textarea id="message-input" class="form-control" 
+                                         placeholder="Ask about your world..." 
+                                         rows="2" 
+                                         style="resize: none;"></textarea>
+                                <button id="send-btn" class="btn btn-primary" type="button" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div id="typing-indicator" class="text-muted small mt-1" style="display: none;">
+                                <div class="d-flex align-items-center">
+                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <span><i class="fas fa-robot me-1"></i>AI is thinking...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Context Panel -->
+            <div class="col-lg-4">
+                <!-- World Image (if available) -->
+                <div class="card mb-3" id="world-image-card" style="display: none;">
+                    <img id="world-image" src="" alt="World Image" class="card-img-top" style="max-height: 200px; object-fit: cover;">
+                </div>
+                
+                <!-- Session Management Buttons -->
+                <div class="card mb-3">
+                    <div class="card-body py-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button id="new-session-btn" class="btn btn-primary btn-sm"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Start a new conversation about this world">
+                                <i class="fas fa-plus me-1"></i>New Chat
+                            </button>
+                            <button id="clear-conversation-btn" class="btn btn-outline-secondary btn-sm"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Clear the current conversation">
+                                <i class="fas fa-broom me-1"></i>Clear
+                            </button>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" 
+                                        id="sessionDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                        title="Load a previous conversation">
+                                    <i class="fas fa-history me-1"></i>Load Session
+                                </button>
+                                <ul class="dropdown-menu" id="session-dropdown-menu" aria-labelledby="sessionDropdown">
+                                    <li><span class="dropdown-item-text">Loading sessions...</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- API Call Statistics -->
+                <div class="card mb-3" id="statistics-card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Last API Call Statistics
+                        </h6>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row text-center">
+                            <div class="col-6 mb-2">
+                                <small class="text-muted d-block">Input Tokens</small>
+                                <strong id="input-tokens">-</strong>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <small class="text-muted d-block">Output Tokens</small>
+                                <strong id="output-tokens">-</strong>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <small class="text-muted d-block">Total Tokens</small>
+                                <strong id="total-tokens">-</strong>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <small class="text-muted d-block">Cost (Coins)</small>
+                                <strong id="call-cost">-</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Model</small>
+                                <strong id="model-name">-</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Duration</small>
+                                <strong id="duration-ms">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="contextTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="quick-info-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#quick-info-pane" type="button" role="tab">Quick Info</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="elements-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#elements-pane" type="button" role="tab">Elements</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content" id="contextTabContent">
+                        <!-- Quick Info Tab -->
+                        <div class="tab-pane fade show active" id="quick-info-pane" role="tabpanel">
+                            <div class="card-body">
+                                <div id="world-stats" class="mb-3">
+                                    <h6><i class="fas fa-chart-bar me-2"></i>World Overview</h6>
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="small text-muted">Characters</div>
+                                            <div class="fw-bold" id="characters-count">-</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="small text-muted">Locations</div>
+                                            <div class="fw-bold" id="locations-count">-</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="small text-muted">Stories</div>
+                                            <div class="fw-bold" id="stories-count">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="chat-tips">
+                                    <h6><i class="fas fa-lightbulb me-2"></i>Chat Tips</h6>
+                                    <ul class="small text-muted mb-0">
+                                        <li>Ask about specific characters or locations</li>
+                                        <li>Request story ideas or plot suggestions</li>
+                                        <li>Explore relationships between elements</li>
+                                        <li>Ask for new world-building ideas</li>
+                                        <li>Discuss character motivations and backstories</li>
+                                        <li>Explore cultural aspects and traditions</li>
+                                        <li>Ask about conflicts and tensions in your world</li>
+                                        <li>Request help with plot holes or inconsistencies</li>
+                                        <li>Brainstorm magical systems or technologies</li>
+                                        <li>Develop political structures and organizations</li>
+                                        <li>Create historical events and their consequences</li>
+                                        <li>Explore different perspectives on the same events</li>
+                                        <li>Ask "What if..." questions to explore alternatives</li>
+                                        <li>Get suggestions for sensory details and atmosphere</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Elements Tab -->
+                        <div class="tab-pane fade" id="elements-pane" role="tabpanel">
+                            <div class="card-body">
+                                <div class="accordion" id="elementsAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#charactersAccordion">
+                                                <i class="fas fa-users me-2"></i>Characters
+                                            </button>
+                                        </h2>
+                                        <div id="charactersAccordion" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-2">
+                                                <div id="characters-list" class="list-group list-group-flush">
+                                                    <div class="text-muted small">Loading...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#locationsAccordion">
+                                                <i class="fas fa-map-marker-alt me-2"></i>Locations
+                                            </button>
+                                        </h2>
+                                        <div id="locationsAccordion" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-2">
+                                                <div id="locations-list" class="list-group list-group-flush">
+                                                    <div class="text-muted small">Loading...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#loreAccordion">
+                                                <i class="fas fa-scroll me-2"></i>Lore
+                                            </button>
+                                        </h2>
+                                        <div id="loreAccordion" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-2">
+                                                <div id="lore-list" class="list-group list-group-flush">
+                                                    <div class="text-muted small">Loading...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block page_scripts %}
+    <script src="{{ url_for('static', path='/js/world_chat_main.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/world_chat_session_manager.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/world_chat_context_loader.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/world_chat_message_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/ai_model_selector.js') }}"></script>
+{% endblock %}
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}

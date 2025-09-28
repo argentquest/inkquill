@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: FastAPI (Uvicorn --reload)", // For general development
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--host", "localhost",
+                "--port", "8000",
+                "--reload",
+                "--log-level", "debug" // Explicitly add log-level for reload runs
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Python: FastAPI (Uvicorn --stable-debug)", // For breakpoint debugging
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--host", "localhost",
+                "--port", "8000",
+                // "--reload", // Omit --reload for stable breakpoint debugging
+                "--log-level", "debug" // Ensure debug logs for this run too
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false 
+            // You might add "justMyCode": false if you need to step into library code
+        }
+    ]
+}

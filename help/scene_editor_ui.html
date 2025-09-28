@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scene Editor - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Scene Editor</h1>
+            <p class="help-subtitle">Craft detailed scenes with AI-powered writing assistance</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"scene-basics\"]').click()">
+                <div class="quick-action-icon">🎬</div>
+                <div class="quick-action-text">Scene Basics</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-assistance\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Assistance</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"scene-craft\"]').click()">
+                <div class="quick-action-icon">🎭</div>
+                <div class="quick-action-text">Scene Craft</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="scene-basics">Scene Basics</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-assistance">AI Assistance</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="scene-craft">Scene Craft</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="advanced">Advanced</button></li>
+            </ul>
+        </div>
+
+        <!-- Scene Basics Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="scene-basics">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    What Makes a Great Scene
+                </h2>
+                <p>Scenes are the building blocks of your story. Each scene should be a complete dramatic unit with its own purpose, conflict, and resolution that advances the larger narrative.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎯 Clear Goal</h3>
+                        <p class="feature-card-description">Every scene needs a character pursuing a specific objective.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">⚡ Conflict</h3>
+                        <p class="feature-card-description">Obstacles prevent easy achievement of the character's goal.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎪 Change</h3>
+                        <p class="feature-card-description">Something must be different by the end of the scene.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🔗 Connection</h3>
+                        <p class="feature-card-description">Scene must connect to and advance the overall story.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Scene Planning Framework</h3>
+                        <span class="recipe-card-time">10 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content"><strong>Purpose:</strong> What does this scene accomplish for the story?</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content"><strong>Characters:</strong> Who appears and what do they want?</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content"><strong>Setting:</strong> Where and when does it take place?</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content"><strong>Conflict:</strong> What prevents easy success?</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content"><strong>Outcome:</strong> How does it end and what changes?</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Scene Types:</strong> Action scenes build tension, dialogue scenes develop relationships, and reflection scenes explore character emotions. Mix types for engaging pacing.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Scene Editor Interface</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Editor Layout</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>The Scene Editor is organized into key sections:</p>
+                        <ul>
+                            <li><strong>Scene Metadata Panel:</strong> Purpose, setting, characters present, and scene goals</li>
+                            <li><strong>Main Writing Area:</strong> Rich text editor with AI assistance</li>
+                            <li><strong>Associated Elements Panel:</strong> Characters, locations, and lore relevant to this scene</li>
+                            <li><strong>Scene Structure Tracker:</strong> Goal-Conflict-Disaster progression</li>
+                            <li><strong>Word Count & Progress:</strong> Track scene length and completion</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Associations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Define which world elements appear in your scene:</p>
+                        <ul>
+                            <li><strong>Characters:</strong> Who's present and what roles they play</li>
+                            <li><strong>Locations:</strong> Primary setting and any background locations</li>
+                            <li><strong>Lore Items:</strong> Relevant magic systems, artifacts, or cultural elements</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Example Character Roles in Scenes:\n- Point of View Character: Whose perspective we follow\n- Active Participant: Character driving scene action\n- Obstacle: Character creating conflict\n- Support: Character providing assistance\n- Witness: Character observing but not participating')">Copy</button>
+                            <pre>Example Character Roles in Scenes:
+- Point of View Character: Whose perspective we follow
+- Active Participant: Character driving scene action
+- Obstacle: Character creating conflict
+- Support: Character providing assistance
+- Witness: Character observing but not participating</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Templates</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Start with proven scene structures:</p>
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Template Type</th>
+                                    <th>Purpose</th>
+                                    <th>Key Elements</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dialogue Scene</td>
+                                    <td>Character interaction</td>
+                                    <td>Conversation with subtext, emotional undercurrents</td>
+                                </tr>
+                                <tr>
+                                    <td>Action Scene</td>
+                                    <td>Physical conflict</td>
+                                    <td>Clear stakes, visceral descriptions, pacing</td>
+                                </tr>
+                                <tr>
+                                    <td>Discovery Scene</td>
+                                    <td>Reveal information</td>
+                                    <td>Clues, realization moments, character reactions</td>
+                                </tr>
+                                <tr>
+                                    <td>Emotional Beat</td>
+                                    <td>Character development</td>
+                                    <td>Internal conflict, personal growth, vulnerability</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Assistance Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-assistance">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Scene-Level AI Features
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🎭 Scene-Aware AI</h3>
+                    <p class="ai-feature-description">AI understands the specific characters, location, and purpose of your scene to provide contextually perfect suggestions and continuations.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Context-Aware Writing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Scene-level AI assistance includes:</p>
+                        <ul>
+                            <li><strong>Character Presence:</strong> Only suggests dialogue for characters actually in the scene</li>
+                            <li><strong>Location Integration:</strong> Incorporates setting details and atmosphere naturally</li>
+                            <li><strong>Emotional Continuity:</strong> Maintains character emotional states from previous scenes</li>
+                            <li><strong>Purpose Alignment:</strong> Ensures content serves the scene's dramatic function</li>
+                            <li><strong>Lore Integration:</strong> Weaves in relevant world knowledge appropriately</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Setting Up Scene Context</h3>
+                                <span class="recipe-card-time">3 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Associate relevant characters with specific roles</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Set the primary location and time of day</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Define the scene's emotional tone and purpose</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Add any relevant lore elements that will appear</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Begin writing - AI will use all this context</div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 2-4 credits per scene-aware suggestion, 8-15 credits for full scene generation
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Dialogue Enhancement</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI provides sophisticated dialogue assistance:</p>
+                        <ul>
+                            <li><strong>Character Voice:</strong> Maintains each character's unique speech patterns</li>
+                            <li><strong>Subtext Creation:</strong> Adds layers of meaning beneath surface conversation</li>
+                            <li><strong>Natural Flow:</strong> Creates realistic conversation rhythms and interruptions</li>
+                            <li><strong>Emotional Beats:</strong> Integrates action and reaction during dialogue</li>
+                            <li><strong>Relationship Dynamics:</strong> Reflects power balances and emotional connections</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Dialogue Enhancement Prompts:\n\"Add subtext to this conversation\"\n\"Make this dialogue more tense\"\n\"Show character emotions through speech patterns\"\n\"Add natural interruptions and overlapping\"\n\"Include character-specific mannerisms\"')">Copy</button>
+                            <pre>Dialogue Enhancement Prompts:
+"Add subtext to this conversation"
+"Make this dialogue more tense"
+"Show character emotions through speech patterns"
+"Add natural interruptions and overlapping"
+"Include character-specific mannerisms"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Structure Assistance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI helps with scene architecture:</p>
+                        <ul>
+                            <li><strong>Opening Hooks:</strong> Engaging ways to start scenes</li>
+                            <li><strong>Conflict Escalation:</strong> Building tension throughout the scene</li>
+                            <li><strong>Turning Points:</strong> Moments where everything changes</li>
+                            <li><strong>Cliffhanger Endings:</strong> Compelling reasons to continue reading</li>
+                            <li><strong>Smooth Transitions:</strong> Natural bridges between scenes</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">✨</span>
+                            <div>
+                                <strong>Pro Tip:</strong> Use the scene structure tracker to identify weak points. AI can suggest specific improvements for goal clarity, conflict intensity, or resolution impact.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Specialized AI Tools</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Sensory Description Generator</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Enhance scenes with rich sensory details:</p>
+                        <ul>
+                            <li><strong>Visual Details:</strong> Lighting, colors, textures, and visual composition</li>
+                            <li><strong>Auditory Elements:</strong> Sounds, music, silence, and acoustic atmosphere</li>
+                            <li><strong>Physical Sensations:</strong> Temperature, touch, pain, and physical comfort</li>
+                            <li><strong>Emotional Atmosphere:</strong> Mood, tension, and psychological environment</li>
+                            <li><strong>Movement and Pacing:</strong> Action beats and physical choreography</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Tension and Pacing Tools</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Control the emotional rhythm of your scenes:</p>
+                        <ul>
+                            <li><strong>Tension Ramp:</strong> Gradually increase conflict and stakes</li>
+                            <li><strong>Pacing Variation:</strong> Mix fast action with slower character moments</li>
+                            <li><strong>Emotional Beats:</strong> Strategic moments of character vulnerability</li>
+                            <li><strong>Suspense Building:</strong> Delay revelation for maximum impact</li>
+                            <li><strong>Release Valves:</strong> Moments of humor or relief to prevent fatigue</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene Craft Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="scene-craft">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Advanced Scene Crafting
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Point of View Management</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Control narrative perspective effectively:</p>
+                        <ul>
+                            <li><strong>POV Character Selection:</strong> Choose the character with most at stake</li>
+                            <li><strong>Consistency:</strong> Maintain perspective throughout the scene</li>
+                            <li><strong>Access to Information:</strong> Only reveal what POV character knows</li>
+                            <li><strong>Emotional Filter:</strong> Color descriptions with character's emotional state</li>
+                            <li><strong>Voice Authenticity:</strong> Use character's vocabulary and thought patterns</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Common Mistake:</strong> Switching POV characters mid-scene confuses readers. Stick to one perspective per scene unless you're an experienced writer.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Show vs. Tell Techniques</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Bring scenes to life through demonstration:</p>
+                        <ul>
+                            <li><strong>Action Over Exposition:</strong> Character does rather than narrator explains</li>
+                            <li><strong>Dialogue Reveals Character:</strong> Speech patterns show personality</li>
+                            <li><strong>Physical Reactions:</strong> Body language conveys emotion</li>
+                            <li><strong>Environmental Details:</strong> Setting reflects character mood</li>
+                            <li><strong>Subtext:</strong> Characters mean more than they say</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Show vs Tell Examples:\n\nTell: Sarah was angry.\nShow: Sarah slammed the door, her jaw clenched.\n\nTell: The room was messy.\nShow: Clothes draped over chairs, empty pizza boxes stacked on the desk.\n\nTell: He was nervous.\nShow: His hand trembled as he reached for the doorknob.')">Copy</button>
+                            <pre>Show vs Tell Examples:
+
+Tell: Sarah was angry.
+Show: Sarah slammed the door, her jaw clenched.
+
+Tell: The room was messy.
+Show: Clothes draped over chairs, empty pizza boxes stacked on the desk.
+
+Tell: He was nervous.
+Show: His hand trembled as he reached for the doorknob.</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Conflict Types and Escalation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create compelling dramatic tension:</p>
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Conflict Type</th>
+                                    <th>Description</th>
+                                    <th>Scene Application</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Person vs. Person</td>
+                                    <td>Character opposes another character</td>
+                                    <td>Dialogue confrontations, physical fights</td>
+                                </tr>
+                                <tr>
+                                    <td>Person vs. Self</td>
+                                    <td>Internal struggle or decision</td>
+                                    <td>Moral dilemmas, fear to overcome</td>
+                                </tr>
+                                <tr>
+                                    <td>Person vs. Environment</td>
+                                    <td>External obstacles or dangers</td>
+                                    <td>Escaping disasters, survival challenges</td>
+                                </tr>
+                                <tr>
+                                    <td>Person vs. Society</td>
+                                    <td>Individual against system or culture</td>
+                                    <td>Breaking rules, challenging authority</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Emotional Arc Development</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Guide character emotional journey:</p>
+                        <ul>
+                            <li><strong>Starting Emotion:</strong> Where character begins emotionally</li>
+                            <li><strong>Emotional Catalyst:</strong> Event that triggers change</li>
+                            <li><strong>Emotional Progression:</strong> How feelings evolve through scene</li>
+                            <li><strong>Emotional Climax:</strong> Peak moment of feeling</li>
+                            <li><strong>Emotional Resolution:</strong> Where character ends up</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Mapping Emotional Beats</h3>
+                                <span class="recipe-card-time">5 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Identify character's emotional state entering scene</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Plan 3-5 emotional shifts throughout the scene</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Connect each shift to specific story events</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Show emotion through action and dialogue</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">End with clear emotional state for next scene</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Scene Evaluation Tools</h2>
+                <p>Use these questions to evaluate scene effectiveness:</p>
+                <ul>
+                    <li><strong>Purpose Test:</strong> What specific story function does this scene serve?</li>
+                    <li><strong>Character Test:</strong> Do characters behave consistently with their motivations?</li>
+                    <li><strong>Conflict Test:</strong> Is there meaningful opposition to character goals?</li>
+                    <li><strong>Change Test:</strong> How is the situation different at scene's end?</li>
+                    <li><strong>Reader Test:</strong> Does this scene make readers want to continue?</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="advanced">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Professional Scene Techniques
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Transitions and Connectors</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Seamlessly connect scenes:</p>
+                        <ul>
+                            <li><strong>Time Cuts:</strong> Jump forward or backward in time smoothly</li>
+                            <li><strong>Location Bridges:</strong> Connect different settings logically</li>
+                            <li><strong>Emotional Continuity:</strong> Maintain character emotional thread</li>
+                            <li><strong>Thematic Links:</strong> Use recurring motifs or images</li>
+                            <li><strong>Cliffhanger Hooks:</strong> Create compelling reasons to continue</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Transition Techniques:\n\n1. Match Cut: End scene with image, start next with similar image\n2. Question Bridge: End with question, start next with partial answer\n3. Time Jump: \"Three hours later...\" or \"The next morning...\"\n4. Emotional Echo: Mirror emotions between scenes\n5. Action Continuation: Start mid-action, explain context later')">Copy</button>
+                            <pre>Transition Techniques:
+
+1. Match Cut: End scene with image, start next with similar image
+2. Question Bridge: End with question, start next with partial answer
+3. Time Jump: "Three hours later..." or "The next morning..."
+4. Emotional Echo: Mirror emotions between scenes
+5. Action Continuation: Start mid-action, explain context later</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Advanced Dialogue Techniques</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Master sophisticated conversation craft:</p>
+                        <ul>
+                            <li><strong>Subtext Layers:</strong> Multiple meanings beneath surface dialogue</li>
+                            <li><strong>Power Dynamics:</strong> Who controls the conversation and how</li>
+                            <li><strong>Information Revelation:</strong> Strategic disclosure and withholding</li>
+                            <li><strong>Naturalistic Patterns:</strong> Real speech rhythms and interruptions</li>
+                            <li><strong>Cultural Voice:</strong> Authentic dialect and cultural expressions</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">🎭</span>
+                            <div>
+                                <strong>Dialogue Tip:</strong> Read your dialogue aloud. If it sounds unnatural or stilted, revise until it flows like real conversation.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Genre-Specific Scene Considerations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Genre</th>
+                                    <th>Scene Focus</th>
+                                    <th>Key Elements</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fantasy</td>
+                                    <td>World-building integration</td>
+                                    <td>Magic systems, cultural details, otherworldly atmosphere</td>
+                                </tr>
+                                <tr>
+                                    <td>Science Fiction</td>
+                                    <td>Technological context</td>
+                                    <td>Future society, tech integration, scientific plausibility</td>
+                                </tr>
+                                <tr>
+                                    <td>Mystery</td>
+                                    <td>Clue placement</td>
+                                    <td>Evidence revelation, red herrings, deductive reasoning</td>
+                                </tr>
+                                <tr>
+                                    <td>Romance</td>
+                                    <td>Relationship development</td>
+                                    <td>Emotional intimacy, relationship obstacles, chemistry</td>
+                                </tr>
+                                <tr>
+                                    <td>Thriller</td>
+                                    <td>Tension maintenance</td>
+                                    <td>Constant danger, time pressure, escalating stakes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Length and Pacing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Control narrative rhythm effectively:</p>
+                        <ul>
+                            <li><strong>Short Scenes (300-800 words):</strong> Action, revelation, cliffhangers</li>
+                            <li><strong>Medium Scenes (800-1500 words):</strong> Character development, dialogue</li>
+                            <li><strong>Long Scenes (1500+ words):</strong> Complex events, multiple conflicts</li>
+                            <li><strong>Pacing Variation:</strong> Mix lengths for dynamic rhythm</li>
+                            <li><strong>Chapter Placement:</strong> Strategic scene breaks for maximum impact</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Revision and Polish</h2>
+                <p>Professional-level scene refinement:</p>
+                <ul>
+                    <li><strong>First Pass:</strong> Structure, logic, and character consistency</li>
+                    <li><strong>Second Pass:</strong> Dialogue quality and character voice</li>
+                    <li><strong>Third Pass:</strong> Description, pacing, and atmosphere</li>
+                    <li><strong>Fourth Pass:</strong> Line-level prose and word choice</li>
+                    <li><strong>Final Pass:</strong> Grammar, punctuation, and formatting</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">📝</span>
+                    <div>
+                        <strong>Revision Strategy:</strong> Let scenes "rest" between drafts when possible. Fresh eyes catch problems that familiarity misses.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Keyboard Shortcuts</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + S</span></td>
+                            <td>Save scene</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + /</span></td>
+                            <td>AI writing assistance</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + M</span></td>
+                            <td>Add comment/note</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">F11</span></td>
+                            <td>Full-screen focus mode</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + A</span> (selected element)</td>
+                            <td>Manage associations</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + D</span></td>
+                            <td>Add dialogue block</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + A</span></td>
+                            <td>Add action description</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

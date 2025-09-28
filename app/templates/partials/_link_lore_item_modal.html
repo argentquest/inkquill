@@ -1,0 +1,31 @@
+{# /ai_rag_story_app/app/templates/partials/_link_lore_item_modal.html #}
+<div class="modal fade" id="linkLoreItemModal" tabindex="-1" aria-labelledby="linkLoreItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkLoreItemModalLabel">Link Lore Item to Story</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="link-lore-item-form">
+                    <div class="mb-3">
+                        <label for="select-world-lore-item" class="form-label">Select Lore Item from World:</label>
+                        <select class="form-select" id="select-world-lore-item" name="lore_item_id" required>
+                            <option value="">Loading lore items...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lore-item-relevance-to-story" class="form-label">Lore Item's Relevance to this Story (Optional):</label>
+                        <textarea class="form-control" id="lore-item-relevance-to-story" name="relevance_to_story" rows="3" placeholder="e.g., Key plot device, Explains character motivations, Background flavor"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirm-link-lore-item-btn">
+                    <i class="fas fa-link me-1"></i> Link Lore Item
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

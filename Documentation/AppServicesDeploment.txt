@@ -1,0 +1,186 @@
+My apologies again that the document view is not working for the deployment instructions. I understand that's frustrating.
+
+I will output the full, detailed instructions for deploying the FastAPI application to Azure App Service as plain text directly here in the chat.
+
+Instructions: Deploying the FastAPI Application to Azure App Service
+This guide outlines the steps to deploy the Python FastAPI application (including Semantic Kernel, RAG components, etc.) to Azure App Service on Linux.
+
+1. Prerequisites:
+
+Azure Account: An active Azure subscription.
+Azure CLI: Install the Azure Command-Line Interface (az) locally and log in (az login).
+Code Repository: Your application code pushed to a Git repository (e.g., GitHub, Azure Repos).
+Created Azure Resources:
+Azure Database for PostgreSQL server (with database created).
+Azure Key Vault (with secrets stored).
+Azure Storage Account (with blob container for RAG documents).
+Azure AI Search service (with the index created).
+Azure OpenAI Service (with models deployed).
+.gitignore: Ensure your .gitignore file prevents committing .env, .venv, __pycache__, etc.
+requirements.txt: A file listing all Python dependencies.
+(Optional) Dockerfile: If deploying as a container.
+2. Provision Azure App Service Resources:
+
+You need an App Service Plan (defines compute resources) and the App Service itself (hosts your app).
+
+Create Resource Group (if needed):
+Bash
+
+az group create --name YourResourceGroupName --location YourAzureRegion # e.g., eastus
+Create App Service Plan: (Choose a Linux plan and an appropriate pricing tier - e.g., B1, S1, P1v2)
+Bash
+
+az appservice plan create \
+    --name YourAppServicePlanName \
+    --resource-group YourResourceGroupName \
+    --location YourAzureRegion \
+    --is-linux \
+    --sku B1 # Choose a SKU (B1, S1, P1v2, etc.)
+Create Web App (App Service): (Choose a Python runtime version matching your development environment)
+Bash
+
+az webapp create \
+    --name YourUniqueWebAppName \
+    --resource-group YourResourceGroupName \
+    --plan YourAppServicePlanName \
+    --runtime "PYTHON|3.11" # Or your Python version (e.g., 3.10, 3.9)
+    # Optional: Deployment source (can be configured later)
+    # --deployment-source-url <your-repo-url> --deployment-source-branch main
+YourUniqueWebAppName will be part of your app's URL (https://YourUniqueWebAppName.azurewebsites.net).
+3. Configure the App Service:
+
+Enable System-Assigned Managed Identity:
+
+Bash
+
+az webapp identity assign \
+    --name YourUniqueWebAppName \
+    --resource-group YourResourceGroupName
+Grant Permissions: After enabling, go to the Azure Portal and assign the necessary RBAC roles (e.g., Key Vault Secrets User, Storage Blob Data Contributor, Search Index Data Contributor) to this Managed Identity on the respective Key Vault, Storage Account, and AI Search resources, as detailed previously. Also, configure PostgreSQL AAD authentication and grant DB permissions to the Managed Identity if using that method.
+Configure Application Settings (Environment Variables):
+
+This is where you provide configuration like database details, Key Vault name, deployment names, etc. Crucially, use Key Vault references for secrets.
+Syntax for Key Vault Reference: @Microsoft.KeyVault(SecretUri=https://YourKeyVaultName.vault.azure.net/secrets/YourSecretName/YourOptionalSecretVersion)
+Example Settings (using Azure CLI):
+Bash
+
+# Key Vault Name (used by app code to construct vault URL)
+az webapp config appsettings set --resource-group YourResourceGroupName --name YourUniqueWebAppName --settings KEY_VAULT_NAME="YourKeyVaultName"
+
+# --- Secrets via Key Vault References ---
+# Note: App Service needs permissions (via Managed Identity) to the Key Vault
+# Get the secret URIs using Azure CLI (run these locally)
+AUTH_SECRET_KEY_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AuthSecretKey --query id -o tsv)
+AZURE_OPENAI_API_KEY_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureOpenAI--ApiKey --query id -o tsv)
+AZURE_OPENAI_ENDPOINT_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureOpenAI--Endpoint --query id -o tsv)
+AZURE_OPENAI_CHAT_DEPLOYMENT_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureOpenAI--ChatDeploymentName --query id -o tsv)
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureOpenAI--EmbeddingDeploymentName --query id -o tsv)
+AZURE_AI_SEARCH_API_KEY_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureAISearch--ApiKey --query id -o tsv)
+AZURE_AI_SEARCH_ENDPOINT_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureAISearch--Endpoint --query id -o tsv)
+AZURE_STORAGE_ACCOUNT_NAME_URI=$(az keyvault secret show --vault-name YourKeyVaultName --name AzureStorage--AccountName --query id -o tsv)
+# Add others like POSTGRES_PASSWORD_URI if needed
+
+# Set the App Settings using the secret URIs
+az webapp config appsettings set --resource-group YourResourceGroupName --name YourUniqueWebAppName --settings \
+    "AUTH_SECRET_KEY=@Microsoft.KeyVault(SecretUri=$AUTH_SECRET_KEY_URI)" \
+    "AZURE_OPENAI_API_KEY=@Microsoft.KeyVault(SecretUri=$AZURE_OPENAI_API_KEY_URI)" \
+    "AZURE_OPENAI_ENDPOINT=@Microsoft.KeyVault(SecretUri=$AZURE_OPENAI_ENDPOINT_URI)" \
+    "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=@Microsoft.KeyVault(SecretUri=$AZURE_OPENAI_CHAT_DEPLOYMENT_URI)" \
+    "AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME=@Microsoft.KeyVault(SecretUri=$AZURE_OPENAI_EMBEDDING_DEPLOYMENT_URI)" \
+    "AZURE_AI_SEARCH_API_KEY=@Microsoft.KeyVault(SecretUri=$AZURE_AI_SEARCH_API_KEY_URI)" \
+    "AZURE_AI_SEARCH_ENDPOINT=@Microsoft.KeyVault(SecretUri=$AZURE_AI_SEARCH_ENDPOINT_URI)" \
+    "AZURE_STORAGE_ACCOUNT_NAME=@Microsoft.KeyVault(SecretUri=$AZURE_STORAGE_ACCOUNT_NAME_URI)" \
+    # Add POSTGRES_PASSWORD reference if using password auth for DB
+    # "POSTGRES_PASSWORD=@Microsoft.KeyVault(SecretUri=$POSTGRES_PASSWORD_URI)"
+
+# --- Non-Secret Configuration ---
+# Set directly as environment variables
+az webapp config appsettings set --resource-group YourResourceGroupName --name YourUniqueWebAppName --settings \
+    APP_PROJECT_NAME="AI Story Assistant (Prod)" \
+    POSTGRES_USER="YourProdDbUser" \
+    POSTGRES_SERVER="YourProdDbServer.postgres.database.azure.com" \
+    POSTGRES_PORT="5432" \
+    POSTGRES_DB="YourProdDbName" \
+    AZURE_OPENAI_API_VERSION="2024-02-01" \
+    AZURE_AI_SEARCH_INDEX_NAME="rag-app-content-index" \
+    AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS="rag-documents" \
+    # Add any other non-sensitive config your app needs
+    # Ensure DATABASE_URL is NOT set if constructing dynamically for AAD auth
+You can also configure these settings in the Azure Portal under your App Service -> Configuration -> Application settings.
+Set Startup Command: Tell App Service how to start your application using Gunicorn.
+
+Bash
+
+az webapp config set \
+    --resource-group YourResourceGroupName \
+    --name YourUniqueWebAppName \
+    --startup-file "gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --timeout 120 app.main:app"
+    # Adjust workers (-w) based on your App Service Plan size (e.g., 2-4 * CPU cores)
+    # Adjust timeout based on expected request duration (especially AI calls)
+Alternatively, configure this in the Azure Portal -> Configuration -> General settings -> Startup Command.
+Enable WebSockets: Required for the AI-assisted writing feature.
+
+Go to Azure Portal -> Your App Service -> Configuration -> General settings.
+Ensure "Web sockets" is set to On. Save the configuration.
+(Optional) Configure CORS: If your frontend is served from a different domain than your App Service backend, configure CORS settings under the "API" -> "CORS" blade in the portal. Add the allowed origin(s) of your frontend. (Not needed if serving UI from FastAPI itself).
+
+4. Deploy Your Application Code:
+
+Choose a deployment method:
+
+Method A: Zip Deploy (Simple & Common):
+
+Create Deployment Package: Create a zip file of your project, ensuring it includes requirements.txt and all your application code (app/ directory, etc.) but excludes .venv, .git, __pycache__, .env.
+Bash
+
+# From your project root directory (ensure .venv etc. are excluded via .gitignore or manually)
+zip -r deployment.zip . -x ".venv/*" ".git/*" "__pycache__/*" "*.pyc" "*.pyo" ".env" ".pytest_cache/*" "tests/*" "alembic.log" "docker-compose.yml" "Dockerfile" "*.db" "*.sqlite3"
+Deploy using Azure CLI:
+Bash
+
+az webapp deploy \
+    --name YourUniqueWebAppName \
+    --resource-group YourResourceGroupName \
+    --src-path deployment.zip \
+    --type zip
+App Service build process (Oryx) will detect requirements.txt and install dependencies.
+Method B: Git Deployment (CI/CD):
+
+Set up Deployment Source: Configure your App Service to deploy from a Git repository (GitHub, Azure Repos, Bitbucket, Local Git). This is done in the Azure Portal -> Deployment Center.
+Configure Build: App Service will typically automatically detect Python and requirements.txt and build your app upon pushes to the configured branch.
+CI/CD Pipelines: For more control, set up GitHub Actions or Azure Pipelines to build (optional, e.g., run tests) and deploy your application. Azure provides templates for this.
+Method C: Docker Container:
+
+Build & Push Image: Build your Docker image using docker build -t youracrname.azurecr.io/ai-story-app:latest . and push it to a container registry like Azure Container Registry (ACR).
+Configure App Service: When creating the App Service (az webapp create), specify --deployment-container-image-name youracrname.azurecr.io/ai-story-app:latest. Or configure it later under Deployment Center -> Container settings.
+Authentication: Configure the App Service to authenticate with ACR (e.g., using its Managed Identity with AcrPull role assigned on ACR).
+5. Run Database Migrations in Azure:
+
+After deployment, your database schema needs to be created or updated. You cannot run alembic upgrade head directly on the App Service instance easily.
+Options:
+SSH into App Service: Connect via SSH (Portal -> Development Tools -> SSH) and run the alembic upgrade head command manually within the deployed environment (ensure Alembic is installed via requirements.txt). This is feasible for initial setup or infrequent updates but not ideal for automation.
+Run Locally Against Azure DB: Temporarily configure your local environment (e.g., .env file) to point directly to your Azure PostgreSQL database (ensure your local IP is allowed through the DB firewall) and run alembic upgrade head locally. Use caution with direct connections.
+CI/CD Pipeline Step: Add a step in your deployment pipeline (GitHub Actions, Azure DevOps) that securely connects to the Azure PostgreSQL database and runs alembic upgrade head after the code deployment is successful. This is the most robust and automated approach.
+Startup Script (Less Recommended): Modify your application's startup command or code to run migrations on startup. This can add significant delay to startup time and might cause issues in scaled-out environments if multiple instances try to migrate simultaneously.
+6. Verify Deployment:
+
+Navigate to your App Service URL (https://YourUniqueWebAppName.azurewebsites.net).
+Check the application logs in the Azure Portal (Monitoring -> Log stream or App Service logs) for any startup errors or runtime issues.
+Test application functionality (login, creating stories, AI features, document upload).
+7. Monitoring and Troubleshooting:
+
+Log Stream: View real-time logs.
+App Service Logs: Configure and view application logs, web server logs, etc.
+Azure Monitor / Application Insights: Integrate Application Insights for deeper performance monitoring, exception tracking, and distributed tracing.
+
+
+
+
+
+
+
+
+
+
+Canvas
+

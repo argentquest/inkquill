@@ -1,0 +1,238 @@
+{# /ai_rag_story_app/app/templates/partials/_navbar.html #}
+
+<!-- Tabler Sidebar Navigation -->
+<aside class="navbar navbar-vertical navbar-expand-lg">
+    <div class="container-fluid">
+        <!-- Brand -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <h1 class="navbar-brand navbar-brand-autodark">
+            <a href="{{ url_for('ui_home') }}" class="text-decoration-none d-flex align-items-center justify-content-center h-100">
+                <img src="/static/images/logo.jpeg" alt="Ink and Quill" style="height: 100%; width: 100%; object-fit: cover;">
+            </a>
+        </h1>
+        
+        <!-- Collapsible navbar -->
+        <div class="collapse navbar-collapse" id="sidebar-menu">
+            <!-- Coin Balance Section -->
+            <div class="card mb-3">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">
+                            <i class="fas fa-coins text-warning me-1"></i>
+                            {% if current_user and current_user.username.startswith('anon_') %}
+                                Anonymous User #{{ current_user.id }}:
+                            {% elif current_user %}
+                                {{ current_user.display_name or current_user.username }}:
+                            {% else %}
+                                Free Trial:
+                            {% endif %}
+                        </span>
+                        <span class="badge bg-primary" id="coin-balance-badge">Loading...</span>
+                    </div>
+                    {% if current_user %}
+                        {% if current_user.username.startswith('anon_') %}
+                        <!-- Anonymous user info -->
+                        <div class="mt-1">
+                            <small class="text-muted d-block">
+                                <a href="{{ url_for('ui_register_form') }}" class="text-decoration-none">
+                                    Register to keep your stories forever
+                                </a>
+                            </small>
+                        </div>
+                        {% else %}
+                        <!-- Last AI Call Info for registered users -->
+                        <div class="mt-1" id="lastAiCallInfo" style="display: none;">
+                            <small class="text-muted d-block" style="font-size: 11px; line-height: 1.2;">
+                                <span id="lastAiCallSummary">Last AI Call - 0.00 Coins - No recent calls - --:--</span>
+                            </small>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <div class="mt-1">
+                        <small class="text-muted d-block">
+                            <a href="{{ url_for('ui_register_form') }}" class="text-decoration-none">
+                                Register for unlimited access
+                            </a>
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Pending Image Jobs Indicator -->
+            <div id="pending-image-jobs-indicator" class="mb-3" style="display: none;">
+                <!-- Content will be updated by JavaScript -->
+            </div>
+            
+            <!-- Main Navigation -->
+            <ul class="navbar-nav pt-lg-3">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path == (url_for('ui_home') | string) %}active{% endif %}" href="{{ url_for('ui_home') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-home"></i>
+                        </span>
+                        <span class="nav-link-title">Home</span>
+                    </a>
+                </li>
+                
+                <!-- Login/Logout as second menu item -->
+                {% if current_user %}
+                <!-- Logout for authenticated users -->
+                <li class="nav-item">
+                    <form action="{{ url_for('logout') }}" method="post" class="d-inline w-100">
+                        <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <span class="nav-link-title">
+                                {% if current_user.username.startswith('anon_') %}
+                                    Logout as Anonymous User #{{ current_user.id }}
+                                {% else %}
+                                    Logout as {{ current_user.display_name or current_user.username }}
+                                {% endif %}
+                            </span>
+                        </button>
+                    </form>
+                </li>
+                {% else %}
+                <!-- Login for anonymous users -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path == (url_for('ui_login_form') | string) %}active{% endif %}" href="{{ url_for('ui_login_form') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </span>
+                        <span class="nav-link-title">Login</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- User's Personal Items - Only for authenticated users -->
+                {% if current_user %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path == (url_for('ui_my_account') | string) %}active{% endif %}" href="{{ url_for('ui_my_account') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-user-cog"></i>
+                        </span>
+                        <span class="nav-link-title">My Account</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="my-worlds-nav-item">
+                    <a class="nav-link {% if request.url.path.startswith((url_for('ui_list_worlds') | string)) or request.url.path.startswith((url_for('ui_import_world_from_book_form') | string)) %}active{% endif %}" href="{{ url_for('ui_list_worlds') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-globe"></i>
+                        </span>
+                        <span class="nav-link-title">My Worlds</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/ui/brainstorm') %}active{% endif %}" href="{{ url_for('brainstorm_page') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-lightbulb"></i>
+                        </span>
+                        <span class="nav-link-title">My Brainstorms</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/blog/dashboard') %}active{% endif %}" href="{{ url_for('blog_dashboard') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-pen-nib"></i>
+                        </span>
+                        <span class="nav-link-title">My Blog</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Public Links -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith((url_for('ui_list_stories') | string)) %}active{% endif %}" href="{{ url_for('ui_list_stories') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-book"></i>
+                        </span>
+                        <span class="nav-link-title">My Stories</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/blog') %}active{% endif %}" href="{{ url_for('blog_home') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        <span class="nav-link-title">Blog</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/news') %}active{% endif %}" href="{{ url_for('ui_news_list') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-newspaper"></i>
+                        </span>
+                        <span class="nav-link-title">News & Updates</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/forum') %}active{% endif %}" href="{{ url_for('ui_forum_home') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-comments"></i>
+                        </span>
+                        <span class="nav-link-title">Community Forum</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/public') %}active{% endif %}" href="{{ url_for('public_world_gallery') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-robot"></i>
+                        </span>
+                        <span class="nav-link-title">AI Chat Gallery</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/published') %}active{% endif %}" href="{{ url_for('published_stories_gallery') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-book-open"></i>
+                        </span>
+                        <span class="nav-link-title">Published Stories</span>
+                    </a>
+                </li>
+                
+                <!-- Admin Menu -->
+                {% if current_user and current_user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/admin') or request.url.path == (url_for('ui_admin_users') | string) %}active{% endif %}" href="{{ url_for('ui_admin_dashboard') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-shield-alt"></i>
+                        </span>
+                        <span class="nav-link-title">Admin</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/ui/llm-models') %}active{% endif %}" href="{{ url_for('ui_llm_models') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-robot"></i>
+                        </span>
+                        <span class="nav-link-title">AI Models</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Additional Tools - Only for authenticated users -->
+                {% if current_user %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path.startswith('/billing') %}active{% endif %}" href="{{ url_for('ui_billing_dashboard') }}">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="fas fa-credit-card"></i>
+                        </span>
+                        <span class="nav-link-title">Billing & Credits</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            
+        </div>
+    </div>
+</aside>

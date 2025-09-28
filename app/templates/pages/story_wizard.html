@@ -1,0 +1,828 @@
+{# /ai_rag_story_app/app/templates/pages/story_wizard.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Story Wizard - Create Your Story{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+:root {
+    --tblr-wizard-padding: 1.5rem;
+}
+
+/* Enhanced Story Wizard Container */
+.story-wizard-container {
+    background: var(--tblr-bg-surface);
+    min-height: calc(100vh - var(--tblr-navbar-height));
+}
+
+/* Enhanced Wizard Header */
+.wizard-header {
+    background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-blue));
+    color: white;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.wizard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.wizard-subtitle {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.coin-balance {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--tblr-border-radius);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+/* Enhanced Progress Bar */
+.wizard-progress {
+    background: var(--tblr-bg-surface-secondary);
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.progress-track {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.progress-track::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--tblr-border-color);
+    z-index: 1;
+}
+
+.progress-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    background: var(--tblr-bg-surface-secondary);
+    padding: 0 1rem;
+}
+
+.phase-indicator {
+    text-align: center;
+}
+
+.phase-number {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--tblr-bg-surface);
+    border: 2px solid var(--tblr-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--tblr-text-muted);
+    transition: all 0.3s ease;
+}
+
+.phase-number.active {
+    background: var(--tblr-primary);
+    border-color: var(--tblr-primary);
+    color: white;
+}
+
+.phase-number.completed {
+    background: var(--tblr-success);
+    border-color: var(--tblr-success);
+    color: white;
+}
+
+.phase-name {
+    font-size: var(--tblr-font-size-sm);
+    font-weight: 500;
+    color: var(--tblr-text-muted);
+}
+
+/* Enhanced Chat Container */
+.chat-container {
+    background: var(--tblr-card-bg);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius-lg);
+    box-shadow: var(--tblr-box-shadow-card);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 20rem);
+    overflow: hidden;
+}
+
+.chat-header {
+    background: var(--tblr-bg-surface-secondary);
+    border-bottom: 1px solid var(--tblr-border-color);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: var(--tblr-bg-surface);
+}
+
+.message {
+    display: flex;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.wizard-message .message-avatar {
+    background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-blue));
+    color: white;
+}
+
+.user-message .message-avatar {
+    background: var(--tblr-success);
+    color: white;
+}
+
+.message-content {
+    flex: 1;
+    background: var(--tblr-card-bg);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 1rem;
+    box-shadow: var(--tblr-box-shadow-input);
+}
+
+.message-content p {
+    margin-bottom: 0.75rem;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Enhanced Chat Input */
+.chat-input {
+    border-top: 1px solid var(--tblr-border-color);
+    padding: 1rem;
+    background: var(--tblr-bg-surface-secondary);
+}
+
+.chat-input textarea {
+    border-color: var(--tblr-border-color);
+    resize: none;
+    transition: all 0.15s ease;
+}
+
+.chat-input textarea:focus {
+    border-color: var(--tblr-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), 0.25);
+}
+
+.input-status {
+    margin-top: 0.5rem;
+    min-height: 1.5rem;
+}
+
+#typing-indicator {
+    color: var(--tblr-text-muted);
+    font-size: var(--tblr-font-size-sm);
+}
+
+/* Enhanced Story Panel */
+.story-panel {
+    background: var(--tblr-card-bg);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius-lg);
+    box-shadow: var(--tblr-box-shadow-card);
+    height: calc(100vh - 20rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.panel-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.story-section {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    overflow: hidden;
+}
+
+.section-title {
+    background: var(--tblr-bg-surface-secondary);
+    padding: 0.75rem 1rem;
+    margin: 0;
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.section-content {
+    padding: 1rem;
+    background: var(--tblr-card-bg);
+}
+
+.placeholder-text {
+    color: var(--tblr-text-muted);
+    font-style: italic;
+    margin: 0;
+}
+
+/* Enhanced Prompt/Response Display */
+.prompt-display,
+.response-display {
+    height: 100%;
+}
+
+.prompt-content,
+.response-content {
+    background: var(--tblr-bg-surface-secondary);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 1rem;
+    height: calc(100% - 4rem);
+    overflow-y: auto;
+}
+
+.prompt-text {
+    font-family: var(--tblr-font-family-monospace);
+    font-size: var(--tblr-font-size-sm);
+    color: var(--tblr-body-color);
+    background: transparent;
+    border: none;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.response-text {
+    font-size: var(--tblr-font-size-sm);
+    line-height: 1.6;
+    color: var(--tblr-body-color);
+}
+
+/* Enhanced Panel Footer */
+.panel-footer {
+    border-top: 1px solid var(--tblr-border-color);
+    padding: 1rem;
+    background: var(--tblr-bg-surface-secondary);
+}
+
+/* Enhanced Modal */
+.modal-content {
+    border: none;
+    border-radius: var(--tblr-border-radius-lg);
+    box-shadow: var(--tblr-box-shadow-dropdown);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--tblr-border-color);
+    background: var(--tblr-bg-surface-secondary);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--tblr-border-color);
+    background: var(--tblr-bg-surface-secondary);
+}
+
+.story-report {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--tblr-bg-surface);
+    border-radius: var(--tblr-border-radius);
+}
+
+/* Enhanced Nav Tabs */
+.nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+    color: var(--tblr-text-muted);
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--tblr-border-color);
+    color: var(--tblr-body-color);
+}
+
+.nav-tabs .nav-link.active {
+    background: var(--tblr-card-bg);
+    border-color: var(--tblr-border-color);
+    border-bottom-color: var(--tblr-card-bg);
+    color: var(--tblr-primary);
+}
+
+/* Error State */
+.alert {
+    border: none;
+    border-radius: var(--tblr-border-radius);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .wizard-content {
+        padding: 1rem 0;
+    }
+    
+    .chat-container,
+    .story-panel {
+        height: auto;
+        min-height: 400px;
+        margin-bottom: 1rem;
+    }
+    
+    .chat-messages {
+        max-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wizard-title {
+        font-size: 1.5rem;
+    }
+    
+    .wizard-subtitle {
+        font-size: 1rem;
+    }
+    
+    .progress-phase {
+        padding: 0 0.5rem;
+    }
+    
+    .phase-number {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .phase-name {
+        font-size: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% if error %}
+<!-- Enhanced Error State -->
+<div class="page-wrapper">
+    <div class="page-header d-print-none">
+        <div class="container-fluid">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title text-danger">
+                        <i class="ti ti-alert-triangle me-2"></i>
+                        Story Wizard Unavailable
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <div class="empty-icon mb-3">
+                                <i class="ti ti-alert-triangle text-warning" style="font-size: 4rem;"></i>
+                            </div>
+                            <h3 class="empty-title">Unable to Start Story Wizard</h3>
+                            <p class="empty-subtitle text-muted">{{ error }}</p>
+                            {% if min_coins_required %}
+                            <div class="alert alert-info mt-3">
+                                <i class="ti ti-info-circle me-2"></i>
+                                You need at least {{ min_coins_required }} credits to use Story Wizard.
+                            </div>
+                            <a href="/ui/billing/" class="btn btn-primary btn-pill">
+                                <i class="ti ti-coins me-2"></i>
+                                Purchase Credits
+                            </a>
+                            {% endif %}
+                            <div class="mt-3">
+                                <a href="/ui/" class="btn btn-outline-secondary">
+                                    <i class="ti ti-arrow-left me-2"></i>
+                                    Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-magic me-3"></i>
+                    Story Wizard
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Let's create your story together, one step at a time
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-wand-magic me-1"></i>
+                        AI-Powered Creation
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-coins me-1"></i>
+                        Credits Available
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <a href="/ui/" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Dashboard
+                    </a>
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('story_wizard')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with story wizard">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Enhanced Story Wizard Container -->
+<div class="page-wrapper story-wizard-container">
+
+    <!-- Enhanced Progress Bar -->
+    <div class="wizard-progress">
+        <div class="container-fluid">
+            <div class="progress-track">
+                {% for phase in phases %}
+                <div class="progress-phase" data-phase="{{ phase.id }}">
+                    <div class="phase-indicator">
+                        <div class="phase-number {% if loop.index == 1 %}active{% endif %}">
+                            {{ phase.id }}
+                        </div>
+                        <div class="phase-name">{{ phase.name }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Main Content -->
+    <div class="page-body wizard-content">
+        <div class="container-fluid">
+            <div class="row g-4">
+                <!-- Enhanced Chat Interface -->
+                <div class="col-lg-7">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">
+                                        <span id="current-phase-name">Phase 1: Core Spark & Protagonist</span>
+                                    </h5>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <small class="text-muted">
+                                            Step <span id="current-step">1</span> of <span id="total-steps">2</span>
+                                        </small>
+                                        <span class="badge bg-green-lt text-green">
+                                            <i class="ti ti-robot me-1"></i>DeepSeek R1
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ms-3" style="min-width: 200px;">
+                                    {% with select_id='ai-model-select', tooltip_text='Select the AI model for story generation', show_label=false, select_class='form-select-sm', select_name='ai_model_id', default_model_type='generation' %}
+                                        {% include 'partials/_ai_model_selector.html' %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Chat Messages -->
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message wizard-message">
+                                <div class="message-avatar">
+                                    <i class="ti ti-wand"></i>
+                                </div>
+                                <div class="message-content">
+                                    <div class="mb-2">
+                                        <strong class="text-primary">Welcome, storyteller!</strong>
+                                    </div>
+                                    <p>I am your Story Wizard, here to guide you through creating a comprehensive story outline.</p>
+                                    <p>Let's begin with <strong>Phase 1: The Core Spark & Protagonist</strong>.</p>
+                                    <div class="alert alert-primary alert-sm">
+                                        <strong>Step 1: The Inciting Vision</strong><br>
+                                        <small>What is the absolute core concept or the single most intriguing "what if" question that sparks your story?</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Chat Input -->
+                        <div class="chat-input">
+                            <div class="input-group">
+                                <textarea id="user-message" class="form-control" rows="3" 
+                                    placeholder="Share your story idea, concept, or vision here..." 
+                                    aria-label="Your message"></textarea>
+                                <button id="send-button" class="btn btn-primary btn-pill" type="button">
+                                    <i class="ti ti-send me-2"></i>
+                                    Send
+                                </button>
+                            </div>
+                            <div class="input-status">
+                                <span id="typing-indicator" class="d-none text-muted">
+                                    <i class="ti ti-loader fa-spin me-2"></i>
+                                    Story Wizard is thinking...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Story Accumulation Panel -->
+                <div class="col-lg-5">
+                    <div class="story-panel">
+                        <div class="panel-header">
+                            <ul class="nav nav-tabs" id="storyPanelTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="story-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#story-pane" type="button" role="tab">
+                                        <i class="ti ti-book me-2"></i>Your Story
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="prompt-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#prompt-pane" type="button" role="tab">
+                                        <i class="ti ti-code me-2"></i>AI Prompt
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="response-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#response-pane" type="button" role="tab">
+                                        <i class="ti ti-robot me-2"></i>AI Response
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tab-content" id="storyPanelTabContent">
+                            <!-- Your Story Tab -->
+                            <div class="tab-pane fade show active" id="story-pane" role="tabpanel">
+                                <div class="panel-content" id="story-accumulation">
+                                <!-- Enhanced Story Sections -->
+                                <div class="story-section" id="section-core">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-bulb me-2 text-yellow"></i>
+                                        Core Concept & Genre
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+
+                                <div class="story-section" id="section-protagonist">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-user me-2 text-blue"></i>
+                                        Protagonist
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+
+                                <div class="story-section" id="section-setting">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-world me-2 text-green"></i>
+                                        Setting & World
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+
+                                <div class="story-section" id="section-conflict">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-sword me-2 text-red"></i>
+                                        Conflict & Stakes
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+
+                                <div class="story-section" id="section-relationships">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-users me-2 text-purple"></i>
+                                        Key Relationships
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+
+                                <div class="story-section" id="section-climax">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-flag me-2 text-orange"></i>
+                                        Climax & Resolution
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+
+                                <div class="story-section" id="section-theme">
+                                    <h6 class="section-title">
+                                        <i class="ti ti-heart me-2 text-pink"></i>
+                                        Central Theme
+                                    </h6>
+                                    <div class="section-content">
+                                        <p class="placeholder-text">Will be filled as you progress...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Prompt Tab -->
+                            <div class="tab-pane fade" id="prompt-pane" role="tabpanel">
+                                <div class="panel-content">
+                                    <div class="prompt-display">
+                                        <div class="prompt-header mb-3">
+                                            <h6 class="mb-1">
+                                                <i class="ti ti-code me-2 text-primary"></i>
+                                                Last AI Prompt
+                                            </h6>
+                                            <small class="text-muted">The prompt sent to the AI for the current conversation</small>
+                                        </div>
+                                        <div class="prompt-content">
+                                            <pre id="ai-prompt-text" class="prompt-text">No prompt sent yet...</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Response Tab -->
+                            <div class="tab-pane fade" id="response-pane" role="tabpanel">
+                                <div class="panel-content">
+                                    <div class="response-display">
+                                        <div class="response-header mb-3">
+                                            <h6 class="mb-1">
+                                                <i class="ti ti-robot me-2 text-primary"></i>
+                                                Last AI Response
+                                            </h6>
+                                            <small class="text-muted">The raw response received from the AI</small>
+                                        </div>
+                                        <div class="response-content">
+                                            <div id="ai-response-text" class="response-text">No response received yet...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Panel Footer -->
+                        <div class="panel-footer">
+                            <button id="generate-report-btn" class="btn btn-success btn-pill w-100 d-none">
+                                <i class="ti ti-file-text me-2"></i>
+                                Generate Story Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Story Report Preview Modal -->
+<div class="modal fade" id="storyReportModal" tabindex="-1" aria-labelledby="storyReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div>
+                        <h4 class="modal-title" id="storyReportModalLabel">
+                            <i class="ti ti-book-2 me-2 text-primary"></i>
+                            Your Story Frame
+                        </h4>
+                        <div class="text-muted small">Complete outline and structure for your story</div>
+                    </div>
+                    <div class="report-controls">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="download-text-btn"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Download as text file">
+                                <i class="ti ti-download me-1"></i>Text
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="download-json-btn"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Download as JSON file">
+                                <i class="ti ti-code me-1"></i>JSON
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="copy-report-btn"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Copy to clipboard">
+                                <i class="ti ti-copy me-1"></i>Copy
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="print-report-btn"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Print story frame">
+                                <i class="ti ti-printer me-1"></i>Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="story-report-content" class="story-report">
+                    <!-- Report content will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-2"></i>
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary btn-pill" id="create-story-btn">
+                    <i class="ti ti-plus me-2"></i>
+                    Create Story from This Frame
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data -->
+<input type="hidden" id="session-id" value="{{ session_id }}">
+<input type="hidden" id="current-phase" value="1">
+<input type="hidden" id="current-step-value" value="1">
+
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', path='/js/pages/story-wizard.js') }}"></script>
+{% endblock %}

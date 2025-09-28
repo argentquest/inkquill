@@ -1,0 +1,67 @@
+{# 
+   TABLER PREMIUM HELP BUTTON PARTIAL
+   Consistent help button following Tabler Premium design standards
+   
+   Usage:
+   {% set help_topic = 'world_list' %}
+   {% include 'partials/_help_button.html' %}
+   
+   Parameters:
+   - help_topic: The help content to show (required)
+   - position: 'header', 'inline', 'floating' (default: 'header')
+   - tooltip: Custom tooltip text (optional)
+   - size: 'sm', 'md', 'lg' (default: 'md')
+   
+   TABLER PREMIUM FEATURES:
+   - Uses btn-warning for consistent yellow/orange styling
+   - Always shows "Help" text with question circle icon
+   - Proper Tabler spacing and transitions
+   - Consistent with UI Design Standards in CLAUDE.md
+#}
+
+{# TABLER PREMIUM PARAMETERS #}
+{% set help_topic = help_topic or 'dashboard' %}
+{% set position = position or 'header' %}
+{% set tooltip = tooltip or 'Get help with this page' %}
+{% set size = size or 'md' %}
+
+{# Build Tabler Premium button classes #}
+{% set button_classes = ['btn', 'btn-light'] %}
+
+{# Size classes #}
+{% if size == 'sm' %}
+  {% set _ = button_classes.append('btn-sm') %}
+{% elif size == 'lg' %}
+  {% set _ = button_classes.append('btn-lg') %}
+{% endif %}
+
+{# Position-specific classes #}
+{% if position == 'floating' %}
+  {% set _ = button_classes.append('position-fixed') %}
+  {% set _ = button_classes.append('help-button-floating') %}
+{% elif position == 'inline' %}
+  {% set _ = button_classes.append('help-button-inline') %}
+{% endif %}
+
+{# TABLER PREMIUM HELP BUTTON - Follows UI Design Standards #}
+<button class="{{ button_classes | join(' ') }}" 
+        onclick="openHelpModal('{{ help_topic }}')"
+        data-bs-toggle="tooltip" 
+        data-bs-placement="bottom" 
+        title="{{ tooltip }}"
+        aria-label="Open help for this page">
+  <i class="fas fa-question-circle me-1"></i>
+  Help
+</button>
+
+{# Floating button positioning styles #}
+{% if position == 'floating' %}
+<style>
+.help-button-floating {
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1040;
+    box-shadow: var(--tblr-box-shadow-lg);
+}
+</style>
+{% endif %}

@@ -1,0 +1,6 @@
+Create a compelling excerpt for this blog post. The excerpt should:
+- Be {max_length} characters or less
+- Capture the main point of the post
+- Be engaging and make readers want to read more
+- Be suitable for social media sharing
+Return only the excerpt text.

@@ -1,0 +1,87 @@
+%% Authentication Flow Diagram
+%% Title: Authentication and Authorization Flows
+%% Description: Complete authentication flows including standard login and OAuth
+%% Last Updated: 2025-07-14
+%% Version: 1.0.0
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#1976d2',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#1565c0',
+    'lineColor': '#424242',
+    'secondaryColor': '#388e3c',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+sequenceDiagram
+    participant User
+    participant Browser
+    participant FastAPI
+    participant Database
+    participant Security
+    participant Google
+    
+    Note over User,Google: Standard Username/Password Authentication
+    
+    User->>Browser: Enter credentials
+    Browser->>FastAPI: POST /auth/login
+    FastAPI->>Database: Query user by username
+    Database-->>FastAPI: User record
+    FastAPI->>Security: Verify password hash (Argon2)
+    Security-->>FastAPI: Password validation result
+    
+    alt Password Valid
+        FastAPI->>Security: Create JWT token
+        Security-->>FastAPI: JWT token (HS256)
+        FastAPI->>Browser: Set HttpOnly cookie
+        Note over Browser: Cookie attributes:<br/>- HttpOnly: true<br/>- Secure: production<br/>- SameSite: Lax<br/>- Max-Age: 7 days
+        Browser-->>User: Login successful
+    else Password Invalid
+        FastAPI-->>Browser: 401 Unauthorized
+        Browser-->>User: Login failed
+    end
+    
+    Note over User,Google: OAuth 2.0 Authentication Flow
+    
+    User->>Browser: Click "Login with Google"
+    Browser->>FastAPI: GET /auth/google
+    FastAPI->>Google: Redirect to OAuth authorization
+    Note over Google: OAuth 2.0 Authorization<br/>Code Flow with PKCE
+    Google-->>Browser: Authorization page
+    User->>Google: Grant permissions
+    Google->>FastAPI: GET /auth/google/callback?code=...
+    FastAPI->>Google: Exchange code for access token
+    Google-->>FastAPI: Access token + user info
+    
+    FastAPI->>Database: Check if user exists
+    alt User Exists
+        Database-->>FastAPI: Existing user record
+    else New User
+        FastAPI->>Database: Create new user account
+        Database-->>FastAPI: New user record
+    end
+    
+    FastAPI->>Security: Create JWT token
+    Security-->>FastAPI: JWT token
+    FastAPI->>Browser: Redirect with HttpOnly cookie
+    Browser-->>User: Login successful
+    
+    Note over User,Google: Token Validation on Protected Requests
+    
+    User->>Browser: Access protected resource
+    Browser->>FastAPI: Request with cookie
+    FastAPI->>Security: Validate JWT token
+    
+    alt Token Valid
+        Security-->>FastAPI: Decoded payload
+        FastAPI->>Database: Get user by username
+        Database-->>FastAPI: User record
+        FastAPI-->>Browser: Protected resource
+        Browser-->>User: Content displayed
+    else Token Invalid/Expired
+        FastAPI-->>Browser: 401 Unauthorized
+        Browser-->>User: Redirect to login
+    end

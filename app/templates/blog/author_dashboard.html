@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Author Dashboard - AI Storytelling Assistant</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body { background-color: #f8f9fa; }
+        .dashboard-hero {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            border-left: 4px solid #6366f1;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6366f1;
+        }
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .post-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+        }
+        .post-item:last-child {
+            border-bottom: none;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-published { background: #10b981; color: white; }
+        .status-draft { background: #f59e0b; color: white; }
+        .status-archived { background: #6b7280; color: white; }
+        .follower-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .follower-item:last-child {
+            border-bottom: none;
+        }
+        .follower-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<!-- Enhanced Hero Header - MANDATORY for all pages -->
+<div class="page-header d-print-none">
+    <div class="container-fluid">
+        <div class="dashboard-hero text-white p-5 rounded-lg">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-3">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                            <path d="M9 12l2 2l4 -4"/>
+                        </svg>
+                        Author Dashboard
+                    </h1>
+                    <p class="lead mb-4">Welcome back, {{ current_user.display_name or current_user.username }}! Here's how your blog is performing.</p>
+                    
+                    <!-- Stats Badge in Header -->
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="bg-light text-dark px-3 py-2 rounded">
+                            <strong id="headerTotalPosts">0</strong> <small>Posts</small>
+                        </div>
+                        <div class="bg-light text-dark px-3 py-2 rounded">
+                            <strong id="headerTotalViews">0</strong> <small>Views</small>
+                        </div>
+                        <div class="bg-light text-dark px-3 py-2 rounded">
+                            <strong id="headerFollowerCount">0</strong> <small>Followers</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons in Header -->
+                    <div class="btn-list">
+                        <a href="{{ url_for('blog_editor') }}" class="btn btn-light btn-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 5l0 14"/>
+                                <path d="M5 12l14 0"/>
+                            </svg>
+                            Write New Post
+                        </a>
+                        <a href="{{ url_for('blog_home') }}" class="btn btn-outline-light btn-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
+                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
+                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
+                            </svg>
+                            Back to Blog
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="display-1 opacity-25">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                            <path d="M9 12l2 2l4 -4"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPosts">0</div>
+                    <div class="stat-label">Published Posts</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalViews">0</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalLikes">0</div>
+                    <div class="stat-label">Total Likes</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-value" id="followerCount">0</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Recent Posts -->
+            <div class="col-lg-8">
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-0 p-4 pb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">📝 Recent Posts</h5>
+                            <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="recentPosts">
+                            <!-- Recent posts will be loaded here -->
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Performing Posts -->
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-0 p-4 pb-0">
+                        <h5 class="mb-0">🏆 Top Performing Posts</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="topPosts">
+                            <!-- Top posts will be loaded here -->
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Recent Followers -->
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-0 p-4 pb-0">
+                        <h5 class="mb-0">👥 Recent Followers</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="recentFollowers">
+                            <!-- Recent followers will be loaded here -->
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Author Profile -->
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-0 p-4 pb-0">
+                        <h5 class="mb-0">👤 Profile</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="authorProfile">
+                            <!-- Profile will be loaded here -->
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-outline-primary" id="editProfileBtn">
+                                ✏️ Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <div class="card-header bg-transparent border-0 p-4 pb-0">
+                        <h5 class="mb-0">⚡ Quick Actions</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('blog_editor') }}" class="btn btn-primary">
+                                ✏️ Write New Post
+                            </a>
+                            <button class="btn btn-outline-secondary" onclick="exportPosts()">
+                                📊 Export Analytics
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="manageSettings()">
+                                ⚙️ Blog Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Author Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" rows="4" 
+                                      placeholder="Tell readers about yourself..."></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="websiteUrl" class="form-label">Website URL</label>
+                                    <input type="url" class="form-control" id="websiteUrl" 
+                                           placeholder="https://yourwebsite.com">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="twitterHandle" class="form-label">Twitter Handle</label>
+                                    <input type="text" class="form-control" id="twitterHandle" 
+                                           placeholder="@username">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="instagramHandle" class="form-label">Instagram Handle</label>
+                                    <input type="text" class="form-control" id="instagramHandle" 
+                                           placeholder="@username">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="linkedinUrl" class="form-label">LinkedIn URL</label>
+                                    <input type="url" class="form-control" id="linkedinUrl" 
+                                           placeholder="https://linkedin.com/in/username">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="allowCommentsDefault">
+                                    <label class="form-check-label" for="allowCommentsDefault">
+                                        Allow comments by default
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="autoPublish">
+                                    <label class="form-check-label" for="autoPublish">
+                                        Auto-publish posts
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications">
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Email notifications
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Dashboard data
+        let dashboardData = {};
+        let authorProfile = {};
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Load stats
+                const statsResponse = await fetch('/api/blog/author-profile/stats', {
+                    credentials: 'include'
+                });
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    updateStats(stats);
+                }
+
+                // Load dashboard data
+                const dashboardResponse = await fetch('/api/blog/author-profile/dashboard', {
+                    credentials: 'include'
+                });
+                if (dashboardResponse.ok) {
+                    dashboardData = await dashboardResponse.json();
+                    updateDashboard(dashboardData);
+                }
+
+                // Load author profile
+                const profileResponse = await fetch('/api/blog/author-profile/', {
+                    credentials: 'include'
+                });
+                if (profileResponse.ok) {
+                    authorProfile = await profileResponse.json();
+                    updateProfileDisplay(authorProfile);
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showToast('Failed to load dashboard data', 'error');
+            }
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalPosts').textContent = stats.total_posts.toLocaleString();
+            document.getElementById('totalViews').textContent = stats.total_views.toLocaleString();
+            document.getElementById('totalLikes').textContent = stats.total_likes.toLocaleString();
+            document.getElementById('followerCount').textContent = stats.follower_count.toLocaleString();
+        }
+
+        function updateDashboard(data) {
+            // Update recent posts
+            const recentPostsHtml = data.recent_posts.length > 0 ? 
+                data.recent_posts.map(post => `
+                    <div class="post-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${post.title}</h6>
+                                <div class="d-flex align-items-center gap-3 small text-muted">
+                                    <span class="status-badge status-${post.status}">${post.status.toUpperCase()}</span>
+                                    <span>👁️ ${post.view_count} views</span>
+                                    <span>❤️ ${post.like_count} likes</span>
+                                </div>
+                            </div>
+                            <small class="text-muted">${formatDate(post.updated_at)}</small>
+                        </div>
+                    </div>
+                `).join('') :
+                '<div class="text-center py-4 text-muted">No posts yet. <a href="/blog/editor">Write your first post!</a></div>';
+            
+            document.getElementById('recentPosts').innerHTML = recentPostsHtml;
+
+            // Update top posts
+            const topPostsHtml = data.top_posts.length > 0 ?
+                data.top_posts.map(post => `
+                    <div class="post-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${post.title}</h6>
+                                <div class="d-flex align-items-center gap-3 small text-muted">
+                                    <span>👁️ ${post.view_count} views</span>
+                                    <span>❤️ ${post.like_count} likes</span>
+                                </div>
+                            </div>
+                            <small class="text-muted">${formatDate(post.published_at)}</small>
+                        </div>
+                    </div>
+                `).join('') :
+                '<div class="text-center py-4 text-muted">No published posts yet.</div>';
+            
+            document.getElementById('topPosts').innerHTML = topPostsHtml;
+
+            // Update recent followers
+            const followersHtml = data.recent_followers.length > 0 ?
+                data.recent_followers.map(follower => `
+                    <div class="follower-item">
+                        <div class="follower-avatar">
+                            ${(follower.display_name || follower.username)[0].toUpperCase()}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-medium">${follower.display_name || follower.username}</div>
+                            <small class="text-muted">Followed ${formatDate(follower.followed_at)}</small>
+                        </div>
+                    </div>
+                `).join('') :
+                '<div class="text-center py-4 text-muted">No followers yet.</div>';
+            
+            document.getElementById('recentFollowers').innerHTML = followersHtml;
+        }
+
+        function updateProfileDisplay(profile) {
+            const profileHtml = `
+                <div class="text-center">
+                    <div class="mb-3">
+                        <div class="mx-auto" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                            {{ current_user.display_name[0] if current_user.display_name else current_user.username[0] }}
+                        </div>
+                    </div>
+                    <h6 class="fw-bold">{{ current_user.display_name or current_user.username }}</h6>
+                    <p class="text-muted small mb-3">${profile.bio || 'No bio provided yet.'}</p>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="fw-bold">${profile.total_posts}</div>
+                            <small class="text-muted">Posts</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="fw-bold">${profile.follower_count}</div>
+                            <small class="text-muted">Followers</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('authorProfile').innerHTML = profileHtml;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Profile management
+        function editProfile() {
+            // Populate form with current data
+            document.getElementById('bio').value = authorProfile.bio || '';
+            document.getElementById('websiteUrl').value = authorProfile.website_url || '';
+            document.getElementById('twitterHandle').value = authorProfile.twitter_handle || '';
+            document.getElementById('instagramHandle').value = authorProfile.instagram_handle || '';
+            document.getElementById('linkedinUrl').value = authorProfile.linkedin_url || '';
+            document.getElementById('allowCommentsDefault').checked = authorProfile.allow_comments_default || false;
+            document.getElementById('autoPublish').checked = authorProfile.auto_publish || false;
+            document.getElementById('emailNotifications').checked = authorProfile.email_notifications || false;
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+            modal.show();
+        }
+
+        async function saveProfile() {
+            try {
+                const formData = {
+                    bio: document.getElementById('bio').value,
+                    website_url: document.getElementById('websiteUrl').value,
+                    twitter_handle: document.getElementById('twitterHandle').value,
+                    instagram_handle: document.getElementById('instagramHandle').value,
+                    linkedin_url: document.getElementById('linkedinUrl').value,
+                    allow_comments_default: document.getElementById('allowCommentsDefault').checked,
+                    auto_publish: document.getElementById('autoPublish').checked,
+                    email_notifications: document.getElementById('emailNotifications').checked
+                };
+
+                const response = await fetch('/api/blog/author-profile/', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    authorProfile = await response.json();
+                    updateProfileDisplay(authorProfile);
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+                    modal.hide();
+                    
+                    showToast('Profile updated successfully!', 'success');
+                } else {
+                    showToast('Failed to update profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showToast('Failed to update profile', 'error');
+            }
+        }
+
+        // Quick actions
+        function exportPosts() {
+            showToast('Export functionality coming soon!', 'warning');
+        }
+
+        function manageSettings() {
+            showToast('Settings functionality coming soon!', 'warning');
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast position-fixed top-0 end-0 m-3 ${type === 'error' ? 'bg-danger text-white' : type === 'warning' ? 'bg-warning text-dark' : 'bg-success text-white'}`;
+            toast.innerHTML = `
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            
+            document.getElementById('editProfileBtn').addEventListener('click', editProfile);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+/* ========================================================================
+   BUTTON COMPONENT SYSTEM
+   Unified button styling with theme support and consistent sizing
+   ======================================================================== */
+
+/* ========================================================================
+   BASE BUTTON STYLES
+   ======================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  
+  /* Size and spacing */
+  height: var(--btn-height-md);
+  padding: var(--space-2) var(--space-5);
+  
+  /* Typography */
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  
+  /* Appearance */
+  background-color: transparent;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  
+  /* Interaction */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  /* Accessibility */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Remove default styles */
+.btn:hover {
+  text-decoration: none;
+}
+
+/* ========================================================================
+   BUTTON SIZES
+   ======================================================================== */
+
+.btn-sm {
+  height: var(--btn-height-sm);
+  padding: var(--space-1-5) var(--space-4);
+  font-size: var(--text-xs);
+  gap: var(--space-1-5);
+}
+
+.btn-lg {
+  height: var(--btn-height-lg);
+  padding: var(--space-3) var(--space-8);
+  font-size: var(--text-base);
+  gap: var(--space-2-5);
+}
+
+.btn-xl {
+  height: var(--btn-height-xl);
+  padding: var(--space-4) var(--space-10);
+  font-size: var(--text-lg);
+  gap: var(--space-3);
+}
+
+/* ========================================================================
+   BUTTON VARIANTS
+   ======================================================================== */
+
+/* Primary Button */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background-color: var(--bg-surface-secondary);
+  border-color: var(--border-primary);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-surface-tertiary);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Outline Button */
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--border-secondary);
+  color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+  background-color: var(--bg-surface-secondary);
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+/* Outline Primary */
+.btn-outline-primary {
+  background-color: transparent;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-inverse);
+}
+
+/* Success Button */
+.btn-success {
+  background-color: var(--success);
+  border-color: var(--success);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-success:hover {
+  background-color: var(--success-hover);
+  border-color: var(--success-hover);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Warning Button */
+.btn-warning {
+  background-color: var(--warning);
+  border-color: var(--warning);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-warning:hover {
+  background-color: var(--warning-hover);
+  border-color: var(--warning-hover);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Danger Button */
+.btn-danger {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-hover);
+  border-color: var(--danger-hover);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Info Button */
+.btn-info {
+  background-color: var(--info);
+  border-color: var(--info);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-info:hover {
+  background-color: var(--info-hover);
+  border-color: var(--info-hover);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Ghost Button */
+.btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background-color: var(--bg-surface-secondary);
+  color: var(--text-primary);
+}
+
+/* Link Button */
+.btn-link {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* ========================================================================
+   BUTTON SHAPES
+   ======================================================================== */
+
+/* Rounded button */
+.btn-rounded {
+  border-radius: var(--radius-full);
+}
+
+/* Square button */
+.btn-square {
+  width: var(--btn-height-md);
+  padding: 0;
+}
+
+.btn-square.btn-sm {
+  width: var(--btn-height-sm);
+}
+
+.btn-square.btn-lg {
+  width: var(--btn-height-lg);
+}
+
+.btn-square.btn-xl {
+  width: var(--btn-height-xl);
+}
+
+/* Circle button */
+.btn-circle {
+  width: var(--btn-height-md);
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+.btn-circle.btn-sm {
+  width: var(--btn-height-sm);
+}
+
+.btn-circle.btn-lg {
+  width: var(--btn-height-lg);
+}
+
+.btn-circle.btn-xl {
+  width: var(--btn-height-xl);
+}
+
+/* ========================================================================
+   BUTTON STATES
+   ======================================================================== */
+
+/* Loading state */
+.btn-loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: var(--radius-full);
+  animation: btn-spin 1s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Active state */
+.btn-active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ========================================================================
+   BUTTON GROUPS
+   ======================================================================== */
+
+.btn-group {
+  display: inline-flex;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-group .btn {
+  border-radius: 0;
+  border-right-width: 1px;
+  margin-left: -2px;
+}
+
+.btn-group .btn:first-child {
+  margin-left: 0;
+  border-top-left-radius: var(--radius-lg);
+  border-bottom-left-radius: var(--radius-lg);
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  border-right-width: 2px;
+}
+
+.btn-group .btn:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+.btn-group .btn:hover,
+.btn-group .btn:focus {
+  z-index: 1;
+}
+
+/* Vertical button group */
+.btn-group-vertical {
+  display: inline-flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-group-vertical .btn {
+  border-radius: 0;
+  border-bottom-width: 1px;
+  margin-top: -2px;
+}
+
+.btn-group-vertical .btn:first-child {
+  margin-top: 0;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+}
+
+.btn-group-vertical .btn:last-child {
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  border-bottom-width: 2px;
+}
+
+/* ========================================================================
+   ICON BUTTONS
+   ======================================================================== */
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.btn-icon i,
+.btn-icon svg {
+  font-size: 1em;
+  line-height: 1;
+}
+
+/* Icon only buttons */
+.btn-icon-only {
+  gap: 0;
+}
+
+.btn-icon-only .btn-text {
+  display: none;
+}
+
+/* ========================================================================
+   FLOATING ACTION BUTTON
+   ======================================================================== */
+
+.btn-fab {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-sticky);
+  border: none;
+  padding: 0;
+}
+
+.btn-fab:hover {
+  box-shadow: var(--shadow-2xl);
+  transform: scale(1.05);
+}
+
+/* ========================================================================
+   RESPONSIVE BUTTONS
+   ======================================================================== */
+
+@media (max-width: 640px) {
+  .btn {
+    font-size: var(--text-xs);
+    padding: var(--space-1-5) var(--space-4);
+    height: calc(var(--btn-height-md) - 4px);
+  }
+  
+  .btn-lg {
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-6);
+    height: var(--btn-height-md);
+  }
+  
+  .btn-fab {
+    bottom: var(--space-4);
+    right: var(--space-4);
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ========================================================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+  
+  .btn-loading::after {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn {
+    border-width: 3px;
+  }
+  
+  .btn:focus {
+    outline-width: 3px;
+  }
+}

@@ -1,0 +1,771 @@
+{# /ai_rag_story_app/app/templates/pages/character_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set page_action = "Create New" if character is none else "Edit" %}
+{% set button_action_text = "Create Character" if character is none else "Save Changes" %}
+{% set button_icon_class = "fas fa-user-plus" if character is none else "fas fa-save" %}
+{% set world_context = world if world else (character.world if character and character.world else None) %}
+
+{% block title %}{{ page_action }} Character {% if world_context %}in {{ world_context.name | e }}{% endif %}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- TABLER PREMIUM FORM STYLES - Following UI Design Standards -->
+<style>
+    /* Enhanced character form layout with Tabler CSS variables */
+    .character-form-layout {
+        display: flex;
+        min-height: 70vh;
+        gap: 0;
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .character-form-main {
+        flex: 1;
+        min-width: 400px;
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg) 0 0 var(--tblr-border-radius-lg);
+        padding: 2rem;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .character-form-sidebar {
+        width: 400px;
+        min-width: 350px;
+        max-width: 600px;
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-left: none;
+        border-radius: 0 var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0;
+        overflow-y: auto;
+        position: relative;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: var(--tblr-border-color);
+        cursor: col-resize;
+        z-index: 1000;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle:hover {
+        background: var(--tblr-primary);
+    }
+    
+    .form-resize-handle::before {
+        content: '';
+        position: absolute;
+        left: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 30px;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-sm);
+    }
+    
+    .form-sidebar-content {
+        padding: 2rem;
+        height: 100%;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .sidebar-section h3 {
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: var(--tblr-muted);
+        border-bottom: 1px solid var(--tblr-border-color);
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Enhanced image container */
+    #generated-image-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        background-color: var(--tblr-bg-surface-tertiary);
+        border-radius: var(--tblr-border-radius);
+        overflow: hidden;
+        border: 1px solid var(--tblr-border-color);
+        transition: all 0.15s ease-in-out;
+    }
+
+    #generated-image-display {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    #image-generation-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 3rem;
+        height: 3rem;
+    }
+    
+    /* Enhanced gallery */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .gallery-thumbnail {
+        position: relative;
+        border: 2px solid transparent;
+        border-radius: var(--tblr-border-radius);
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .gallery-thumbnail img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
+    
+    .gallery-thumbnail:hover {
+        border-color: var(--tblr-info);
+        transform: translateY(-2px);
+    }
+    
+    .gallery-thumbnail.active {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 2px var(--tblr-primary);
+    }
+    
+    .gallery-thumbnail .set-current-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        line-height: 1;
+    }
+    
+    .gallery-thumbnail:hover .set-current-btn {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    /* Enhanced form controls */
+    .form-control:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+
+    .form-select:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+
+    @media (max-width: 768px) {
+        .character-form-layout {
+            flex-direction: column;
+        }
+        
+        .character-form-sidebar {
+            width: 100%;
+            border-left: 1px solid var(--tblr-border-color);
+            border-radius: 0 0 var(--tblr-border-radius-lg) var(--tblr-border-radius-lg);
+        }
+        
+        .character-form-main {
+            border-radius: var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0 0;
+        }
+        
+        .form-resize-handle {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay for Visual Depth -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="{{ button_icon_class }}"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white-50">Worlds</a></li>
+                            {% if world_context %}
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world_context.id) }}" class="text-white-50">{{ world_context.name }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_characters_for_world', world_id=world_context.id) }}" class="text-white-50">Characters</a></li>
+                            {% endif %}
+                            <li class="breadcrumb-item active text-white" aria-current="page">{{ page_action }} Character</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3">
+                    <i class="{{ button_icon_class }} me-3"></i>
+                    {{ page_action }} Character
+                </h1>
+                <div class="page-subtitle text-white mb-4">
+                    {% if world_context %}
+                        Create and manage character details for {{ world_context.name }}
+                    {% else %}
+                        Create and manage character details
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if world_context %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-globe me-1"></i>{{ world_context.name }}
+                    </span>
+                    {% endif %}
+                    {% if character %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-edit me-1"></i>Editing Character
+                    </span>
+                    {% else %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-plus me-1"></i>New Character
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('character_detail')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            title="Get help with character creation and editing">
+                        <i class="fas fa-question-circle me-1"></i>Help
+                    </button>
+                    {% if world_context %}
+                    <a href="{{ url_for('ui_list_characters_for_world', world_id=world_context.id) }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Return to character list">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Characters
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('ui_list_worlds') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Return to worlds list">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Worlds
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="character-form-page">
+    
+    <div class="container-fluid">
+
+        {# TABLER PREMIUM ALERT - Enhanced error display #}
+        <div id="character-form-error-message" class="alert alert-danger alert-dismissible" style="display: none;" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="m0 0h24v24H0z" fill="none"></path>
+                        <path d="m12 9v4"></path>
+                        <path d="m10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"></path>
+                        <path d="m12 16h.01"></path>
+                    </svg>
+                </div>
+                <div class="alert-message"></div>
+            </div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+
+        <!-- Split Layout -->
+        <div class="character-form-layout" id="form-layout">
+            <!-- Main Form Area -->
+            <div class="character-form-main">
+                <form id="character-form" action="{{ form_action_url }}" method="post" data-page-action="{{ page_action }}" {% if world_context %}data-world-id="{{ world_context.id }}"{% endif %} {% if character and character.id %}data-character-id="{{ character.id }}"{% endif %}>
+                    
+                    {# TABLER PREMIUM FORM ACTIONS - Following UI Design Standards #}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                        {% if world_context %}
+                        <a href="{{ url_for('ui_list_characters_for_world', world_id=world_context.id) }}" 
+                           class="btn btn-ghost-secondary me-md-2"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Discard changes and return to character list">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        {% else %}
+                         <a href="{{ url_for('ui_list_worlds') }}" 
+                            class="btn btn-ghost-secondary me-md-2"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                            title="Discard changes and return to worlds list">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        {% endif %}
+                        <button type="submit" id="save-character-button" class="btn btn-lg"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if character %}Save all changes to this character{% else %}Create a new character with the provided information{% endif %}"
+                                style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%); border: none; color: white; font-weight: 600; padding: 0.75rem 2rem; border-radius: var(--tblr-border-radius-lg); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                            <i class="{{ button_icon_class }} me-1"></i>{{ button_action_text }}
+                        </button>
+                    </div>
+                    
+                    <h4 class="mb-4">Basic Information</h4>
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-bold">
+                                Character Name
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The character's full name or title. This is how they'll be identified throughout your world and stories. Choose something memorable and fitting for your setting."></i>
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="name" name="name"
+                                   value="{{ character.name | e if character and character.name else '' }}"
+                                   required minlength="1" maxlength="255"
+                                   placeholder="Enter the character's name"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">
+                                Description
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="A detailed description of your character including their appearance, personality, role in the story, and any other important details. This will be used by the AI to maintain consistency across your stories."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="description" name="description"
+                                      rows="4"
+                                      placeholder="Your description of the character (appearance, role, etc.)"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.description | e if character and character.description else '' }}</textarea>
+                        </div>
+
+                        {% if character and character.id %}
+                        <div class="mb-3">
+                            <label class="form-label">AI-Generated RAG Context:</label>
+                            <div id="generated-rag-content-display" 
+                                 class="form-control-plaintext p-2 border bg-light rounded">
+                                Loading AI-generated context...
+                            </div>
+                            <div class="form-text">This is descriptive text generated by the AI for RAG purposes.</div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="personality_traits" class="form-label fw-bold">
+                                Personality Traits (Optional)
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Key personality characteristics that define your character's behavior and reactions. Examples: Brave, Curious, Grumpy, Loyal, Sarcastic, Kind. This helps the AI write dialogue and actions that match your character's personality."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="personality_traits" name="personality_traits"
+                                      rows="3"
+                                      placeholder="e.g., Brave, Curious, Grumpy, Loyal."
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.personality_traits | e if character and character.personality_traits else '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="backstory" class="form-label fw-bold">
+                                Backstory Snippet (Optional)
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="A brief summary of your character's history and past experiences. This provides context for their motivations, skills, and relationships. Keep it concise but informative to help the AI understand what shaped your character."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="backstory" name="backstory"
+                                      rows="5"
+                                      placeholder="A brief summary of the character's history."
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.backstory | e if character and character.backstory else '' }}</textarea>
+                        </div>
+
+                        <!-- Character Generator Fields -->
+                        <h4 class="mt-4 mb-4">Character Details <small class="text-muted">(From Character Generator)</small></h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="age_category" class="form-label fw-bold">
+                                        Age Category
+                                        <i class="fas fa-question-circle text-muted ms-1" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top"
+                                           title="The character's age range or life stage. Examples: Child, Young Adult, Adult, Middle-aged, Elder. This is initially generated by the Character Generator but can be edited to match your vision."></i>
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="age_category" name="age_category"
+                                           value="{{ character.age_category | e if character and character.age_category else '' }}"
+                                           placeholder="e.g., Young Adult, Adult, Elder"
+                                           style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                    <div class="form-text">Generated by Character Generator (editable)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="profession" class="form-label fw-bold">
+                                        Profession
+                                        <i class="fas fa-question-circle text-muted ms-1" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top"
+                                           title="The character's job, role, or calling. This defines their skills, social status, and how they fit into your world. Examples: Warrior, Mage, Scholar, Merchant, Noble, Farmer. Generated by the Character Generator but fully editable."></i>
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="profession" name="profession"
+                                           value="{{ character.profession | e if character and character.profession else '' }}"
+                                           placeholder="e.g., Warrior, Mage, Scholar"
+                                           style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                    <div class="form-text">Generated by Character Generator (editable)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="core_motivations" class="form-label fw-bold">
+                                Core Motivations
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The driving forces behind your character's actions. What do they want most? What pushes them forward? Examples: Revenge, Love, Power, Knowledge, Redemption. These motivations help the AI create believable character arcs and decisions."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="core_motivations" name="core_motivations"
+                                      rows="2"
+                                      placeholder="Character's primary motivations and goals"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{% if character and character.core_motivations %}{{ character.core_motivations | join(', ') if character.core_motivations is iterable and character.core_motivations is not string else character.core_motivations | e }}{% endif %}</textarea>
+                            <div class="form-text">Generated by Character Generator (editable)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="short_backstory" class="form-label fw-bold">
+                                Short Backstory (50 words)
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="A concise, AI-generated summary of the character's background limited to 50 words. This provides essential context while remaining manageable for the AI to process. You can edit this to ensure it aligns with your character concept."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="short_backstory" name="short_backstory"
+                                      rows="3"
+                                      placeholder="AI-generated concise backstory"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.short_backstory | e if character and character.short_backstory else '' }}</textarea>
+                            <div class="form-text">AI-generated summary (50 words max) - editable</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="next_quest_scenario" class="form-label fw-bold">
+                                Next Quest Scenario
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="What the character would likely plan to do next based on their motivations and goals. This helps the AI understand the character's forward momentum and can be used to generate future story hooks and adventures."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="next_quest_scenario" name="next_quest_scenario"
+                                      rows="3"
+                                      placeholder="What the character would plan to do in their next quest"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.next_quest_scenario | e if character and character.next_quest_scenario else '' }}</textarea>
+                            <div class="form-text">AI-generated quest planning (editable)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="first_meeting_message" class="form-label fw-bold">
+                                First Meeting Message
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="How the character would introduce themselves or what they would say when meeting someone for the first time. This captures their voice, personality, and social approach, helping the AI write consistent dialogue."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="first_meeting_message" name="first_meeting_message"
+                                      rows="2"
+                                      placeholder="What the character would say when meeting someone for the first time"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.first_meeting_message | e if character and character.first_meeting_message else '' }}</textarea>
+                            <div class="form-text">AI-generated greeting (editable)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="visual_prompt" class="form-label fw-bold">
+                                Visual Description Prompt
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="An AI-generated description optimized for image generation. This text is designed to work well with DALL-E and other AI image generators to create visual representations of your character. You can edit it to better match your vision."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="visual_prompt" name="visual_prompt"
+                                      rows="3"
+                                      placeholder="AI-generated prompt for visual character representation"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.visual_prompt | e if character and character.visual_prompt else '' }}</textarea>
+                            <div class="form-text">AI-generated image prompt (editable)</div>
+                        </div>
+
+                        {% if character and character.physical_attributes %}
+                        <div class="mb-3">
+                            <label class="form-label">Physical Attributes:</label>
+                            <div class="form-control-plaintext p-2 border bg-light rounded">
+                                {% set attrs = character.physical_attributes %}
+                                {% if attrs %}
+                                    {% if attrs.hair_color %}<strong>Hair:</strong> {{ attrs.hair_color }}<br>{% endif %}
+                                    {% if attrs.eye_color %}<strong>Eyes:</strong> {{ attrs.eye_color }}<br>{% endif %}
+                                    {% if attrs.build %}<strong>Build:</strong> {{ attrs.build }}<br>{% endif %}
+                                    {% if attrs.height %}<strong>Height:</strong> {{ attrs.height }}{% endif %}
+                                {% else %}
+                                    <em>No physical attributes specified</em>
+                                {% endif %}
+                            </div>
+                            <div class="form-text">Generated by Character Generator</div>
+                        </div>
+                        {% endif %}
+
+                        {% if character and character.narrative_filter_results %}
+                        <div class="mb-3">
+                            <label class="form-label">Content Filter Results:</label>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Filter Type</th>
+                                            <th>Status</th>
+                                            <th>Severity</th>
+                                            <th>Detected</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for filter_type, filter_data in character.narrative_filter_results.items() %}
+                                        <tr>
+                                            <td><strong>{{ filter_type.title() }}</strong></td>
+                                            <td>
+                                                {% if filter_data.filtered %}
+                                                    <span class="text-danger">❌ Filtered</span>
+                                                {% else %}
+                                                    <span class="text-success">✅ Passed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ filter_data.severity or 'N/A' }}</td>
+                                            <td>
+                                                {% if filter_data.detected is not none %}
+                                                    {{ 'Yes' if filter_data.detected else 'No' }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-text">AI content filter results from narrative generation</div>
+                        </div>
+                        {% endif %}
+
+                        <!-- AI Import Fields -->
+                        <h4 class="mt-4 mb-4">AI Import Data <small class="text-muted">(Optional)</small></h4>
+                        
+                        <div class="mb-3">
+                            <label for="importance_rating" class="form-label fw-bold">
+                                Importance Rating
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="How significant this character is to your overall story. This helps prioritize character development and determines how much detail the AI includes when referencing them. Higher ratings mean more prominent roles in narratives."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="importance_rating" name="importance_rating"
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- Not specified --</option>
+                                <option value="1" {% if character and character.importance_rating == 1 %}selected{% endif %}>1 - Minor character</option>
+                                <option value="2" {% if character and character.importance_rating == 2 %}selected{% endif %}>2 - Background character</option>
+                                <option value="3" {% if character and character.importance_rating == 3 %}selected{% endif %}>3 - Supporting character</option>
+                                <option value="4" {% if character and character.importance_rating == 4 %}selected{% endif %}>4 - Major character</option>
+                                <option value="5" {% if character and character.importance_rating == 5 %}selected{% endif %}>5 - Main protagonist/antagonist</option>
+                            </select>
+                            <div class="form-text">Character's significance to the story (automatically set during AI imports)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="relationships" class="form-label fw-bold">
+                                Relationships (Optional)
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Key relationships and connections this character has with other characters, locations, or lore items in your world. Examples: 'Sister to Princess Elena', 'Guards the Ancient Library', 'Knows the secret of the Lost Crown'. This helps the AI maintain consistency in story connections."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="relationships" name="relationships"
+                                      rows="3"
+                                      placeholder="Key relationships to other characters, locations, or lore items."
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.relationships | e if character and character.relationships else '' }}</textarea>
+                            <div class="form-text">Description of connections to other story elements (automatically set during AI imports)</div>
+                        </div>
+                </form>
+            </div>
+
+            <!-- Appearance & Location Sidebar -->
+            <div class="character-form-sidebar" id="form-sidebar">
+                <div class="form-resize-handle" id="form-resize-handle"></div>
+                <div class="form-sidebar-content">
+                    
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-image me-2"></i>Character Appearance</h3>
+                        <div class="mb-3">
+                            <label for="image_style_select" class="form-label fw-bold">
+                                Image Style
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Choose a predefined art style for your character images. Different styles work better for different genres and moods. If no style is selected, the AI will use its default artistic interpretation."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="image_style_select" name="image_style_select"
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- Default Style --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image_prompt_definition" class="form-label fw-bold">
+                                AI Image Prompt
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Detailed description for DALL-E 3 image generation. Be specific about appearance, clothing, pose, setting, and artistic style. Examples: 'fantasy rogue, leather armor, hooded, cinematic lighting', 'medieval knight in shining armor, heroic pose, castle background'."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="image_prompt_definition" name="image_prompt_definition" form="character-form"
+                                      rows="4"
+                                      placeholder="Describe character for DALL-E 3, e.g., 'fantasy rogue, leather armor, hooded, cinematic lighting'"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.image_prompt_definition | e if character and character.image_prompt_definition else (character.visual_prompt | e if character and character.visual_prompt else '') }}</textarea>
+                            <div class="form-text">
+                                {% if character and character.visual_prompt and not character.image_prompt_definition %}
+                                <small class="text-info"><i class="fas fa-lightbulb"></i> Using AI-generated visual prompt as default</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" id="generate-image-btn" data-element-type="character" data-element-id="{{ character.id if character else '' }}" 
+                                {% if not character %}disabled{% endif %}
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if character %}Use AI to generate a character image based on the description{% else %}Save the character first to enable image generation{% endif %}"
+                                style="transition: all 0.15s ease-in-out;">
+                            <i class="fas fa-magic me-1"></i>Generate Character Image
+                        </button>
+                        <div id="image-generation-status" class="small text-muted mt-2" style="display: none;"></div>
+                        <div id="generated-image-container" class="mt-3">
+                            <div id="image-generation-spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <!-- FIX: Use the top-level 'image_url' variable passed to the template -->
+                            <img id="generated-image-display" src="{{ image_url if image_url else '' }}" alt="Generated character image" style="display: {{ 'block' if image_url else 'none' }};">
+                        </div>
+                        <a href="{{ image_url if image_url else '#' }}" id="generated-image-link" target="_blank" class="small text-truncate d-block mt-1">{{ image_url if image_url else '' }}</a>
+                        
+                        <div class="mt-4" id="image-gallery-section" {% if not character %}style="display: none;"{% endif %}>
+                            <h3 class="h3">Version History</h3>
+                            <div id="image-gallery-container" class="image-gallery">
+                                <p class="text-muted small">Loading image versions...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-map-marker-alt me-2"></i>Location Placement</h3>
+                        <div class="mb-3">
+                            <label for="current_location_id" class="form-label fw-bold">
+                                Location
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Where is this character typically found? Selecting a location helps the AI understand the character's context and makes it easier to include them in stories that take place in that area."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="current_location_id" name="current_location_id" form="character-form" {% if character and character.current_location_id %}data-current-value="{{ character.current_location_id }}"{% endif %}
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- No specific location --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="placement_note" class="form-label fw-bold">
+                                Placement Details
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Specific details about where the character is positioned within the selected location. Examples: 'Standing guard at the main entrance', 'Working behind the bar', 'Reading in the corner study'. This adds depth to scene descriptions."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="placement_note" name="placement_note" form="character-form"
+                                      rows="3"
+                                      placeholder="e.g., 'Standing guard at the main entrance'"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ character.placement_note | e if character and character.placement_note else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/character_form_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/location_form_resize.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/image_generator.js') }}"></script>
+    
+    <script>
+        // Sync visual prompt with AI image prompt
+        document.addEventListener('DOMContentLoaded', function() {
+            const visualPromptField = document.getElementById('visual_prompt');
+            const imagePromptField = document.getElementById('image_prompt_definition');
+            
+            if (visualPromptField && imagePromptField) {
+                // Auto-update image prompt when visual prompt changes (if image prompt is empty)
+                visualPromptField.addEventListener('input', function() {
+                    if (!imagePromptField.value.trim() || imagePromptField.value === visualPromptField.dataset.originalValue) {
+                        imagePromptField.value = visualPromptField.value;
+                    }
+                });
+                
+                // Store original visual prompt value for comparison
+                visualPromptField.dataset.originalValue = visualPromptField.value;
+                
+                // Button to manually sync visual prompt to image prompt
+                const syncButton = document.createElement('button');
+                syncButton.type = 'button';
+                syncButton.className = 'btn btn-outline-primary btn-sm mt-2';
+                syncButton.innerHTML = '<i class="fas fa-sync"></i> Copy to Image Prompt';
+                syncButton.title = 'Copy this visual description to the AI Image Prompt field';
+                
+                syncButton.addEventListener('click', function() {
+                    imagePromptField.value = visualPromptField.value;
+                    // Show brief confirmation
+                    const originalText = syncButton.innerHTML;
+                    syncButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    syncButton.classList.add('btn-success');
+                    syncButton.classList.remove('btn-outline-primary');
+                    
+                    setTimeout(() => {
+                        syncButton.innerHTML = originalText;
+                        syncButton.classList.remove('btn-success');
+                        syncButton.classList.add('btn-outline-primary');
+                    }, 1500);
+                });
+                
+                // Add the button after the visual prompt field
+                const visualPromptContainer = visualPromptField.parentNode;
+                visualPromptContainer.appendChild(syncButton);
+            }
+        });
+    </script>
+{% endblock %}

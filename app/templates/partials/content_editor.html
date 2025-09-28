@@ -1,0 +1,753 @@
+{# Content Editor Partial #}
+{# Usage: 
+   {% set entity_type = "story" %}
+   {% set entity_id = story.id %}
+   {% set initial_content = story.content %}
+   {% include "partials/content_editor.html" %} 
+#}
+
+<style>
+/* Custom toolbar buttons styling */
+.custom-toolbar-buttons {
+    display: inline-flex;
+    gap: 2px;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid #ccc;
+}
+
+.custom-toolbar-btn {
+    background: transparent;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 3px 6px;
+    cursor: pointer;
+    color: #444;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.custom-toolbar-btn:hover {
+    background: #f0f0f0;
+}
+
+.custom-toolbar-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.custom-toolbar-btn i {
+    font-size: 10px;
+}
+</style>
+
+<!-- Content Editor -->
+<div class="mb-3">
+    <label class="form-label fw-bold">Content</label>
+    <div class="editor-wrapper" data-entity-type="{{ entity_type }}" data-entity-id="{{ entity_id }}">
+        <div id="contentEditor_{{ entity_type }}_{{ entity_id }}"></div>
+        <div id="htmlEditorContainer_{{ entity_type }}_{{ entity_id }}" style="display: none;">
+            <textarea id="htmlEditor_{{ entity_type }}_{{ entity_id }}"></textarea>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for all required libraries to load before initializing
+    waitForLibraries(['Quill', 'CodeMirror'], function() {
+        // Initialize content editor for {{ entity_type }} {{ entity_id }}
+        initializeContentEditor('{{ entity_type }}', {{ entity_id }}, {{ (initial_content or editor_content or '')|tojson|safe }});
+    });
+});
+
+// Function to wait for required libraries to be available
+function waitForLibraries(libraries, callback, maxAttempts = 50, attempt = 0) {
+    const allLoaded = libraries.every(lib => typeof window[lib] !== 'undefined');
+    
+    if (allLoaded) {
+        console.log('All required libraries loaded:', libraries);
+        callback();
+    } else if (attempt < maxAttempts) {
+        console.log(`Waiting for libraries... attempt ${attempt + 1}/${maxAttempts}`, libraries.filter(lib => typeof window[lib] === 'undefined'));
+        setTimeout(() => waitForLibraries(libraries, callback, maxAttempts, attempt + 1), 100);
+    } else {
+        console.error('Timeout waiting for libraries:', libraries.filter(lib => typeof window[lib] === 'undefined'));
+        // Try to initialize anyway
+        callback();
+    }
+}
+
+function initializeContentEditor(entityType, entityId, initialContent) {
+    const editorId = `contentEditor_${entityType}_${entityId}`;
+    const htmlContainerId = `htmlEditorContainer_${entityType}_${entityId}`;
+    const htmlEditorId = `htmlEditor_${entityType}_${entityId}`;
+    
+    console.log('Initializing content editor for:', entityType, entityId);
+    console.log('Available libraries check:');
+    console.log('- Quill:', typeof Quill !== 'undefined');
+    console.log('- CodeMirror:', typeof CodeMirror !== 'undefined');
+    console.log('- html_beautify:', typeof html_beautify !== 'undefined');
+    console.log('- AIQuillToolbar:', typeof AIQuillToolbar !== 'undefined');
+    
+    let quill;
+    let htmlCodeMirror;
+    
+    // Check if editor already exists
+    if (window[`quill_${entityType}_${entityId}`]) {
+        console.log('Editor already initialized for', entityType, entityId);
+        return;
+    }
+    
+    try {
+        // Register custom image format to preserve attributes
+        const Image = Quill.import('formats/image');
+        class ImageWithAttributes extends Image {
+            static create(value) {
+                let node = super.create(value);
+                if (typeof value === 'object') {
+                    if (value.alt) node.setAttribute('alt', value.alt);
+                    if (value.class) node.setAttribute('class', value.class);
+                    if (value.style) node.setAttribute('style', value.style);
+                    if (value.src) node.setAttribute('src', value.src);
+                }
+                return node;
+            }
+            
+            static value(node) {
+                return {
+                    src: node.getAttribute('src'),
+                    alt: node.getAttribute('alt'),
+                    class: node.getAttribute('class'),
+                    style: node.getAttribute('style')
+                };
+            }
+        }
+        Quill.register(ImageWithAttributes);
+        
+        quill = new Quill(`#${editorId}`, {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    // Formatting styles dropdown
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+                    
+                    // Text formatting
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    
+                    // Paragraph formatting
+                    [{ 'align': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    
+                    // Insert elements
+                    ['blockquote', 'code-block'],
+                    ['link', 'image', 'video'],
+                    
+                    // Clear formatting
+                    ['clean']
+                ],
+                clipboard: {
+                    matchers: [
+                        // Custom matcher to preserve image classes and attributes
+                        ['IMG', function(node, delta) {
+                            const ops = [];
+                            const src = node.getAttribute('src');
+                            const alt = node.getAttribute('alt') || '';
+                            const className = node.getAttribute('class') || '';
+                            const style = node.getAttribute('style') || '';
+                            
+                            // Create image embed that preserves all attributes
+                            ops.push({
+                                insert: {
+                                    image: src
+                                },
+                                attributes: {
+                                    alt: alt,
+                                    class: className,
+                                    style: style
+                                }
+                            });
+                            
+                            return new Delta(ops);
+                        }]
+                    ]
+                }
+            },
+            placeholder: 'Start writing your content...'
+        });
+        
+        // Store reference globally
+        window[`quill_${entityType}_${entityId}`] = quill;
+        window[`htmlCodeMirror_${entityType}_${entityId}`] = null;
+        
+        // Set initial content if provided
+        if (initialContent) {
+            quill.root.innerHTML = initialContent;
+        }
+        
+        // Add custom image handler for image generation modal
+        quill.getModule('toolbar').addHandler('image', function() {
+            // Save current selection before opening modal
+            const currentSelection = quill.getSelection();
+            if (currentSelection) {
+                window[`savedSelection_${entityType}_${entityId}`] = currentSelection;
+                console.log('Saved selection before opening modal:', currentSelection);
+            } else {
+                // If no selection, save cursor at end
+                window[`savedSelection_${entityType}_${entityId}`] = { index: quill.getLength(), length: 0 };
+                console.log('No selection, saved cursor at end:', quill.getLength());
+            }
+            openImageGenerationModal(entityType, entityId);
+        });
+        
+        // Add click handler for images in the editor
+        quill.root.addEventListener('click', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                openImagePropertiesModal(e.target);
+            }
+        });
+        
+        // Add custom HTML/Visual toggle buttons to toolbar
+        addCustomToolbarButtons(editorId, function(mode) {
+            toggleEditorMode(entityType, entityId, mode);
+        });
+        
+        // Enhance existing Quill toolbar with better tooltips
+        enhanceQuillToolbarTooltips(editorId);
+        
+        // Content change listener - emit custom event
+        quill.on('text-change', function() {
+            const content = quill.root.innerHTML;
+            console.log('📝 Quill text-change detected, emitting content-changed event:', {
+                entity_type: entityType,
+                entity_id: entityId,
+                content_length: content ? content.length : 0
+            });
+            
+            const event = new CustomEvent('content-changed', {
+                detail: {
+                    content: content,
+                    entity_type: entityType,
+                    entity_id: entityId
+                }
+            });
+            document.dispatchEvent(event);
+            console.log('📤 Content-changed event dispatched');
+        });
+        
+        console.log('Content editor initialized successfully for', entityType, entityId);
+        
+        // Initialize AI Quill Toolbar if available
+        initializeAIToolbar(quill, entityType, entityId);
+        
+    } catch (error) {
+        console.error('Error initializing content editor:', error);
+        return;
+    }
+    
+    // Function to initialize AI toolbar
+    function initializeAIToolbar(quill, entityType, entityId) {
+        console.log('Content Editor: Checking AIQuillToolbar availability...');
+        console.log('AIQuillToolbar available:', typeof AIQuillToolbar !== 'undefined');
+        
+        if (typeof AIQuillToolbar !== 'undefined') {
+            const contextProvider = async () => {
+                const content = quill.getLength() > 1 ? quill.getText(0, Math.min(200, quill.getLength())) : '';
+                const wordCount = quill.getText().trim().split(/\s+/).filter(word => word.length > 0).length;
+                
+                return {
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    current_content: content,
+                    total_length: quill.getLength(),
+                    word_count: wordCount,
+                    context_summary: `${entityType} ${entityId} (${wordCount} words)`
+                };
+            };
+            
+            const aiQuillToolbar = new AIQuillToolbar(quill, {
+                contextProvider: contextProvider,
+                beforeTransform: async (text, operationId) => {
+                    console.log('Content Editor AI Transform - Before:', { text: text.substring(0, 50) + '...', operationId });
+                    return true;
+                },
+                afterTransform: async (originalText, transformedText, operationId) => {
+                    console.log('Content Editor AI Transform - After:', { 
+                        operation: operationId,
+                        originalLength: originalText.length,
+                        transformedLength: transformedText.length
+                    });
+                    
+                    // Emit content change event
+                    const event = new CustomEvent('content-changed', {
+                        detail: {
+                            content: quill.root.innerHTML,
+                            entity_type: entityType,
+                            entity_id: entityId
+                        }
+                    });
+                    document.dispatchEvent(event);
+                },
+                showCostEstimate: true,
+                maxTextLength: 4000
+            });
+            
+            console.log('AIQuillToolbar initialized for content editor:', entityType, entityId);
+        } else {
+            console.warn('AIQuillToolbar not available - AI assistance features disabled');
+        }
+    }
+    
+    // Helper function to add custom toolbar buttons
+    function addCustomToolbarButtons(editorId, toggleCallback) {
+        const editorElement = document.querySelector(`#${editorId}`);
+        const toolbar = editorElement ? editorElement.previousElementSibling : null;
+        
+        if (toolbar && toolbar.classList.contains('ql-toolbar')) {
+            const customButtons = document.createElement('div');
+            customButtons.className = 'custom-toolbar-buttons';
+            customButtons.innerHTML = `
+                <button type="button" class="custom-toolbar-btn active" data-mode="visual" title="Visual Editor">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button type="button" class="custom-toolbar-btn" data-mode="html" title="HTML Source Code">
+                    <i class="fas fa-code"></i>
+                </button>
+            `;
+            toolbar.appendChild(customButtons);
+            
+            // Add click handlers
+            customButtons.addEventListener('click', function(e) {
+                const button = e.target.closest('.custom-toolbar-btn');
+                if (button) {
+                    const mode = button.dataset.mode;
+                    const buttons = customButtons.querySelectorAll('.custom-toolbar-btn');
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    toggleCallback(mode);
+                }
+            });
+        }
+    }
+    
+    // Toggle editor mode function
+    function toggleEditorMode(entityType, entityId, mode) {
+        const editorId = `contentEditor_${entityType}_${entityId}`;
+        const htmlContainerId = `htmlEditorContainer_${entityType}_${entityId}`;
+        const htmlEditorId = `htmlEditor_${entityType}_${entityId}`;
+        
+        const quill = window[`quill_${entityType}_${entityId}`];
+        let htmlCodeMirror = window[`htmlCodeMirror_${entityType}_${entityId}`];
+        
+        if (mode === 'html') {
+            // Check if CodeMirror is available
+            if (typeof CodeMirror === 'undefined') {
+                console.error('CodeMirror is not loaded. Please ensure CodeMirror scripts are included.');
+                alert('HTML editor is not available. CodeMirror library is not loaded.');
+                return;
+            }
+            
+            document.getElementById(editorId).style.display = 'none';
+            document.getElementById(htmlContainerId).style.display = 'block';
+            
+            // Initialize CodeMirror if not already initialized
+            if (!htmlCodeMirror) {
+                console.log('Initializing CodeMirror for HTML editor...');
+                try {
+                    const textareaElement = document.getElementById(htmlEditorId);
+                    if (!textareaElement) {
+                        console.error('HTML textarea element not found:', htmlEditorId);
+                        alert('HTML editor textarea not found.');
+                        return;
+                    }
+                    
+                    htmlCodeMirror = CodeMirror.fromTextArea(textareaElement, {
+                    mode: 'htmlmixed',
+                    theme: 'monokai',
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseTags: true,
+                    autoCloseBrackets: true,
+                    foldGutter: true,
+                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                    extraKeys: {
+                        "Ctrl-Space": "autocomplete",
+                        "Shift-Alt-F": function(cm) {
+                            // Format HTML
+                            const currentHtml = cm.getValue();
+                            if (typeof html_beautify === 'function') {
+                                const beautifiedHtml = html_beautify(currentHtml, {
+                                    indent_size: 2,
+                                    indent_char: ' ',
+                                    max_preserve_newlines: 1,
+                                    preserve_newlines: true,
+                                    indent_inner_html: true,
+                                    wrap_line_length: 80,
+                                    wrap_attributes: 'auto',
+                                    unformatted: ['code', 'pre'],
+                                    content_unformatted: ['pre'],
+                                    extra_liners: ['head', 'body', '/body']
+                                });
+                                cm.setValue(beautifiedHtml);
+                            } else {
+                                console.warn('html_beautify is not available. Beautification skipped.');
+                            }
+                        }
+                    },
+                    styleActiveLine: true,
+                    matchBrackets: true
+                });
+                
+                window[`htmlCodeMirror_${entityType}_${entityId}`] = htmlCodeMirror;
+                console.log('CodeMirror initialized successfully');
+                
+                // Add change listener for HTML mode
+                htmlCodeMirror.on('change', function() {
+                    const content = htmlCodeMirror.getValue();
+                    console.log('🖥️ CodeMirror HTML change detected, emitting content-changed event:', {
+                        entity_type: entityType,
+                        entity_id: entityId,
+                        content_length: content ? content.length : 0
+                    });
+                    
+                    const event = new CustomEvent('content-changed', {
+                        detail: {
+                            content: content,
+                            entity_type: entityType,
+                            entity_id: entityId
+                        }
+                    });
+                    document.dispatchEvent(event);
+                    console.log('📤 HTML content-changed event dispatched');
+                });
+                
+                } catch (error) {
+                    console.error('Error initializing CodeMirror:', error);
+                    alert('Failed to initialize HTML editor: ' + error.message);
+                    return;
+                }
+            }
+            
+            // Get HTML from Quill and beautify it
+            const rawHtml = quill.root.innerHTML;
+            const beautifiedHtml = typeof html_beautify === 'function' ? html_beautify(rawHtml, {
+                indent_size: 2,
+                indent_char: ' ',
+                max_preserve_newlines: 1,
+                preserve_newlines: true,
+                indent_inner_html: true,
+                wrap_line_length: 80,
+                wrap_attributes: 'auto',
+                unformatted: ['code', 'pre'],
+                content_unformatted: ['pre'],
+                extra_liners: ['head', 'body', '/body']
+            }) : rawHtml;
+            
+            htmlCodeMirror.setValue(beautifiedHtml);
+            setTimeout(() => {
+                htmlCodeMirror.refresh();
+            }, 100);
+        } else {
+            document.getElementById(editorId).style.display = 'block';
+            document.getElementById(htmlContainerId).style.display = 'none';
+            
+            // Get content from CodeMirror and properly set it in Quill
+            if (htmlCodeMirror) {
+                const htmlContent = htmlCodeMirror.getValue();
+                if (htmlContent) {
+                    try {
+                        // Clear the editor first
+                        quill.setText('');
+                        
+                        // Set the HTML directly to preserve all attributes and classes
+                        quill.root.innerHTML = htmlContent;
+                        
+                        // Force Quill to recognize the content
+                        quill.history.clear();
+                        quill.update();
+                        
+                        // Emit content-changed event to trigger auto-save
+                        console.log('🔄 Mode switch (HTML→Visual): emitting content-changed event:', {
+                            entity_type: entityType,
+                            entity_id: entityId,
+                            content_length: htmlContent ? htmlContent.length : 0
+                        });
+                        
+                        const event = new CustomEvent('content-changed', {
+                            detail: {
+                                content: htmlContent,
+                                entity_type: entityType,
+                                entity_id: entityId
+                            }
+                        });
+                        document.dispatchEvent(event);
+                        console.log('📤 Mode switch content-changed event dispatched');
+                    } catch (error) {
+                        console.warn('Direct HTML setting failed, falling back to clipboard conversion:', error);
+                        
+                        // Fallback to clipboard conversion if direct setting fails
+                        const delta = quill.clipboard.convert(htmlContent);
+                        quill.setContents(delta);
+                        
+                        // Emit content-changed event for fallback case too
+                        console.log('🔄 Mode switch fallback: emitting content-changed event:', {
+                            entity_type: entityType,
+                            entity_id: entityId,
+                            content_length: quill.root.innerHTML ? quill.root.innerHTML.length : 0
+                        });
+                        
+                        const event = new CustomEvent('content-changed', {
+                            detail: {
+                                content: quill.root.innerHTML,
+                                entity_type: entityType,
+                                entity_id: entityId
+                            }
+                        });
+                        document.dispatchEvent(event);
+                        console.log('📤 Mode switch fallback content-changed event dispatched');
+                    }
+                }
+            }
+        }
+    }
+    
+    // Function to open image generation modal for this editor
+    function openImageGenerationModal(entityType, entityId) {
+        // Shared function to handle image insertion
+        function handleImageResult(result) {
+            console.log('Image generation modal callback received result:', result);
+            
+            // Callback when image is applied - insert image into Quill editor
+            let imageUrl = null;
+            
+            // Check different possible result structures
+            if (result && result.url) {
+                imageUrl = result.url;
+            } else if (result && result.image_url) {
+                imageUrl = result.image_url;
+            } else if (result && result.current_image && result.current_image.url) {
+                imageUrl = result.current_image.url;
+            } else if (result && result.current_image && result.current_image.image_url) {
+                imageUrl = result.current_image.image_url;
+            } else if (typeof result === 'string') {
+                imageUrl = result;
+            }
+            
+            console.log('Extracted image URL:', imageUrl);
+            
+            if (imageUrl) {
+                const quill = window[`quill_${entityType}_${entityId}`];
+                if (quill) {
+                    console.log('Inserting image into Quill editor at URL:', imageUrl);
+                    
+                    // Get saved selection or current selection or place at end
+                    const savedSelection = window[`savedSelection_${entityType}_${entityId}`];
+                    const currentSelection = quill.getSelection();
+                    const range = savedSelection || currentSelection || { index: quill.getLength(), length: 0 };
+                    const index = range.index;
+                    
+                    console.log('Saved selection:', savedSelection);
+                    console.log('Current selection:', currentSelection);
+                    console.log('Using insertion index:', index);
+                    
+                    // Focus the editor first
+                    quill.focus();
+                    
+                    // Insert the image
+                    quill.insertEmbed(index, 'image', imageUrl);
+                    
+                    // Move cursor after the image
+                    quill.setSelection(index + 1);
+                    
+                    // Clear saved selection
+                    delete window[`savedSelection_${entityType}_${entityId}`];
+                    
+                    console.log('Image inserted successfully');
+                    
+                    // Emit content change event
+                    const event = new CustomEvent('content-changed', {
+                        detail: {
+                            content: quill.root.innerHTML,
+                            entity_type: entityType,
+                            entity_id: entityId
+                        }
+                    });
+                    document.dispatchEvent(event);
+                } else {
+                    console.error('Quill editor not found for', entityType, entityId);
+                }
+            } else {
+                console.error('No valid image URL found in result:', result);
+            }
+            
+            // Also emit the custom event for any listeners
+            const event = new CustomEvent('image-inserted', {
+                detail: {
+                    image: result,
+                    entity_type: entityType,
+                    entity_id: entityId
+                }
+            });
+            document.dispatchEvent(event);
+        }
+        
+        // Try both available functions
+        if (typeof initImageGenerationModal === 'function') {
+            console.log('Using initImageGenerationModal function');
+            initImageGenerationModal(entityType, entityId, '', handleImageResult);
+        } else if (typeof window.showImageGenerationModal === 'function') {
+            console.log('Using window.showImageGenerationModal function');
+            window.showImageGenerationModal(entityType, entityId, '', handleImageResult);
+        } else {
+            console.warn('Image generation modal not available');
+        }
+    }
+    
+    // Helper function to add custom toolbar buttons
+    function addCustomToolbarButtons(editorId, toggleCallback) {
+        const editorElement = document.querySelector(`#${editorId}`);
+        const toolbar = editorElement ? editorElement.previousElementSibling : null;
+        
+        if (toolbar && toolbar.classList.contains('ql-toolbar')) {
+            const customButtons = document.createElement('div');
+            customButtons.className = 'custom-toolbar-buttons';
+            customButtons.innerHTML = `
+                <button type="button" class="custom-toolbar-btn active" data-mode="visual" 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Visual Editor - Rich text editing with formatting">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button type="button" class="custom-toolbar-btn" data-mode="html" 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="HTML Editor - Edit raw HTML source code with syntax highlighting">
+                    <i class="fas fa-code"></i>
+                </button>
+            `;
+            toolbar.appendChild(customButtons);
+            
+            // Initialize tooltips for the custom buttons
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                const tooltipElements = customButtons.querySelectorAll('[data-bs-toggle="tooltip"]');
+                tooltipElements.forEach(element => {
+                    new bootstrap.Tooltip(element);
+                });
+                console.log('Tooltips initialized for custom toolbar buttons');
+            } else {
+                console.warn('Bootstrap tooltips not available');
+            }
+            
+            // Add click handlers
+            customButtons.addEventListener('click', function(e) {
+                const button = e.target.closest('.custom-toolbar-btn');
+                if (button) {
+                    const mode = button.dataset.mode;
+                    const buttons = customButtons.querySelectorAll('.custom-toolbar-btn');
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    toggleCallback(mode);
+                }
+            });
+        } else {
+            console.warn('Toolbar not found for editor:', editorId);
+        }
+    }
+    
+    // Function to enhance Quill toolbar with better tooltips
+    function enhanceQuillToolbarTooltips(editorId) {
+        const editorElement = document.querySelector(`#${editorId}`);
+        const toolbar = editorElement ? editorElement.previousElementSibling : null;
+        
+        if (!toolbar || !toolbar.classList.contains('ql-toolbar')) {
+            console.warn('Toolbar not found for tooltip enhancement:', editorId);
+            return;
+        }
+        
+        // Define tooltips for common Quill toolbar buttons
+        const tooltipConfig = {
+            '.ql-bold': 'Bold - Make text bold (Ctrl+B)',
+            '.ql-italic': 'Italic - Make text italic (Ctrl+I)', 
+            '.ql-underline': 'Underline - Underline text (Ctrl+U)',
+            '.ql-strike': 'Strikethrough - Strike through text',
+            '.ql-blockquote': 'Quote - Insert blockquote',
+            '.ql-code-block': 'Code Block - Insert code block',
+            '.ql-header[value="1"]': 'Heading 1 - Large heading',
+            '.ql-header[value="2"]': 'Heading 2 - Medium heading', 
+            '.ql-header[value="3"]': 'Heading 3 - Small heading',
+            '.ql-list[value="ordered"]': 'Numbered List - Insert numbered list',
+            '.ql-list[value="bullet"]': 'Bullet List - Insert bullet list',
+            '.ql-list[value="check"]': 'Checklist - Insert checklist',
+            '.ql-script[value="sub"]': 'Subscript - Make text subscript',
+            '.ql-script[value="super"]': 'Superscript - Make text superscript',
+            '.ql-indent[value="-1"]': 'Decrease Indent - Move text left',
+            '.ql-indent[value="+1"]': 'Increase Indent - Move text right',
+            '.ql-direction[value="rtl"]': 'Right-to-Left - Change text direction',
+            '.ql-align[value="center"]': 'Center Align - Center text',
+            '.ql-align[value="right"]': 'Right Align - Align text right',
+            '.ql-align[value="justify"]': 'Justify - Justify text',
+            '.ql-color': 'Text Color - Change text color',
+            '.ql-background': 'Background Color - Change text background',
+            '.ql-font': 'Font Family - Change font',
+            '.ql-size': 'Font Size - Change font size',
+            '.ql-link': 'Link - Insert or edit link (Ctrl+K)',
+            '.ql-image': 'Image - Insert image from library or generate new',
+            '.ql-video': 'Video - Insert video embed',
+            '.ql-clean': 'Clear Formatting - Remove all formatting'
+        };
+        
+        // Apply tooltips to toolbar buttons
+        Object.entries(tooltipConfig).forEach(([selector, title]) => {
+            const elements = toolbar.querySelectorAll(selector);
+            elements.forEach(element => {
+                element.setAttribute('data-bs-toggle', 'tooltip');
+                element.setAttribute('data-bs-placement', 'bottom');
+                element.setAttribute('title', title);
+                
+                // Initialize tooltip if Bootstrap is available
+                if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                    new bootstrap.Tooltip(element);
+                }
+            });
+        });
+        
+        console.log('Enhanced Quill toolbar with tooltips');
+    }
+    
+    // Function to open image properties modal
+    function openImagePropertiesModal(imgElement) {
+        if (typeof window.openImagePropertiesModal === 'function') {
+            console.log('Opening image properties modal via global function');
+            window.openImagePropertiesModal(imgElement);
+        } else {
+            console.warn('Image properties modal not available - using fallback');
+            // Fallback: Simple alert for now (can be enhanced later)
+            const altText = imgElement.alt || 'No alt text';
+            const size = imgElement.classList.contains('img-blog-small') ? 'Small' :
+                        imgElement.classList.contains('img-blog-medium') ? 'Medium' :
+                        imgElement.classList.contains('img-blog-large') ? 'Large' :
+                        imgElement.classList.contains('img-blog-full') ? 'Full' : 'Auto';
+            
+            alert(`Image Properties:\nAlt Text: ${altText}\nSize: ${size}\n\nImage properties modal not available in this editor.`);
+        }
+    }
+    
+    // Public function to get current content
+    window[`getContentEditor_${entityType}_${entityId}`] = function() {
+        const quill = window[`quill_${entityType}_${entityId}`];
+        return quill ? quill.root.innerHTML : '';
+    };
+    
+    // Public function to set content
+    window[`setContentEditor_${entityType}_${entityId}`] = function(content) {
+        const quill = window[`quill_${entityType}_${entityId}`];
+        if (quill) {
+            quill.root.innerHTML = content;
+        }
+    };
+}
+</script>

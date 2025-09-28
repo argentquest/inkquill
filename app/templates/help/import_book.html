@@ -1,0 +1,581 @@
+<div class="container-fluid">
+    <!-- Enhanced Tabler Premium Hero Header with Gradient -->
+    <div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.25); margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <!-- Background Pattern Overlay -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+        
+        <div class="page-body" style="position: relative; z-index: 1;">
+            <div class="container-fluid">
+                <div class="row align-items-center py-4">
+                    <div class="col">
+                        <h1 class="page-title text-white mb-2">
+                            <i class="fas fa-book-open me-2"></i>
+                            Book Import Help
+                        </h1>
+                        <div class="page-subtitle text-white opacity-75 mb-3">
+                            Bring existing books and manuscripts into your storytelling workflow with intelligent analysis
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-upload me-1"></i>
+                                Multiple Formats
+                            </span>
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-brain me-1"></i>
+                                AI Analysis
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-link me-1"></i>
+                                Auto Integration
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn btn-light">
+                                <i class="fas fa-upload me-1"></i>
+                                Import Book
+                            </button>
+                            <button class="btn btn-outline-light">
+                                <i class="fas fa-history me-1"></i>
+                                View History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabler Navigation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card position-sticky" style="top: 1rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Navigation</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#overview" class="list-group-item list-group-item-action">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Import Overview
+                    </a>
+                    <a href="#supported-formats" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-alt me-2 text-success"></i>
+                        Supported Formats
+                    </a>
+                    <a href="#upload-process" class="list-group-item list-group-item-action">
+                        <i class="fas fa-upload me-2 text-blue"></i>
+                        Upload Process
+                    </a>
+                    <a href="#analysis" class="list-group-item list-group-item-action">
+                        <i class="fas fa-search me-2 text-purple"></i>
+                        Content Analysis
+                    </a>
+                    <a href="#integration" class="list-group-item list-group-item-action">
+                        <i class="fas fa-link me-2 text-orange"></i>
+                        Integration
+                    </a>
+                    <a href="#troubleshooting" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tools me-2 text-red"></i>
+                        Troubleshooting
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabler Main Content -->
+        <div class="col-lg-9">
+            <div class="space-y-4">
+                <!-- Import Overview Card -->
+                <div class="card" id="overview">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Import Overview
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">The Book Import feature allows you to bring existing manuscripts, published works, or reference materials into your storytelling workspace. This powerful tool analyzes your content, extracts structural elements, and integrates everything seamlessly with your world-building and AI assistance features.</p>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="text-primary mb-3">Key Capabilities</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-primary-lt me-3">
+                                                <i class="fas fa-sitemap"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Automatic Structure Detection</strong>
+                                                <div class="text-secondary">Identifies chapters, scenes, and story elements</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-success-lt me-3">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Character Extraction</strong>
+                                                <div class="text-secondary">Finds and catalogs characters mentioned in your text</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-blue-lt me-3">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Location Mapping</strong>
+                                                <div class="text-secondary">Identifies settings and locations throughout your work</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-purple-lt me-3">
+                                                <i class="fas fa-brain"></i>
+                                            </div>
+                                            <div>
+                                                <strong>AI Integration</strong>
+                                                <div class="text-secondary">Makes your content searchable for AI assistance</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supported Formats Card -->
+                <div class="card" id="supported-formats">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-file-alt me-2 text-success"></i>
+                            Supported Formats
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Import books in various formats to work with your existing content:</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                        <h4>Text Files</h4>
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item">.txt (Plain text)</div>
+                                            <div class="list-group-item">.rtf (Rich Text Format)</div>
+                                            <div class="list-group-item">.md (Markdown)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-file-word"></i>
+                                        </div>
+                                        <h4>Documents</h4>
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item">.docx (Microsoft Word)</div>
+                                            <div class="list-group-item">.odt (OpenDocument)</div>
+                                            <div class="list-group-item">.pages (Apple Pages)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-orange-lt mb-3 mx-auto">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        <h4>eBooks</h4>
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item">.epub (Electronic Publication)</div>
+                                            <div class="list-group-item">.mobi (Kindle format)</div>
+                                            <div class="list-group-item">.pdf (Portable Document)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <div class="d-flex">
+                                <div class="avatar avatar-sm bg-info-lt me-3">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <h4 class="alert-title">Format Notes</h4>
+                                    <ul class="mb-0">
+                                        <li><strong>PDF Files:</strong> Text must be selectable (not image-based)</li>
+                                        <li><strong>EPUB Files:</strong> DRM-free files only</li>
+                                        <li><strong>File Size:</strong> Maximum 50MB per file</li>
+                                        <li><strong>Encoding:</strong> UTF-8 recommended for best results</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Process Card -->
+                <div class="card" id="upload-process">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-upload me-2 text-blue"></i>
+                            Upload Process
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Follow these steps to import your book successfully:</p>
+                        
+                        <div class="steps steps-counter steps-blue">
+                            <div class="step-item">
+                                <div class="h4 m-0">Select Your File</div>
+                                <div class="text-secondary">Choose your book file from your computer. You can drag and drop or use the file browser.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Provide Metadata</div>
+                                <div class="text-secondary">Enter title, author, genre, and description. This helps with organization and analysis.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Choose Import Settings</div>
+                                <div class="text-secondary">Select analysis depth, structure detection level, and integration preferences.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Start Import</div>
+                                <div class="text-secondary">Begin the import process. Large files may take several minutes to process.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Analysis Card -->
+                <div class="card" id="analysis">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-search me-2 text-purple"></i>
+                            Content Analysis
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Advanced AI analysis extracts meaningful elements from your imported book:</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-lg-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-user me-2 text-primary"></i>
+                                            Character Analysis
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Character Discovery
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Role Classification
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Relationship Mapping
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Character Arcs
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-globe me-2 text-blue"></i>
+                                            World Building
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Location Extraction
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                World Rules
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Cultural Elements
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Historical Context
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-chart-line me-2 text-orange"></i>
+                                            Plot Analysis
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Story Structure
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Conflict Identification
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Theme Extraction
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Pacing Analysis
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integration Card -->
+                <div class="card" id="integration">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-link me-2 text-orange"></i>
+                            Integration
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Your imported book integrates seamlessly with your existing storytelling tools:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-primary-lt me-3">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Character Profiles</strong>
+                                        <div class="text-secondary">Automatically creates character entries</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-success-lt me-3">
+                                        <i class="fas fa-map"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Location Database</strong>
+                                        <div class="text-secondary">Adds locations to your world map</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-blue-lt me-3">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <div>
+                                        <strong>AI Assistant Integration</strong>
+                                        <div class="text-secondary">AI can reference your imported content</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Search and Discovery</strong>
+                                        <div class="text-secondary">Full-text and semantic search capabilities</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting Card -->
+                <div class="card" id="troubleshooting">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-tools me-2 text-red"></i>
+                            Troubleshooting
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 class="text-red mb-3">Common Issues</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>File Too Large:</strong> Compress or split files larger than 50MB
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Unsupported Format:</strong> Convert to a supported format first
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>DRM Protection:</strong> Only DRM-free files can be imported
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Structure Issues:</strong> Check chapter formatting consistency
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="text-red mb-3">Performance Tips</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Large Files:</strong> Import during off-peak hours
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Multiple Books:</strong> Import one book at a time
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Analysis Depth:</strong> Reduce depth for faster processing
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Progress Tracking:</strong> Monitor in background tasks panel
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-rocket me-2 text-success"></i>
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-primary-lt mb-3 mx-auto">
+                                            <i class="fas fa-upload"></i>
+                                        </div>
+                                        <h4>Import New Book</h4>
+                                        <p class="text-secondary">Start importing a book into your workspace</p>
+                                        <button class="btn btn-primary">Import Book</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-history"></i>
+                                        </div>
+                                        <h4>View Import History</h4>
+                                        <p class="text-secondary">Check status of previous imports</p>
+                                        <button class="btn btn-success">View History</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-cog"></i>
+                                        </div>
+                                        <h4>Manage Books</h4>
+                                        <p class="text-secondary">Organize and edit imported books</p>
+                                        <button class="btn btn-blue">Manage Books</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Tip Alert -->
+                <div class="alert alert-success">
+                    <div class="d-flex">
+                        <div class="avatar avatar-sm bg-success-lt me-3">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">💡 Pro Tip</h4>
+                            <div class="text-secondary">Before importing, ensure your book is well-formatted with consistent chapter headers and clean text. This helps the AI better understand your story structure and provide more accurate analysis and integration.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('.list-group-item-action').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Highlight active navigation item
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('[id]');
+        const navLinks = document.querySelectorAll('.list-group-item-action');
+        
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentSection) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>

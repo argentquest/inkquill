@@ -1,0 +1,967 @@
+{# Image Generation Modal Partial #}
+{# Usage: {% include "partials/image_generation_modal.html" with entity_type="story" entity_id=story.id default_prompt="A fantasy story cover" %} #}
+
+<style>
+/* Image Generation Gallery Improvements */
+#imageGallery {
+    gap: 1rem;
+}
+
+#imageGallery .card {
+    transition: all 0.2s ease;
+    height: fit-content;
+}
+
+#imageGallery .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive grid adjustments for aspect ratios */
+@media (max-width: 768px) {
+    #imageGallery .col-sm-12 {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Badge styling for aspect ratios */
+.badge.position-absolute {
+    font-size: 0.65rem;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+</style>
+
+<!-- Image Generation Modal -->
+<div class="modal fade" id="imageGenerationModal" tabindex="-1" aria-labelledby="imageGenerationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 80vw; width: 80vw; max-height: 80vh; margin: 5vh auto;">
+        <div class="modal-content" style="height: 80vh; overflow-y: auto;">
+            <!-- Enhanced Tabler Premium Header -->
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); color: white; border-bottom: none;">
+                <h4 class="modal-title text-white" id="imageGenerationModalLabel">
+                    <i class="fas fa-image me-2"></i>Generate Image
+                </h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" style="max-height: calc(80vh - 120px); overflow-y: auto; padding: 1.5rem;">
+                <!-- Current Balance and Cost Info -->
+                <div class="card mb-4">
+                    <div class="card-status-top bg-success"></div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <span class="avatar avatar-sm bg-success-lt">
+                                    <i class="fas fa-coins"></i>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="font-weight-medium">Current Balance</div>
+                                        <div class="text-secondary">
+                                            <span id="currentBalance">0</span> coins
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="font-weight-medium">Generation Cost</div>
+                                        <div class="text-secondary">
+                                            <span id="generationCost">100</span> coins per image
+                                        </div>
+                                        <div class="text-secondary mt-1">
+                                            <small>Upload processing: 200 coins per image</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Prompt and Style Selection -->
+                <div class="card mb-4">
+                    <div class="card-status-top bg-primary"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit me-2"></i>
+                            Image Configuration
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Image Prompt</label>
+                                    <textarea class="form-control" id="imagePrompt" rows="3" placeholder="Enter your image prompt here..."></textarea>
+                                    <div class="form-hint">Describe what you want to see in the generated image</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Art Style</label>
+                                    <select class="form-select" id="imageStyle">
+                                        <option value="realistic">Realistic</option>
+                                        <!-- Dynamic options will be loaded here -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Aspect Ratio</label>
+                                    <select class="form-select" id="aspectRatio" required>
+                                        <option value="16x9">16:9 (Featured/Hero)</option>
+                                        <option value="5x4">5:4 (Content)</option>
+                                        <option value="1x1">1:1 (Square/Thumbnail)</option>
+                                    </select>
+                                    <div class="form-hint">Choose the aspect ratio based on intended use</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Upload Section -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="border-top pt-3 mt-3">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-upload me-2"></i>
+                                        Or Upload Your Own Image
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Select Image File</label>
+                                                <input type="file" class="form-control" id="imageFile" accept="image/*">
+                                                <div class="form-hint">JPG, PNG, or other image formats</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Upload Aspect Ratio</label>
+                                                <select class="form-select" id="uploadAspectRatio">
+                                                    <option value="16x9">16:9 (Landscape)</option>
+                                                    <option value="4x3">4:3 (Standard)</option>
+                                                    <option value="1x1">1:1 (Square)</option>
+                                                    <option value="9x16">9:16 (Portrait)</option>
+                                                </select>
+                                                <div class="form-hint">Standard dimensions will be applied automatically</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button type="button" class="btn btn-success" id="uploadImageBtn" disabled>
+                                                <i class="fas fa-upload me-2"></i>
+                                                Upload & Process Image
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" id="generateImageBtn">
+                                    <i class="fas fa-magic me-2"></i>
+                                    Generate Image
+                                </button>
+                                <button type="button" class="btn btn-warning d-none" id="retryGenerationBtn">
+                                    <i class="fas fa-redo me-2"></i>
+                                    Retry Generation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generation Status -->
+                <div class="card d-none" id="generationStatusCard">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="flex-fill">
+                                <h4 class="card-title mb-1">Generating Image...</h4>
+                                <p class="text-secondary mb-0">Please wait while we create your image. This may take a moment.</p>
+                                <p class="text-secondary mb-0"><small>It can take up to 10 seconds per image.</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div class="alert alert-danger d-none" id="errorMessage">
+                    <div class="d-flex">
+                        <div class="me-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">Generation Failed</h4>
+                            <div class="text-secondary" id="errorDetails"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated Images Gallery -->
+                <div class="card">
+                    <div class="card-status-top bg-indigo"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-images me-2"></i>
+                            Generated Images
+                        </h3>
+                        <div class="card-subtitle text-secondary">
+                            Click "Set as Current" to select your preferred image
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="imageGallery" class="row">
+                            <!-- Images will be populated here -->
+                        </div>
+                        <div id="emptyGallery" class="empty">
+                            <div class="empty-img">
+                                <i class="fas fa-images" style="font-size: 4rem; color: var(--tblr-gray-400);"></i>
+                            </div>
+                            <p class="empty-title">No images generated yet</p>
+                            <p class="empty-subtitle text-secondary">
+                                Use the form above to generate your first image
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="applyImageBtn" disabled>
+                    <i class="fas fa-check me-2"></i>Apply Selected Image
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Generation Modal JavaScript -->
+<script>
+// Prevent duplicate class declaration
+if (typeof ImageGenerationModal === 'undefined') {
+class ImageGenerationModal {
+    constructor(entityType, entityId, defaultPrompt, callback) {
+        this.entityType = entityType;
+        this.entityId = entityId;
+        this.defaultPrompt = defaultPrompt;
+        this.callback = callback;
+        this.selectedImageId = null;
+        this.generationCost = 100; // Default cost
+        this.modal = null;
+        
+        this.init();
+    }
+    
+    init() {
+        this.modal = new bootstrap.Modal(document.getElementById('imageGenerationModal'));
+        this.setupEventListeners();
+        this.loadUserBalance();
+        this.loadExistingImages();
+        this.setDefaultPrompt();
+        this.loadArtStyles();
+    }
+    
+    setupEventListeners() {
+        // Generate button
+        document.getElementById('generateImageBtn').addEventListener('click', () => {
+            this.generateImage();
+        });
+        
+        // Retry button
+        document.getElementById('retryGenerationBtn').addEventListener('click', () => {
+            this.generateImage();
+        });
+        
+        // Apply button
+        document.getElementById('applyImageBtn').addEventListener('click', () => {
+            this.applySelectedImage();
+        });
+        
+        // Upload functionality
+        document.getElementById('imageFile').addEventListener('change', () => {
+            this.onFileSelected();
+        });
+        
+        // Removed dimension selection - now always uses standard dimensions
+        
+        document.getElementById('uploadImageBtn').addEventListener('click', () => {
+            this.uploadImage();
+        });
+        
+        // Modal close event
+        document.getElementById('imageGenerationModal').addEventListener('hidden.bs.modal', () => {
+            this.cleanup();
+        });
+    }
+    
+    show() {
+        this.modal.show();
+    }
+    
+    hide() {
+        this.modal.hide();
+    }
+    
+    setDefaultPrompt() {
+        const promptTextarea = document.getElementById('imagePrompt');
+        promptTextarea.value = this.defaultPrompt || '';
+        
+        if (!this.defaultPrompt) {
+            promptTextarea.placeholder = 'Enter your image prompt here...';
+        }
+    }
+    
+    aspectRatioToDimensions(aspectRatio) {
+        // Convert aspect ratio selection to actual pixel dimensions optimized for ComfyUI
+        const dimensionMap = {
+            '16x9': '1344x768',    // Landscape/Widescreen - good for featured images, banners
+            '5x4': '1280x1024',    // Portrait/Content - good for blog content, vertical images  
+            '1x1': '1024x1024'     // Square - good for thumbnails, profile images
+        };
+        
+        return dimensionMap[aspectRatio] || '1024x1024'; // Default to square
+    }
+    
+    async loadUserBalance() {
+        try {
+            const response = await fetch('/api/v1/billing/balance');
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('currentBalance').textContent = data.balance || 0;
+            }
+        } catch (error) {
+            console.error('Error loading user balance:', error);
+        }
+    }
+    
+    async loadArtStyles() {
+        try {
+            const response = await fetch('/api/v1/prompts/art-styles');
+            if (response.ok) {
+                const artStyles = await response.json();
+                const selectElement = document.getElementById('imageStyle');
+                
+                // Clear existing options except realistic
+                const realisticOption = selectElement.querySelector('option[value="realistic"]');
+                selectElement.innerHTML = '';
+                if (realisticOption) {
+                    selectElement.appendChild(realisticOption);
+                }
+                
+                // Add dynamic options
+                artStyles.forEach(style => {
+                    const option = document.createElement('option');
+                    // Convert title to lowercase with underscores for value
+                    option.value = style.title.toLowerCase().replace(/\s+/g, '_');
+                    option.textContent = style.title;
+                    selectElement.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading art styles:', error);
+            // Fallback to default options if loading fails
+            const selectElement = document.getElementById('imageStyle');
+            const fallbackOptions = [
+                { value: 'fantasy', text: 'Fantasy Art' },
+                { value: 'cartoon', text: 'Cartoon' },
+                { value: 'digital_art', text: 'Digital Art' },
+                { value: 'oil_painting', text: 'Oil Painting' },
+                { value: 'watercolor', text: 'Watercolor' },
+                { value: 'sketch', text: 'Sketch' }
+            ];
+            
+            fallbackOptions.forEach(styleOption => {
+                const option = document.createElement('option');
+                option.value = styleOption.value;
+                option.textContent = styleOption.text;
+                selectElement.appendChild(option);
+            });
+        }
+    }
+    
+    async loadExistingImages() {
+        try {
+            const response = await fetch(`/api/v1/images/${this.entityType}/${this.entityId}`);
+            if (response.ok) {
+                const images = await response.json();
+                this.displayImages(images);
+            }
+        } catch (error) {
+            console.error('Error loading existing images:', error);
+        }
+    }
+    
+    displayImages(images) {
+        const gallery = document.getElementById('imageGallery');
+        const emptyGallery = document.getElementById('emptyGallery');
+        
+        if (images.length === 0) {
+            gallery.classList.add('d-none');
+            emptyGallery.classList.remove('d-none');
+            return;
+        }
+        
+        gallery.classList.remove('d-none');
+        emptyGallery.classList.add('d-none');
+        
+        gallery.innerHTML = '';
+        
+        images.forEach(image => {
+            const imageCard = this.createImageCard(image);
+            gallery.appendChild(imageCard);
+        });
+    }
+    
+    createImageCard(image) {
+        const col = document.createElement('div');
+        
+        // Determine aspect ratio and column size based on image dimensions or aspect_ratio field
+        let aspectRatio = '1'; // default to square
+        let colClass = 'col-sm-6 col-md-4 col-lg-3'; // default column size
+        
+        // If image has aspect_ratio metadata, use it
+        if (image.aspect_ratio) {
+            switch (image.aspect_ratio) {
+                case '16x9':
+                    aspectRatio = '16/9';
+                    colClass = 'col-sm-12 col-md-6 col-lg-4'; // wider for landscape
+                    break;
+                case '5x4':
+                    aspectRatio = '5/4';
+                    colClass = 'col-sm-6 col-md-4 col-lg-3';
+                    break;
+                case '1x1':
+                    aspectRatio = '1';
+                    colClass = 'col-sm-6 col-md-4 col-lg-3';
+                    break;
+                default:
+                    aspectRatio = '1';
+                    colClass = 'col-sm-6 col-md-4 col-lg-3';
+            }
+        }
+        
+        col.className = colClass;
+        
+        const isSelected = this.selectedImageId === image.id;
+        const isCurrent = image.is_current;
+        
+        // Add aspect ratio badge
+        const aspectRatioBadge = image.aspect_ratio ? 
+            `<span class="badge bg-secondary position-absolute" style="top: 8px; left: 8px; z-index: 2;">${image.aspect_ratio.replace('x', ':')}</span>` : '';
+        
+        col.innerHTML = `
+            <div class="card card-sm">
+                ${isCurrent ? '<div class="ribbon ribbon-top bg-green"><i class="fas fa-check"></i></div>' : ''}
+                <div class="card-status-top ${isSelected ? 'bg-primary' : 'bg-gray'}"></div>
+                <div class="card-body p-2">
+                    <div class="mb-2 position-relative">
+                        ${aspectRatioBadge}
+                        <img src="${image.url}" class="img-fluid rounded" 
+                             style="aspect-ratio: ${aspectRatio}; object-fit: cover; width: 100%; border: 1px solid var(--tblr-border-color);" 
+                             alt="Generated image">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-clock me-1"></i>
+                            ${new Date(image.created_at).toLocaleDateString()}
+                        </small>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                onclick="window.imageGenerationModal.deleteImage(${image.id})"
+                                title="Delete image">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-primary'}" 
+                                onclick="window.imageGenerationModal.selectImage(${image.id})">
+                            ${isSelected ? '<i class="fas fa-check me-1"></i>Selected' : 'Set as Current'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return col;
+    }
+    
+    selectImage(imageId) {
+        this.selectedImageId = imageId;
+        
+        // Update UI to show selection
+        const gallery = document.getElementById('imageGallery');
+        const buttons = gallery.querySelectorAll('button');
+        
+        buttons.forEach(btn => {
+            const card = btn.closest('.card');
+            const statusBar = card.querySelector('.card-status-top');
+            
+            if (btn.onclick.toString().includes(imageId)) {
+                btn.className = 'btn btn-sm btn-primary';
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Selected';
+                statusBar.className = 'card-status-top bg-primary';
+            } else {
+                btn.className = 'btn btn-sm btn-outline-primary';
+                btn.innerHTML = 'Set as Current';
+                statusBar.className = 'card-status-top bg-gray';
+            }
+        });
+        
+        // Enable apply button
+        document.getElementById('applyImageBtn').disabled = false;
+    }
+    
+    async deleteImage(imageId) {
+        // Show confirmation dialog
+        if (!confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/v1/images/${imageId}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to delete image');
+            }
+            
+            const result = await response.json();
+            
+            // Remove the image card from the gallery
+            const gallery = document.getElementById('imageGallery');
+            const imageCards = gallery.querySelectorAll('.col-sm-6, .col-sm-12, .col-md-4, .col-md-6, .col-lg-3, .col-lg-4');
+            
+            imageCards.forEach(card => {
+                const deleteBtn = card.querySelector(`button[onclick*="deleteImage(${imageId})"]`);
+                if (deleteBtn) {
+                    card.remove();
+                }
+            });
+            
+            // If this was the selected image, clear selection
+            if (this.selectedImageId === imageId) {
+                this.selectedImageId = null;
+                document.getElementById('applyImageBtn').disabled = true;
+            }
+            
+            // Check if gallery is now empty
+            const remainingCards = gallery.querySelectorAll('.col-sm-6, .col-sm-12, .col-md-4, .col-md-6, .col-lg-3, .col-lg-4');
+            if (remainingCards.length === 0) {
+                // Show empty gallery message
+                gallery.classList.add('d-none');
+                document.getElementById('emptyGallery').classList.remove('d-none');
+            }
+            
+            // Show success message
+            this.showToast('Image deleted successfully', 'success');
+            
+        } catch (error) {
+            console.error('Error deleting image:', error);
+            this.showError(`Failed to delete image: ${error.message}`);
+        }
+    }
+    
+    showToast(message, type = 'info') {
+        // Create a simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `toast show position-fixed alert alert-${type === 'success' ? 'success' : 'danger'}`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <span class="me-2">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                </span>
+                <div>${message}</div>
+                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 3000);
+    }
+    
+    async generateImage() {
+        const prompt = document.getElementById('imagePrompt').value.trim();
+        const style = document.getElementById('imageStyle').value;
+        const aspectRatio = document.getElementById('aspectRatio').value;
+        
+        if (!prompt) {
+            this.showError('Please enter an image prompt');
+            return;
+        }
+        
+        if (!aspectRatio) {
+            this.showError('Please select an aspect ratio');
+            return;
+        }
+        
+        // Convert aspect ratio to dimensions for ComfyUI
+        const dimensions = this.aspectRatioToDimensions(aspectRatio);
+        
+        // Show loading state
+        this.showGenerationStatus();
+        
+        try {
+            const response = await fetch('/api/v1/images/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    entity_type: this.entityType,
+                    entity_id: this.entityId,
+                    prompt: prompt,
+                    style: style,
+                    aspect_ratio: aspectRatio,
+                    size: dimensions  // Add actual dimensions for backend
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Image generation failed');
+            }
+            
+            const result = await response.json();
+            
+            // Update balance
+            await this.loadUserBalance();
+            
+            // Show cost confirmation
+            this.showCostConfirmation(result.cost);
+            
+            // Add the new image to the gallery immediately
+            const newImage = {
+                id: result.id,
+                url: result.url,
+                prompt: result.prompt,
+                revised_prompt: result.revised_prompt,
+                created_at: result.created_at,
+                is_current: false
+            };
+            
+            // Get existing images and add the new one at the beginning
+            const gallery = document.getElementById('imageGallery');
+            const emptyGallery = document.getElementById('emptyGallery');
+            
+            // Hide empty gallery message
+            gallery.classList.remove('d-none');
+            emptyGallery.classList.add('d-none');
+            
+            // Create the new image card and prepend it
+            const newImageCard = this.createImageCard(newImage);
+            gallery.insertBefore(newImageCard, gallery.firstChild);
+            
+            // Auto-select the newly generated image
+            this.selectImage(result.id);
+            
+            // Hide loading state
+            this.hideGenerationStatus();
+            
+            // Optionally reload all images to ensure consistency
+            setTimeout(() => {
+                this.loadExistingImages();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error generating image:', error);
+            this.showError(error.message);
+            this.hideGenerationStatus();
+        }
+    }
+    
+    showGenerationStatus() {
+        document.getElementById('generationStatusCard').classList.remove('d-none');
+        document.getElementById('generateImageBtn').disabled = true;
+        document.getElementById('retryGenerationBtn').classList.add('d-none');
+        this.hideError();
+    }
+    
+    hideGenerationStatus() {
+        document.getElementById('generationStatusCard').classList.add('d-none');
+        document.getElementById('generateImageBtn').disabled = false;
+    }
+    
+    showError(message) {
+        document.getElementById('errorDetails').textContent = message;
+        document.getElementById('errorMessage').classList.remove('d-none');
+        document.getElementById('retryGenerationBtn').classList.remove('d-none');
+        this.hideGenerationStatus();
+    }
+    
+    hideError() {
+        document.getElementById('errorMessage').classList.add('d-none');
+        document.getElementById('retryGenerationBtn').classList.add('d-none');
+    }
+    
+    showCostConfirmation(cost) {
+        // Create a temporary toast notification
+        const toast = document.createElement('div');
+        toast.className = 'toast show position-fixed';
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+        toast.innerHTML = `
+            <div class="toast-body">
+                <div class="d-flex align-items-center">
+                    <span class="avatar avatar-sm bg-success-lt me-3">
+                        <i class="fas fa-coins"></i>
+                    </span>
+                    <div>
+                        <strong>Image Generated!</strong><br>
+                        <small class="text-secondary">Cost: ${cost} coins</small>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
+    }
+    
+    async applySelectedImage() {
+        if (!this.selectedImageId) {
+            this.showError('Please select an image first');
+            return;
+        }
+        
+        try {
+            // Set the selected image as current
+            const response = await fetch(`/api/v1/images/${this.entityType}/${this.entityId}/set-current/${this.selectedImageId}`, {
+                method: 'POST'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to set image as current');
+            }
+            
+            const result = await response.json();
+            
+            // Call the callback with the result
+            if (this.callback) {
+                this.callback(result);
+            }
+            
+            // Close modal
+            this.hide();
+            
+        } catch (error) {
+            console.error('Error applying selected image:', error);
+            this.showError(error.message);
+        }
+    }
+    
+    // Upload functionality methods
+    onFileSelected() {
+        try {
+            const fileInput = document.getElementById('imageFile');
+            const uploadBtn = document.getElementById('uploadImageBtn');
+            
+            if (fileInput && uploadBtn) {
+                if (fileInput.files && fileInput.files[0]) {
+                    uploadBtn.disabled = false;
+                    this.hideError();
+                } else {
+                    uploadBtn.disabled = true;
+                }
+            }
+        } catch (error) {
+            console.error('Error in onFileSelected:', error);
+        }
+    }
+    
+    getStandardDimension(aspectRatio) {
+        // Return standard (first) dimension for each aspect ratio
+        const standardDimensions = {
+            '16x9': '1344x768',
+            '4x3': '1280x960', 
+            '1x1': '1024x1024',
+            '9x16': '768x1344'
+        };
+        
+        return standardDimensions[aspectRatio] || '1024x1024';
+    }
+    
+    async uploadImage() {
+        const fileInput = document.getElementById('imageFile');
+        const aspectRatio = document.getElementById('uploadAspectRatio').value;
+        const dimension = this.getStandardDimension(aspectRatio);
+        
+        if (!fileInput.files || !fileInput.files[0]) {
+            this.showError('Please select an image file');
+            return;
+        }
+        
+        const file = fileInput.files[0];
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            this.showError('Please select a valid image file');
+            return;
+        }
+        
+        // Show loading state
+        this.showGenerationStatus();
+        document.getElementById('uploadImageBtn').disabled = true;
+        
+        try {
+            // Create FormData for upload
+            const formData = new FormData();
+            formData.append('entity_type', this.entityType);
+            formData.append('entity_id', this.entityId);
+            formData.append('aspect_ratio', aspectRatio);
+            formData.append('dimension', dimension);
+            formData.append('image_file', file);
+            
+            const response = await fetch('/api/v1/images/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Image upload failed');
+            }
+            
+            const result = await response.json();
+            
+            // Add the new image to the gallery
+            const newImage = {
+                id: result.id,
+                url: result.url,
+                prompt: result.prompt,
+                revised_prompt: result.revised_prompt,
+                created_at: result.created_at,
+                is_current: false,
+                aspect_ratio: aspectRatio
+            };
+            
+            // Update gallery
+            const gallery = document.getElementById('imageGallery');
+            const emptyGallery = document.getElementById('emptyGallery');
+            
+            gallery.classList.remove('d-none');
+            emptyGallery.classList.add('d-none');
+            
+            const newImageCard = this.createImageCard(newImage);
+            gallery.insertBefore(newImageCard, gallery.firstChild);
+            
+            // Auto-select the uploaded image
+            this.selectImage(result.id);
+            
+            // Reset upload form
+            fileInput.value = '';
+            document.getElementById('uploadImageBtn').disabled = true;
+            
+            // Hide loading state
+            this.hideGenerationStatus();
+            
+            // Show success message with actual cost
+            this.showCostConfirmation(result.cost);
+            
+            // Reload images to ensure consistency
+            setTimeout(() => {
+                this.loadExistingImages();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            this.showError(error.message);
+            this.hideGenerationStatus();
+            document.getElementById('uploadImageBtn').disabled = false;
+        }
+    }
+    
+    cleanup() {
+        try {
+            this.selectedImageId = null;
+            
+            const applyBtn = document.getElementById('applyImageBtn');
+            if (applyBtn) applyBtn.disabled = true;
+            
+            const fileInput = document.getElementById('imageFile');
+            if (fileInput) fileInput.value = '';
+            
+            const uploadBtn = document.getElementById('uploadImageBtn');
+            if (uploadBtn) uploadBtn.disabled = true;
+            
+            this.hideError();
+            this.hideGenerationStatus();
+        } catch (error) {
+            console.error('Error in cleanup:', error);
+        }
+    }
+}
+
+// Global reference for onclick handlers
+window.imageGenerationModal = null;
+
+// Helper function to initialize the modal
+window.initImageGenerationModal = function(entityType, entityId, defaultPrompt, callback) {
+    window.imageGenerationModal = new ImageGenerationModal(entityType, entityId, defaultPrompt, callback);
+    window.imageGenerationModal.show();
+}
+} // End of ImageGenerationModal class check
+
+// Global convenience functions for easy integration (matching the module API)
+if (typeof window.showImageGenerationModal === 'undefined') {
+    window.showImageGenerationModal = function(entityType, entityId, defaultPrompt = '', callback = null) {
+        if (window.initImageGenerationModal) {
+            window.initImageGenerationModal(entityType, entityId, defaultPrompt, callback);
+        } else {
+            console.error('ImageGenerationModal not loaded yet');
+        }
+    };
+}
+
+if (typeof window.showStoryImageModal === 'undefined') {
+    window.showStoryImageModal = function(storyId, defaultPrompt = '', callback = null) {
+        if (window.initImageGenerationModal) {
+            window.initImageGenerationModal('story', storyId, defaultPrompt, callback);
+        } else {
+            console.error('ImageGenerationModal not loaded yet');
+        }
+    };
+}
+
+if (typeof window.showActImageModal === 'undefined') {
+    window.showActImageModal = function(actId, defaultPrompt = '', callback = null) {
+        if (window.initImageGenerationModal) {
+            window.initImageGenerationModal('act', actId, defaultPrompt, callback);
+        } else {
+            console.error('ImageGenerationModal not loaded yet');
+        }
+    };
+}
+
+if (typeof window.showSceneImageModal === 'undefined') {
+    window.showSceneImageModal = function(sceneId, defaultPrompt = '', callback = null) {
+        if (window.initImageGenerationModal) {
+            window.initImageGenerationModal('scene', sceneId, defaultPrompt, callback);
+        } else {
+            console.error('ImageGenerationModal not loaded yet');
+        }
+    };
+}
+</script>

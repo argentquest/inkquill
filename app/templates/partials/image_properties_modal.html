@@ -1,0 +1,260 @@
+{# Image Properties Modal Partial #}
+{# This modal allows editing image properties like size, alignment, alt text, caption, and effects #}
+
+<!-- Image Properties Modal -->
+<div class="modal modal-blur fade" id="imagePropertiesModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-image me-2"></i>
+                    Image Properties
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left Column: Image Preview -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Preview</label>
+                            <div class="border rounded p-3 text-center bg-light">
+                                <img id="imagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Properties -->
+                    <div class="col-md-6">
+                        <!-- Alt Text -->
+                        <div class="mb-3">
+                            <label for="imageAltText" class="form-label">Alt Text</label>
+                            <input type="text" class="form-control" id="imageAltText" placeholder="Describe the image for accessibility">
+                            <div class="form-text">Important for accessibility and SEO</div>
+                        </div>
+                        
+                        <!-- Caption -->
+                        <div class="mb-3">
+                            <label for="imageCaption" class="form-label">Caption</label>
+                            <input type="text" class="form-control" id="imageCaption" placeholder="Optional caption text">
+                            <div class="form-text">Appears below the image</div>
+                        </div>
+                        
+                        <!-- Size -->
+                        <div class="mb-3">
+                            <label for="imageSize" class="form-label">Size</label>
+                            <select class="form-select" id="imageSize">
+                                <option value="auto">Auto</option>
+                                <option value="small">Small (25%)</option>
+                                <option value="medium">Medium (50%)</option>
+                                <option value="large">Large (75%)</option>
+                                <option value="full">Full Width (100%)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Alignment -->
+                        <div class="mb-3">
+                            <label for="imageAlignment" class="form-label">Alignment</label>
+                            <select class="form-select" id="imageAlignment">
+                                <option value="none">None</option>
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Effects -->
+                        <div class="mb-3">
+                            <label class="form-label">Effects</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="imageBorder">
+                                <label class="form-check-label" for="imageBorder">Border</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="imageShadow">
+                                <label class="form-check-label" for="imageShadow">Shadow</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="imageRounded">
+                                <label class="form-check-label" for="imageRounded">Rounded Corners</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyImageProperties()">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variable to track current image being edited
+let currentEditingImage = null;
+
+// Global function to open image properties modal
+window.openImagePropertiesModal = function(imgElement) {
+    console.log('Opening image properties modal for:', imgElement);
+    currentEditingImage = imgElement;
+    
+    try {
+        // Set preview
+        const preview = document.getElementById('imagePreview');
+        if (preview) {
+            preview.src = imgElement.src;
+        }
+        
+        // Get current properties
+        const altTextInput = document.getElementById('imageAltText');
+        if (altTextInput) {
+            altTextInput.value = imgElement.alt || '';
+        }
+        
+        // Check for caption wrapper
+        const wrapper = imgElement.closest('.img-blog-wrapper');
+        const captionElement = wrapper ? wrapper.querySelector('.img-blog-caption') : null;
+        const captionInput = document.getElementById('imageCaption');
+        if (captionInput) {
+            captionInput.value = captionElement ? captionElement.textContent : '';
+        }
+        
+        // Get current alignment
+        let alignment = 'none';
+        if (imgElement.classList.contains('img-blog-left') || (wrapper && wrapper.classList.contains('left'))) {
+            alignment = 'left';
+        } else if (imgElement.classList.contains('img-blog-right') || (wrapper && wrapper.classList.contains('right'))) {
+            alignment = 'right';
+        } else if (imgElement.classList.contains('img-blog-center') || (wrapper && wrapper.classList.contains('center'))) {
+            alignment = 'center';
+        }
+        const alignmentSelect = document.getElementById('imageAlignment');
+        if (alignmentSelect) {
+            alignmentSelect.value = alignment;
+        }
+        
+        // Get current size
+        let size = 'auto';
+        if (imgElement.classList.contains('img-blog-small')) size = 'small';
+        else if (imgElement.classList.contains('img-blog-medium')) size = 'medium';
+        else if (imgElement.classList.contains('img-blog-large')) size = 'large';
+        else if (imgElement.classList.contains('img-blog-full')) size = 'full';
+        const sizeSelect = document.getElementById('imageSize');
+        if (sizeSelect) {
+            sizeSelect.value = size;
+        }
+        
+        // Get current effects
+        const borderCheck = document.getElementById('imageBorder');
+        const shadowCheck = document.getElementById('imageShadow');
+        const roundedCheck = document.getElementById('imageRounded');
+        if (borderCheck) borderCheck.checked = imgElement.classList.contains('img-blog-border');
+        if (shadowCheck) shadowCheck.checked = imgElement.classList.contains('img-blog-shadow');
+        if (roundedCheck) roundedCheck.checked = imgElement.classList.contains('img-blog-rounded');
+        
+        // Show modal
+        const modalElement = document.getElementById('imagePropertiesModal');
+        if (modalElement) {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                console.log('Using Bootstrap modal');
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                console.warn('Bootstrap not available, showing modal manually');
+                modalElement.style.display = 'block';
+                modalElement.classList.add('show');
+                document.body.classList.add('modal-open');
+            }
+        } else {
+            console.error('Image properties modal element not found');
+            alert('Error: Image properties modal not found');
+        }
+        
+    } catch (error) {
+        console.error('Error opening image properties modal:', error);
+        alert('Error opening image properties: ' + error.message);
+    }
+};
+
+// Apply image properties function
+window.applyImageProperties = function() {
+    if (!currentEditingImage) {
+        console.error('No image selected for editing');
+        return;
+    }
+    
+    try {
+        const img = currentEditingImage;
+        
+        // Update alt text
+        const altText = document.getElementById('imageAltText').value;
+        img.alt = altText;
+        
+        // Remove existing size classes
+        img.classList.remove('img-blog-small', 'img-blog-medium', 'img-blog-large', 'img-blog-full');
+        
+        // Add new size class
+        const size = document.getElementById('imageSize').value;
+        if (size !== 'auto') {
+            img.classList.add(`img-blog-${size}`);
+        }
+        
+        // Remove existing alignment classes
+        img.classList.remove('img-blog-left', 'img-blog-center', 'img-blog-right');
+        
+        // Add new alignment class
+        const alignment = document.getElementById('imageAlignment').value;
+        if (alignment !== 'none') {
+            img.classList.add(`img-blog-${alignment}`);
+        }
+        
+        // Handle effects
+        const border = document.getElementById('imageBorder').checked;
+        const shadow = document.getElementById('imageShadow').checked;
+        const rounded = document.getElementById('imageRounded').checked;
+        
+        img.classList.toggle('img-blog-border', border);
+        img.classList.toggle('img-blog-shadow', shadow);
+        img.classList.toggle('img-blog-rounded', rounded);
+        
+        // Handle caption (simplified version)
+        const captionText = document.getElementById('imageCaption').value;
+        if (captionText) {
+            // For now, just add title attribute - could be enhanced to add actual caption elements
+            img.title = captionText;
+        } else {
+            img.removeAttribute('title');
+        }
+        
+        // Close modal
+        const modalElement = document.getElementById('imagePropertiesModal');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        } else {
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            document.body.classList.remove('modal-open');
+        }
+        
+        // Clear current editing image
+        currentEditingImage = null;
+        
+        console.log('Image properties applied successfully');
+        
+        // Show success message if possible
+        if (typeof showToast === 'function') {
+            showToast('Image properties updated!', 'success');
+        } else {
+            console.log('Image properties updated!');
+        }
+        
+    } catch (error) {
+        console.error('Error applying image properties:', error);
+        alert('Error applying changes: ' + error.message);
+    }
+};
+</script>

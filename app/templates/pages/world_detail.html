@@ -1,0 +1,1401 @@
+{# /ai_rag_story_app/app/templates/pages/world_detail.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ world.name | e if world else "World Details" }} - Details{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ world.name | e if world else "World Details" }}{% endblock %}
+{% block og_description %}{{ world.description | e if world and world.description else "Explore this immersive world created with AI assistance on our storytelling platform." }}{% endblock %}
+{% block og_image %}{% if world and world.image_url %}{{ world.image_url }}{% elif world %}{{ request.url_for('generate_social_preview', content_type='world', content_id=world.id) if request else '/api/v1/social/preview/world/' + world.id|string + '.jpg' }}{% else %}{{ request.url_for('static', path='/images/logo.jpeg') if request else '/static/images/logo.jpeg' }}{% endif %}{% endblock %}
+{% block og_url %}{{ request.url if request else '' }}{% endblock %}
+
+{% block twitter_card %}summary_large_image{% endblock %}
+{% block meta_keywords %}world building, {{ world.name | e if world else "AI world" }}, creative writing, AI storytelling, fantasy world{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* World Detail Page - Tabler Premium UI Standards */
+    .page {
+        background: var(--tblr-bg-surface-secondary);
+        min-height: 100vh;
+    }
+    
+    /* World hero header similar to other detail pages */
+    .world-hero-header {
+        background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    }
+    
+    .world-hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .world-hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 3rem 0;
+        color: white;
+    }
+    
+    .world-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.75rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .world-stats {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .world-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    .world-actions .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        backdrop-filter: blur(10px);
+    }
+    
+    .world-actions .btn-light {
+        background: rgba(255,255,255,0.9) !important;
+        color: var(--tblr-dark) !important;
+        border-color: rgba(255,255,255,0.7) !important;
+    }
+    
+    .world-actions .btn-light:hover {
+        background: rgba(255,255,255,1) !important;
+        border-color: rgba(255,255,255,0.9) !important;
+        color: var(--tblr-dark) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    
+    .world-actions .btn-warning {
+        background: var(--tblr-warning) !important;
+        border-color: var(--tblr-warning) !important;
+        color: var(--tblr-dark) !important;
+    }
+    
+    .world-actions .btn-warning:hover {
+        background: var(--tblr-yellow) !important;
+        border-color: var(--tblr-yellow) !important;
+        color: var(--tblr-dark) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+    }
+    
+    /* Stories section button styling to match hero buttons */
+    .card-header.bg-warning .btn-light {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .card-header.bg-warning .btn-light:hover {
+        background: rgba(255,255,255,1) !important;
+        border-color: rgba(255,255,255,0.9) !important;
+        color: var(--tblr-dark) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    
+    /* Element sections button styling to match hero buttons */
+    .card-header.bg-primary .btn-light,
+    .card-header.bg-success .btn-light,
+    .card-header.bg-info .btn-light {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .card-header.bg-primary .btn-light:hover,
+    .card-header.bg-success .btn-light:hover,
+    .card-header.bg-info .btn-light:hover {
+        background: rgba(255,255,255,1) !important;
+        border-color: rgba(255,255,255,0.9) !important;
+        color: var(--tblr-dark) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    
+    .world-breadcrumb .breadcrumb {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: var(--tblr-border-radius);
+        padding: 0.5rem 1rem;
+    }
+    
+    .world-breadcrumb .breadcrumb-item {
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .world-breadcrumb .breadcrumb-item a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+    }
+    
+    .world-breadcrumb .breadcrumb-item.active {
+        color: white;
+        font-weight: 500;
+    }
+    
+    /* Enhanced cards for world detail */
+    .detail-card {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-box-shadow);
+        margin-bottom: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .detail-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #206bc4, #a855f7);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .detail-card:hover {
+        box-shadow: var(--tblr-box-shadow-lg);
+        transform: translateY(-4px);
+        border-color: var(--tblr-primary);
+    }
+    
+    .detail-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .section-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--tblr-border-color-translucent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-header::before {
+        content: '';
+        width: 4px;
+        height: 1.25rem;
+        background: linear-gradient(135deg, #206bc4, #a855f7);
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    /* Enhanced alerts */
+    .enhanced-alert {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        box-shadow: var(--tblr-box-shadow-input);
+    }
+    
+    .enhanced-alert.alert-info {
+        border-left: 4px solid var(--tblr-blue);
+    }
+    
+    .enhanced-alert .avatar {
+        flex-shrink: 0;
+    }
+    
+    .enhanced-alert .alert-content {
+        flex: 1;
+    }
+    
+    .enhanced-alert .alert-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--tblr-body-color);
+    }
+    
+    .enhanced-alert .alert-text {
+        color: var(--tblr-text-secondary);
+        margin: 0;
+    }
+    
+    /* 4. Stories Section with Softer Yellow */
+    .world-detail-page .bg-warning {
+        background: #FEF3C7 !important;
+        color: #92400E !important;
+        border-bottom: 1px solid #F59E0B !important;
+    }
+    
+    .world-detail-page .bg-warning h3 {
+        color: #92400E !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+    }
+    
+    .world-detail-page .btn-outline-dark {
+        background: #F8FAFC !important;
+        color: #92400E !important;
+        border: 2px solid #D97706 !important;
+        padding: 8px 16px !important;
+        min-height: 36px !important;
+        font-size: 14px !important;
+        border-radius: 6px !important;
+    }
+    
+    .world-detail-page .btn-outline-dark:hover {
+        background: #F1F5F9 !important;
+        color: #92400E !important;
+        border-color: #D97706 !important;
+    }
+    
+    /* Story cards in stories section */
+    .world-detail-page .border-secondary {
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 12px !important;
+        transition: all 0.2s ease;
+    }
+    
+    /* World Element Cards - Better balanced padding and spacing */
+    .world-element-card .card-body {
+        padding: 1.25rem !important;
+    }
+    
+    .world-element-card .card-link .card-body {
+        padding: 1rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 140px !important;
+    }
+    
+    .world-element-card .card-title {
+        text-align: center !important;
+        margin-bottom: 0 !important;
+        font-size: 0.875rem !important;
+        line-height: 1.3 !important;
+        font-weight: 600 !important;
+        margin-top: 0.75rem !important;
+    }
+    
+    /* Consistent avatar/image sizing and spacing */
+    .world-element-card .mb-3 {
+        margin-bottom: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    
+    .world-element-card .avatar,
+    .world-element-card img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    .world-element-card .avatar {
+        font-size: 2rem !important;
+    }
+    
+    /* Stories cards - consistent with element cards */
+    .card.border-secondary .card-body {
+        padding: 1rem !important;
+        min-height: 140px !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .card.border-secondary .card-title {
+        text-align: center !important;
+        margin-bottom: 0.75rem !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Empty state consistency */
+    .world-element-card .text-center.py-4 {
+        padding: 1.5rem 1rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 200px !important;
+    }
+    
+    .world-element-card .text-center.py-4 .avatar {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 2rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Card Header Title Styling - Bigger font, better spacing */
+    .world-element-card .card-header h3,
+    .card-header h3 {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .world-element-card .card-header .text-center,
+    .card-header .text-center {
+        margin-bottom: 1rem !important;
+    }
+    
+    .world-element-card .card-header .d-flex.justify-content-center.flex-wrap,
+    .card-header .d-flex.justify-content-center.flex-wrap {
+        margin-bottom: 0 !important;
+    }
+    
+    /* Standardized header styling with proper contrast */
+    .world-element-card .card-header.bg-dark,
+    .card-header.bg-dark {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid #495057 !important;
+    }
+    
+    .world-element-card .card-header.bg-dark h3,
+    .card-header.bg-dark h3 {
+        color: #ffffff !important;
+    }
+    
+    .world-element-card .card-header.bg-dark i,
+    .card-header.bg-dark i {
+        color: #ffffff !important;
+    }
+    
+    /* Button styling for dark headers */
+    .card-header.bg-dark .btn-light {
+        background: rgba(255,255,255,0.95) !important;
+        color: #343a40 !important;
+        border-color: rgba(255,255,255,0.8) !important;
+        font-weight: 600 !important;
+    }
+    
+    .card-header.bg-dark .btn-light:hover {
+        background: rgba(255,255,255,1) !important;
+        color: #343a40 !important;
+        border-color: rgba(255,255,255,1) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .world-detail-page .border-secondary:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        transform: translateY(-1px);
+    }
+    
+    .world-detail-page .border-secondary .card-body {
+        padding: 20px !important;
+    }
+    
+    .world-detail-page .border-secondary .card-title {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .world-detail-page .border-secondary .card-text {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        color: #64748B !important;
+    }
+    
+    .world-detail-page .border-secondary .btn-group-sm .btn {
+        min-height: 32px !important;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        border-radius: 6px !important;
+    }
+    
+    /* Empty state for stories */
+    .world-detail-page .text-center.py-4 {
+        padding: 40px 20px !important;
+    }
+    
+    .world-detail-page .text-center.py-4 i {
+        color: #94A3B8 !important;
+        margin-bottom: 16px !important;
+    }
+    
+    .world-detail-page .text-center.py-4 p {
+        font-size: 16px !important;
+        color: #64748B !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* 5. Category Sections (Characters, Locations, etc.) */
+    .world-detail-page .world-element-card .card-header {
+        padding: 16px 20px !important;
+    }
+    
+    .world-detail-page .world-element-card .card-header h3 {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+    }
+    
+    /* Characters header - primary blue */
+    .world-detail-page .bg-primary {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Locations header - success green */
+    .world-detail-page .bg-success {
+        background: #10B981 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Lore Items header - info cyan */
+    .world-detail-page .bg-info {
+        background: #06B6D4 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Documents header - warning yellow (softer) */
+    .world-detail-page .bg-warning.text-dark {
+        background: #FEF3C7 !important;
+        color: #92400E !important;
+    }
+    
+    /* Header action buttons */
+    .world-detail-page .btn-outline-light {
+        background: rgba(255,255,255,0.1) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        padding: 6px 12px !important;
+        min-height: 32px !important;
+        font-size: 13px !important;
+        border-radius: 6px !important;
+    }
+    
+    .world-detail-page .btn-outline-light:hover {
+        background: rgba(255,255,255,0.2) !important;
+        color: #FFFFFF !important;
+        border-color: rgba(255,255,255,0.5) !important;
+    }
+    
+    /* Clickable Card Hover Effects - Matching Home Page Style */
+    .world-detail-page .card-link {
+        text-decoration: none !important;
+        color: inherit !important;
+        display: block !important;
+    }
+    
+    .world-detail-page .card-link:hover {
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    
+    .world-detail-page .card-link .card {
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    
+    .world-detail-page .card-link:hover .card {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    .world-detail-page .card-link:hover .card .card-title {
+        color: var(--tblr-primary) !important;
+        transform: scale(1.02) !important;
+    }
+    
+    .world-detail-page .card-link .card .card-title {
+        transition: all 0.3s ease !important;
+    }
+    
+    .world-detail-page .card-link:hover .avatar {
+        transform: scale(1.1) !important;
+    }
+    
+    .world-detail-page .card-link .avatar {
+        transition: transform 0.3s ease !important;
+    }
+    
+    .world-detail-page .card-link:hover img {
+        transform: scale(1.05) !important;
+    }
+    
+    .world-detail-page .card-link img {
+        transition: transform 0.3s ease !important;
+    }
+    
+    /* 6. Element Lists with Larger Avatars (48px) */
+    .world-detail-page .element-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .world-detail-page .element-list-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #F1F5F9;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .world-detail-page .element-list-item:last-child {
+        border-bottom: none;
+    }
+    
+    .world-detail-page .element-list-img {
+        width: 48px !important;
+        height: 48px !important;
+        object-fit: cover;
+        border-radius: 50%;
+        background-color: #F1F5F9;
+        flex-shrink: 0;
+    }
+    
+    .world-detail-page .element-list-icon {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #F1F5F9;
+        flex-shrink: 0;
+    }
+    
+    .world-detail-page .element-list-icon .fas {
+        color: #94A3B8;
+        font-size: 20px !important;
+    }
+    
+    .world-detail-page .element-list-item a {
+        color: #1E293B !important;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 15px !important;
+    }
+    
+    .world-detail-page .element-list-item a:hover {
+        color: #6366F1 !important;
+    }
+    
+    /* Empty states */
+    .world-detail-page .no-elements-message {
+        font-size: 14px !important;
+        color: #94A3B8 !important;
+        font-style: italic;
+        padding: 20px 0 !important;
+        text-align: center;
+    }
+    
+    /* Add buttons */
+    .world-detail-page .btn-secondary {
+        background: #F1F5F9 !important;
+        color: #64748B !important;
+        border: 1px solid #E2E8F0 !important;
+        padding: 8px 16px !important;
+        min-height: 36px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        border-radius: 6px !important;
+    }
+    
+    .world-detail-page .btn-secondary:hover {
+        background: #E2E8F0 !important;
+        color: #334155 !important;
+        border-color: #CBD5E1 !important;
+        transform: translateY(-1px);
+    }
+    
+    /* 7. Grid Layout Improvements */
+    .world-detail-page .row.mt-2 {
+        margin-top: 32px !important;
+    }
+    
+    .world-detail-page .col-lg-3.mb-4 {
+        margin-bottom: 32px !important;
+    }
+    
+    /* Card height consistency */
+    .world-detail-page .world-element-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .world-detail-page .world-element-card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .world-detail-page .world-element-card .element-list {
+        flex: 1;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .world-hero-content {
+            padding: 2rem 0;
+        }
+        
+        .world-title {
+            font-size: 2rem;
+        }
+        
+        .world-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .world-actions .btn {
+            justify-content: center;
+        }
+        
+        .detail-card .card-header,
+        .detail-card .card-body {
+            padding: 1rem;
+        }
+        
+        .element-list-img,
+        .element-list-icon {
+            width: 2rem;
+            height: 2rem;
+        }
+    }
+    
+    /* FIX: Added missing square container style for card images on this page */
+    .world-element-card .card-img-square-container { 
+        position: relative; 
+        width: 100%; 
+        padding-top: 100%; /* 1:1 Aspect Ratio for a square */ 
+        background-color: #f8f9fa; 
+        border-bottom: 1px solid #dee2e6; 
+    }
+    .world-element-card .card-img-top, 
+    .world-element-card .card-img-placeholder { 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+    }
+    .world-element-card .card-img-placeholder { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #adb5bd; 
+    }
+    .world-element-card .card-img-placeholder .fas { 
+        font-size: 4rem; 
+    }
+    /* END FIX */
+</style>
+{% endblock %}
+
+{% block page_header %}
+{% if world %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 300px;">
+    <!-- Background Pattern Overlay for Visual Depth -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <!-- Animated Background Elements -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none;">
+        <div style="position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); top: -150px; right: -150px; animation: float 20s ease-in-out infinite;"></div>
+        <div style="position: absolute; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); bottom: -100px; left: -100px; animation: float 15s ease-in-out infinite reverse;"></div>
+    </div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <!-- Breadcrumb Navigation -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb mb-0" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: var(--tblr-border-radius); padding: 0.75rem 1rem;">
+                        <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white"><i class="fas fa-home me-1"></i>Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white"><i class="fas fa-globe me-1"></i>My Worlds</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page"><strong>{{ world.name }}</strong></li>
+                    </ol>
+                </nav>
+                
+                <!-- Title Section -->
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center mb-3">
+                        <div class="avatar avatar-xl" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); width: 80px; height: 80px;">
+                            <i class="fas fa-globe-americas" style="font-size: 2.5rem; color: white;"></i>
+                        </div>
+                    </div>
+                    <h1 class="page-title text-white mb-2" style="font-size: 3rem; font-weight: 800; text-shadow: 0 4px 6px rgba(0,0,0,0.3); letter-spacing: -0.5px;">
+                        {{ world.name | e }}
+                    </h1>
+                    {% if world.description %}
+                    <p class="text-white-50 mb-0" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+                        {{ world.description | e | truncate(150) }}
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <!-- World Statistics -->
+                <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+                    <div class="d-flex align-items-center" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50px; padding: 0.5rem 1rem;">
+                        <i class="fas fa-book text-white me-2"></i>
+                        <span class="text-white fw-bold">{{ stories_in_world|length if stories_in_world else 0 }}</span>
+                        <span class="text-white-50 ms-1">Stories</span>
+                    </div>
+                    <div class="d-flex align-items-center" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50px; padding: 0.5rem 1rem;">
+                        <i class="fas fa-users text-white me-2"></i>
+                        <span class="text-white fw-bold">{{ world_characters|length if world_characters else 0 }}</span>
+                        <span class="text-white-50 ms-1">Characters</span>
+                    </div>
+                    <div class="d-flex align-items-center" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50px; padding: 0.5rem 1rem;">
+                        <i class="fas fa-map-marker-alt text-white me-2"></i>
+                        <span class="text-white fw-bold">{{ world_locations|length if world_locations else 0 }}</span>
+                        <span class="text-white-50 ms-1">Locations</span>
+                    </div>
+                    <div class="d-flex align-items-center" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50px; padding: 0.5rem 1rem;">
+                        <i class="fas fa-scroll text-white me-2"></i>
+                        <span class="text-white fw-bold">{{ world_lore_items|length if world_lore_items else 0 }}</span>
+                        <span class="text-white-50 ms-1">Lore Items</span>
+                    </div>
+                </div>
+                
+                <!-- Primary Action Buttons -->
+                <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
+                    <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" 
+                       class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Interactive visualization - Explore your world's structure as an expandable tree diagram. See relationships between characters, locations, and lore at a glance. Perfect for understanding your world's organization.">
+                        <i class="fas fa-network-wired me-2"></i>World Map
+                    </a>
+                    <a href="{{ url_for('ui_world_chat', world_id=world.id) }}" 
+                       class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="AI world assistant - Have conversations with an AI that knows everything about your world. Ask questions, explore scenarios, or brainstorm new ideas with context-aware responses.">
+                        <i class="fas fa-comment-dots me-2"></i>AI Assistant
+                    </a>
+                    <a href="{{ url_for('ui_edit_world_form', world_id=world.id) }}" 
+                       class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="World configuration - Modify the name, description, and core settings. Upload a cover image or adjust privacy settings for your world.">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </a>
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('world_detail')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Documentation & tutorials - Access guides, tips, and best practices for world-building. Learn about all features and how to make the most of your creative tools.">
+                        <i class="fas fa-graduation-cap me-2"></i>Learn
+                    </button>
+                </div>
+                
+                <!-- Metadata Footer -->
+                <div class="text-center">
+                    <small class="text-white-50">
+                        <i class="fas fa-user me-1"></i>Created by <strong>{{ current_user.display_name or current_user.username if current_user else 'Unknown' }}</strong>
+                        <span class="mx-2">•</span>
+                        <i class="fas fa-calendar me-1"></i>{{ world.created_at.strftime('%B %d, %Y') if world.created_at else 'N/A' }}
+                        {% if world.updated_at %}
+                        <span class="mx-2">•</span>
+                        <i class="fas fa-clock me-1"></i>Updated {{ world.updated_at.strftime('%B %d, %Y') }}
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS for floating animation -->
+<style>
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(30px, -30px) rotate(5deg); }
+    50% { transform: translate(-20px, 20px) rotate(-3deg); }
+    75% { transform: translate(-40px, -15px) rotate(2deg); }
+}
+</style>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% if world %}
+            <!-- World Description Card -->
+            {% if world.description %}
+            <div class="card detail-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-align-left me-2 text-primary"></i>
+                        World Description
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p style="white-space: pre-wrap; line-height: 1.7; color: var(--tblr-text-secondary);">{{ world.description | e }}</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="enhanced-alert alert-info mb-4">
+                <div class="avatar avatar-sm bg-blue text-white">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">No Description Yet</div>
+                    <p class="alert-text mb-2">Add a description to help bring your world to life.</p>
+                    <a href="{{ url_for('ui_edit_world_form', world_id=world.id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit me-2"></i>Add Description
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Stories Section -->
+            <div class="card detail-card mb-4">
+                <div class="card-header" style="background: #cc5200; color: white;">
+                    <!-- First Row: Title -->
+                    <div class="text-center mb-3">
+                        <h3 class="h4"><i class="fas fa-book me-2"></i>Stories in this World</h3>
+                    </div>
+                    <!-- Second Row: Action Buttons -->
+                    <div class="d-flex justify-content-center flex-wrap gap-2">
+                        <a href="{{ url_for('ui_create_story_for_world_form', world_id=world.id) }}" 
+                           class="btn btn-light border"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Start from scratch - Write your own story with complete creative control. Perfect for when you have a specific vision in mind."
+                           style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                            <i class="fas fa-pen-fancy me-1"></i>Write New Story
+                        </a>
+                        <button class="btn btn-light border" id="generate-ai-story-btn"
+                                data-world-id="{{ world.id }}"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Quick AI generation - Instantly create a complete story using all available world elements. The AI will automatically select characters, locations, and lore to craft a compelling narrative."
+                                style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                            <i class="fas fa-magic me-1"></i>Quick Generate
+                        </button>
+                        <button class="btn btn-light border" id="generate-advanced-story-btn"
+                                data-world-id="{{ world.id }}"
+                                data-bs-toggle="modal" data-bs-target="#storyGenerationModal"
+                                data-bs-placement="bottom" 
+                                title="Guided AI creation - Choose specific characters, locations, and lore items. Set the genre, tone, and conflict type. Perfect for when you want AI assistance with creative control."
+                                style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                            <i class="fas fa-sliders-h me-1"></i>Custom Generate
+                        </button>
+                        <a href="{{ url_for('ui_list_stories') }}" 
+                           class="btn btn-light border"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="View all stories - Browse, edit, publish, or delete existing stories. Access your complete story library across all worlds."
+                           style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                            <i class="fas fa-folder-open me-1"></i>View All Stories
+                        </a>
+                    </div>
+                </div>
+            <div class="card-body">
+                {% if stories_in_world %}
+                    <div class="row">
+                        {% for story in stories_in_world %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-secondary h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-book-open text-warning me-2"></i>
+                                        {{ story.title | e }}
+                                    </h5>
+                                    {% if story.short_description %}
+                                        <p class="card-text text-muted small flex-grow-1">{{ story.short_description | e | truncate(100) }}</p>
+                                    {% else %}
+                                        <p class="card-text text-muted small flex-grow-1 fst-italic">No description provided</p>
+                                    {% endif %}
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-theater-masks me-1"></i>
+                                                {{ story.acts|length }} acts
+                                            </small>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ url_for('ui_story_detail', story_id=story.id) }}" 
+                                                   class="btn btn-outline-primary btn-sm"
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="View story details, acts, and scenes. Navigate to the story workspace to read or continue writing.">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </a>
+                                                <a href="{{ url_for('ui_edit_story_form', story_id=story.id) }}" 
+                                                   class="btn btn-outline-secondary btn-sm"
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="Edit story settings including title, description, genre, and other metadata. Modify the story's core properties.">
+                                                    <i class="fas fa-edit me-1"></i>Edit
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No stories created for this world yet. Use the buttons above to get started!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- World Elements Grid -->
+            <div class="row mt-2">
+            {# Characters Section #}
+            <div class="col-lg-3 mb-4">
+                <div class="card detail-card h-100 world-element-card">
+                    <div class="card-header" style="background: #cc5200; color: white;">
+                        <!-- First Row: Title -->
+                        <div class="text-center mb-3">
+                            <h3 class="h4"><i class="fas fa-users me-2"></i>Characters</h3>
+                        </div>
+                        <!-- Second Row: Action Buttons -->
+                        <div class="d-flex justify-content-center flex-wrap gap-2">
+                            <a href="{{ url_for('ui_character_generator', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="AI-powered creation - Answer guided questions about personality, background, and role. The AI will generate a fully developed character with rich backstory and unique traits."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-robot me-1"></i>AI Character Builder
+                            </a>
+                            <a href="{{ url_for('ui_create_character_for_world_form', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Manual creation - Design every aspect yourself. Define appearance, personality, abilities, and backstory with complete control over every detail."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-user-plus me-1"></i>Create Character
+                            </a>
+                            <a href="{{ url_for('ui_list_characters_for_world', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Character gallery - Browse all characters with their portraits and details. Edit, delete, or view relationships between characters in your world."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-users-cog me-1"></i>View All Characters
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        {% if world_characters %}
+                            <div class="row g-3 mt-2 flex-grow-1">
+                                {% for char in world_characters %}
+                                <div class="col-12">
+                                    <a href="{{ url_for('ui_edit_character_form', character_id=char.id) }}" class="text-decoration-none">
+                                        <div class="card h-100 card-link" style="border: 1px solid var(--tblr-border-color); transition: all 0.3s ease; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                                            <div class="card-body text-center p-3">
+                                                <div class="mb-3 d-flex justify-content-center">
+                                                    {% if char.image_url %}
+                                                        <img src="{{ char.image_url }}" alt="{{ char.name|e }}" 
+                                                             class="rounded" 
+                                                             style="width: 128px; height: 128px; object-fit: cover; border: 2px solid var(--tblr-border-color);">
+                                                    {% else %}
+                                                        <div class="avatar avatar-xl bg-primary-lt d-flex align-items-center justify-content-center" style="width: 128px; height: 128px; font-size: 3rem;">
+                                                            <i class="fas fa-user-secret"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <h6 class="card-title mb-2 text-center" style="font-size: 1rem; font-weight: 600; color: var(--tblr-body-color);">
+                                                    {{ char.name | e }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 flex-grow-1">
+                                <div class="avatar avatar-xl bg-primary-lt mb-3" style="width: 128px; height: 128px; font-size: 3rem; margin: 0 auto;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <p class="text-muted">No characters defined yet. Use the buttons above to get started!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Locations Section #}
+            <div class="col-lg-3 mb-4">
+                <div class="card detail-card h-100 world-element-card">
+                    <div class="card-header" style="background: #cc5200; color: white;">
+                        <!-- First Row: Title -->
+                        <div class="text-center mb-3">
+                            <h3 class="h4"><i class="fas fa-map-marker-alt me-2"></i>Locations</h3>
+                        </div>
+                        <!-- Second Row: Action Buttons -->
+                        <div class="d-flex justify-content-center flex-wrap gap-2">
+                            <a href="{{ url_for('ui_create_location_for_world_form', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Design a location - Create cities, landmarks, or regions. Define geography, climate, culture, and significance to your world's narrative."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-map-pin me-1"></i>Add Location
+                            </a>
+                            <a href="{{ url_for('ui_list_locations_for_world', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Location explorer - Navigate through all your world's places. View maps, edit details, or establish connections between different locations."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-map-marked-alt me-1"></i>Browse Locations
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        {% if world_locations %}
+                            <div class="row g-3 mt-2 flex-grow-1">
+                                {% for loc in world_locations %}
+                                <div class="col-12">
+                                    <a href="{{ url_for('ui_edit_location_form', location_id=loc.id) }}" class="text-decoration-none">
+                                        <div class="card h-100 card-link" style="border: 1px solid var(--tblr-border-color); transition: all 0.3s ease; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                                            <div class="card-body text-center p-3">
+                                                <div class="mb-3 d-flex justify-content-center">
+                                                    {% if loc.image_url %}
+                                                        <img src="{{ loc.image_url }}" alt="{{ loc.name|e }}" 
+                                                             class="rounded" 
+                                                             style="width: 128px; height: 128px; object-fit: cover; border: 2px solid var(--tblr-border-color);">
+                                                    {% else %}
+                                                        <div class="avatar avatar-xl bg-success-lt d-flex align-items-center justify-content-center" style="width: 128px; height: 128px; font-size: 3rem;">
+                                                            <i class="fas fa-map-marked-alt"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <h6 class="card-title mb-2 text-center" style="font-size: 1rem; font-weight: 600; color: var(--tblr-body-color);">
+                                                    {{ loc.name | e }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 flex-grow-1">
+                                <div class="avatar avatar-xl bg-success-lt mb-3" style="width: 128px; height: 128px; font-size: 3rem; margin: 0 auto;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <p class="text-muted">No locations defined yet. Use the buttons above to get started!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Lore Items Section #}
+            <div class="col-lg-3 mb-4">
+                 <div class="card detail-card h-100 world-element-card">
+                    <div class="card-header" style="background: #cc5200; color: white;">
+                        <!-- First Row: Title -->
+                        <div class="text-center mb-3">
+                            <h3 class="h4"><i class="fas fa-scroll me-2"></i>Lore Items</h3>
+                        </div>
+                        <!-- Second Row: Action Buttons -->
+                        <div class="d-flex justify-content-center flex-wrap gap-2">
+                            <a href="{{ url_for('ui_create_lore_item_for_world_form', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Create world lore - Add historical events, magical artifacts, ancient prophecies, or cultural traditions. Build the mythology and history that shapes your world."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-feather-alt me-1"></i>Create Lore
+                            </a>
+                            <a href="{{ url_for('ui_list_lore_items_for_world', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Lore library - Explore your world's history, myths, and artifacts. Organize and cross-reference important events and items that define your world."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-book-open me-1"></i>View Lore Library
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        {% if world_lore_items %}
+                            <div class="row g-3 mt-2 flex-grow-1">
+                                {% for item in world_lore_items %}
+                                <div class="col-12">
+                                    <a href="{{ url_for('ui_edit_lore_item_form', lore_item_id=item.id) }}" class="text-decoration-none">
+                                        <div class="card h-100 card-link" style="border: 1px solid var(--tblr-border-color); transition: all 0.3s ease; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                                            <div class="card-body text-center p-3">
+                                                <div class="mb-3 d-flex justify-content-center">
+                                                    {% if item.image_url %}
+                                                        <img src="{{ item.image_url }}" alt="{{ item.title|e }}" 
+                                                             class="rounded" 
+                                                             style="width: 128px; height: 128px; object-fit: cover; border: 2px solid var(--tblr-border-color);">
+                                                    {% else %}
+                                                        <div class="avatar avatar-xl bg-info-lt d-flex align-items-center justify-content-center" style="width: 128px; height: 128px; font-size: 3rem;">
+                                                            <i class="fas fa-scroll"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <h6 class="card-title mb-2 text-center" style="font-size: 1rem; font-weight: 600; color: var(--tblr-body-color);">
+                                                    {{ item.title | e }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 flex-grow-1">
+                                <div class="avatar avatar-xl bg-info-lt mb-3" style="width: 128px; height: 128px; font-size: 3rem; margin: 0 auto;">
+                                    <i class="fas fa-scroll"></i>
+                                </div>
+                                <p class="text-muted">No lore items defined yet. Use the buttons above to get started!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                 </div>
+            </div>
+
+            {# Documents Section #}
+            <div class="col-lg-3 mb-4">
+                <div class="card detail-card h-100 world-element-card">
+                    <div class="card-header" style="background: #cc5200; color: white;">
+                        <!-- First Row: Title -->
+                        <div class="text-center mb-3">
+                            <h3 class="h4"><i class="fas fa-file-alt me-2"></i>Documents</h3>
+                        </div>
+                        <!-- Second Row: Action Buttons -->
+                        <div class="d-flex justify-content-center flex-wrap gap-2">
+                            <a href="{{ url_for('ui_document_manager_for_world', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Upload references - Import PDFs, text files, or documents containing research, inspiration, or additional world details. These become searchable context for AI assistance."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-cloud-upload-alt me-1"></i>Upload Documents
+                            </a>
+                            <a href="{{ url_for('ui_document_manager_for_world', world_id=world.id) }}" 
+                               class="btn btn-light border"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Document manager - Access uploaded reference materials, research notes, and inspiration files. Download, preview, or remove documents from your world's knowledge base."
+                               style="background: rgba(255,255,255,0.9); color: var(--tblr-dark); border-color: rgba(255,255,255,0.7); font-weight: 500; padding: 0.5rem 1rem; min-height: 38px; display: inline-flex; align-items: center;">
+                                <i class="fas fa-folder-tree me-1"></i>Manage Files
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        {% if world_documents %}
+                            <div class="row g-3 mt-2 flex-grow-1">
+                                {% for doc in world_documents %}
+                                <div class="col-12">
+                                    <div class="card h-100" style="border: 1px solid var(--tblr-border-color); transition: all 0.2s ease;">
+                                        <div class="card-body text-center p-3">
+                                            <div class="mb-3 d-flex justify-content-center">
+                                                {% set file_ext = doc.filename.split('.')[-1].upper() if doc.filename and '.' in doc.filename else 'DOC' %}
+                                                <div class="avatar avatar-xl bg-warning-lt d-flex align-items-center justify-content-center" style="width: 128px; height: 128px; font-size: 3rem;">
+                                                    {% if file_ext == 'PDF' %}
+                                                        <i class="fas fa-file-pdf text-danger"></i>
+                                                    {% elif file_ext == 'DOCX' or file_ext == 'DOC' %}
+                                                        <i class="fas fa-file-word text-primary"></i>
+                                                    {% elif file_ext == 'TXT' %}
+                                                        <i class="fas fa-file-alt text-secondary"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-file text-muted"></i>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <h6 class="card-title mb-2 text-center" style="font-size: 1rem; font-weight: 600;">
+                                                <a href="{{ url_for('download_document', document_id=doc.id) }}" 
+                                                   target="_blank"
+                                                   class="text-decoration-none" style="color: var(--tblr-body-color);"
+                                                   title="Click to view {{ doc.filename | e }}">
+                                                    {{ doc.filename | e | truncate(20, True) }}
+                                                </a>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 flex-grow-1">
+                                <div class="avatar avatar-xl bg-warning-lt mb-3" style="width: 128px; height: 128px; font-size: 3rem; margin: 0 auto;">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <p class="text-muted">No documents uploaded yet. Use the buttons above to get started!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Include Advanced Story Generation Modal -->
+{% include 'partials/_story_generation_modal.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', path='/js/story_generation_modal.js') }}"></script>
+<script>
+// Initialize story generation modal
+const storyGenerationModal = new StoryGenerationModal();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Initialize tooltip for Custom Generate button (which uses modal toggle)
+    var customGenerateBtn = document.getElementById('generate-advanced-story-btn');
+    if (customGenerateBtn && customGenerateBtn.getAttribute('title')) {
+        new bootstrap.Tooltip(customGenerateBtn);
+    }
+    
+    // Initialize tooltips inside the modal when it opens
+    var modalEl = document.getElementById('storyGenerationModal');
+    if (modalEl) {
+        modalEl.addEventListener('shown.bs.modal', function () {
+            var modalTooltipTriggerList = [].slice.call(modalEl.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            modalTooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                if (!tooltipTriggerEl._tooltip) {
+                    new bootstrap.Tooltip(tooltipTriggerEl);
+                }
+            });
+        });
+    }
+    
+    // Handle AI story generation buttons
+    const generateBtns = document.querySelectorAll('#generate-ai-story-btn');
+    
+    generateBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const worldId = this.dataset.worldId;
+            const originalText = this.innerHTML;
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generating...';
+            
+            try {
+                // Collect all element IDs from the page
+                const characterIds = [];
+                const locationIds = [];
+                const loreItemIds = [];
+                
+                // Extract character IDs from character links
+                document.querySelectorAll('a[href*="/characters/"][href*="/edit"]').forEach(link => {
+                    const match = link.href.match(/\/characters\/(\d+)\/edit/);
+                    if (match) characterIds.push(parseInt(match[1]));
+                });
+                
+                // Extract location IDs from location links
+                document.querySelectorAll('a[href*="/locations/"][href*="/edit"]').forEach(link => {
+                    const match = link.href.match(/\/locations\/(\d+)\/edit/);
+                    if (match) locationIds.push(parseInt(match[1]));
+                });
+                
+                // Extract lore item IDs from lore item links
+                document.querySelectorAll('a[href*="/lore-items/"][href*="/edit"]').forEach(link => {
+                    const match = link.href.match(/\/lore-items\/(\d+)\/edit/);
+                    if (match) loreItemIds.push(parseInt(match[1]));
+                });
+                
+                console.log('Found elements:', { characterIds, locationIds, loreItemIds });
+                
+                // Use existing story generation endpoint
+                const response = await fetch(`/api/v1/worlds/${worldId}/stories/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        selected_characters: characterIds,
+                        selected_locations: locationIds,
+                        selected_lore_items: loreItemIds,
+                        story_genre: "Fantasy",
+                        story_tone: "Adventurous", 
+                        primary_conflict_type: "Person vs. Person",
+                        ai_model_config_id: 1,
+                        author_concept: "Auto-generated story from world elements"
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Show success message
+                    if (window.showToast) {
+                        showToast('AI story generated successfully!', 'success');
+                    } else {
+                        alert('AI story generated successfully!');
+                    }
+                    
+                    // Redirect to the new story
+                    if (result.story_id) {
+                        window.location.href = `/ui/stories/${result.story_id}`;
+                    } else {
+                        // Refresh the page to show the new story
+                        window.location.reload();
+                    }
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    const errorMessage = errorData.detail || 'Failed to generate AI story. Please try again.';
+                    
+                    if (window.showToast) {
+                        showToast(errorMessage, 'error');
+                    } else {
+                        alert(errorMessage);
+                    }
+                }
+            } catch (error) {
+                console.error('Error generating AI story:', error);
+                const errorMessage = 'Network error. Please check your connection and try again.';
+                
+                if (window.showToast) {
+                    showToast(errorMessage, 'error');
+                } else {
+                    alert(errorMessage);
+                }
+            } finally {
+                // Restore button state
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

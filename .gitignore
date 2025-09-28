@@ -1,0 +1,127 @@
+# /ai_rag_story_app/.gitignore
+
+# --- Byte-compiled / optimized / DLL files ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Distribution / packaging ---
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- PyInstaller ---
+# Usually these files are written by a python script from a template
+# before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# --- Installer logs ---
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Unit test / coverage reports ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# --- Translations ---
+*.mo
+*.pot
+
+# --- Django stuff ---
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/ # If you store user media locally (we use Azure Blob)
+
+# --- Flask stuff ---
+instance/
+.webassets-cache
+
+# --- Scrapy stuff ---
+.scrapy
+
+# --- Environments ---
+.env # IMPORTANT: Ignore environment file containing secrets
+.venv/ # Common name for virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- IDE / Editor Files ---
+.idea/ # PyCharm / IntelliJ
+.vscode/ # VS Code (allow settings.json if needed for team consistency, but ignore user-specific parts)
+# *.vscode/*
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+nbproject/ # NetBeans
+*.DS_Store # MacOS
+
+# --- OS Files ---
+Thumbs.db # Windows
+ehthumbs.db # Windows
+Desktop.ini # Windows
+
+# --- Log Files ---
+*.log
+logs/
+*.log.*
+
+# --- Temporary Files ---
+*.swp
+*~
+*.tmp
+*.bak
+
+# --- Other ---
+# Add any other project-specific generated files or directories here
+alembic.log # Example if alembic generates logs
+
+# If using Docker locally
+docker-compose.override.yml
+
+# Python Virtual Environment
+.venv/
+venv/
+*.pyc
+
+# Python Caches
+__pycache__/
+.pytest_cache/
+
+# Deployment artifacts
+*.zip

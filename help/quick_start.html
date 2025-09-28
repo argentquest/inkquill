@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start Guide - AI Storytelling Assistant</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #334155;
+            margin: 0;
+            padding: 20px;
+            background: #ffffff;
+        }
+
+        .help-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .help-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .help-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .help-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .quick-action-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .steps-container {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-card:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .step-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .step-description {
+            margin-bottom: 1rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-tag {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid #bae6fd;
+        }
+
+        .step-action {
+            margin-top: 1.5rem;
+        }
+
+        .step-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .step-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .step-btn-secondary {
+            background: #f8fafc;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .step-btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-left-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .tips-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tips-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tips-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            color: #6366f1;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .help-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .step-card {
+                padding: 1.5rem;
+            }
+
+            .step-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1>🚀 Quick Start Guide</h1>
+            <p>Your first story in 3 simple steps</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search help content..." id="searchInput">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="scrollToSection('step1')">
+                <i class="fas fa-globe"></i> Step 1: Create World
+            </button>
+            <button class="quick-action-btn" onclick="scrollToSection('step2')">
+                <i class="fas fa-book"></i> Step 2: Start Story
+            </button>
+            <button class="quick-action-btn" onclick="scrollToSection('step3')">
+                <i class="fas fa-wand-sparkles"></i> Step 3: AI Writing
+            </button>
+            <button class="quick-action-btn" onclick="scrollToSection('tips')">
+                <i class="fas fa-lightbulb"></i> Pro Tips
+            </button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">Overview</button>
+            <button class="tab" onclick="showTab('detailed')">Detailed Steps</button>
+            <button class="tab" onclick="showTab('troubleshooting')">Troubleshooting</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="alert alert-success">
+                <i class="fas fa-rocket"></i>
+                <strong>Welcome!</strong> This guide will get you creating AI-assisted stories in just 3 steps. The entire process takes about 5-10 minutes.
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card" id="step1">
+                    <div class="step-header">
+                        <div class="step-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <h3 class="step-title">Step 1: Create Your World (e.g., Wonderland)</h3>
+                    </div>
+                    <p class="step-description">
+                        Your <strong>World</strong> is the AI's source of truth. Start by going to "My Worlds" and choosing "Import from Book". When prompted, enter the title: <code>Alice's Adventures in Wonderland</code>. The AI will populate a new world for you.
+                    </p>
+                    <p class="step-description" style="font-size: 14px; color: #64748B; margin-bottom: 16px;">Your new World will contain:</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag"><strong>Characters:</strong> Alice, The White Rabbit, The Mad Hatter</span>
+                        <span class="feature-tag"><strong>Locations:</strong> The Rabbit-Hole, The Mad Tea-Party</span>
+                        <span class="feature-tag"><strong>Lore:</strong> "Eat Me" cakes, "Drink Me" potions</span>
+                    </div>
+                    <div class="step-action">
+                        <a href="/ui/worlds" class="step-btn step-btn-secondary">
+                            <i class="fas fa-globe"></i>
+                            Go to "My Worlds"
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="step-card" id="step2">
+                    <div class="step-header">
+                        <div class="step-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3 class="step-title">Step 2: Start a Story & Link It</h3>
+                    </div>
+                    <p class="step-description">
+                        Now that you have Wonderland, create a new narrative. Go to "My Stories" and click "Create New Story". The most important step is to <strong>select your "Wonderland" world</strong> from the dropdown menu to tell the AI which universe to use.
+                    </p>
+                    <div class="feature-tags">
+                        <span class="feature-tag"><strong>Tip:</strong> You could name your story "The Cheshire Cat's Riddle" to fit the theme</span>
+                    </div>
+                    <div class="step-action">
+                        <a href="/ui/stories/create" class="step-btn">
+                            <i class="fas fa-plus"></i>
+                            Start a New Story
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="step-card" id="step3">
+                    <div class="step-header">
+                        <div class="step-icon">
+                            <i class="fas fa-wand-sparkles"></i>
+                        </div>
+                        <h3 class="step-title">Step 3: Write with an AI That Knows Wonderland</h3>
+                    </div>
+                    <p class="step-description">
+                        This is where world-building pays off. Inside your story, create an <strong>Act</strong> and enter the editor. Now, when you ask the AI to write about the White Rabbit, it will know he has a pocket watch. It's writing within the context of <em>your</em> world.
+                    </p>
+                    <div class="feature-tags">
+                        <span class="feature-tag"><strong>Tip:</strong> Link specific characters like Alice to your story for even smarter AI suggestions</span>
+                    </div>
+                    <div class="step-action">
+                        <a href="/ui/stories" class="step-btn">
+                            <i class="fas fa-book"></i>
+                            Go to Your Stories
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="detailed" class="tab-content">
+            <div class="alert alert-info">
+                <strong>Detailed Instructions:</strong> Follow these step-by-step instructions for a more thorough walkthrough.
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card">
+                    <h3><i class="fas fa-globe-americas"></i> Step 1: World Creation - Detailed</h3>
+                    <ol style="color: #475569; line-height: 1.6;">
+                        <li><strong>Navigate to Worlds:</strong> Click "My Worlds" in the sidebar navigation</li>
+                        <li><strong>Choose Import Method:</strong> Click "Import from Book" button</li>
+                        <li><strong>Enter Book Title:</strong> Type <code>Alice's Adventures in Wonderland</code> in the text field</li>
+                        <li><strong>Wait for Processing:</strong> The AI will analyze the book and extract world elements (2-3 minutes)</li>
+                        <li><strong>Review Results:</strong> Check the generated characters, locations, and lore items</li>
+                        <li><strong>Customize (Optional):</strong> Edit any generated content to match your vision</li>
+                    </ol>
+                    <div class="feature-tags">
+                        <span class="feature-tag">⏱️ Estimated time: 5-10 minutes</span>
+                        <span class="feature-tag">💡 Alternative: Use the World Builder Wizard for original worlds</span>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h3><i class="fas fa-book-open"></i> Step 2: Story Creation - Detailed</h3>
+                    <ol style="color: #475569; line-height: 1.6;">
+                        <li><strong>Navigate to Stories:</strong> Click "My Stories" in the sidebar</li>
+                        <li><strong>Start Creation:</strong> Click "Create New Story" button</li>
+                        <li><strong>Fill Basic Info:</strong> Enter story title, description, and target audience</li>
+                        <li><strong>Link Your World:</strong> <em>Most Important!</em> Select "Wonderland" from the world dropdown</li>
+                        <li><strong>Choose Story Class:</strong> Select appropriate genre (Fantasy, Adventure, etc.)</li>
+                        <li><strong>Create Initial Structure:</strong> Add your first Act with a descriptive name</li>
+                    </ol>
+                    <div class="feature-tags">
+                        <span class="feature-tag">⏱️ Estimated time: 3-5 minutes</span>
+                        <span class="feature-tag">🎯 Key: Linking the world enables AI context</span>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h3><i class="fas fa-wand-sparkles"></i> Step 3: AI Writing - Detailed</h3>
+                    <ol style="color: #475569; line-height: 1.6;">
+                        <li><strong>Enter Act Editor:</strong> Click on your Act to open the writing interface</li>
+                        <li><strong>Start Writing:</strong> Begin typing your story opening</li>
+                        <li><strong>Engage AI Assistant:</strong> Use the AI panel to ask for help or continuation</li>
+                        <li><strong>Reference World Elements:</strong> Mention characters or locations - AI knows them!</li>
+                        <li><strong>Use Contextual Suggestions:</strong> AI will offer relevant plot developments</li>
+                        <li><strong>Iterate and Refine:</strong> Work with AI to develop your narrative</li>
+                    </ol>
+                    <div class="feature-tags">
+                        <span class="feature-tag">✨ AI knows your world's characters, locations, and lore</span>
+                        <span class="feature-tag">🔄 Real-time collaboration with AI assistance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="troubleshooting" class="tab-content">
+            <div class="alert alert-info">
+                <strong>Common Issues:</strong> Solutions to frequently encountered problems during quick start.
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> World Import Issues</h3>
+                    <p><strong>Problem:</strong> "Import from Book" doesn't work or takes too long</p>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Try a different public domain book title</li>
+                        <li>Use "World Builder Wizard" instead for AI-guided creation</li>
+                        <li>Create a manual world and add elements one by one</li>
+                        <li>Check your internet connection and try again</li>
+                    </ul>
+                </div>
+
+                <div class="step-card">
+                    <h3><i class="fas fa-link"></i> Story-World Linking Issues</h3>
+                    <p><strong>Problem:</strong> AI doesn't seem to know about my world elements</p>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Verify the world is selected in the story settings</li>
+                        <li>Check that characters/locations exist in your world</li>
+                        <li>Wait a moment for the AI context to load</li>
+                        <li>Explicitly mention character names in your writing</li>
+                    </ul>
+                </div>
+
+                <div class="step-card">
+                    <h3><i class="fas fa-robot"></i> AI Assistant Issues</h3>
+                    <p><strong>Problem:</strong> AI responses are generic or unhelpful</p>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Be more specific in your prompts</li>
+                        <li>Mention specific characters or locations from your world</li>
+                        <li>Use the world chat feature to discuss ideas first</li>
+                        <li>Check your credit balance - low credits affect AI quality</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-section" id="tips">
+            <h3 class="tips-title">
+                <i class="fas fa-lightbulb"></i>
+                Pro Tips for Success
+            </h3>
+            <ul class="tips-list">
+                <li><strong>Start Small:</strong> Begin with a simple story idea before attempting complex narratives</li>
+                <li><strong>Rich Worlds = Better AI:</strong> The more detailed your world, the smarter the AI assistance</li>
+                <li><strong>Use Document Manager:</strong> Upload reference materials for additional AI context</li>
+                <li><strong>Experiment with Prompts:</strong> Try different ways of asking the AI for help</li>
+                <li><strong>Save Frequently:</strong> Use Ctrl+S or rely on auto-save in the editors</li>
+                <li><strong>Join the Community:</strong> Visit the forum for tips and inspiration from other writers</li>
+                <li><strong>Monitor Credits:</strong> Keep track of AI usage in your billing dashboard</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Scroll to section functionality
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const stepCards = document.querySelectorAll('.step-card');
+            
+            stepCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Add copy functionality for code elements
+        document.querySelectorAll('code').forEach(code => {
+            code.style.cursor = 'pointer';
+            code.title = 'Click to copy';
+            code.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = '✓ Copied!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

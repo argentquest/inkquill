@@ -1,0 +1,89 @@
+<!-- Status Card Component -->
+<!-- Usage: {% include "components/cards/status_card.html" title="Active Users" value="2,847" status="success" %} -->
+
+<div class="card{% if class %} {{ class }}{% endif %}">
+    {% if status %}
+    <div class="card-status-top bg-{{ status }}"></div>
+    {% endif %}
+    
+    <div class="card-body{% if center %} text-center{% endif %}">
+        {% if icon %}
+        <div class="card-stamp">
+            <div class="card-stamp-icon bg-{{ icon_color | default('primary') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    {% case icon %}
+                        {% when 'users' %}
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
+                        {% when 'chart-line' %}
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <line x1="4" y1="19" x2="20" y2="19"/>
+                            <polyline points="4,15 8,9 12,11 16,6 20,10"/>
+                        {% when 'currency-dollar' %}
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2"/>
+                            <path d="M12 3v3m0 12v3"/>
+                        {% else %}
+                            <circle cx="12" cy="12" r="1"/>
+                    {% endcase %}
+                </svg>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if subtitle %}
+        <p class="text-muted">{{ subtitle }}</p>
+        {% endif %}
+        
+        {% if value %}
+        <h2 class="h1 m-0">{{ value }}</h2>
+        {% endif %}
+        
+        {% if title %}
+        <h3 class="card-title{% if value %} mt-2{% endif %}">{{ title }}</h3>
+        {% endif %}
+        
+        {% if description %}
+        <div class="text-muted mt-2">{{ description }}</div>
+        {% endif %}
+        
+        {% if progress %}
+        <div class="progress progress-sm mt-2">
+            <div class="progress-bar bg-{{ progress_color | default('primary') }}" 
+                 style="width: {{ progress }}%" 
+                 role="progressbar" 
+                 aria-valuenow="{{ progress }}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if change %}
+        <div class="mt-2">
+            <span class="badge bg-{{ change_color | default('success') }}">
+                {% if change_icon %}
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    {% if change_icon == 'up' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <polyline points="3,17 9,11 13,15 21,7"/>
+                        <polyline points="14,7 21,7 21,14"/>
+                    {% elsif change_icon == 'down' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <polyline points="3,7 9,13 13,9 21,17"/>
+                        <polyline points="21,10 21,17 14,17"/>
+                    {% endif %}
+                </svg>
+                {% endif %}
+                {{ change }}
+            </span>
+            {% if change_text %}
+            <span class="text-muted ms-1">{{ change_text }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

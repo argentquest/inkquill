@@ -1,0 +1,1070 @@
+{# /app/templates/pages/brainstorm.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Story Brainstorm - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced Tabler Premium Styles for Story Brainstorm */
+    .brainstorm-hero {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        position: relative;
+        padding: 2rem;
+        margin-bottom: 1.4rem;
+        margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    }
+    
+    .brainstorm-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23ffffff15'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e");
+        pointer-events: none;
+    }
+    
+    /* Enhanced card hover effects for Tabler premium */
+    .card-sm {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--tblr-border-color-translucent);
+    }
+    
+    .card-sm:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tblr-box-shadow-lg);
+        border-color: var(--tblr-primary);
+    }
+    
+    .card-sm:hover .card-status-top {
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+    }
+    
+    /* Enhanced ribbon styling */
+    .ribbon {
+        z-index: 2;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .ribbon.bg-red {
+        background: linear-gradient(135deg, var(--tblr-red) 0%, #dc2626 100%) !important;
+    }
+    
+    .ribbon.bg-yellow {
+        background: linear-gradient(135deg, var(--tblr-yellow) 0%, #d97706 100%) !important;
+    }
+    
+    /* Additional padding for favorites section ribbon specifically */
+    .favorites-section .ribbon.ribbon-top {
+        top: 1rem;
+    }
+    
+    /* Padding for individual favorite concept card ribbons */
+    .favorites-section .card-body .card .ribbon.ribbon-top.bg-red {
+        top: 1rem;
+        margin-top: 1rem;
+    }
+    
+    /* Ensure individual favorite concept cards also have proper padding */
+    .favorites-section .card-body .card.card-sm {
+        padding-top: 1rem;
+    }
+    
+    /* Concept actions enhancement */
+    .concept-actions {
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover .concept-actions {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .concept-actions:not(.d-none) {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Enhanced progress bar */
+    .progress-bar-indeterminate {
+        background-image: linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.2) 75%,
+            transparent 75%,
+            transparent
+        );
+        background-size: 1rem 1rem;
+        animation: progress-bar-stripes 1s linear infinite;
+    }
+    
+    @keyframes progress-bar-stripes {
+        0% { background-position-x: 1rem; }
+        100% { background-position-x: 0; }
+    }
+    
+    /* Enhanced button styling */
+    .btn-start-brainstorm {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        border: none;
+        box-shadow: 0 4px 12px rgba(32, 107, 196, 0.3);
+        transition: all 0.3s ease;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-start-brainstorm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(32, 107, 196, 0.4);
+    }
+    
+    /* Enhanced status indicators */
+    .status-indicator {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--tblr-success);
+        animation: pulse 2s infinite;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+    
+    /* Enhanced generation status */
+    .generation-status-card {
+        background: linear-gradient(135deg, var(--tblr-blue) 0%, var(--tblr-indigo) 100%);
+        border: none;
+        color: white;
+    }
+    
+    .generation-status-card .spinner-border {
+        color: white;
+    }
+    
+    /* Favorites section enhancements */
+    .favorites-section .card {
+        position: relative;
+        overflow: hidden;
+        padding-top: 1rem;
+    }
+    
+    .favorites-section .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-red), var(--tblr-pink));
+        z-index: 1;
+    }
+    
+    /* Specific padding for favorites section ribbon */
+    .favorites-section .card .ribbon.ribbon-top.bg-red {
+        margin-top: 1rem;
+    }
+    
+    /* Session cards enhancement */
+    .session-card {
+        border: 1px solid var(--tblr-border-color-translucent);
+        transition: all 0.3s ease;
+    }
+    
+    .session-card:hover {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 4px 12px rgba(32, 107, 196, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3">
+                    <i class="fas fa-lightbulb me-3"></i>
+                    Story Brainstorm
+                </h1>
+                <div class="page-subtitle text-white mb-4">
+                    Let our AI help you discover amazing story ideas! Answer a few questions about your preferences, and we'll generate 15 unique story concepts tailored just for you.
+                </div>
+                
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-magic me-1"></i>
+                        AI-Powered
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        15 Unique Concepts
+                    </span>
+                </div>
+                
+                <!-- Step 2 Bonus Notification - Only show if not already claimed -->
+                {% if current_user and not current_user.bonus2 %}
+                <div class="d-flex align-items-center mt-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="me-3">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                            <i class="fas fa-coins" style="color: white; font-size: 16px;"></i>
+                        </div>
+                    </div>
+                    <div class="flex-fill">
+                        <div class="text-white font-weight-bold mb-1">
+                            <i class="fas fa-gift me-1"></i>
+                            Bonus Reward Available!
+                        </div>
+                        <div class="text-white-75">
+                            <strong>Mark any story concept as a favorite</strong> to earn <strong>50 coins</strong> and unlock Step 3!
+                        </div>
+                    </div>
+                </div>
+                {% elif current_user and current_user.bonus2 %}
+                <div class="d-flex align-items-center mt-3 p-3 rounded" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="me-3">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                            <i class="fas fa-check" style="color: white; font-size: 16px;"></i>
+                        </div>
+                    </div>
+                    <div class="flex-fill">
+                        <div class="text-white font-weight-bold mb-1">
+                            <i class="fas fa-star me-1"></i>
+                            Step 2 Complete!
+                        </div>
+                        <div class="text-white-75">
+                            You've earned your <strong>50 coins bonus</strong>! Ready for Step 3?
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('brainstorm')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with story brainstorming">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="brainstorm-page">
+    <!-- Start Brainstorming Button Row -->
+    <div class="container-fluid mb-4">
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <button id="startBrainstormBtn" class="btn btn-primary btn-lg btn-start-brainstorm px-5 py-3">
+                    <i class="fas fa-magic me-2"></i>
+                    Start Brainstorming
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+            
+            <!-- Enhanced Tabler Generation Status -->
+            <div id="generationStatus" class="d-none mb-4">
+                <div class="card generation-status-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="avatar avatar-lg bg-white bg-opacity-25">
+                                    <div class="spinner-border text-white" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-fill">
+                                <h3 class="card-title mb-1 text-white">
+                                    <i class="fas fa-magic me-2"></i>
+                                    Generating Your Story Ideas...
+                                </h3>
+                                <p class="text-white-75 mb-2">Please wait while our AI creates 15 unique story concepts based on your preferences. This may take a moment.</p>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-indeterminate bg-white bg-opacity-50" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Tabler Generated Concepts -->
+            <div id="conceptsSection" class="d-none">
+                <div class="card">
+                    <div class="card-status-top bg-primary"></div>
+                    <div class="card-header">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="card-title">
+                                    <i class="fas fa-lightbulb me-2 text-primary"></i>
+                                    Your Story Concepts
+                                </h3>
+                                <p class="card-subtitle text-secondary">
+                                    Click the heart icon to save concepts you like to your favorites! 
+                                    {% if current_user and not current_user.bonus2 %}
+                                    <span class="badge bg-yellow text-dark ms-1">
+                                        <i class="fas fa-coins me-1"></i>50 coins bonus for your first favorite!
+                                    </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="card-actions">
+                                <button id="newSessionBtn" class="btn btn-outline-primary btn-sm" onclick="resetBrainstormPage()">
+                                    <i class="fas fa-plus me-1"></i>
+                                    New Brainstorm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="conceptsGrid" class="row row-cards">
+                            <!-- Concepts will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Tabler Recent Sessions -->
+            {% if sessions and sessions|length > 0 %}
+            <div class="sessions-section mb-4">
+                <div class="card">
+                    <div class="card-status-top bg-indigo"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-history text-indigo me-2"></i>
+                            Recent Brainstorm Sessions
+                        </h3>
+                        <p class="card-subtitle text-secondary">Your previous brainstorming sessions. Click to view generated concepts.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row row-cards">
+                            {% for session in sessions[:3] %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card card-sm session-card">
+                                    <div class="card-status-top bg-indigo"></div>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="me-3">
+                                                <span class="avatar avatar-md bg-indigo-lt">
+                                                    <i class="fas fa-lightbulb"></i>
+                                                </span>
+                                            </div>
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium mb-1">{{ session.session_name or 'Brainstorm Session' }}</div>
+                                                <div class="text-secondary small">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
+                                                    {{ session.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <span class="badge bg-indigo-lt text-indigo">
+                                                    <i class="fas fa-lightbulb me-1"></i>
+                                                    {{ session.get_concepts()|length }} concepts
+                                                </span>
+                                                <div class="status-indicator"></div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-indigo w-100 btn-sm" onclick="loadSessionConcepts({{ session.id }})">
+                                            <i class="fas fa-eye me-1"></i>
+                                            View Concepts
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if sessions|length > 3 %}
+                <div class="text-center mt-2">
+                    <button class="btn btn-link" onclick="showAllSessions()">
+                        View All {{ sessions|length }} Sessions
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Enhanced Tabler Favorites Section -->
+            {% if has_favorites %}
+            <div class="favorites-section mt-4">
+                <div class="card">
+                    <div class="ribbon ribbon-top bg-red">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="card-status-top bg-red"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-heart text-red me-2"></i>
+                            Your Favorite Concepts
+                        </h3>
+                    </div>
+                    <div class="card-body border-bottom">
+                        <p class="card-subtitle text-secondary mb-0">These are story concepts you've saved from previous brainstorm sessions.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row row-cards">
+                            {% for favorite in favorites %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card card-sm">
+                                    <div class="ribbon ribbon-top bg-red">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                    <div class="card-status-top bg-red"></div>
+                                    <div class="card-body">
+                                        <h3 class="card-title mb-2">{{ favorite.get_concept_data().get('title', 'Untitled') }}</h3>
+                                        <p class="text-secondary mb-3">{{ favorite.get_concept_data().get('synopsis', 'No synopsis available') }}</p>
+                                        <div class="d-flex align-items-center text-secondary mb-3">
+                                            <span class="avatar avatar-xs bg-red-lt me-2">
+                                                <i class="fas fa-clock"></i>
+                                            </span>
+                                            <span class="badge bg-red-lt text-red">Saved {{ favorite.created_at.strftime('%b %d, %Y') }}</span>
+                                        </div>
+                                        <div class="btn-list w-100">
+                                            <button class="btn btn-primary flex-fill" onclick="createStoryFromFavorite({{ favorite.id }})">
+                                                <i class="fas fa-plus me-1"></i>
+                                                Create Story
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="deleteFavorite({{ favorite.id }})" 
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Delete this favorite concept">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                
+                </div>
+                {% if favorites|length > 1 %}
+                <div class="card-footer text-center">
+                    <button class="btn btn-success btn-lg" onclick="showFavoriteSelection()">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Choose from All Favorites
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<!-- Include Interview Component -->
+{% include "partials/interview_full.html" %}
+
+<!-- Enhanced Favorite Selection Modal -->
+<div class="modal fade" id="favoriteSelectionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-red) 0%, var(--tblr-pink) 100%); color: white; border-bottom: none;">
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-heart me-2"></i>
+                    Choose Your Favorite Concept
+                </h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Select the story concept you'd like to develop into a full three-act story.
+                </div>
+                <div id="favoritesList">
+                    <!-- Favorites will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Include Interview Component JavaScript -->
+<script src="/static/js/interview.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Start brainstorm button handler
+    document.getElementById('startBrainstormBtn').addEventListener('click', function() {
+        startStoryBrainstorm();
+    });
+    
+    // Listen for interview completion
+    document.addEventListener('interviewCompleted', function(event) {
+        console.log('Story brainstorm interview completed:', event.detail);
+        
+        if (event.detail.interviewId === 'story_brainstorm') {
+            // Store the response ID for later use
+            window.latestInterviewResponseId = event.detail.responseId;
+            
+            // Hide the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('interviewModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Show generation status
+            showGenerationStatus();
+            
+            // Start AI generation
+            generateStoryConcepts();
+        }
+    });
+});
+
+async function startStoryBrainstorm() {
+    console.log('Starting story brainstorm interview...');
+    
+    try {
+        // Show the interview modal
+        const modal = new bootstrap.Modal(document.getElementById('interviewModal'));
+        modal.show();
+        
+        // Initialize the interview component with story_brainstorm
+        const interviewComponent = new InterviewComponent('story_brainstorm');
+        await interviewComponent.init();
+        
+    } catch (error) {
+        console.error('Error starting story brainstorm:', error);
+        alert('Error starting brainstorm. Please try again.');
+    }
+}
+
+function showGenerationStatus() {
+    document.getElementById('generationStatus').classList.remove('d-none');
+    
+    // Hide the start button
+    document.getElementById('startBrainstormBtn').style.display = 'none';
+}
+
+async function generateStoryConcepts() {
+    try {
+        console.log('Generating story concepts...');
+        
+        // Use the stored response ID from the interview completion
+        if (!window.latestInterviewResponseId) {
+            throw new Error('No interview response ID available');
+        }
+        
+        // Call the AI generation API
+        const response = await fetch('/ui/brainstorm/api/generate-concepts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                interview_response_id: window.latestInterviewResponseId
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Generated concepts:', result);
+        
+        // Store session ID for later use
+        window.currentSessionId = result.session_id;
+        
+        // Hide generation status
+        document.getElementById('generationStatus').classList.add('d-none');
+        
+        // Show concepts section
+        document.getElementById('conceptsSection').classList.remove('d-none');
+        
+        // Display the generated concepts
+        displayConcepts(result.concepts);
+        
+    } catch (error) {
+        console.error('Error generating concepts:', error);
+        document.getElementById('generationStatus').innerHTML = `
+            <div class="alert alert-danger">
+                <h5>Generation Failed</h5>
+                <p>Sorry, we couldn't generate story concepts at this time. Please try again later.</p>
+                <button class="btn btn-primary mt-2" onclick="location.reload()">Try Again</button>
+            </div>
+        `;
+    }
+}
+
+
+function displayConcepts(concepts) {
+    const grid = document.getElementById('conceptsGrid');
+    grid.innerHTML = '';
+    
+    concepts.forEach(concept => {
+        const card = createConceptCard(concept);
+        grid.appendChild(card);
+    });
+    
+    // Initialize tooltips for new cards
+    const tooltipTriggerList = [].slice.call(grid.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}
+
+function createConceptCard(concept) {
+    const cardCol = document.createElement('div');
+    cardCol.className = 'col-md-6 col-lg-4 mb-3';
+    cardCol.innerHTML = `
+        <div class="card card-sm h-100">
+            <div class="card-status-top bg-primary"></div>
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                    <h3 class="card-title mb-0">${concept.title}</h3>
+                    <button class="btn btn-outline-red btn-sm ms-2" onclick="toggleFavorite('${concept.id}', this)" 
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Add to favorites">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+                <p class="text-secondary flex-fill mb-3">${concept.synopsis}</p>
+                <div class="concept-actions d-none">
+                    <button class="btn btn-primary w-100" onclick="createStoryFromConcept('${concept.id}')">
+                        <i class="fas fa-plus me-1"></i>
+                        Create Story
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    return cardCol;
+}
+
+function toggleFavorite(conceptId, button) {
+    const icon = button.querySelector('i');
+    const card = button.closest('.card');
+    const createBtn = card.querySelector('.concept-actions');
+    
+    if (icon.classList.contains('far')) {
+        // Add to favorites
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        button.classList.remove('btn-outline-red');
+        button.classList.add('btn-red');
+        button.setAttribute('data-bs-original-title', 'Remove from favorites');
+        
+        // Add ribbon to card
+        const cardTop = card.querySelector('.card-status-top');
+        cardTop.classList.remove('bg-primary');
+        cardTop.classList.add('bg-red');
+        
+        // Add ribbon
+        if (!card.querySelector('.ribbon')) {
+            const ribbon = document.createElement('div');
+            ribbon.className = 'ribbon ribbon-top bg-red';
+            ribbon.innerHTML = '<i class="fas fa-heart"></i>';
+            card.appendChild(ribbon);
+        }
+        
+        createBtn.classList.remove('d-none');
+        
+        // Save to database
+        saveFavorite(conceptId);
+    } else {
+        // Remove from favorites
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        button.classList.remove('btn-red');
+        button.classList.add('btn-outline-red');
+        button.setAttribute('data-bs-original-title', 'Add to favorites');
+        
+        // Reset card styling
+        const cardTop = card.querySelector('.card-status-top');
+        cardTop.classList.remove('bg-red');
+        cardTop.classList.add('bg-primary');
+        
+        // Remove ribbon
+        const ribbon = card.querySelector('.ribbon');
+        if (ribbon) {
+            ribbon.remove();
+        }
+        
+        createBtn.classList.add('d-none');
+        
+        // Remove from database
+        removeFavorite(conceptId);
+    }
+}
+
+async function getLatestInterviewResponse() {
+    try {
+        const response = await fetch('/api/v1/interview/story-brainstorm/sessions');
+        if (!response.ok) {
+            throw new Error('Failed to get interview sessions');
+        }
+        
+        const data = await response.json();
+        if (data.sessions && data.sessions.length > 0) {
+            // Return the most recent session
+            return {
+                interview_response_id: data.sessions[0].id
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting interview response:', error);
+        return null;
+    }
+}
+
+async function saveFavorite(conceptId) {
+    try {
+        console.log('Saving favorite:', conceptId);
+        
+        if (!window.currentSessionId) {
+            throw new Error('No session ID available');
+        }
+        
+        const response = await fetch('/ui/brainstorm/api/save-favorite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: window.currentSessionId,
+                concept_id: conceptId
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to save favorite: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Favorite saved:', result);
+        
+        // Check if bonus was awarded and show celebration
+        if (result.bonus_awarded) {
+            console.log('Step 2 bonus awarded! Showing coin celebration...');
+            // Trigger Step 2 bonus celebration
+            setTimeout(() => {
+                showStepBonus(2, 50);
+            }, 500); // Small delay to let UI update
+        }
+        
+        return result;
+        
+    } catch (error) {
+        console.error('Error saving favorite:', error);
+        alert('Failed to save favorite. Please try again.');
+        throw error;
+    }
+}
+
+async function removeFavorite(conceptId) {
+    try {
+        console.log('Removing favorite:', conceptId);
+        
+        // This would need the favorite ID, which we'd need to track
+        // For now, we'll implement this when we have the full flow
+        console.log('Remove favorite not yet fully implemented');
+        
+    } catch (error) {
+        console.error('Error removing favorite:', error);
+        alert('Failed to remove favorite. Please try again.');
+        throw error;
+    }
+}
+
+async function createStoryFromConcept(conceptId) {
+    try {
+        console.log('Creating story from concept:', conceptId);
+        
+        // For concepts that are not yet favorites, we need to save them first
+        const favorite = await saveFavorite(conceptId);
+        
+        // Then create story from the favorite
+        await createStoryFromFavorite(favorite.id);
+        
+    } catch (error) {
+        console.error('Error creating story from concept:', error);
+        alert('Failed to create story. Please try again.');
+    }
+}
+
+async function createStoryFromFavorite(favoriteId) {
+    try {
+        console.log('Creating story from favorite:', favoriteId);
+        
+        // Show loading state
+        const loadingAlert = document.createElement('div');
+        loadingAlert.className = 'alert alert-info position-fixed';
+        loadingAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 500px;';
+        loadingAlert.innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div>
+                    <h5 class="alert-title mb-1">Generating Your Three-Act Story...</h5>
+                    <p class="mb-0">Creating a detailed story structure based on your favorite concept and preferences.</p>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(loadingAlert);
+        
+        // Call the API to generate three-act structure
+        const response = await fetch('/ui/brainstorm/api/create-story', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                favorite_id: favoriteId
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create story: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Story created:', result);
+        
+        // Remove loading alert
+        document.body.removeChild(loadingAlert);
+        
+        // Redirect to basic story editor
+        if (result.story_id) {
+            // For basic stories, redirect to the basic story editor
+            const editorUrl = `/ui/stories/basic/${result.story_id}/editor`;
+            
+            // Show success message and redirect
+            const successMessage = `Story "${result.title}" created successfully! Redirecting to editor...`;
+            
+            // Create a success notification instead of alert
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert alert-success position-fixed';
+            successAlert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 500px;';
+            successAlert.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <div>
+                        <strong>${successMessage}</strong>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(successAlert);
+            
+            // Redirect after short delay
+            setTimeout(() => {
+                window.location.href = editorUrl;
+            }, 1500);
+        } else {
+            // Fallback to story detail page
+            alert(`Story "${result.title}" created successfully!`);
+            setTimeout(() => {
+                window.location.href = `/ui/stories/${result.story_id}`;
+            }, 1000);
+        }
+        
+    } catch (error) {
+        console.error('Error creating story from favorite:', error);
+        
+        // Remove loading alert if it exists
+        const loadingAlert = document.querySelector('.alert-info.position-fixed');
+        if (loadingAlert) {
+            document.body.removeChild(loadingAlert);
+        }
+        
+        alert('Failed to create story. Please try again.');
+    }
+}
+
+function showFavoriteSelection() {
+    const modal = new bootstrap.Modal(document.getElementById('favoriteSelectionModal'));
+    modal.show();
+    // TODO: Populate favorites list
+}
+
+async function deleteFavorite(favoriteId) {
+    // Show confirmation dialog
+    if (!confirm('Are you sure you want to delete this favorite concept? This action cannot be undone.')) {
+        return;
+    }
+    
+    // Find the delete button and show loading state
+    const deleteBtn = document.querySelector(`button[onclick="deleteFavorite(${favoriteId})"]`);
+    const originalContent = deleteBtn.innerHTML;
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    try {
+        console.log('Deleting favorite:', favoriteId);
+        
+        const response = await fetch(`/ui/brainstorm/api/favorite/${favoriteId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            const errorMessage = errorData?.detail || `Failed to delete favorite: ${response.status}`;
+            throw new Error(errorMessage);
+        }
+        
+        // Remove the card from the DOM
+        const favoriteCard = document.querySelector(`button[onclick="deleteFavorite(${favoriteId})"]`).closest('.col-md-6');
+        if (favoriteCard) {
+            favoriteCard.remove();
+        }
+        
+        // Check if there are any remaining favorites
+        const remainingFavorites = document.querySelectorAll('.favorites-section .card .ribbon.bg-red');
+        if (remainingFavorites.length === 0) {
+            // Hide the entire favorites section if no favorites remain
+            const favoritesSection = document.querySelector('.favorites-section');
+            if (favoritesSection) {
+                favoritesSection.remove();
+            }
+        } else if (remainingFavorites.length === 1) {
+            // Hide the "Choose from All Favorites" button if only one favorite remains
+            const chooseAllBtn = document.querySelector('button[onclick="showFavoriteSelection()"]');
+            if (chooseAllBtn) {
+                chooseAllBtn.parentElement.style.display = 'none';
+            }
+        }
+        
+        console.log('Favorite deleted successfully');
+        
+    } catch (error) {
+        console.error('Error deleting favorite:', error);
+        
+        // Show more specific error message
+        let userMessage = 'Failed to delete favorite. Please try again.';
+        if (error.message.includes('Cannot delete this favorite concept')) {
+            userMessage = error.message;
+        } else if (error.message.includes('used to create')) {
+            userMessage = error.message;
+        }
+        
+        alert(userMessage);
+        
+        // Restore button state on error
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = originalContent;
+    }
+}
+
+async function loadSessionConcepts(sessionId) {
+    try {
+        console.log('Loading concepts for session:', sessionId);
+        
+        // Fetch session data
+        const response = await fetch('/ui/brainstorm/api/sessions');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch sessions: ${response.status}`);
+        }
+        
+        const sessions = await response.json();
+        const session = sessions.find(s => s.id === sessionId);
+        
+        if (!session) {
+            throw new Error('Session not found');
+        }
+        
+        // Store session ID for favorites
+        window.currentSessionId = sessionId;
+        
+        // Hide the start button and show concepts section
+        document.getElementById('startBrainstormBtn').style.display = 'none';
+        document.getElementById('conceptsSection').classList.remove('d-none');
+        
+        // Display the concepts
+        displayConcepts(session.concepts);
+        
+        // Scroll to concepts section
+        document.getElementById('conceptsSection').scrollIntoView({ behavior: 'smooth' });
+        
+    } catch (error) {
+        console.error('Error loading session concepts:', error);
+        alert('Failed to load session concepts. Please try again.');
+    }
+}
+
+function showAllSessions() {
+    // TODO: Implement modal or page to show all sessions
+    alert('Feature coming soon: View all brainstorm sessions');
+}
+
+// Add function to reset the page state
+function resetBrainstormPage() {
+    // Show start button
+    document.getElementById('startBrainstormBtn').style.display = 'inline-block';
+    
+    // Hide generated content sections
+    document.getElementById('generationStatus').classList.add('d-none');
+    document.getElementById('conceptsSection').classList.add('d-none');
+    
+    // Clear concepts grid
+    document.getElementById('conceptsGrid').innerHTML = '';
+    
+    // Clear session ID
+    window.currentSessionId = null;
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+{% endblock %}

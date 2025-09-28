@@ -1,0 +1,174 @@
+{
+    "name": "rag-app-content-index",
+    "fields": [
+        {
+            "name": "id",
+            "type": "Edm.String",
+            "key": true,
+            "retrievable": true,
+            "filterable": true,
+            "sortable": false,
+            "facetable": false,
+            "searchable": false
+        },
+        {
+            "name": "document_id",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": true,
+            "searchable": false
+        },
+        {
+            "name": "user_id",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": false,
+            "facetable": true,
+            "searchable": false
+        },
+        {
+            "name": "source_filename",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": false,
+            "searchable": true,
+            "analyzer": "standard.lucene"
+        },
+        {
+            "name": "chunk_text",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": false,
+            "sortable": false,
+            "facetable": false,
+            "searchable": true,
+            "analyzer": "standard.lucene"
+        },
+        {
+            "name": "chunk_text_vector",
+            "type": "Collection(Edm.Single)",
+            "retrievable": true,
+            "searchable": true,
+            "dimensions": 3072,
+            "vectorSearchProfile": "default-hnsw-cosine-profile"
+        },
+        {
+            "name": "page_number",
+            "type": "Edm.Int32",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": true,
+            "searchable": false,
+            "stored": true
+        },
+        {
+            "name": "uploaded_at",
+            "type": "Edm.DateTimeOffset",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": false,
+            "searchable": false
+        },
+        {
+            "name": "tags",
+            "type": "Collection(Edm.String)",
+            "retrievable": true,
+            "filterable": true,
+            "searchable": true,
+            "facetable": true
+        },
+        {
+            "name": "processing_status",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": true,
+            "searchable": false,
+            "stored": true
+        },
+        {
+            "name": "world_id",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "facetable": true,
+            "searchable": false,
+            "stored": true
+        },
+        {
+            "name": "element_type",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "facetable": true,
+            "searchable": false,
+            "stored": true
+        },
+        {
+            "name": "source_element_id",
+            "type": "Edm.String",
+            "retrievable": true,
+            "filterable": true,
+            "sortable": true,
+            "facetable": true,
+            "searchable": false,
+            "stored": true
+        }
+    ],
+    "vectorSearch": {
+        "profiles": [
+            {
+                "name": "default-hnsw-cosine-profile",
+                "algorithm": "default-hnsw-config"
+            }
+        ],
+        "algorithms": [
+            {
+                "name": "default-hnsw-config",
+                "kind": "hnsw",
+                "hnswParameters": {
+                    "m": 4,
+                    "efConstruction": 400,
+                    "efSearch": 500,
+                    "metric": "cosine"
+                }
+            }
+        ]
+    },
+    "semantic": {
+        "configurations": [
+            {
+                "name": "default-semantic-configuration",
+                "prioritizedFields": {
+                    "titleField": {
+                        "fieldName": "source_filename"
+                    },
+                    "prioritizedContentFields": [
+                        {
+                            "fieldName": "chunk_text"
+                        }
+                    ],
+                    "prioritizedKeywordsFields": [
+                        {
+                            "fieldName": "tags"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "suggesters": [],
+    "scoringProfiles": [],
+    "charFilters": [],
+    "tokenFilters": [],
+    "tokenizers": [],
+    "corsOptions": null
+}

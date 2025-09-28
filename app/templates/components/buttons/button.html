@@ -1,0 +1,112 @@
+<!-- Button Component -->
+<!-- Usage: {% include "components/buttons/button.html" text="Save" color="primary" icon="save" %} -->
+
+{% assign btn_tag = tag | default('button') %}
+{% assign btn_type = type | default('button') %}
+{% assign btn_class = 'btn' %}
+
+{% if color %}
+    {% if outline %}
+        {% assign btn_class = btn_class | append: ' btn-outline-' | append: color %}
+    {% elsif ghost %}
+        {% assign btn_class = btn_class | append: ' btn-ghost-' | append: color %}
+    {% else %}
+        {% assign btn_class = btn_class | append: ' btn-' | append: color %}
+    {% endif %}
+{% endif %}
+
+{% if size %}
+    {% assign btn_class = btn_class | append: ' btn-' | append: size %}
+{% endif %}
+
+{% if block %}
+    {% assign btn_class = btn_class | append: ' w-100' %}
+{% endif %}
+
+{% if pill %}
+    {% assign btn_class = btn_class | append: ' btn-pill' %}
+{% endif %}
+
+{% if square %}
+    {% assign btn_class = btn_class | append: ' btn-square' %}
+{% endif %}
+
+{% if loading %}
+    {% assign btn_class = btn_class | append: ' btn-loading' %}
+{% endif %}
+
+{% if class %}
+    {% assign btn_class = btn_class | append: ' ' | append: class %}
+{% endif %}
+
+<{{ btn_tag }} {% if btn_tag == 'button' %}type="{{ btn_type }}"{% endif %}
+           class="{{ btn_class }}"
+           {% if id %}id="{{ id }}"{% endif %}
+           {% if name %}name="{{ name }}"{% endif %}
+           {% if value %}value="{{ value }}"{% endif %}
+           {% if disabled %}disabled{% endif %}
+           {% if href %}href="{{ href }}"{% endif %}
+           {% if target %}target="{{ target }}"{% endif %}
+           {% if onclick %}onclick="{{ onclick }}"{% endif %}
+           {% if data_bs_toggle %}data-bs-toggle="{{ data_bs_toggle }}"{% endif %}
+           {% if data_bs_target %}data-bs-target="{{ data_bs_target }}"{% endif %}
+           {% if data_bs_dismiss %}data-bs-dismiss="{{ data_bs_dismiss }}"{% endif %}
+           {% if title %}title="{{ title }}"{% endif %}
+           {{ attrs | default('') }}>
+    
+    {% if loading %}
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+    {% elsif icon %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon{% if text %} me-2{% endif %}" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            {% case icon %}
+                {% when 'save' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"/>
+                    <circle cx="12" cy="14" r="2"/>
+                    <polyline points="14,4 14,8 8,8 8,4"/>
+                {% when 'edit' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                    <path d="M16 5l3 3"/>
+                {% when 'delete' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <line x1="4" y1="7" x2="20" y2="7"/>
+                    <line x1="10" y1="11" x2="10" y2="17"/>
+                    <line x1="14" y1="11" x2="14" y2="17"/>
+                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                {% when 'plus' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                {% when 'download' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                    <polyline points="7,11 12,16 17,11"/>
+                    <line x1="12" y1="4" x2="12" y2="16"/>
+                {% when 'upload' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+                    <polyline points="7,9 12,4 17,9"/>
+                    <line x1="12" y1="4" x2="12" y2="16"/>
+                {% when 'search' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <circle cx="10" cy="10" r="7"/>
+                    <path d="M21 21l-6 -6"/>
+                {% when 'close' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                {% when 'check' %}
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M5 12l5 5l10 -10"/>
+                {% else %}
+                    <circle cx="12" cy="12" r="1"/>
+            {% endcase %}
+        </svg>
+    {% endif %}
+    
+    {% if text %}{{ text }}{% else %}{{ content }}{% endif %}
+    
+</{{ btn_tag }}>

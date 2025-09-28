@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lore Item Detail - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Lore Item Detail</h1>
+            <p class="help-subtitle">Build rich world knowledge and cultural depth</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"basics\"]').click()">
+                <div class="quick-action-icon">📜</div>
+                <div class="quick-action-text">Lore Basics</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"categories\"]').click()">
+                <div class="quick-action-icon">🗂️</div>
+                <div class="quick-action-text">Categories</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"integration\"]').click()">
+                <div class="quick-action-icon">🔗</div>
+                <div class="quick-action-text">Story Integration</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="basics">Basics</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="categories">Categories</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="integration">Integration</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-tools">AI Tools</button></li>
+            </ul>
+        </div>
+
+        <!-- Basics Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="basics">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    What Are Lore Items?
+                </h2>
+                <p>Lore items represent the knowledge, systems, and cultural elements that make your world unique. They encompass everything from magic systems and historical events to artifacts and customs that give your world depth and authenticity.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎯 World Knowledge</h3>
+                        <p class="feature-card-description">Information that characters and readers need to understand your world.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🏛️ Cultural Depth</h3>
+                        <p class="feature-card-description">Customs, beliefs, and practices that make societies feel real.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">⚡ System Rules</h3>
+                        <p class="feature-card-description">How magic, technology, or other special elements work in your world.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Story Support</h3>
+                        <p class="feature-card-description">Background information that enriches narrative without overwhelming it.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Creating Your First Lore Item</h3>
+                        <span class="recipe-card-time">10 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Identify what your story needs readers to understand</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Choose the appropriate category (magic system, artifact, etc.)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Write a clear, concise description of what it is</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Explain how it works or why it's important</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Connect it to relevant characters and locations</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">6</div>
+                            <div class="recipe-step-content">Consider its role in your current or future stories</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Balance Tip:</strong> Create lore that serves your story. Too much unused world-building can overwhelm readers, while too little leaves them confused.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Essential Lore Elements</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Core Information Fields</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Purpose</th>
+                                    <th>Tips</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Title</td>
+                                    <td>Clear identification</td>
+                                    <td>Use names that fit your world's naming conventions</td>
+                                </tr>
+                                <tr>
+                                    <td>Description</td>
+                                    <td>Explain what it is</td>
+                                    <td>Focus on what characters would know or observe</td>
+                                </tr>
+                                <tr>
+                                    <td>Category</td>
+                                    <td>Organization and context</td>
+                                    <td>Choose the most specific category that fits</td>
+                                </tr>
+                                <tr>
+                                    <td>Importance Rating</td>
+                                    <td>Priority for story inclusion</td>
+                                    <td>Rate 1-10 based on story relevance</td>
+                                </tr>
+                                <tr>
+                                    <td>Related Elements</td>
+                                    <td>Connection tracking</td>
+                                    <td>Note characters, locations, or other lore that connect</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Writing Effective Descriptions</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Guidelines for lore descriptions:</p>
+                        <ul>
+                            <li><strong>Reader Perspective:</strong> Write from the viewpoint of someone in your world</li>
+                            <li><strong>Concrete Examples:</strong> Show how it affects daily life or specific situations</li>
+                            <li><strong>Sensory Details:</strong> Include what people see, hear, feel when encountering it</li>
+                            <li><strong>Practical Impact:</strong> Explain how it changes character behavior or story events</li>
+                            <li><strong>Mystery Balance:</strong> Reveal enough to understand, preserve some mystery</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Good vs Poor Lore Descriptions:\n\n❌ Poor: \"Magic exists in this world\"\n✅ Good: \"The Weave allows trained mages to channel elemental forces through spoken incantations and hand gestures, but each spell drains the caster\'s life force\"\n\n❌ Poor: \"There was a war\"\n✅ Good: \"The Crimson War ended fifty years ago when dragons burned the capital, leaving the kingdom divided into feuding duchies that still distrust each other\"')">Copy</button>
+                            <pre>Good vs Poor Lore Descriptions:
+
+❌ Poor: "Magic exists in this world"
+✅ Good: "The Weave allows trained mages to channel elemental forces through spoken incantations and hand gestures, but each spell drains the caster's life force"
+
+❌ Poor: "There was a war"
+✅ Good: "The Crimson War ended fifty years ago when dragons burned the capital, leaving the kingdom divided into feuding duchies that still distrust each other"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Location Associations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Many lore items have location connections:</p>
+                        <ul>
+                            <li><strong>Origin Point:</strong> Where the lore item was created or first discovered</li>
+                            <li><strong>Current Location:</strong> Where it can be found now</li>
+                            <li><strong>Area of Influence:</strong> Geographic regions where it has effect</li>
+                            <li><strong>Related Sites:</strong> Locations connected to its history or use</li>
+                            <li><strong>Forbidden Areas:</strong> Places where it's banned, hidden, or dangerous</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="categories">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Lore Item Categories
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Magic Systems</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Define how supernatural forces work in your world:</p>
+                        <ul>
+                            <li><strong>Power Source:</strong> Where magical energy comes from</li>
+                            <li><strong>Usage Methods:</strong> How people access and control magic</li>
+                            <li><strong>Limitations:</strong> What prevents unlimited magical power</li>
+                            <li><strong>Consequences:</strong> Costs or risks of using magic</li>
+                            <li><strong>Training Requirements:</strong> How one learns magical abilities</li>
+                            <li><strong>Social Impact:</strong> How magic affects society and daily life</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Designing a Magic System</h3>
+                                <span class="recipe-card-time">20 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Define the fundamental force or energy source</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Establish clear rules for how it works</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Set meaningful limitations and costs</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Consider societal and cultural implications</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Test consistency with your story needs</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Historical Events</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Important past occurrences that shape your world:</p>
+                        <ul>
+                            <li><strong>Wars and Conflicts:</strong> Battles, rebellions, and their outcomes</li>
+                            <li><strong>Disasters:</strong> Natural or magical catastrophes</li>
+                            <li><strong>Discoveries:</strong> New lands, technologies, or knowledge</li>
+                            <li><strong>Political Changes:</strong> Rise and fall of rulers or governments</li>
+                            <li><strong>Cultural Shifts:</strong> Changes in beliefs, traditions, or society</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">📚</span>
+                            <div>
+                                <strong>Story Connection:</strong> Historical events should have clear impact on your current story, whether through lasting consequences, character connections, or ongoing conflicts.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Artifacts and Objects</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Important items that carry significance:</p>
+                        <ul>
+                            <li><strong>Magical Items:</strong> Objects with supernatural properties</li>
+                            <li><strong>Religious Relics:</strong> Items of spiritual importance</li>
+                            <li><strong>Royal Regalia:</strong> Symbols of authority and power</li>
+                            <li><strong>Ancient Weapons:</strong> Arms with history and reputation</li>
+                            <li><strong>Cultural Treasures:</strong> Items that represent heritage</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Deities and Pantheons</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Divine beings and religious systems:</p>
+                        <ul>
+                            <li><strong>Divine Domains:</strong> What aspects of life each deity controls</li>
+                            <li><strong>Worship Practices:</strong> How followers honor their gods</li>
+                            <li><strong>Divine Intervention:</strong> How gods interact with mortals</li>
+                            <li><strong>Religious Hierarchy:</strong> Priests, temples, and religious structure</li>
+                            <li><strong>Competing Faiths:</strong> Conflicts between different religions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Creatures and Species</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Non-human beings that inhabit your world:</p>
+                        <ul>
+                            <li><strong>Intelligent Species:</strong> Sentient non-humans with their own cultures</li>
+                            <li><strong>Magical Creatures:</strong> Beasts with supernatural abilities</li>
+                            <li><strong>Monsters:</strong> Dangerous creatures that threaten civilization</li>
+                            <li><strong>Mythical Beings:</strong> Legendary creatures of folklore</li>
+                            <li><strong>Domesticated Animals:</strong> Beasts used by civilized species</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Category Selection Guide</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>If You're Creating...</th>
+                            <th>Choose Category</th>
+                            <th>Focus On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>How supernatural forces work</td>
+                            <td>Magic System</td>
+                            <td>Rules, limitations, and consequences</td>
+                        </tr>
+                        <tr>
+                            <td>Something that happened in the past</td>
+                            <td>Historical Event</td>
+                            <td>Causes, consequences, and current impact</td>
+                        </tr>
+                        <tr>
+                            <td>A specific important item</td>
+                            <td>Artifact</td>
+                            <td>Powers, history, and current location</td>
+                        </tr>
+                        <tr>
+                            <td>Religious or spiritual elements</td>
+                            <td>Deity</td>
+                            <td>Domains, worship, and divine interaction</td>
+                        </tr>
+                        <tr>
+                            <td>Non-human beings</td>
+                            <td>Creature</td>
+                            <td>Abilities, behavior, and habitat</td>
+                        </tr>
+                        <tr>
+                            <td>Groups or organizations</td>
+                            <td>Faction/Organization</td>
+                            <td>Goals, structure, and methods</td>
+                        </tr>
+                        <tr>
+                            <td>Cultural practices</td>
+                            <td>Culture/Custom</td>
+                            <td>Traditions, beliefs, and social impact</td>
+                        </tr>
+                        <tr>
+                            <td>Advanced tools or science</td>
+                            <td>Technology</td>
+                            <td>Function, availability, and social effect</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Integration Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="integration">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Integrating Lore into Stories
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story Association Strategies</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Connect lore items to narrative elements effectively:</p>
+                        <ul>
+                            <li><strong>Plot Device:</strong> Lore that drives story events forward</li>
+                            <li><strong>Character Motivation:</strong> Background that explains character goals</li>
+                            <li><strong>Conflict Source:</strong> Lore that creates tension or obstacles</li>
+                            <li><strong>World Texture:</strong> Background details that add richness</li>
+                            <li><strong>Mystery Element:</strong> Information revealed gradually for intrigue</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Lore Integration Examples:\n\n📖 Plot Device: \"The Crown of Storms must be recovered to end the eternal winter\"\n\n👤 Character Motivation: \"Sarah seeks the ancient healing arts because her brother is dying\"\n\n⚔️ Conflict Source: \"The peace treaty forbids magic, but Marcus is a secret mage\"\n\n🌍 World Texture: \"The festival of lights celebrates the day magic returned to the world\"\n\n🕵️ Mystery Element: \"The true identity of the Masked Prophet remains hidden\"')">Copy</button>
+                            <pre>Lore Integration Examples:
+
+📖 Plot Device: "The Crown of Storms must be recovered to end the eternal winter"
+
+👤 Character Motivation: "Sarah seeks the ancient healing arts because her brother is dying"
+
+⚔️ Conflict Source: "The peace treaty forbids magic, but Marcus is a secret mage"
+
+🌍 World Texture: "The festival of lights celebrates the day magic returned to the world"
+
+🕵️ Mystery Element: "The true identity of the Masked Prophet remains hidden"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Revelation Techniques</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Methods for introducing lore naturally:</p>
+                        <ul>
+                            <li><strong>Character Knowledge:</strong> What characters already know and share</li>
+                            <li><strong>Dialogue Exposition:</strong> Natural conversation about world elements</li>
+                            <li><strong>Environmental Storytelling:</strong> Details characters observe in their surroundings</li>
+                            <li><strong>Discovery Moments:</strong> Characters learn new information</li>
+                            <li><strong>Gradual Revelation:</strong> Building understanding piece by piece</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Avoid Info-Dumping:</strong> Don't overwhelm readers with large blocks of world-building information. Weave lore naturally into action and dialogue.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Connections</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Link lore items to characters meaningfully:</p>
+                        <ul>
+                            <li><strong>Expertise:</strong> Characters who are knowledgeable about specific lore</li>
+                            <li><strong>Personal History:</strong> Lore connected to character backgrounds</li>
+                            <li><strong>Cultural Identity:</strong> Lore that defines character heritage</li>
+                            <li><strong>Professional Interest:</strong> Lore relevant to character occupations</li>
+                            <li><strong>Fear or Trauma:</strong> Lore connected to negative experiences</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Consistency and Continuity</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Maintain coherent world-building:</p>
+                        <ul>
+                            <li><strong>Rule Adherence:</strong> Follow established magical or technological rules</li>
+                            <li><strong>Timeline Consistency:</strong> Ensure historical events make chronological sense</li>
+                            <li><strong>Cultural Logic:</strong> Verify that customs fit their societies</li>
+                            <li><strong>Geographic Coherence:</strong> Check that lore fits its locations</li>
+                            <li><strong>Character Knowledge:</strong> Ensure characters know what they should know</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Scene-Level Integration</h2>
+                <p>Bringing lore into specific scenes:</p>
+                <ul>
+                    <li><strong>Atmospheric Details:</strong> Use lore to enhance scene mood and setting</li>
+                    <li><strong>Dialogue References:</strong> Characters mention relevant lore naturally</li>
+                    <li><strong>Action Consequences:</strong> Lore affects what characters can and cannot do</li>
+                    <li><strong>Problem Solutions:</strong> Lore knowledge helps resolve conflicts</li>
+                    <li><strong>Foreshadowing:</strong> Subtle lore hints that pay off later</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- AI Tools Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-tools">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI-Enhanced Lore Development
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧙‍♂️ Intelligent World-Building</h3>
+                    <p class="ai-feature-description">AI can help expand your lore concepts into rich, detailed systems that feel authentic and internally consistent while serving your story needs.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Lore Expansion Tools</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can help develop your lore items:</p>
+                        <ul>
+                            <li><strong>System Elaboration:</strong> Expand basic magic or technology concepts</li>
+                            <li><strong>Historical Detail:</strong> Add depth to past events and their consequences</li>
+                            <li><strong>Cultural Integration:</strong> Connect lore to appropriate societies</li>
+                            <li><strong>Practical Applications:</strong> Show how lore affects daily life</li>
+                            <li><strong>Consequence Exploration:</strong> Understand implications of your world-building</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 10-20 credits for lore expansion, 25-40 credits for comprehensive system development
+                        </div>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">AI-Assisted Lore Development</h3>
+                                <span class="recipe-card-time">15 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Start with your core concept and basic description</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Ask AI to suggest implications and consequences</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Select ideas that fit your story vision</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Request elaboration on chosen elements</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Refine and personalize AI suggestions</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Consistency Checking</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can analyze your lore for coherence:</p>
+                        <ul>
+                            <li><strong>Internal Logic:</strong> Check that systems follow their own rules</li>
+                            <li><strong>Cultural Fit:</strong> Verify lore matches its cultural context</li>
+                            <li><strong>Timeline Coherence:</strong> Ensure historical events make chronological sense</li>
+                            <li><strong>Power Balance:</strong> Identify overpowered or underutilized elements</li>
+                            <li><strong>Story Integration:</strong> Check how well lore serves narrative needs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Connection Suggestions</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can suggest relationships between lore items:</p>
+                        <ul>
+                            <li><strong>Thematic Links:</strong> Lore items that reinforce similar themes</li>
+                            <li><strong>Causal Relationships:</strong> How one lore element affects another</li>
+                            <li><strong>Historical Connections:</strong> Events and systems that share timeline</li>
+                            <li><strong>Cultural Intersections:</strong> Where different cultural elements meet</li>
+                            <li><strong>Conflict Potential:</strong> Lore elements that naturally oppose each other</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'AI Connection Prompts:\n\"How might this magic system interact with the political structure?\"\n\"What are the unintended consequences of this historical event?\"\n\"How would this artifact affect the existing religious beliefs?\"\n\"What cultural practices might develop around this technology?\"\n\"How do these two lore elements conflict or complement each other?\"')">Copy</button>
+                            <pre>AI Connection Prompts:
+"How might this magic system interact with the political structure?"
+"What are the unintended consequences of this historical event?"
+"How would this artifact affect the existing religious beliefs?"
+"What cultural practices might develop around this technology?"
+"How do these two lore elements conflict or complement each other?"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story Integration Assistance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI helps weave lore into narratives:</p>
+                        <ul>
+                            <li><strong>Natural Introduction:</strong> Ways to reveal lore without info-dumping</li>
+                            <li><strong>Character Perspectives:</strong> How different characters would understand lore</li>
+                            <li><strong>Scene Integration:</strong> Using lore to enhance specific scenes</li>
+                            <li><strong>Conflict Creation:</strong> How lore generates story tension</li>
+                            <li><strong>Resolution Support:</strong> Using lore to solve story problems</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Best Practices for AI Lore Development</h2>
+                <ul>
+                    <li><strong>Start Simple:</strong> Begin with basic concepts and expand gradually</li>
+                    <li><strong>Story First:</strong> Always consider how lore serves your narrative</li>
+                    <li><strong>Cultural Context:</strong> Provide AI with cultural background for authentic suggestions</li>
+                    <li><strong>Selective Integration:</strong> Choose only AI ideas that enhance your vision</li>
+                    <li><strong>Regular Review:</strong> Check that new lore remains consistent with existing elements</li>
+                </ul>
+
+                <div class="alert alert-success">
+                    <span class="alert-icon">✨</span>
+                    <div>
+                        <strong>Creative Partnership:</strong> Use AI to explore possibilities and implications you might not have considered, but always maintain creative control over your world's vision.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

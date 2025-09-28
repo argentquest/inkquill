@@ -1,0 +1,187 @@
+/* ========================================================================
+   HELP BUTTON LAYOUT ENFORCEMENT
+   Ensures help buttons are always positioned consistently across all pages
+   ======================================================================== */
+
+/* ========================================================================
+   GLOBAL HELP BUTTON POSITIONING RULES
+   ======================================================================== */
+
+/* Force help buttons to always be last in any container */
+.help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* Page header standardization */
+.page-header,
+.content-header,
+.section-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: var(--space-3) !important;
+}
+
+.page-header .help-button,
+.content-header .help-button,
+.section-header .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Card header standardization */
+.card-header,
+.card-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.card-header .help-button,
+.card-title .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Bootstrap and flexbox containers */
+.d-flex .help-button,
+.row .help-button,
+.col .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Button groups and toolbars */
+.btn-group .help-button,
+.btn-toolbar .help-button,
+.button-group .help-button,
+.toolbar .help-button,
+.actions .help-button {
+  order: 999 !important;
+  margin-left: var(--space-2) !important;
+}
+
+/* Navigation and menu areas */
+.navbar .help-button,
+.nav .help-button,
+.breadcrumb .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* ========================================================================
+   CONTAINER ENFORCEMENT RULES
+   ======================================================================== */
+
+/* Ensure parent containers can accommodate help button positioning */
+.container .help-button,
+.container-fluid .help-button,
+.row .help-button,
+.col .help-button {
+  position: relative !important;
+}
+
+/* Grid system adjustments */
+.col-md-12 .help-button,
+.col-lg-12 .help-button,
+.col-xl-12 .help-button {
+  position: absolute !important;
+  top: var(--space-4) !important;
+  right: var(--space-4) !important;
+  z-index: var(--z-sticky) !important;
+}
+
+/* ========================================================================
+   SPECIFIC PAGE LAYOUT OVERRIDES
+   ======================================================================== */
+
+/* World list page */
+.world-list-header .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Story detail page */
+.story-header .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Editor pages */
+.editor-header .help-button,
+.act-editor-header .help-button,
+.scene-editor-header .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Form pages */
+.form-header .help-button,
+.character-form-header .help-button,
+.location-form-header .help-button,
+.lore-form-header .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* Dashboard and management pages */
+.dashboard-header .help-button,
+.billing-header .help-button,
+.document-manager-header .help-button {
+  order: 999 !important;
+  margin-left: auto !important;
+}
+
+/* ========================================================================
+   RESPONSIVE LAYOUT ENFORCEMENT
+   ======================================================================== */
+
+@media (max-width: 768px) {
+  /* Mobile header adjustments */
+  .page-header,
+  .content-header,
+  .section-header {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+  
+  .help-button {
+    order: 999 !important;
+    margin-left: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small mobile adjustments */
+  .col-md-12 .help-button,
+  .col-lg-12 .help-button,
+  .col-xl-12 .help-button {
+    top: var(--space-2) !important;
+    right: var(--space-2) !important;
+  }
+}
+
+/* ========================================================================
+   OVERRIDE ANY CONFLICTING STYLES
+   ======================================================================== */
+
+/* Remove any positioning that might conflict */
+.help-button[style*="position"] {
+  position: relative !important;
+}
+
+/* Force standardized dimensions */
+.help-button[style*="width"],
+.help-button[style*="height"] {
+  width: 90px !important;
+  height: 36px !important;
+}
+
+/* Force standardized colors */
+.help-button[style*="background"],
+.help-button[style*="color"] {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+  color: white !important;
+}

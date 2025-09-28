@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Detail - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">🌍 World Detail</h1>
+            <p class="help-subtitle">Manage and develop your storytelling universe</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Navigation -->
+            <div class="help-navigation">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#world-overview">World Overview</a></li>
+                    <li><a href="#world-elements">World Elements</a></li>
+                    <li><a href="#ai-features">AI Features</a></li>
+                    <li><a href="#management">Management Tools</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[href*=character_generator]')?.click()">
+                    <div class="quick-action-icon">🎭</div>
+                    <div class="quick-action-text">Generate Character</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[href*=create_location]')?.click()">
+                    <div class="quick-action-icon">📍</div>
+                    <div class="quick-action-text">Add Location</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[href*=world_chat]')?.click()">
+                    <div class="quick-action-icon">💬</div>
+                    <div class="quick-action-text">World Chat</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[href*=world_hierarchy]')?.click()">
+                    <div class="quick-action-icon">🗺️</div>
+                    <div class="quick-action-text">View Hierarchy</div>
+                </div>
+            </div>
+
+            <!-- World Overview Section -->
+            <div class="help-section" id="world-overview">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    What is World Detail?
+                </h2>
+                <p>Worlds are the foundation of your storytelling ecosystem. They contain all your characters, locations, lore items, and provide context for AI-assisted writing. The World Detail page is your central hub for managing and developing your universe.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🏗️ World Building</h3>
+                        <p class="feature-card-description">Create comprehensive universes with characters, locations, and lore items.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🤖 AI Integration</h3>
+                        <p class="feature-card-description">AI understands your world context for better writing assistance.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📊 Organization</h3>
+                        <p class="feature-card-description">Hierarchical view of relationships between world elements.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎨 Visual Assets</h3>
+                        <p class="feature-card-description">Generate AI images and manage visual representations.</p>
+                    </div>
+                </div>
+
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧠 RAG Integration</h3>
+                    <p class="ai-feature-description">Your world elements automatically become context for AI writing assistance. The more detailed your world, the better AI suggestions become.</p>
+                </div>
+            </div>
+
+            <!-- World Elements Section -->
+            <div class="help-section" id="world-elements">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Managing World Elements
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Characters</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create and manage the people who populate your world:</p>
+                        <ul>
+                            <li><strong>Protagonists:</strong> Main characters who drive your story</li>
+                            <li><strong>Antagonists:</strong> Characters who create conflict and obstacles</li>
+                            <li><strong>Supporting Characters:</strong> Secondary characters who enrich the narrative</li>
+                            <li><strong>NPCs:</strong> Background characters who populate your world</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Creating Rich Characters</h3>
+                                <span class="recipe-card-time">15 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Start with basic information: name, age, occupation</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Define personality traits and core motivations</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Add physical description and appearance details</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Develop backstory and personal history</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Associate with relevant locations and other characters</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Locations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Build the places where your story unfolds:</p>
+                        <ul>
+                            <li><strong>Cities and Towns:</strong> Urban centers with their own culture and politics</li>
+                            <li><strong>Natural Locations:</strong> Forests, mountains, rivers, and wilderness areas</li>
+                            <li><strong>Buildings:</strong> Specific structures like taverns, castles, or spaceships</li>
+                            <li><strong>Regions:</strong> Larger geographical or political areas</li>
+                        </ul>
+
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Location Type</th>
+                                    <th>Key Details</th>
+                                    <th>AI Benefits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Cities</td>
+                                    <td>Population, culture, government, districts</td>
+                                    <td>Rich scene setting, cultural context</td>
+                                </tr>
+                                <tr>
+                                    <td>Buildings</td>
+                                    <td>Layout, atmosphere, purpose, inhabitants</td>
+                                    <td>Detailed scene descriptions</td>
+                                </tr>
+                                <tr>
+                                    <td>Wilderness</td>
+                                    <td>Geography, climate, dangers, resources</td>
+                                    <td>Environmental storytelling</td>
+                                </tr>
+                                <tr>
+                                    <td>Regions</td>
+                                    <td>Borders, politics, trade, conflicts</td>
+                                    <td>Political context, travel logistics</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Lore Items</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Document the deeper elements of your world:</p>
+                        <ul>
+                            <li><strong>Organizations:</strong> Guilds, governments, secret societies</li>
+                            <li><strong>Artifacts:</strong> Magical items, ancient relics, technology</li>
+                            <li><strong>Customs:</strong> Cultural practices, traditions, ceremonies</li>
+                            <li><strong>History:</strong> Past events, wars, discoveries</li>
+                            <li><strong>Languages:</strong> Communication systems and linguistic details</li>
+                            <li><strong>Magic Systems:</strong> How supernatural powers work in your world</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Features Section -->
+            <div class="help-section" id="ai-features">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI-Enhanced World Features
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Chat</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Discuss your world with AI to develop ideas and resolve issues:</p>
+                        <ul>
+                            <li><strong>Plot Development:</strong> Work through story problems with AI guidance</li>
+                            <li><strong>World Consistency:</strong> Check for contradictions in your world-building</li>
+                            <li><strong>Character Development:</strong> Explore character motivations and relationships</li>
+                            <li><strong>Research Assistance:</strong> Get suggestions for historical or scientific accuracy</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 5-15 credits per conversation, depending on complexity and length
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Generator</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create detailed characters using AI assistance:</p>
+                        <ul>
+                            <li><strong>Personality Generation:</strong> AI creates believable personality traits</li>
+                            <li><strong>Backstory Development:</strong> Generate rich character histories</li>
+                            <li><strong>Physical Descriptions:</strong> Detailed appearance and mannerisms</li>
+                            <li><strong>Voice and Dialogue:</strong> Examples of how the character speaks</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Image Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create visual representations of your world elements:</p>
+                        <ul>
+                            <li><strong>Character Portraits:</strong> Visualize how your characters look</li>
+                            <li><strong>Location Art:</strong> Generate landscape and architectural images</li>
+                            <li><strong>Item Illustrations:</strong> Create images of artifacts and objects</li>
+                            <li><strong>World Maps:</strong> Generate geographical representations</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 15-30 credits per image, depending on complexity and style
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Document Integration</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Upload research materials to enhance AI context:</p>
+                        <ul>
+                            <li><strong>Reference Materials:</strong> Historical documents, cultural research</li>
+                            <li><strong>Character Sheets:</strong> Detailed character templates and profiles</li>
+                            <li><strong>World Bibles:</strong> Comprehensive world-building documents</li>
+                            <li><strong>Map Files:</strong> Geographical and political maps</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Section -->
+            <div class="help-section" id="management">
+                <h2 class="help-section-title">World Management Tools</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Hierarchy View</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Visualize relationships between world elements:</p>
+                        <ul>
+                            <li><strong>Character Relationships:</strong> Family trees, friendships, rivalries</li>
+                            <li><strong>Location Hierarchies:</strong> Cities within regions, buildings within cities</li>
+                            <li><strong>Organization Structures:</strong> Guild hierarchies, government levels</li>
+                            <li><strong>Timeline Connections:</strong> Historical events and their impacts</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Map</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Interactive map showing location connections:</p>
+                        <ul>
+                            <li><strong>Geographical Layout:</strong> Visual representation of your world</li>
+                            <li><strong>Location Markers:</strong> Pin important places and landmarks</li>
+                            <li><strong>Travel Routes:</strong> Show paths between locations</li>
+                            <li><strong>Political Boundaries:</strong> Mark territories and regions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Export and Backup</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Protect and share your world data:</p>
+                        <ul>
+                            <li><strong>World Export:</strong> Download complete world data as JSON or PDF</li>
+                            <li><strong>Element Sharing:</strong> Share specific characters or locations</li>
+                            <li><strong>Backup Creation:</strong> Regular automatic backups of your world</li>
+                            <li><strong>Version Control:</strong> Track changes and restore previous versions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Practices Section -->
+            <div class="help-section" id="best-practices">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    World Building Best Practices
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Effective World Development</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Strategies for creating rich, consistent worlds:</p>
+                        <ul>
+                            <li><strong>Start Small:</strong> Begin with essential elements and expand gradually</li>
+                            <li><strong>Focus on Story Needs:</strong> Develop elements that serve your narrative</li>
+                            <li><strong>Maintain Consistency:</strong> Regular consistency checks prevent contradictions</li>
+                            <li><strong>Layer Details:</strong> Add depth progressively rather than all at once</li>
+                            <li><strong>Document Everything:</strong> Keep detailed records of all decisions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Optimization Tips</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Get the most from AI features:</p>
+                        <ul>
+                            <li><strong>Detailed Descriptions:</strong> More detail provides better AI context</li>
+                            <li><strong>Clear Relationships:</strong> Define how elements connect to each other</li>
+                            <li><strong>Regular Updates:</strong> Keep world elements current with story progress</li>
+                            <li><strong>Strategic Associations:</strong> Link elements that should influence each other</li>
+                            <li><strong>Quality over Quantity:</strong> Better to have fewer, well-developed elements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Collaboration and Sharing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Work with others on world development:</p>
+                        <ul>
+                            <li><strong>World Sharing:</strong> Grant access to co-authors and beta readers</li>
+                            <li><strong>Element Permissions:</strong> Control what others can view or edit</li>
+                            <li><strong>Comment System:</strong> Collect feedback on world elements</li>
+                            <li><strong>Version Tracking:</strong> See who made what changes when</li>
+                            <li><strong>Export Tools:</strong> Share formatted documents with stakeholders</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe Card -->
+            <div class="recipe-card">
+                <div class="recipe-card-header">
+                    <h3 class="recipe-card-title">Building Your First World</h3>
+                    <span class="recipe-card-time">30 minutes</span>
+                </div>
+                <ol class="recipe-steps">
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">1</div>
+                        <div class="recipe-step-content">Create your world with a compelling name and description</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">2</div>
+                        <div class="recipe-step-content">Add your protagonist - start with the most important character</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">3</div>
+                        <div class="recipe-step-content">Create the primary setting where your story begins</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">4</div>
+                        <div class="recipe-step-content">Add any important organizations or magic systems</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">5</div>
+                        <div class="recipe-step-content">Test AI writing assistance to see how context helps</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">6</div>
+                        <div class="recipe-step-content">Expand elements as your story develops</div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Final Tips -->
+            <div class="help-tip">
+                <div class="help-tip-title">
+                    <i class="fas fa-lightbulb help-tip-icon"></i>
+                    Pro World-Building Tip
+                </div>
+                <div class="help-tip-content">
+                    Your world should feel lived-in and authentic. Focus on how ordinary people experience your world's unique elements. The small details often make the biggest impact on reader immersion.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Collapsible functionality
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('.collapsible-icon');
+                
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                    icon.textContent = '▼';
+                } else {
+                    content.style.display = 'block';
+                    icon.textContent = '▲';
+                }
+            });
+        });
+
+        // Helper function for closing modal (if this help is shown in a modal)
+        function closeHelpModal() {
+            // This function would be implemented by the parent application
+            console.log('Closing help modal...');
+        }
+    </script>
+</body>
+</html>

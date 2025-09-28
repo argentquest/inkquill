@@ -1,0 +1,45 @@
+<!-- Base Modal Component -->
+<!-- Usage: {% include "components/modals/base_modal.html" modal_id="my-modal" size="lg" title="Modal Title" %} -->
+
+<div class="modal modal-blur fade{{ ' ' + class if class else '' }}" 
+     id="{{ modal_id | default('base-modal') }}" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-hidden="true"
+     {% if style %}style="{{ style }}"{% endif %}>
+    <div class="modal-dialog{% if size %} modal-{{ size }}{% endif %}{% if not top %} modal-dialog-centered{% endif %}{% if scrollable %} modal-dialog-scrollable{% endif %}" role="document">
+        <div class="modal-content">
+            {% if title %}
+            <div class="modal-header">
+                <h5 class="modal-title">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            {% endif %}
+            
+            {% if status_color %}
+            <div class="modal-status bg-{{ status_color }}"></div>
+            {% endif %}
+            
+            <div class="modal-body{% if center_content %} text-center py-4{% endif %}">
+                {% if body %}
+                    {{ body | safe }}
+                {% else %}
+                    {{ content | safe }}
+                {% endif %}
+            </div>
+            
+            {% if show_footer %}
+            <div class="modal-footer">
+                {% if footer %}
+                    {{ footer | safe }}
+                {% else %}
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">{{ close_text | default('Close') }}</button>
+                    {% if primary_button %}
+                    <button type="button" class="btn btn-primary" {{ primary_button_attrs | default('') }}>{{ primary_button }}</button>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

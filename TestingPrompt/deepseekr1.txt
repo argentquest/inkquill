@@ -1,0 +1,117 @@
+{
+  "world": {
+    "name": "Ununiverse",
+    "description": "Ununiverse is a conceptual world blending the infinite expanse of outer space with a childlike, personal perception reminiscent of the skies viewed through an airplane window. It exists in a gentle wonder where imagination bridges logical realities and mythical flights. A unique characteristic is that pockets transform into planets of varied topography but childlike nature, accessible through the act of gazing at an airplane in flight. The overall tone blends whimsical adventure with poignant wisdom, exemplified by encounters with simple beings who ask powerful questions about life and relationships. The world's essence lies in the contrast between vast emptiness and minute petals, between a ticking existence and a slow growth, creating a memorable allegory for adult detachment versus childlike perspective."
+  },
+  "characters": [
+    {
+      "name": "The Little Prince (L'Élève Dupont)",
+      "description": "A small boy, younger than many realization persons have grown, wearing a jaunty green felt hat, dressed in a white, somewhat worn coat and trousers.",
+      "personality_traits": "Perspicacious, Resolute, Charming, Unquestioning, Idealistic",
+      "backstory": "Originating from his peculiar planet Asteroid B-612, inhabited only by an orchid and several sudden appearances, he embarked on a rocket journey across habitable stars after his rose was torn and initially perceived neglect.",
+      "importance_rating": 5,
+      "relationships": "Becomes close with the Pilot, learns the nature of the Rose through communication with various figures (King, Autocrat, Businessman, Lamplighter), forms a profound bond with The Fox.",
+      "image_prompt_definition": "Small boy wearing green felt hat, white coat and trousers, extraordinarily perceptive expression, gazing pensively at the viewer under a clear sky"
+    },
+    {
+      "name": "Pilot (the Aviator)",
+      "description": "An adult with rosy cheeks and a face weathered by time and the elements, typically sitting 'just so' - head tilted, hands palm-down in front of him.",
+      "personality_traits": "Innocent, Kind, Forlorn, Philosophical, Expressive",
+      "backstory": "Originally a pilot stranded in the Sahara Desert by underfunding and unfavorable weather, it was a chance encounter, or the 'This is the maybe chance' as he calls it, with the Little Prince near his downed aircraft that initiated their journey.",
+      "importance_rating": 4,
+      "relationships": "The Little Prince's guide and witness to transformation. Told his desert story to the Little Prince who later told him the tale of the Rose.",
+      "image_prompt_definition": "Middle-aged man with weathered face, rosy cheeks, sitting awkwardly under a vast desert sky, reminiscent landscape silhouette in the background"
+    },
+    {
+      "name": "The Rose (La Rose Bleue)",
+      "description": "A peculiar blue flower, more a stylized shape due to paradox phenomenon, boasting of Local Weather rights claimed from a distant planet, yet utterly vulnerable.",
+      "personality_traits": "Graceful, Proud, Vulnerable, Unique, Dependence Seeker",
+      "backstory": "Was the caretsian possession of the Little Prince's B-612 Asteroid, the only unique one of its kind, fulfilling many duties conversational, while relying solely on the student.",
+      "importance_rating": 5,
+      "relationships": "The object of the Little Prince's primary journey. Her 'I am unique but not so unique, it's because on B-612 there might be others' has significant resonance.",
+      "image_prompt_definition": "A peculiarly shaped blue flower in a tiny, crystalline vase against a colored backdrop, petals softly curving but delicate"
+    },
+    {
+      "name": "The Fox",
+      "description": "A clever, deep-voiced fox as tawny-colored as theパイании Desert, covering great distances with purposeful, silent paces.",
+      "personality_traits": "Wise, Patient, Superstitious, Deep-thinking, Loyal",
+      "backstory": "Lives amidst his own personalized observatory, perceiving The Little Prince as a friend following an 'appointment with the sun' after having company.",
+      "importance_rating": 4,
+      "relationships": "Unveils the profound concept of 'taming' to the Little Prince and The Pilot, imparting wisdom on affection and universal bonds.",
+      "image_prompt_definition": "Yellow desert-colored fox, sitting with straight posture, gazing meaningfully with large eyes, fine pattern light brown details"
+    }
+  ],
+  "locations": [
+    {
+      "name": "The Sahara Desert",
+      "description": "An vast expanse of ever changing sand dunes that conversant travelers are known to briefly rocket overhead, leaving little mechanism players stranded for long durations. This environment is often populated with graceful antelope.",
+      "atmosphere": "Lonely, Endless, Vulnerable Contrasts, Confiding Solitude",
+      "scale": "REGION",
+      "geography": "Sandy dunes meet the infinite sky, with sudden rock formations or oasis dotting the terrain.",
+      "cultural_context": "Not a place of human habitation but of chance encounters, a canvas for shifting perspectives.",
+      "significance": "The starting point for the Pilot's sojourning story and the meeting place of the Little Prince after his landfall journey; a symbol of isolation and breaking down systems.",
+      "importance_rating": 5,
+      "connected_elements": "Pilot, Little Prince, Rocket, Asteroid B-612",
+      "image_prompt_definition": "Golden desert dunes rolling towards the horizon under a vast, flooding sky, impressionistic depiction dune faces below, upper sky composed with clouds or rocket contrails"
+    },
+    {
+      "name": "Asteroid B-612",
+      "description": "A small, Named Asteroid of marked speckled hypothesis, apparently miniature enough to set the student's footstep counting actual impact. Only slightly larger than a contemporaneous hat with handle. Home to a Royal Rose, some tiny Balbous plants, the Earth, A family of The Little Prince's arrivals, forcing to remove Baobabs.",
+      "atmosphere": "Tiny, Personalized, Sensitive, Cultivated, Anomalous",
+      "scale": "BUILDING",
+      "geography": "A small asteroid; specific distinct spots marked by stories - The Rose's location, Baobab grove.",
+      "cultural_context": "An entirely singular domain defined by its miniaturized dynamics, played in the entities present.",
+      "significance": "The place the Little Prince calls home before embarking on interstellar journeys, origin of the events.",
+      "importance_rating": 5,
+      "connected_elements": "Little Prince, Rose, The Fox (memory), Baobabs, Local Extraterrestrials",
+      "image_prompt_definition": "Drawing of a miniaturized painted astronomical body, tiny elements like a hut, flower, plants, rising miniature \"people\" above"
+    },
+    {
+      "name": "Planet With The King",
+      "description": "The little Planet acquired by The Little Prince was desired to be ruled by one title or another known differently. The King took his own counsel, pride, with titled laws.",
+      "atmosphere": "Majestic, Ignorant, Ambiguous, Lawful, Coleoptera-like.",
+      "atmosphere": "Absolute, Exclusive, Centered, Benevolent, Scatterbrained",
+      "atmosphere": "Humble, Star-wary, Eloquent, Precarious, Pointed.",
+      "atmosphere": "Inwardly questioning, Humble, Broad, Commendable, Grand.",
+      "atmosphere": "Immutable, Strict, Altered, Hopeful",
+      "connect_elements": "The Pilot might describe King activities, but The Pilot only met him via the four-layered Earth.",
+      "description": "A standard asteroid expanse, simply a place where the King exists.",
+      "name": "King's Planet",
+      "description": "A named asteroid with one marked resident, a title-thinker walking around, lost in myths.",
+      "atmosphere": "Exclusive, Nebuluwe-dependent Worldwide Rule respected if needed",
+      "scale": "BUILDING",
+      "geography": "Non-specific terrain, one figure perhaps a smallhandle, drawn profile.",
+      "cultural_context": "A monarchical state existing under a self-proclaimed sovereignty defined only by an inherently Customكه-- the titled law.",
+      "significance": "Test of governance through perspective: the King demanded everyone bow only to him because he was taller.",
+      "importance_rating": 3,
+      "connected_elements": "Little Prince (for testing innocence or understanding demands), named Asteroid B-612 as destination.",
+      "image_prompt_definition": "An lonely expanse under a bright sky, perhaps a few nominal bumps, one figure characterized as a tall, unchanged adult."
+    }
+  ],
+  "lore_items": [
+    {
+      "title": "The Concept of 'Taming'",
+      "description": "The ultimate lesson imparted by the Fox to the Little Prince. Taming turns a simple object into a uniquely meaningful specific thing to whom obligations and affection might well be exacted - it appears in aamazingly different contexts.",
+      "category": "OTHER_LORE",
+      "importance_rating": 5,
+      "related_elements": "Little Prince, Fox, Rose, The Pilot",
+      "image_prompt_definition": "Orchid illustration sprouting from a complex design of grid lines within a picture frame (representing unseen life and connections)."
+    },
+    {
+      "title": "The Rose (Bleue Rose or Secondary concepts)",
+      "description": "The unique flower occupying the center stage of the Little Prince's understanding of preference. Often perceived as distant, thorny, sarcastic until previous bonds are involved.",
+      "category": "ARTIFACT",
+      "importance_rating": 5,
+      "related_elements": "Little Prince, The Rose, Pilot, Fox",
+      "image_prompt_definition": "A stylized blue flower lying near the center of an old star map illustration, tendrils potentially extending towards planetary diagrams or initials."
+    },
+    {
+      "title": "Baobabs",
+      "description": "The invasive trees The Little Prince seeks to control overlooking his tiny Asteroid B-612. Large enough to be mistaken if they are standing alone. If left unchecked, they literally crush the asteroid.",
+      "category": "CREATURE",
+      "importance_rating": 4,
+      "related_elements": "Little Prince, Asteroid B-612 (as a unit to be maintained).",
+      "image_prompt_definition": "Majestic African baobab tree set against a bright desert sky, its large trunk mirroring Asteroid growth, origin apparently from a nearby planet or star."
+    }
+  ]
+}

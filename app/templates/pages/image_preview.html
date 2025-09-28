@@ -1,0 +1,240 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ image_title or 'Image Preview' }}{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ image_title or 'AI Generated Image' }}{% endblock %}
+{% block og_description %}{{ image_description or 'Beautiful AI-generated artwork created with advanced AI models' }}{% endblock %}
+{% block og_image %}{{ image_url }}{% endblock %}
+{% block og_image_width %}1200{% endblock %}
+{% block og_image_height %}630{% endblock %}
+{% block og_image_alt %}{{ image_title or 'AI Generated Image' }}{% endblock %}
+{% block og_url %}{{ request.url }}{% endblock %}
+
+{% block twitter_title %}{{ image_title or 'AI Generated Image' }}{% endblock %}
+{% block twitter_description %}{{ image_description or 'Beautiful AI-generated artwork created with advanced AI models' }}{% endblock %}
+{% block twitter_image %}{{ image_url }}{% endblock %}
+
+{% block meta_description %}{{ image_description or 'Beautiful AI-generated artwork created with advanced AI models' }}{% endblock %}
+{% block meta_keywords %}AI art, generated image, AI artwork, artificial intelligence{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .image-preview-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .image-display-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .image-display {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .image-info {
+        padding: 2rem;
+    }
+    
+    .image-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+    }
+    
+    .image-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+    
+    .image-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .image-description {
+        font-size: 1.125rem;
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .image-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .image-preview-container {
+            padding: 1rem;
+        }
+        
+        .image-info {
+            padding: 1.5rem;
+        }
+        
+        .image-title {
+            font-size: 1.5rem;
+        }
+        
+        .image-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="image-preview-container">
+    {# Standardized Page Header #}
+    {% set page_title = image_title or 'AI Generated Image' %}
+    {% set page_icon = 'fas fa-image' %}
+    {% set page_description = 'High-quality AI-generated artwork' %}
+    {% set page_stats = [
+        {'icon': 'fas fa-palette', 'text': 'AI Generated'},
+        {'icon': 'fas fa-eye', 'text': 'Public Preview'}
+    ] %}
+    {% if back_url %}
+    {% set back_url = back_url %}
+    {% set back_text = back_text or 'Back' %}
+    {% endif %}
+    {% set help_topic = 'image_preview' %}
+    {% include 'partials/_page_header.html' %}
+
+    <!-- Image Display -->
+    <div class="image-display-card">
+        {% if image_url %}
+        <img src="{{ image_url }}" 
+             alt="{{ image_title or 'AI Generated Image' }}" 
+             class="image-display"
+             loading="lazy">
+        {% else %}
+        <div class="text-center p-5">
+            <i class="fas fa-image fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Image not available</h4>
+        </div>
+        {% endif %}
+        
+        {% if image_title or image_description or image_meta %}
+        <div class="image-info">
+            {% if image_title %}
+            <h1 class="image-title">{{ image_title }}</h1>
+            {% endif %}
+            
+            {% if image_meta %}
+            <div class="image-meta">
+                {% for meta in image_meta %}
+                <div class="image-meta-item">
+                    <i class="{{ meta.icon }}"></i>
+                    <span>{{ meta.text }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if image_description %}
+            <div class="image-description">
+                {{ image_description }}
+            </div>
+            {% endif %}
+            
+            <div class="image-actions">
+                {% if image_url %}
+                <a href="{{ image_url }}" 
+                   target="_blank" 
+                   class="btn btn-primary"
+                   download>
+                    <i class="fas fa-download me-2"></i>Download Image
+                </a>
+                
+                <a href="{{ image_url }}" 
+                   target="_blank" 
+                   class="btn btn-outline-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>Open Full Size
+                </a>
+                {% endif %}
+                
+                {% if original_context_url %}
+                <a href="{{ original_context_url }}" 
+                   class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{{ original_context_text or 'Back to Original' }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Social Sharing Section -->
+    {% if image_url %}
+    {% set share_config = {
+        'content_type': 'image_preview',
+        'content_id': image_id|string if image_id else 'preview',
+        'content_title': image_title or 'AI Generated Image',
+        'content_description': image_description or ('Beautiful AI-generated artwork: ' + (image_title or 'Check out this amazing image!')),
+        'content_url': request.url,
+        'content_image': image_url,
+        'hashtags': '#AIArt #GeneratedImage #AICreativity'
+    } %}
+    {% include 'partials/_social_sharing.html' %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handler for image to show full size in modal
+    const imageDisplay = document.querySelector('.image-display');
+    if (imageDisplay) {
+        imageDisplay.style.cursor = 'pointer';
+        imageDisplay.addEventListener('click', function() {
+            // Create modal to show full size image
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ image_title or 'Full Size Image' }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ image_url }}" alt="{{ image_title or 'AI Generated Image' }}" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            
+            // Remove modal after it's hidden
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.body.removeChild(modal);
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

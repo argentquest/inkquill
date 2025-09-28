@@ -1,0 +1,140 @@
+{# /ai_rag_story_app/app/templates/pages/login.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="text-center">
+                    <h1 class="page-title text-white mb-3">
+                        <i class="fas fa-sign-in-alt me-3"></i>
+                        Welcome Back
+                    </h1>
+                    <div class="page-subtitle text-white mb-4">
+                        Sign in to your account to continue your creative writing journey
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Secure Login
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-user-check me-1"></i>
+                            Quick Access
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Enhanced Tabler Premium Login Page -->
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-5 col-xl-4">
+            <div class="card" style="border-radius: var(--tblr-border-radius-lg); box-shadow: var(--tblr-box-shadow-lg); border: 1px solid var(--tblr-border-color);">
+                <div class="card-status-top bg-primary"></div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <span class="avatar avatar-xl bg-primary-lt mb-3">
+                            <i class="fas fa-sign-in-alt fa-2x"></i>
+                        </span>
+                        <h2 class="card-title text-center mb-2">Welcome Back</h2>
+                        <p class="text-secondary">Sign in to your account to continue</p>
+                    </div>
+
+                    <div id="login-error-message" class="alert alert-danger d-none" role="alert">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="avatar bg-red-lt">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </span>
+                            </div>
+                            <div class="flex-fill">
+                                <h4 class="alert-title">Login Error</h4>
+                                <div class="text-secondary" id="login-error-text"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced OAuth Section -->
+                    <div class="oauth-section mb-4">
+                        {% include 'partials/_google_signin_button.html' %}
+                        
+                        <div class="hr-text my-4">
+                            <span>or continue with email</span>
+                        </div>
+                    </div>
+
+                    <!-- FIX: Changed form action from url_for to a hardcoded path -->
+                    <form id="login-form" action="/api/v1/auth/login" method="post">
+                    <!-- END FIX -->
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   style="border-radius: var(--tblr-border-radius); padding: 0.75rem;" 
+                                   placeholder="Enter your username" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-bold">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   style="border-radius: var(--tblr-border-radius); padding: 0.75rem;" 
+                                   placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="d-grid gap-2 mb-3"> 
+                            <button type="submit" id="login-button" class="btn btn-primary btn-lg"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="Sign in to your account"
+                                    style="border-radius: var(--tblr-border-radius); padding: 0.75rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mb-3">
+                            <a href="{{ url_for('ui_forgot_password_form') }}" class="text-decoration-none text-secondary">
+                                <i class="fas fa-key me-1"></i>Forgot Password?
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
+                        <small class="text-secondary">
+                            Don't have an account?
+                            <a href="{{ url_for('ui_register_form') }}" class="link-primary text-decoration-none fw-bold">
+                                Create free account
+                            </a>
+                        </small>
+                    </div>
+                    
+                    <!-- Help Button -->
+                    <div class="text-center mt-3">
+                        {% set help_topic = 'login' %}
+                        {% set size = 'sm' %}
+                        {% set tooltip = 'Get help with login and account access' %}
+                        {% include 'partials/_help_button.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    <script src="{{ url_for('static', path='/js/auth_forms.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ page_title }} - {{ project_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('ui_forum_home') }}">Forum</a>
+                    </li>
+                    <li class="breadcrumb-item active">{{ category.name }}</li>
+                </ol>
+            </nav>
+
+            <!-- Category Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-1">
+                        {% if category.icon %}
+                            <span class="me-2">{{ category.icon }}</span>
+                        {% endif %}
+                        {{ category.name }}
+                    </h1>
+                    {% if category.description %}
+                    <p class="text-muted mb-0">{{ category.description }}</p>
+                    {% endif %}
+                </div>
+                {% if current_user %}
+                <a href="{{ url_for('ui_new_thread_in_category', category_slug=category.slug) }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    New Thread
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Public Access Notice -->
+            {% if not current_user %}
+            <div class="alert alert-info mb-3" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span class="small">
+                        Viewing in read-only mode. 
+                        <a href="{{ url_for('ui_login_form') }}" class="alert-link">Log in</a> to create threads and participate in discussions.
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Threads List -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Discussions</h6>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" style="width: auto;">
+                            <option value="updated">Latest Activity</option>
+                            <option value="recent">Newest First</option>
+                            <option value="popular">Most Popular</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if threads %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50%;">Thread</th>
+                                    <th class="text-center" style="width: 15%;">Replies</th>
+                                    <th class="text-center" style="width: 15%;">Views</th>
+                                    <th style="width: 20%;">Last Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for thread in threads %}
+                                <tr {% if thread.is_pinned %}class="table-warning"{% endif %}>
+                                    <td>
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3 text-center" style="min-width: 30px;">
+                                                {% if thread.is_pinned %}
+                                                    <i class="fas fa-thumbtack text-warning" title="Pinned"></i>
+                                                {% elif thread.is_locked %}
+                                                    <i class="fas fa-lock text-danger" title="Locked"></i>
+                                                {% else %}
+                                                    <i class="fas fa-comment text-muted"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">
+                                                    <a href="{{ url_for('ui_forum_thread', thread_id=thread.id) }}" 
+                                                       class="text-decoration-none">
+                                                        {{ thread.title }}
+                                                    </a>
+                                                </h6>
+                                                <div class="small text-muted">
+                                                    Started by <strong>{{ thread.user }}</strong> • 
+                                                    {{ thread.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                                    {% if thread.world_name %}
+                                                        • <i class="fas fa-globe me-1"></i>{{ thread.world_name }}
+                                                    {% endif %}
+                                                    {% if thread.story_title %}
+                                                        • <i class="fas fa-book me-1"></i>{{ thread.story_title }}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ thread.post_count - 1 }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">{{ thread.view_count }}</span>
+                                    </td>
+                                    <td>
+                                        {% if thread.last_post_at %}
+                                        <div class="small">
+                                            <div>{{ thread.last_post_at.strftime('%b %d, %Y') }}</div>
+                                            {% if thread.last_post_by %}
+                                            <div class="text-muted">by {{ thread.last_post_by }}</div>
+                                            {% endif %}
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted small">No replies</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page > 1 or has_next %}
+                    <div class="card-footer">
+                        <nav aria-label="Thread pagination">
+                            <ul class="pagination pagination-sm justify-content-center mb-0">
+                                {% if page > 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('ui_forum_category', category_slug=category.slug, page=page-1) }}">
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li class="page-item active">
+                                    <span class="page-link">Page {{ page }}</span>
+                                </li>
+                                {% if has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('ui_forum_category', category_slug=category.slug, page=page+1) }}">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No threads in this category yet</h5>
+                        <p class="text-muted">Be the first to start a discussion!</p>
+                        {% if current_user %}
+                        <a href="{{ url_for('ui_new_thread_in_category', category_slug=category.slug) }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>
+                            Create First Thread
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Category Stats -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Category Statistics
+                            </h6>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="h5 mb-0 text-primary">{{ threads|length }}</div>
+                                    <small class="text-muted">Threads</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="h5 mb-0 text-success">{{ threads|sum(attribute='post_count') }}</div>
+                                    <small class="text-muted">Posts</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="h5 mb-0 text-info">{{ threads|sum(attribute='view_count') }}</div>
+                                    <small class="text-muted">Views</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Quick Tips
+                            </h6>
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1">
+                                    <i class="fas fa-thumbtack text-warning me-2"></i>
+                                    Pinned threads stay at the top
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-lock text-danger me-2"></i>
+                                    Locked threads cannot accept new posts
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-heart text-danger me-2"></i>
+                                    Use voting to highlight great content
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

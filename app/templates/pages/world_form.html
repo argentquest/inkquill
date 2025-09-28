@@ -1,0 +1,414 @@
+{# /ai_rag_story_app/app/templates/pages/world_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set page_action = "Create New" if world is none else "Edit" %}
+{% set button_action_text = "Create World" if world is none else "Save Changes" %}
+{% set button_icon_class = "fas fa-plus-circle" if world is none else "fas fa-save" %}
+
+{% block title %}{{ page_action }} World{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- TABLER PREMIUM FORM STYLES - Following UI Design Standards -->
+<style>
+    /* Enhanced form layout with Tabler CSS variables */
+    .form-layout { 
+        display: flex; 
+        min-height: 70vh; 
+        gap: 0; 
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .form-main { 
+        flex: 1; 
+        min-width: 400px; 
+        background: var(--tblr-bg-surface); 
+        border: 1px solid var(--tblr-border-color); 
+        border-radius: var(--tblr-border-radius-lg) 0 0 var(--tblr-border-radius-lg); 
+        padding: 2rem; 
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .form-sidebar { 
+        width: 400px; 
+        min-width: 300px; 
+        max-width: 600px; 
+        background: var(--tblr-bg-surface-secondary); 
+        border: 1px solid var(--tblr-border-color); 
+        border-left: none; 
+        border-radius: 0 var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0; 
+        overflow-y: auto; 
+        position: relative;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        bottom: 0; 
+        width: 6px; 
+        background: var(--tblr-border-color); 
+        cursor: col-resize; 
+        z-index: 1000;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle:hover { 
+        background: var(--tblr-primary); 
+    }
+    
+    .form-sidebar-content { 
+        padding: 2rem; 
+        height: 100%; 
+    }
+    
+    .sidebar-section { 
+        margin-bottom: 2rem; 
+    }
+    
+    .sidebar-section h6 { 
+        margin-bottom: 1rem; 
+        font-weight: 600; 
+        color: var(--tblr-muted); 
+        border-bottom: 1px solid var(--tblr-border-color); 
+        padding-bottom: 0.5rem; 
+    }
+    
+    /* Enhanced image container */
+    #generated-image-container { 
+        position: relative; 
+        width: 100%; 
+        padding-top: 56.25%; 
+        background-color: var(--tblr-bg-surface-tertiary); 
+        border-radius: var(--tblr-border-radius); 
+        overflow: hidden; 
+        border: 1px solid var(--tblr-border-color);
+        transition: all 0.15s ease-in-out;
+    }
+    
+    #generated-image-display { 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+    }
+    
+    #image-generation-spinner { 
+        position: absolute; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+    }
+    
+    /* Enhanced gallery */
+    .image-gallery { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+        gap: 0.5rem; 
+    }
+    
+    .gallery-thumbnail { 
+        position: relative; 
+        border: 2px solid transparent; 
+        border-radius: var(--tblr-border-radius); 
+        overflow: hidden; 
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .gallery-thumbnail img { 
+        width: 100%; 
+        height: 80px; 
+        object-fit: cover; 
+    }
+    
+    .gallery-thumbnail:hover { 
+        border-color: var(--tblr-info); 
+        transform: translateY(-2px);
+    }
+    
+    .gallery-thumbnail.active { 
+        border-color: var(--tblr-primary); 
+        box-shadow: 0 0 0 2px var(--tblr-primary); 
+    }
+    
+    .gallery-thumbnail .set-current-btn { 
+        position: absolute; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        opacity: 0; 
+        transition: opacity 0.2s ease; 
+        pointer-events: none; 
+    }
+    
+    .gallery-thumbnail:hover .set-current-btn { 
+        opacity: 1; 
+        pointer-events: all; 
+    }
+
+    /* Enhanced form controls */
+    .form-control:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+
+    .form-select:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="world-form-page">
+    {# TABLER PREMIUM GRADIENT HERO HEADER - Following UI Design Standards #}
+    <div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); position: relative; overflow: hidden; margin-bottom: 2rem;">
+        <!-- Background pattern overlay -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
+        
+        <div class="container-fluid position-relative">
+            <!-- Breadcrumb Navigation -->
+            <div class="row align-items-center" style="padding-top: 1rem;">
+                <div class="col">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-transparent mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('ui_list_worlds') }}" class="text-white-50 text-decoration-none">
+                                    <i class="fas fa-globe me-1"></i>My Worlds
+                                </a>
+                            </li>
+                            {% if world %}
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50 text-decoration-none">
+                                    {{ world.name }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">
+                                Edit World
+                            </li>
+                            {% else %}
+                            <li class="breadcrumb-item active text-white" aria-current="page">
+                                Create New World
+                            </li>
+                            {% endif %}
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Header Content -->
+            <div class="row align-items-center py-4">
+                <div class="col-12 col-md-8">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="{{ button_icon_class }} text-white me-3" style="font-size: 2.5rem;"></i>
+                        <div>
+                            <h1 class="text-white mb-1 fw-bold">{{ page_action }} World</h1>
+                            <p class="text-white-75 mb-0 lead">Create and manage world settings, characters, locations, and lore</p>
+                        </div>
+                    </div>
+                    
+                    {% if world %}
+                    <!-- World Stats -->
+                    <div class="d-flex flex-wrap gap-3 mt-3">
+                        <div class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                            <i class="fas fa-globe me-1"></i>
+                            Editing: {{ world.name }}
+                        </div>
+                        <div class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Created: {{ world.created_at.strftime('%b %d, %Y') if world.created_at else 'Recently' }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Header Actions -->
+                <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
+                    {% if world %}
+                    <div class="btn-group">
+                        <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="btn btn-light btn-sm"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="View the complete world details page">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                        <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" class="btn btn-light btn-sm"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Explore the world's hierarchical structure">
+                            <i class="fas fa-sitemap me-1"></i> Hierarchy
+                        </a>
+                        <a href="{{ url_for('ui_world_chat', world_id=world.id) }}" class="btn btn-light btn-sm"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Start an AI conversation about this world">
+                            <i class="fas fa-comments me-1"></i> Chat
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container-fluid">
+        {# TABLER PREMIUM ALERT - Enhanced error display #}
+        <div id="world-form-error-message" class="alert alert-danger alert-dismissible" style="display: none;" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="m0 0h24v24H0z" fill="none"></path>
+                        <path d="m12 9v4"></path>
+                        <path d="m10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"></path>
+                        <path d="m12 16h.01"></path>
+                    </svg>
+                </div>
+                <div class="alert-message"></div>
+            </div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+
+        <div class="form-layout" id="form-layout">
+            <div class="form-main">
+                <form id="world-form" action="{{ form_action_url }}" method="post" data-page-action="{{ page_action }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label d-flex align-items-center">
+                            World Name:
+                            <i class="fas fa-question-circle text-muted ms-2" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="The unique name for your world. This will be displayed in world lists and used to identify your world throughout the application."></i>
+                        </label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ world.name | e if world else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="short_description" class="form-label d-flex align-items-center">
+                            Short Description (Optional):
+                            <i class="fas fa-question-circle text-muted ms-2" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="A brief 1-2 sentence summary of your world. This appears in world lists, previews, and helps users quickly understand your world's theme and setting."></i>
+                        </label>
+                        <textarea class="form-control" id="short_description" name="short_description" rows="3" placeholder="A brief summary of this world (1-2 sentences)">{{ world.short_description | e if world and world.short_description else '' }}</textarea>
+                        <div class="form-text">A concise summary that appears in world lists and previews.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label d-flex align-items-center">
+                            Full Description (Optional):
+                            <i class="fas fa-question-circle text-muted ms-2" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="A detailed description of your world's setting, atmosphere, history, cultures, and key features. This helps the AI understand your world's context when generating stories and providing assistance."></i>
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="12" placeholder="Detailed description of your world's setting, atmosphere, history, and key features">{{ world.description | e if world and world.description else '' }}</textarea>
+                        <div class="form-text">Comprehensive description used for AI assistance and world building.</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0 d-flex align-items-center">
+                                <i class="fas fa-globe me-1"></i>Public Chat Settings
+                                <i class="fas fa-question-circle text-muted ms-2" 
+                                   data-bs-toggle="tooltip" data-bs-placement="right"
+                                   title="Configure whether anonymous users can access AI chat features for this world. When enabled, your world becomes publicly discoverable in the AI Chat Gallery."></i>
+                            </h6>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_free_chat_enabled" name="is_free_chat_enabled" value="true" 
+                                   {% if world and world.is_free_chat_enabled %}checked{% endif %}>
+                            <label class="form-check-label d-flex align-items-center" for="is_free_chat_enabled">
+                                <i class="fas fa-comments me-2"></i>Enable Public AI Chat
+                                <i class="fas fa-question-circle text-muted ms-2" 
+                                   data-bs-toggle="tooltip" data-bs-placement="right"
+                                   title="Allow anonymous users to have AI conversations about this world without requiring an account. Your world will be featured in the public AI Chat Gallery for discovery."></i>
+                            </label>
+                            <div class="form-text">When enabled, anonymous users can have AI conversations about this world without logging in. Your world will appear in the AI Chat Gallery for others to explore.</div>
+                        </div>
+                    </div>
+                    {# TABLER PREMIUM FORM ACTIONS - Following UI Design Standards #}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('ui_list_worlds') }}" class="btn btn-ghost-secondary me-md-2"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Discard changes and return to worlds list">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" id="save-world-button" class="btn btn-primary"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if world %}Save all changes to this world{% else %}Create a new world with the provided information{% endif %}">
+                            <i class="{{ button_icon_class }} me-1"></i>{{ button_action_text }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="form-sidebar" id="form-sidebar">
+                <div class="form-resize-handle" id="form-resize-handle"></div>
+                <div class="form-sidebar-content">
+                    <!-- FIX: ADD IMAGE GENERATION SECTION -->
+                    <div class="sidebar-section">
+                        <h6><i class="fas fa-image me-2"></i>World Image</h6>
+                        <div class="mb-3">
+                            <label for="image_style_select" class="form-label d-flex align-items-center">
+                                Image Style:
+                                <i class="fas fa-question-circle text-muted ms-2" 
+                                   data-bs-toggle="tooltip" data-bs-placement="right"
+                                   title="Choose the artistic style for AI-generated images of this world. Different styles affect the visual mood and aesthetic of generated artwork."></i>
+                            </label>
+                            <select class="form-select" id="image_style_select" name="image_style_select">
+                                <option value="">-- Default Style --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image_prompt_definition" class="form-label d-flex align-items-center">
+                                AI Image Prompt:
+                                <i class="fas fa-question-circle text-muted ms-2" 
+                                   data-bs-toggle="tooltip" data-bs-placement="right"
+                                   title="Custom text prompt used by AI to generate images for this world. Include visual details, atmosphere, colors, and style preferences to guide the image generation."></i>
+                            </label>
+                            <textarea class="form-control" id="image_prompt_definition" name="image_prompt_definition" form="world-form" rows="4" placeholder="Describe the visual appearance, atmosphere, and style you want for generated world images...">{{ world.image_prompt_definition | e if world and world.image_prompt_definition else '' }}</textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" id="generate-image-btn" data-element-type="world" data-element-id="{{ world.id if world else '' }}" 
+                                {% if not world %}disabled{% endif %}
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if world %}Use AI to generate a world image based on the description{% else %}Save the world first to enable image generation{% endif %}"
+                                style="transition: all 0.15s ease-in-out;">
+                            <i class="fas fa-magic me-1"></i>Generate World Image
+                        </button>
+                        <div id="image-generation-status" class="small text-muted mt-2" style="display: none;"></div>
+                        <div id="generated-image-container" class="mt-3">
+                            <div id="image-generation-spinner" class="spinner-border text-primary" role="status" style="display: none;"><span class="visually-hidden">Loading...</span></div>
+                            <img id="generated-image-display" src="{{ image_url if image_url else '' }}" alt="Generated world image" style="display: {{ 'block' if image_url else 'none' }};">
+                        </div>
+                        <a href="{{ image_url if image_url else '#' }}" id="generated-image-link" target="_blank" class="small text-truncate d-block mt-1">{{ image_url if image_url else '' }}</a>
+                        
+                        <div class="mt-4" id="image-gallery-section" {% if not world %}style="display: none;"{% endif %}>
+                            <h6 class="h6">Version History</h6>
+                            <div id="image-gallery-container" class="image-gallery"><p class="text-muted small">Loading versions...</p></div>
+                        </div>
+                    </div>
+                    <!-- END FIX -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/world_form_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/location_form_resize.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/image_generator.js') }}"></script>
+    
+    {# Initialize Bootstrap tooltips for help icons #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+{% endblock %}

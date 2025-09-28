@@ -1,0 +1,24 @@
+<!-- Button Group Component -->
+<!-- Usage: {% include "components/buttons/button_group.html" buttons=button_list %} -->
+
+<div class="btn-group{% if class %} {{ class }}{% endif %}" 
+     {% if vertical %}role="group"{% endif %}
+     {% if label %}aria-label="{{ label }}"{% endif %}
+     {{ attrs | default('') }}>
+     
+    {% if buttons %}
+        {% for button in buttons %}
+            {% include "components/buttons/button.html" 
+                text=button.text 
+                color=button.color 
+                icon=button.icon 
+                onclick=button.onclick 
+                href=button.href 
+                disabled=button.disabled 
+                class=button.class 
+                attrs=button.attrs %}
+        {% endfor %}
+    {% else %}
+        {{ content }}
+    {% endif %}
+</div>

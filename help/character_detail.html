@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Detail - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Character Detail</h1>
+            <p class="help-subtitle">Create compelling, multi-dimensional characters</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"basics\"]').click()">
+                <div class="quick-action-icon">👤</div>
+                <div class="quick-action-text">Character Basics</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"development\"]').click()">
+                <div class="quick-action-icon">🧠</div>
+                <div class="quick-action-text">Development</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-tools\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Tools</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="basics">Basics</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="development">Development</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="relationships">Relationships</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-tools">AI Tools</button></li>
+            </ul>
+        </div>
+
+        <!-- Basics Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="basics">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Character Information Fields
+                </h2>
+                <p>A well-developed character is the heart of compelling storytelling. The Character Detail page helps you create three-dimensional people who drive your narrative forward.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📝 Basic Information</h3>
+                        <p class="feature-card-description">Name, age, physical description, and core identity details.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎭 Personality Traits</h3>
+                        <p class="feature-card-description">Behaviors, quirks, and psychological characteristics that make them unique.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Background & History</h3>
+                        <p class="feature-card-description">Past experiences that shaped who they are today.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎯 Goals & Motivations</h3>
+                        <p class="feature-card-description">What they want and why they want it - the driving force of conflict.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Creating Your First Character</h3>
+                        <span class="recipe-card-time">15 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Start with a compelling concept or role in your story</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Fill in basic details: name, age, appearance</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Define their primary goal and motivation</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Add personality traits and behavioral quirks</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Create relevant backstory and formative experiences</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">6</div>
+                            <div class="recipe-step-content">Connect them to your world through relationships and associations</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Essential Character Elements</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Physical Description Guidelines</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create memorable visual impressions:</p>
+                        <ul>
+                            <li><strong>Distinctive Features:</strong> One or two memorable physical traits</li>
+                            <li><strong>Body Language:</strong> How they carry themselves, gestures, posture</li>
+                            <li><strong>Clothing Style:</strong> What their fashion choices reveal about personality</li>
+                            <li><strong>Voice and Speech:</strong> Accent, tone, speaking patterns</li>
+                            <li><strong>Scars and Marks:</strong> Physical evidence of their history</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">💡</span>
+                            <div>
+                                <strong>Show, Don't List:</strong> Instead of cataloging every feature, focus on the details that matter most to the story and reveal character personality.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Personality Development Framework</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Questions to Consider</th>
+                                    <th>Example Traits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Core Values</td>
+                                    <td>What principles guide their decisions?</td>
+                                    <td>Justice, loyalty, freedom, knowledge</td>
+                                </tr>
+                                <tr>
+                                    <td>Strengths</td>
+                                    <td>What are they good at?</td>
+                                    <td>Brave, intelligent, compassionate, skilled</td>
+                                </tr>
+                                <tr>
+                                    <td>Flaws</td>
+                                    <td>What holds them back?</td>
+                                    <td>Prideful, impulsive, cynical, naive</td>
+                                </tr>
+                                <tr>
+                                    <td>Quirks</td>
+                                    <td>What makes them unique?</td>
+                                    <td>Always hums, collects buttons, speaks to plants</td>
+                                </tr>
+                                <tr>
+                                    <td>Fears</td>
+                                    <td>What terrifies them?</td>
+                                    <td>Heights, failure, abandonment, spiders</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Arc Planning</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Plan character growth throughout your story:</p>
+                        <ul>
+                            <li><strong>Starting Point:</strong> Who are they at the beginning?</li>
+                            <li><strong>Catalyst Event:</strong> What forces them to change?</li>
+                            <li><strong>Internal Conflict:</strong> What beliefs or behaviors must they overcome?</li>
+                            <li><strong>Growth Moments:</strong> Key scenes where they evolve</li>
+                            <li><strong>Transformed State:</strong> Who have they become by the end?</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Development Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="development">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Advanced Character Development
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Backstory and History</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create meaningful character history:</p>
+                        <ul>
+                            <li><strong>Formative Events:</strong> Experiences that shaped their worldview</li>
+                            <li><strong>Family Background:</strong> Relationships with parents, siblings, mentors</li>
+                            <li><strong>Education and Skills:</strong> How they learned what they know</li>
+                            <li><strong>Previous Relationships:</strong> Past loves, friendships, enemies</li>
+                            <li><strong>Secrets and Regrets:</strong> Hidden aspects of their past</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Building Compelling Backstory</h3>
+                                <span class="recipe-card-time">20 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Identify 3-5 major events that shaped them</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Connect each event to current personality traits</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Create specific details that could surface in stories</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Leave some mysteries for later exploration</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Ensure backstory serves current story needs</div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Avoid Backstory Overload:</strong> Create only the history you need for your current story. Too much unused backstory can overwhelm your narrative focus.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Voice and Dialogue</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Develop distinctive speech patterns:</p>
+                        <ul>
+                            <li><strong>Vocabulary Level:</strong> Formal, casual, technical, street smart</li>
+                            <li><strong>Sentence Structure:</strong> Short and choppy vs. long and flowing</li>
+                            <li><strong>Cultural Background:</strong> Regional dialects, foreign influences</li>
+                            <li><strong>Emotional Patterns:</strong> How they express anger, joy, fear</li>
+                            <li><strong>Social Awareness:</strong> Formal with superiors, casual with friends</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Dialogue Voice Examples:\n\nScholar: \"I must confess, the evidence suggests otherwise.\"\nStreet Kid: \"Nah, that ain\'t how it went down.\"\nMilitary: \"Negative. Mission parameters have changed.\"\nArtist: \"The whole thing just felt... wrong, you know?\"\nNoble: \"One simply does not discuss such matters.\"')">Copy</button>
+                            <pre>Dialogue Voice Examples:
+
+Scholar: "I must confess, the evidence suggests otherwise."
+Street Kid: "Nah, that ain't how it went down."
+Military: "Negative. Mission parameters have changed."
+Artist: "The whole thing just felt... wrong, you know?"
+Noble: "One simply does not discuss such matters."</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Internal vs. External Characteristics</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create depth through contrast:</p>
+                        <ul>
+                            <li><strong>Public Persona:</strong> How they present themselves to the world</li>
+                            <li><strong>Private Self:</strong> Who they are when no one is watching</li>
+                            <li><strong>Hidden Depths:</strong> Unexpected skills, knowledge, or sensitivity</li>
+                            <li><strong>Contradictions:</strong> Conflicting traits that create complexity</li>
+                            <li><strong>Growth Potential:</strong> Areas where they can change and develop</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Character Types and Roles</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Character Type</th>
+                            <th>Story Function</th>
+                            <th>Development Focus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Protagonist</td>
+                            <td>Drives main story action</td>
+                            <td>Clear goals, major character arc, relatable flaws</td>
+                        </tr>
+                        <tr>
+                            <td>Antagonist</td>
+                            <td>Creates conflict and obstacles</td>
+                            <td>Understandable motivation, competent opposition</td>
+                        </tr>
+                        <tr>
+                            <td>Supporting Cast</td>
+                            <td>Aids or complicates protagonist journey</td>
+                            <td>Specific expertise, unique perspective, loyalty/conflict</td>
+                        </tr>
+                        <tr>
+                            <td>Love Interest</td>
+                            <td>Emotional stakes and growth catalyst</td>
+                            <td>Independent agency, chemistry, personal goals</td>
+                        </tr>
+                        <tr>
+                            <td>Mentor</td>
+                            <td>Provides guidance and wisdom</td>
+                            <td>Relevant experience, teaching ability, own limitations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Relationships Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="relationships">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Character Relationships and Associations
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Relationship Dynamics</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Define how characters interact:</p>
+                        <ul>
+                            <li><strong>Power Balance:</strong> Who has more influence or authority?</li>
+                            <li><strong>Emotional Bond:</strong> Level of trust, affection, or animosity</li>
+                            <li><strong>History Together:</strong> Shared experiences that shaped the relationship</li>
+                            <li><strong>Current Status:</strong> Are they growing closer or drifting apart?</li>
+                            <li><strong>Conflict Potential:</strong> What could make them clash?</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Relationship Types:\n- Mentor/Student: Guidance and growth\n- Rivals: Competition and challenge\n- Allies: Mutual support and cooperation\n- Family: Complex bonds and obligations\n- Romantic: Emotional and physical attraction\n- Enemies: Opposition and conflict\n- Strangers: Unknown potential and uncertainty')">Copy</button>
+                            <pre>Relationship Types:
+- Mentor/Student: Guidance and growth
+- Rivals: Competition and challenge
+- Allies: Mutual support and cooperation
+- Family: Complex bonds and obligations
+- Romantic: Emotional and physical attraction
+- Enemies: Opposition and conflict
+- Strangers: Unknown potential and uncertainty</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story-Level Associations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Connect characters to narrative elements:</p>
+                        <ul>
+                            <li><strong>Story Role:</strong> Protagonist, antagonist, ally, obstacle, mentor</li>
+                            <li><strong>Act Involvement:</strong> Which story acts feature this character prominently</li>
+                            <li><strong>Scene Presence:</strong> Specific scenes where they appear</li>
+                            <li><strong>Location Connections:</strong> Places associated with this character</li>
+                            <li><strong>Lore Relationships:</strong> How they connect to world knowledge and systems</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">🔗</span>
+                            <div>
+                                <strong>Association Benefits:</strong> Well-defined associations help AI provide more relevant and consistent writing suggestions that maintain character relationships and story continuity.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Networks</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Map the social web around your character:</p>
+                        <ul>
+                            <li><strong>Inner Circle:</strong> 2-3 closest relationships (family, best friends, lovers)</li>
+                            <li><strong>Regular Contacts:</strong> 5-8 people they interact with frequently</li>
+                            <li><strong>Professional Network:</strong> Colleagues, superiors, subordinates</li>
+                            <li><strong>Community Ties:</strong> Neighbors, acquaintances, service providers</li>
+                            <li><strong>Antagonistic Relationships:</strong> Enemies, rivals, obstacles</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Managing Character Connections</h2>
+                <p>Use the association system to:</p>
+                <ul>
+                    <li><strong>Track Relationships:</strong> Define how characters know each other</li>
+                    <li><strong>Story Integration:</strong> Connect characters to specific narrative elements</li>
+                    <li><strong>Scene Planning:</strong> Determine which characters appear together</li>
+                    <li><strong>Conflict Generation:</strong> Identify potential sources of drama</li>
+                    <li><strong>AI Context:</strong> Provide rich context for AI writing assistance</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- AI Tools Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-tools">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI-Powered Character Development
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧠 Intelligent Character Enhancement</h3>
+                    <p class="ai-feature-description">AI can help develop deeper characters by suggesting personality traits, backstory elements, and dialogue patterns based on your initial concepts.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Description Enhancement</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can expand your character descriptions:</p>
+                        <ul>
+                            <li><strong>Physical Details:</strong> Enhance basic appearance with distinctive features</li>
+                            <li><strong>Personality Expansion:</strong> Develop traits into full behavioral patterns</li>
+                            <li><strong>Backstory Generation:</strong> Create relevant history from basic concepts</li>
+                            <li><strong>Motivation Depth:</strong> Explore the psychology behind character goals</li>
+                            <li><strong>Voice Development:</strong> Create distinctive speech patterns and vocabulary</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 5-10 credits for description enhancement, 15-25 credits for full character development
+                        </div>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Using AI for Character Development</h3>
+                                <span class="recipe-card-time">10 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Start with basic concept and key traits</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Use AI to suggest additional personality elements</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Select suggestions that fit your vision</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Ask AI to elaborate on chosen elements</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Customize AI output to match your style</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Image Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create visual representations of your characters:</p>
+                        <ul>
+                            <li><strong>Portrait Generation:</strong> Face and expression based on descriptions</li>
+                            <li><strong>Full Body Images:</strong> Complete character visualization with clothing</li>
+                            <li><strong>Action Shots:</strong> Characters in dynamic poses or situations</li>
+                            <li><strong>Style Variations:</strong> Different artistic styles (realistic, cartoon, sketch)</li>
+                            <li><strong>Expression Studies:</strong> Multiple emotional states for reference</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">🎨</span>
+                            <div>
+                                <strong>Image Tips:</strong> Be specific about physical details, clothing, and emotional expression. Include setting context for more accurate results.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Consistency Checking</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can analyze character consistency across your story:</p>
+                        <ul>
+                            <li><strong>Personality Tracking:</strong> Ensure character behaves consistently</li>
+                            <li><strong>Voice Consistency:</strong> Check dialogue patterns remain authentic</li>
+                            <li><strong>Growth Arc Analysis:</strong> Evaluate character development progression</li>
+                            <li><strong>Relationship Continuity:</strong> Verify relationships develop logically</li>
+                            <li><strong>Capability Consistency:</strong> Ensure skills and knowledge remain stable</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Dialogue and Voice Tools</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI assistance for character speech:</p>
+                        <ul>
+                            <li><strong>Voice Samples:</strong> Generate example dialogue in character voice</li>
+                            <li><strong>Speech Pattern Analysis:</strong> Identify unique linguistic characteristics</li>
+                            <li><strong>Emotional Range:</strong> How character speaks in different emotional states</li>
+                            <li><strong>Cultural Integration:</strong> Incorporate background into speech patterns</li>
+                            <li><strong>Relationship Dynamics:</strong> How speech changes with different characters</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'AI Dialogue Prompts:\n\"Generate dialogue for [Character] expressing anger\"\n\"How would [Character] comfort a friend?\"\n\"Create small talk between [Character A] and [Character B]\"\n\"Show [Character] explaining their motivation\"\n\"Write [Character] dialogue under pressure\"')">Copy</button>
+                            <pre>AI Dialogue Prompts:
+"Generate dialogue for [Character] expressing anger"
+"How would [Character] comfort a friend?"
+"Create small talk between [Character A] and [Character B]"
+"Show [Character] explaining their motivation"
+"Write [Character] dialogue under pressure"</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Best Practices for AI Character Development</h2>
+                <ul>
+                    <li><strong>Start Human:</strong> Create the core concept yourself, then use AI to expand</li>
+                    <li><strong>Selective Adoption:</strong> Choose only AI suggestions that fit your vision</li>
+                    <li><strong>Iterate and Refine:</strong> Use multiple AI sessions to develop ideas gradually</li>
+                    <li><strong>Maintain Control:</strong> Always review and edit AI output for consistency</li>
+                    <li><strong>Cross-Reference:</strong> Check AI suggestions against existing story elements</li>
+                </ul>
+
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div>
+                        <strong>Avoid Over-Reliance:</strong> AI should enhance your creativity, not replace it. The best characters come from your unique vision and understanding of human nature.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

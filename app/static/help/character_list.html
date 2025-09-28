@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Management - AI Storytelling Assistant</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header centered">
+            <h1 class="help-title">👥 Character Management</h1>
+            <p class="help-subtitle">Create, organize, and develop compelling characters with AI assistance</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Quick Navigation -->
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#overview">Character Overview</a></li>
+                    <li><a href="#creating-characters">Creating Characters</a></li>
+                    <li><a href="#list-management">List Management</a></li>
+                    <li><a href="#ai-features">AI Features</a></li>
+                    <li><a href="#organization">Organization Tips</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="scrollToSection('creating-characters')">
+                    <div class="quick-action-icon">✨</div>
+                    <div class="quick-action-text">Create Character</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('list-management')">
+                    <div class="quick-action-icon">📋</div>
+                    <div class="quick-action-text">Manage List</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('ai-features')">
+                    <div class="quick-action-icon">🤖</div>
+                    <div class="quick-action-text">AI Generator</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('organization')">
+                    <div class="quick-action-icon">📁</div>
+                    <div class="quick-action-text">Organization</div>
+                </div>
+            </div>
+
+            <section id="overview" class="help-section">
+                <h2 class="help-section-title">Character Management Overview</h2>
+                <p>Organize and manage all characters in your world with powerful filtering, sorting, and AI-powered creation tools. Well-developed characters are the foundation of compelling narratives and intelligent AI assistance.</p>
+                
+                <div class="help-alert help-alert-success">
+                    <div class="help-alert-icon">🎭</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">Characters Drive Story Intelligence</div>
+                        <div class="help-alert-text">The more detailed your character profiles, the better the AI can write authentic dialogue, consistent actions, and meaningful character interactions in your stories.</div>
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/characters" class="help-action-button">
+                        👥 View My Characters
+                    </a>
+                    <a href="/ui/characters/generator" class="help-action-button-secondary">
+                        ✨ AI Character Generator
+                    </a>
+                </div>
+            </section>
+
+            <section id="creating-characters" class="help-section">
+                <h2 class="help-section-title">Creating Characters</h2>
+                <p>Build compelling characters using multiple creation methods tailored to your workflow and needs:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">🤖 AI Character Generator</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-beginner">Recommended</span><br>
+                            Let AI create detailed characters from simple prompts. Specify role, personality traits, or story function and get complete character profiles with backstories, motivations, and relationships.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/characters/generator" class="help-action-button">Start Generator</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📝 Manual Creation</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-intermediate">Full Control</span><br>
+                            Build characters from scratch with complete control over every detail. Perfect for experienced writers with specific character visions or unique concepts.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/characters/new" class="help-action-button">Create Manually</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📚 Import from Stories</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-intermediate">From Text</span><br>
+                            Extract characters from existing text or manuscripts. AI analyzes your writing and creates character profiles based on how they appear in your story.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/documents" class="help-action-button">Document Import</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🎲 Random Generation</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-beginner">Quick Start</span><br>
+                            Generate random characters for inspiration or to populate your world quickly. Great for creating NPCs, background characters, or exploring new character concepts.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/characters/random" class="help-action-button">Random Character</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-card mt-lg">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">🎭 Character Creation Best Practices</div>
+                        <div class="recipe-card-time">⏱️ Time: 10-30 minutes per character</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Define Role First:</strong> Establish the character's function in your story (protagonist, antagonist, mentor, comic relief)
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Core Personality:</strong> Choose 3-5 key personality traits that drive their decisions and conflicts
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Motivation & Goals:</strong> What does this character want most? What drives their actions?
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Voice & Dialogue:</strong> Add examples of how they speak to help AI maintain consistent character voice
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">
+                                <strong>Relationships:</strong> Connect them to other characters, locations, and world elements for rich context
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="list-management" class="help-section">
+                <h2 class="help-section-title">Character List Features</h2>
+                <p>Efficiently manage your character roster with powerful organization and filtering tools:</p>
+                
+                <h3 class="help-section-subtitle">List Organization</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">🔍 Quick Search</div>
+                        <div class="feature-card-description">Find characters instantly by name, role, or personality traits. Search across all character details including backstories and relationships.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🎭 Role Filtering</div>
+                        <div class="feature-card-description">Filter by character roles: protagonists, antagonists, supporting characters, or NPCs. Quickly find characters by their story function.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">⭐ Importance Levels</div>
+                        <div class="feature-card-description">Organize by importance: major characters (central to plot), minor characters (supporting roles), and background characters (world population).</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📊 Bulk Operations</div>
+                        <div class="feature-card-description">Select multiple characters for batch operations: delete, export, change importance levels, or assign to stories in bulk.</div>
+                    </div>
+                </div>
+
+                <h3 class="help-section-subtitle">Character Cards & Preview</h3>
+                <p>Each character appears as an information-rich card displaying:</p>
+                <ul>
+                    <li><strong>🎭 Name & Role:</strong> Character name and their function in the story</li>
+                    <li><strong>📝 Quick Description:</strong> Brief personality summary and key traits</li>
+                    <li><strong>🎨 Visual Design:</strong> Character portrait or AI-generated appearance</li>
+                    <li><strong>⭐ Importance Level:</strong> Major, minor, or background character designation</li>
+                    <li><strong>🔗 Story Connections:</strong> Which stories feature this character</li>
+                    <li><strong>📅 Last Modified:</strong> When the character was last updated</li>
+                </ul>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/characters" class="help-action-button">
+                        📋 Manage Character List
+                    </a>
+                </div>
+            </section>
+
+            <section id="ai-features" class="help-section">
+                <h2 class="help-section-title">AI Character Features</h2>
+                
+                <h3 class="help-section-subtitle">AI Character Generator</h3>
+                <p>Create rich, detailed characters with minimal input using advanced AI generation:</p>
+                
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Provide Simple Prompts</div>
+                            <div class="help-step-description">Enter basic information like "brave knight with a secret" or "cunning merchant who fears magic" - the AI expands this into full character profiles.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Review Generated Profile</div>
+                            <div class="help-step-description">AI creates personality, backstory, motivations, fears, relationships, and appearance details. Review and modify anything that doesn't fit your vision.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Generate Character Image</div>
+                            <div class="help-step-description">Optionally create AI-generated character portraits based on the personality and appearance descriptions. Multiple styles available.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Integrate with World</div>
+                            <div class="help-step-description">Connect the character to locations, other characters, and lore items to create rich relationships and world connections.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-alert help-alert-info mt-lg">
+                    <div class="help-alert-icon">🎯</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">AI Generation Tips</div>
+                        <div class="help-alert-text">Be specific about the character's role and one key trait. "Nervous librarian who discovers forbidden magic" generates much better results than just "librarian".</div>
+                    </div>
+                </div>
+
+                <h3 class="help-section-subtitle">Smart Character Integration</h3>
+                <p>Once created, characters become intelligent parts of your storytelling system:</p>
+                <ul>
+                    <li><strong>🗣️ Voice Consistency:</strong> AI remembers how each character speaks and acts</li>
+                    <li><strong>🤝 Relationship Awareness:</strong> AI understands character relationships and conflicts</li>
+                    <li><strong>📍 Location Connections:</strong> Characters remember their favorite places and past events</li>
+                    <li><strong>📚 Story Integration:</strong> Link characters to specific stories for focused AI assistance</li>
+                    <li><strong>🎭 Personality-Driven Actions:</strong> AI suggests actions that fit each character's nature</li>
+                </ul>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/characters/generator" class="help-action-button">
+                        🤖 Try AI Generator
+                    </a>
+                    <a href="/help/character_detail.html" class="help-action-button-secondary">
+                        📝 Character Detail Guide
+                    </a>
+                </div>
+            </section>
+
+            <section id="organization" class="help-section">
+                <h2 class="help-section-title">Organization & Best Practices</h2>
+                
+                <h3 class="help-section-subtitle">Character Organization Strategies</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">📁 By Story Role</div>
+                        <div class="feature-card-description">
+                            Group characters by their narrative function:
+                            <ul class="mt-sm">
+                                <li>Protagonists (main characters)</li>
+                                <li>Antagonists (opposition forces)</li>
+                                <li>Supporting (friends, allies, mentors)</li>
+                                <li>NPCs (background population)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">⭐ By Importance</div>
+                        <div class="feature-card-description">
+                            Organize by narrative significance:
+                            <ul class="mt-sm">
+                                <li>Major (central to main plot)</li>
+                                <li>Minor (important subplots)</li>
+                                <li>Background (world flavor)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🏰 By Location</div>
+                        <div class="feature-card-description">
+                            Group by geographic or social location:
+                            <ul class="mt-sm">
+                                <li>Royal court characters</li>
+                                <li>Village inhabitants</li>
+                                <li>Traveling merchants</li>
+                                <li>Wilderness dwellers</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📖 By Story Arc</div>
+                        <div class="feature-card-description">
+                            Organize by when they appear:
+                            <ul class="mt-sm">
+                                <li>Act 1 introductions</li>
+                                <li>Mid-story arrivals</li>
+                                <li>Climax participants</li>
+                                <li>Epilogue appearances</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-tip mt-lg">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">💡</i>
+                        Organization Pro Tip
+                    </div>
+                    <div class="help-tip-content">
+                        Use consistent naming conventions and maintain a main character roster. For fantasy: "Sir Marcus the Bold" vs modern: "Marcus Rodriguez, Detective". Consistency helps both you and the AI navigate your character roster efficiently.
+                    </div>
+                </div>
+
+                <h3 class="help-section-subtitle">Character Development Workflow</h3>
+                <ol>
+                    <li><strong>Start Simple:</strong> Begin with name, role, and one key trait</li>
+                    <li><strong>Add Depth Gradually:</strong> Expand personality, backstory, and relationships over time</li>
+                    <li><strong>Test in Stories:</strong> Use characters in writing to see how they feel</li>
+                    <li><strong>Refine Based on Use:</strong> Adjust personality and voice based on story needs</li>
+                    <li><strong>Connect to World:</strong> Link to locations, other characters, and lore items</li>
+                    <li><strong>Update Regularly:</strong> Keep character details current as stories evolve</li>
+                </ol>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/characters" class="help-action-button">
+                        👥 Organize My Characters
+                    </a>
+                    <a href="/ui/worlds" class="help-action-button-secondary">
+                        🌍 World Management
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

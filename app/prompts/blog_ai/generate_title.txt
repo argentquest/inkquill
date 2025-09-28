@@ -1,0 +1,12 @@
+Generate 5 compelling blog post titles for the following content/topic:
+
+{source_text}
+
+Requirements:
+- Make titles engaging and click-worthy
+- Use {style} style
+- Keep titles under 60 characters for SEO
+- Include power words when appropriate
+- Make each title unique and appealing
+
+Return the titles as a numbered list.

@@ -1,0 +1,26 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/dce7a470-918a-4d4b-b24f-c41d50cfaa8b/resourceGroups/appsvc_linux_canadacentral_basic/providers/Microsoft.Web/sites/agstorymaker",
+    "appService.deploySubpath": "",
+    "appService.zipIgnorePattern": [
+        ".git{,/**}",
+        ".vscode{,/**}",
+        "**/__pycache__/**",
+        "**/*.pyc",
+        ".env*",
+        "venv{,/**}",
+        ".pytest_cache{,/**}",
+        "logs{,/**}",
+        "*.log",
+        "node_modules{,/**}",
+        ".coverage",
+        "htmlcov{,/**}",
+        "testing_scripts{,/**}",
+        "Notes{,/**}",
+        "Documentation{,/**}",
+        "tests{,/**}"
+    ],
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "appService.preDeployTask": "",
+    "appService.postDeployTask": "",
+    "git.ignoreLimitWarning": true
+}

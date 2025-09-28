@@ -1,0 +1,2220 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+{{ world.name }} - Hierarchy View
+{% if is_story_filtered %} - {{ stories[0].title if stories else 'Filtered Story' }}{% endif %}
+{% endblock %}
+
+{% block styles %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+.hierarchy-container {
+    display: flex;
+    height: calc(100vh - 120px);
+    gap: 0;
+}
+
+.tree-panel {
+    flex: 2;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow-y: auto;
+    padding: 2px;
+    min-width: 300px;
+}
+
+.resize-handle {
+    width: 6px;
+    background: #dee2e6;
+    cursor: col-resize;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+    background: #adb5bd;
+}
+
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+    background: #6c757d;
+    border-radius: 1px;
+}
+
+.details-panel {
+    flex: 1;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 2px;
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.tree-node {
+    margin-bottom: 1px;
+    margin: 10px!important;
+}
+
+.tree-node-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5px 1px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tree-node-header:hover {
+    background-color: #f8f9fa;
+}
+
+.tree-node-header.selected {
+    background-color: #e3f2fd;
+    border: 1px solid #2196f3;
+}
+
+.expand-icon {
+    margin-right: 2px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background-color 0.2s;
+}
+
+.expand-icon:hover {
+    background-color: #e9ecef;
+}
+
+.expand-icon.collapsed::before {
+    content: "▶";
+}
+
+.expand-icon.expanded::before {
+    content: "▼";
+}
+
+.node-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* FontAwesome icons for object types instead of color boxes */
+.node-icon.default-world { 
+    background-color: var(--tblr-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+.node-icon.default-world::before { content: "\f0ac"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.node-icon.default-story { 
+    background-color: var(--tblr-orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+.node-icon.default-story::before { content: "\f02d"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.node-icon.default-act { 
+    background-color: var(--tblr-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+.node-icon.default-act::before { content: "\f073"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.node-icon.default-scene { 
+    background-color: var(--tblr-pink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+.node-icon.default-scene::before { content: "\f03d"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.node-icon.default-character { 
+    background-color: var(--tblr-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+.node-icon.default-character::before { content: "\f007"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.node-icon.default-location { 
+    background-color: var(--tblr-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+.node-icon.default-location::before { content: "\f3c5"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.node-icon.default-lore { 
+    background-color: var(--tblr-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+.node-icon.default-lore::before { content: "\f70e"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+/* Icons with images - add white background and better styling */
+.node-icon.has-image {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Fallback icons using CSS pseudo-elements for when images fail to load */
+.node-icon.default-character:not(.has-image)::before {
+    content: "👤";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: white;
+}
+
+.node-icon.default-location:not(.has-image)::before {
+    content: "📍";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: white;
+}
+
+.node-icon.default-lore:not(.has-image)::before {
+    content: "📜";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: white;
+}
+
+.node-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.node-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 4px;
+}
+
+.creation-hint {
+    color: #28a745;
+    font-size: 0.8em;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+.tree-node-header:hover .creation-hint {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.creation-hint:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    color: #218838;
+}
+
+.node-title {
+    font-weight: 500;
+    color: #212529;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9em;
+}
+
+.node-subtitle {
+    font-size: 0.75em;
+    color: #6c757d;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-children {
+    margin-left: 4px;
+    border-left: 1px solid #dee2e6;
+    padding-left: 2px;
+}
+
+.tree-children.collapsed {
+    display: none;
+}
+
+.element-section {
+    margin-top: 2px;
+}
+
+.element-section-title {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 1px;
+    padding-bottom: 0.5px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.role-badges {
+    margin-top: 1px;
+}
+
+.role-badge {
+    display: inline-block;
+    background-color: #e9ecef;
+    color: #495057;
+    font-size: 0.65em;
+    padding: 0.5px 2px;
+    border-radius: 2px;
+    margin-right: 1px;
+    margin-bottom: 0.5px;
+}
+
+.association-notes {
+    font-size: 0.7em;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 0.5px;
+    padding: 0.5px 1.5px;
+    background-color: #f8f9fa;
+    border-radius: 2px;
+    border-left: 2px solid #dee2e6;
+    max-width: 200px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.association-notes .fas {
+    font-size: 0.8em;
+    margin-right: 2px;
+    color: #95a5a6;
+}
+
+.element-section-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.element-section-header:hover .element-section-title {
+    color: #2196f3;
+}
+
+.collapse-indicator {
+    font-size: 0.7em;
+    margin-right: 2px;
+    transition: transform 0.2s;
+}
+
+.element-section-header[aria-expanded="false"] .collapse-indicator {
+    transform: rotate(-90deg);
+}
+
+.element-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+    gap: 1px;
+    margin-top: 1px;
+}
+
+.element-card {
+    display: flex;
+    align-items: center;
+    padding: 1px 2px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.8em;
+}
+
+.element-card:hover {
+    background: #e3f2fd;
+    border-color: #2196f3;
+    transform: translateY(-1px);
+}
+
+.element-card.selected {
+    background: #e3f2fd;
+    border-color: #2196f3;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.element-card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.element-card-icon.default-character { 
+    background-color: var(--tblr-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+.element-card-icon.default-character::before { content: "\f007"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.element-card-icon.default-location { 
+    background-color: var(--tblr-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+.element-card-icon.default-location::before { content: "\f3c5"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.element-card-icon.default-lore { 
+    background-color: var(--tblr-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+.element-card-icon.default-lore::before { content: "\f70e"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+/* Element card icons with images */
+.element-card-icon.has-image {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.element-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.element-card-title {
+    font-weight: 500;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.context-menu {
+    position: absolute;
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    box-shadow: var(--tblr-box-shadow-dropdown);
+    padding: 0.5rem 0;
+    z-index: 1050;
+    min-width: 180px;
+    font-family: var(--tblr-font-sans-serif);
+}
+
+.context-menu-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--tblr-body-color);
+    transition: all 0.15s ease-in-out;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.context-menu-item:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+    color: var(--tblr-primary);
+}
+
+.context-menu-item[data-action="remove-association"]:hover {
+    background-color: var(--tblr-yellow-lt);
+    color: var(--tblr-warning-darker);
+}
+
+.context-menu-item[data-action="delete"]:hover {
+    background-color: var(--tblr-red-lt);
+    color: var(--tblr-danger-darker);
+}
+
+.context-menu-separator {
+    height: 1px;
+    background-color: var(--tblr-border-color);
+    margin: 0.5rem 0;
+    border: none;
+}
+
+.details-empty {
+    text-align: center;
+    color: #6c757d;
+    margin-top: 60px;
+}
+
+.details-title {
+    font-size: 1.25em;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 15px;
+}
+
+.details-image {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.details-description {
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: #495057;
+    margin-bottom: 15px;
+}
+
+/* Custom tooltip styles */
+.tooltip-inner {
+    max-width: 300px;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before,
+.tooltip.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+    border-top-color: #333;
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before,
+.tooltip.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+    border-right-color: #333;
+}
+
+.tooltip-inner {
+    background-color: #333;
+}
+
+/* Role Management Styles */
+/* This rule moved to the association cards section below */
+
+.role-input-container {
+    margin-top: 4px;
+}
+
+.role-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+    min-height: 24px;
+}
+
+.role-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    border: 1px solid #2196f3;
+}
+
+.role-tag-remove {
+    margin-left: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #1976d2;
+    line-height: 1;
+}
+
+.role-tag-remove:hover {
+    color: #d32f2f;
+}
+
+.role-suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.role-suggestion-item {
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.85em;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.role-suggestion-item:hover {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.role-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.role-input {
+    font-size: 0.8em;
+}
+
+/* Association container heights now handled in the modal section below */
+
+/* Enhanced Quick Edit Form Styles - Tabler Premium Standards */
+#quick-edit-form {
+    margin-bottom: 1rem;
+}
+
+.quick-edit-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 1rem;
+    box-shadow: var(--tblr-box-shadow);
+    transition: all 0.15s ease-in-out;
+}
+
+.quick-edit-card:hover {
+    box-shadow: var(--tblr-box-shadow-lg);
+    border-color: var(--tblr-primary);
+}
+
+.quick-edit-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.quick-edit-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.75rem;
+    border-radius: var(--tblr-border-radius);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-edit-form-group {
+    margin-bottom: 1rem;
+}
+
+.quick-edit-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--tblr-body-color);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quick-edit-input {
+    width: 100%;
+    padding: var(--tblr-form-control-padding-y) var(--tblr-form-control-padding-x);
+    font-size: var(--tblr-form-control-font-size);
+    font-weight: var(--tblr-form-control-font-weight);
+    line-height: var(--tblr-form-control-line-height);
+    color: var(--tblr-form-control-color);
+    background-color: var(--tblr-form-control-bg);
+    background-image: var(--tblr-form-control-bg-image);
+    border: var(--tblr-form-control-border-width) solid var(--tblr-form-control-border-color);
+    border-radius: var(--tblr-form-control-border-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.quick-edit-input:focus {
+    color: var(--tblr-form-control-focus-color);
+    background-color: var(--tblr-form-control-focus-bg);
+    border-color: var(--tblr-form-control-focus-border-color);
+    outline: 0;
+    box-shadow: var(--tblr-form-control-focus-box-shadow);
+}
+
+.quick-edit-textarea {
+    resize: vertical;
+    min-height: 4rem;
+    max-height: 8rem;
+    border: 2px solid var(--tblr-border-color);
+    border-left: 4px solid var(--tblr-primary);
+}
+
+.quick-edit-save-btn {
+    width: 100%;
+    padding: var(--tblr-btn-padding-y) var(--tblr-btn-padding-x);
+    font-size: var(--tblr-btn-font-size);
+    border-radius: var(--tblr-btn-border-radius);
+    background-color: var(--tblr-primary);
+    border-color: var(--tblr-primary);
+    color: var(--tblr-primary-fg);
+    border: var(--tblr-btn-border-width) solid transparent;
+    cursor: pointer;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.quick-edit-save-btn:hover {
+    background-color: var(--tblr-primary-darker);
+    border-color: var(--tblr-primary-darker);
+}
+
+.quick-edit-save-btn:disabled {
+    background-color: var(--tblr-secondary);
+    border-color: var(--tblr-secondary);
+    color: var(--tblr-secondary-fg);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.quick-edit-saving {
+    background-color: var(--tblr-secondary) !important;
+    border-color: var(--tblr-secondary) !important;
+}
+
+/* Tabbed Details Styles */
+.details-header {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+#detailsTabs {
+    border-bottom: 1px solid #dee2e6;
+}
+
+#detailsTabs .nav-link {
+    font-size: 0.85em;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 2px solid transparent;
+}
+
+#detailsTabs .nav-link.active {
+    background: transparent;
+    border-bottom-color: #2196f3;
+    color: #2196f3;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-pane {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#content-panel {
+    flex: 1;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+}
+
+#content-panel .card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#content-panel .card-header {
+    background: var(--tblr-bg-surface-secondary);
+    border-bottom: 1px solid var(--tblr-border-color);
+    flex-shrink: 0;
+}
+
+#content-panel .card-body {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#content-editor {
+    flex: 1;
+    overflow: hidden;
+    border: 2px solid var(--tblr-border-color);
+    border-left: 4px solid var(--tblr-primary);
+    border-radius: var(--tblr-border-radius);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Prevent Quill scrollbars and make it fill the container */
+#content-editor .ql-container {
+    flex: 1;
+    overflow: hidden;
+    border: none;
+    display: flex;
+    flex-direction: column;
+}
+
+#content-editor .ql-editor {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 15px;
+    background-color: var(--tblr-bg-surface);
+}
+
+#content-editor .ql-toolbar {
+    border-bottom: 1px solid var(--tblr-border-color);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background-color: var(--tblr-bg-surface-secondary);
+}
+
+/* Warning alert styling */
+.alert-sm {
+    font-size: 0.8em;
+}
+
+/* Ensure details panel content doesn't overflow and uses full height */
+.details-panel {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#element-details {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#tabbed-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Element action buttons styling */
+#element-actions .btn {
+    font-size: 0.75em;
+    padding: 4px 8px;
+}
+
+#element-actions .btn-group {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Loading placeholder styling */
+.loading-placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Custom modal sizing - 50% taller than xl */
+.modal-xl-tall {
+    max-width: 1140px;
+    height: 90vh; /* Make it much taller */
+}
+
+.modal-xl-tall .modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-xl-tall .modal-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Reduced padding styles */
+.modal-body-compact {
+    padding: 0.75rem; /* Reduced from 1.5rem */
+}
+
+.modal-header-compact {
+    padding: 0.5rem 0.75rem; /* Reduced from 1rem 1.5rem */
+}
+
+.card-body-compact {
+    padding: 0.75rem; /* Reduced from 1.25rem */
+}
+
+.card-header-compact {
+    padding: 0.375rem 0.75rem; /* Reduced from 0.75rem 1.25rem */
+}
+
+/* Fixed height note fields */
+.note-field-fixed {
+    height: 100px !important;
+    resize: vertical;
+}
+
+/* Full height association cards */
+.modal-xl-tall .modal-body .row {
+    height: 100%;
+}
+
+.modal-xl-tall .card {
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-xl-tall .card-body {
+    flex: 1;
+    overflow: hidden; /* Prevent double scrollbars */
+    height: 0; /* Force flex to work properly */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make sure association containers fill the card body */
+#characterAssociations,
+#locationAssociations, 
+#loreItemAssociations {
+    flex: 1; /* Use all available space */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Allow flexbox shrinking */
+    height: 0; /* Force flex to work properly */
+}
+
+/* Association item styling with thumbnails */
+.association-item {
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    flex-shrink: 0; /* Don't shrink individual items */
+}
+
+.association-item-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.association-thumbnail {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    margin-right: 8px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.association-thumbnail.default-character { 
+    background-color: var(--tblr-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+.association-thumbnail.default-character::before { content: "\f007"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.association-thumbnail.default-location { 
+    background-color: var(--tblr-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+.association-thumbnail.default-location::before { content: "\f3c5"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+.association-thumbnail.default-lore { 
+    background-color: var(--tblr-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+.association-thumbnail.default-lore::before { content: "\f70e"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+/* Thumbnails with images */
+.association-thumbnail.has-image {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- TABLER PREMIUM GRADIENT HERO HEADER - Following UI Design Standards -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); position: relative; overflow: hidden; margin-bottom: 2rem;">
+    <!-- Background pattern overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid position-relative">
+        <!-- Breadcrumb Navigation -->
+        <div class="row align-items-center" style="padding-top: 1rem;">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-transparent mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('ui_list_worlds') }}" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-globe me-1"></i>My Worlds
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50 text-decoration-none">
+                                {{ world.name }}
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">
+                            Hierarchy
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Header Content -->
+        <div class="row align-items-center py-4">
+            <div class="col-12 col-md-8">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-sitemap text-white me-3" style="font-size: 2.5rem;"></i>
+                    <div>
+                        <h1 class="text-white mb-1 fw-bold">{{ world.name }} - Hierarchy</h1>
+                        <!-- Updated Template Marker -->
+                        {% if is_story_filtered %}
+                        <p class="text-white-75 mb-0 lead">
+                            <i class="fas fa-filter me-1"></i>Showing only: {{ stories[0].title if stories else 'Unknown Story' }}
+                            <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" class="text-white-50 ms-2 text-decoration-none">
+                                <i class="fas fa-times-circle me-1"></i>View all stories
+                            </a>
+                        </p>
+                        {% else %}
+                        <p class="text-white-75 mb-0 lead">Organize your world elements by stories and acts</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- World Stats -->
+                <div class="d-flex flex-wrap gap-3 mt-3">
+                    <div class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                        <i class="fas fa-sitemap me-1"></i>
+                        World Hierarchy
+                    </div>
+                    {% if is_story_filtered %}
+                    <div class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                        <i class="fas fa-filter me-1"></i>
+                        Filtered View
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Header Actions -->
+            <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('world_hierarchy')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Learn how to use the world hierarchy view to organize your stories, acts, scenes, and world elements">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm story-generation-trigger" 
+                            data-bs-toggle="modal" data-bs-target="#storyGenerationModal" 
+                            data-world-id="{{ world.id }}"
+                            data-bs-placement="bottom"
+                            title="Use AI to generate a new story with selected world elements and customize genre, tone, and conflicts">
+                        <i class="fas fa-magic me-1"></i>Generate Story
+                    </button>
+                    <a href="{{ url_for('ui_world_chat', world_id=world.id) }}" class="btn btn-light btn-sm"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom"
+                       title="Start an AI-powered conversation about this world, its elements, and story possibilities">
+                        <i class="fas fa-comments me-1"></i>Chat
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Quick Actions -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary btn-sm" 
+                    onclick="hierarchyManager.expandAllNodes()"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom"
+                    title="Expand all story and act nodes to show the complete hierarchy structure with all scenes and associations">
+                <i class="fas fa-expand-arrows-alt me-1"></i>Expand All
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm" 
+                    onclick="hierarchyManager.collapseAllNodes()"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom"
+                    title="Collapse all nodes to show only the top-level world and story structure for a cleaner overview">
+                <i class="fas fa-compress-arrows-alt me-1"></i>Collapse All
+            </button>
+        </div>
+        <div class="btn-group">
+            <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="btn btn-outline-secondary btn-sm"
+               data-bs-toggle="tooltip" data-bs-placement="bottom"
+               title="View the complete world overview with all elements, statistics, and detailed information">
+                <i class="fas fa-eye me-1"></i>World Details
+            </a>
+            <a href="{{ url_for('ui_edit_world_form', world_id=world.id) }}" class="btn btn-outline-primary btn-sm"
+               data-bs-toggle="tooltip" data-bs-placement="bottom"
+               title="Edit world settings including name, description, image prompts, and collaboration options">
+                <i class="fas fa-edit me-1"></i>Edit World
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Hierarchy Container -->
+    <div class="hierarchy-container">
+        <!-- Tree Panel -->
+        <div class="tree-panel">
+            <div id="hierarchy-tree">
+                <!-- World Root Node -->
+                <div class="tree-node" data-type="world" data-id="{{ world.id }}">
+                    <div class="tree-node-header" data-level="0"
+                         data-bs-toggle="tooltip" 
+                         data-bs-placement="right" 
+                         title="{{ world.description or 'No description available' }}">
+                        <div class="expand-icon expanded"></div>
+                        <div class="node-icon default-world"></div>
+                        <div class="node-content">
+                            <div class="node-title">{{ world.name }}</div>
+                            <div class="node-subtitle">World</div>
+                        </div>
+                        <div class="node-actions">
+                            <i class="fas fa-plus-circle creation-hint" 
+                               title="Right-click to create new story"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="left"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="tree-children">
+                        <!-- Stories -->
+                        {% for story in stories %}
+                        <div class="tree-node" data-type="story" data-id="{{ story.id }}">
+                            <div class="tree-node-header" data-level="1"
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="right" 
+                                 title="{{ story.synopsis[:200] ~ '...' if story.synopsis and story.synopsis|length > 200 else story.synopsis or 'No synopsis available' }}">
+                                <div class="expand-icon collapsed"></div>
+                                <div class="node-icon default-story"></div>
+                                <div class="node-content">
+                                    <div class="node-title">{{ story.title }}</div>
+                                    <div class="node-subtitle">Story</div>
+                                </div>
+                                <div class="node-actions">
+                                    {% if not is_story_filtered %}
+                                    <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}?story_id={{ story.id }}" 
+                                       class="btn btn-sm btn-outline-primary me-1"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="left"
+                                       title="Filter the hierarchy to show only this story's acts, scenes, and associated elements">
+                                        <i class="fas fa-filter me-1"></i>Focus
+                                    </a>
+                                    {% endif %}
+                                    <i class="fas fa-plus-circle creation-hint" 
+                                       title="Right-click to create new act"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="left"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-children collapsed">
+                                <!-- Acts for this story -->
+                                {% for act in story.acts %}
+                                <div class="tree-node" data-type="act" data-id="{{ act.id }}">
+                                    <div class="tree-node-header" data-level="2"
+                                         data-bs-toggle="tooltip" 
+                                         data-bs-placement="right" 
+                                         title="{{ act.description[:200] ~ '...' if act.description and act.description|length > 200 else act.description or 'No description available' }}">
+                                        <div class="expand-icon collapsed"></div>
+                                        <div class="node-icon default-act"></div>
+                                        <div class="node-content">
+                                            <div class="node-title">Act {{ act.act_number }}: {{ act.title }}</div>
+                                            <div class="node-subtitle">{{ act.scenes|length }} scenes</div>
+                                        </div>
+                                        <div class="node-actions">
+                                            <i class="fas fa-plus-circle creation-hint" 
+                                               title="Right-click to create new scene"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="left"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="tree-children collapsed">
+                                        <!-- Associated Characters for this act -->
+                                        {% if act_associations[act.id].characters %}
+                                        <div class="element-section">
+                                            <div class="element-section-title">Characters</div>
+                                            {% for assoc in act_associations[act.id].characters %}
+                                            <div class="tree-node" data-type="character" data-id="{{ assoc.character.id }}">
+                                                <div class="tree-node-header" data-level="3" 
+                                                     data-bs-toggle="tooltip" 
+                                                     data-bs-placement="right" 
+                                                     title="{{ assoc.character.description or 'No description available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                                    <div class="expand-icon" style="visibility: hidden;"></div>
+                                                    <div class="node-icon default-character{% if assoc.character.image_url %} has-image{% endif %}" 
+                                                         {% if assoc.character.image_url %}style="background-image: url('{{ assoc.character.image_url }}');"{% endif %}></div>
+                                                    <div class="node-content">
+                                                        <div class="node-title">
+                                                            {{ assoc.character.name }}
+                                                            {% if assoc.roles %}
+                                                                <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                            {% endif %}
+                                                            {% if assoc.notes %}
+                                                                <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- Associated Locations for this act -->
+                                        {% if act_associations[act.id].locations %}
+                                        <div class="element-section">
+                                            <div class="element-section-title">Locations</div>
+                                            {% for assoc in act_associations[act.id].locations %}
+                                            <div class="tree-node" data-type="location" data-id="{{ assoc.location.id }}">
+                                                <div class="tree-node-header" data-level="3"
+                                                     data-bs-toggle="tooltip" 
+                                                     data-bs-placement="right" 
+                                                     title="{{ assoc.location.description or 'No description available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                                    <div class="expand-icon" style="visibility: hidden;"></div>
+                                                    <div class="node-icon default-location{% if assoc.location.image_url %} has-image{% endif %}"
+                                                         {% if assoc.location.image_url %}style="background-image: url('{{ assoc.location.image_url }}');"{% endif %}></div>
+                                                    <div class="node-content">
+                                                        <div class="node-title">
+                                                            {{ assoc.location.name }}
+                                                            {% if assoc.roles %}
+                                                                <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                            {% endif %}
+                                                            {% if assoc.notes %}
+                                                                <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- Associated Lore Items for this act -->
+                                        {% if act_associations[act.id].lore_items %}
+                                        <div class="element-section">
+                                            <div class="element-section-title">Lore Items</div>
+                                            {% for assoc in act_associations[act.id].lore_items %}
+                                            <div class="tree-node" data-type="lore_item" data-id="{{ assoc.lore_item.id }}">
+                                                <div class="tree-node-header" data-level="3"
+                                                     data-bs-toggle="tooltip" 
+                                                     data-bs-placement="right" 
+                                                     title="{{ assoc.lore_item.content[:100] ~ '...' if assoc.lore_item.content and assoc.lore_item.content|length > 100 else assoc.lore_item.content or 'No content available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                                    <div class="expand-icon" style="visibility: hidden;"></div>
+                                                    <div class="node-icon default-lore{% if assoc.lore_item.image_url %} has-image{% endif %}"
+                                                         {% if assoc.lore_item.image_url %}style="background-image: url('{{ assoc.lore_item.image_url }}');"{% endif %}></div>
+                                                    <div class="node-content">
+                                                        <div class="node-title">
+                                                            {{ assoc.lore_item.title }}
+                                                            {% if assoc.roles %}
+                                                                <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                            {% endif %}
+                                                            {% if assoc.notes %}
+                                                                <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- Scenes for this act -->
+                                        {% if act.scenes %}
+                                        <div class="element-section">
+                                            <div class="element-section-title">Scenes</div>
+                                            {% for scene in act.scenes %}
+                                            <div class="tree-node" data-type="scene" data-id="{{ scene.id }}">
+                                                <div class="tree-node-header" data-level="3"
+                                                     data-bs-toggle="tooltip" 
+                                                     data-bs-placement="right" 
+                                                     title="{{ scene.description[:200] ~ '...' if scene.description and scene.description|length > 200 else scene.description or 'No description available' }}">
+                                                    {% set has_scene_associations = (scene_associations[scene.id].characters or scene_associations[scene.id].locations or scene_associations[scene.id].lore_items) %}
+                                                    <div class="expand-icon{% if has_scene_associations %} collapsed{% else %}" style="visibility: hidden;{% endif %}"></div>
+                                                    <div class="node-icon default-scene"></div>
+                                                    <div class="node-content">
+                                                        <div class="node-title">Scene {{ scene.scene_number }}: {{ scene.summary or scene.title or 'Untitled Scene' }}</div>
+                                                        <div class="node-subtitle">{{ (scene.content|striptags)[:200] ~ '...' if scene.content and (scene.content|striptags)|length > 200 else (scene.content|striptags) or 'No content yet' }}</div>
+                                                    </div>
+                                                </div>
+                                                
+                                                {% if has_scene_associations %}
+                                                <div class="tree-children collapsed">
+                                                    <!-- Associated Characters for this scene -->
+                                                    {% if scene_associations[scene.id].characters %}
+                                                    <div class="element-section">
+                                                        <div class="element-section-title">Scene Characters</div>
+                                                        {% for assoc in scene_associations[scene.id].characters %}
+                                                        <div class="tree-node" data-type="character" data-id="{{ assoc.character.id }}">
+                                                            <div class="tree-node-header" data-level="4" 
+                                                                 data-bs-toggle="tooltip" 
+                                                                 data-bs-placement="right" 
+                                                                 title="{{ assoc.character.description or 'No description available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                                                <div class="expand-icon" style="visibility: hidden;"></div>
+                                                                <div class="node-icon default-character{% if assoc.character.image_url %} has-image{% endif %}" 
+                                                                     {% if assoc.character.image_url %}style="background-image: url('{{ assoc.character.image_url }}');"{% endif %}></div>
+                                                                <div class="node-content">
+                                                                    <div class="node-title">
+                                                                        {{ assoc.character.name }}
+                                                                        {% if assoc.roles %}
+                                                                            <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                                        {% endif %}
+                                                                        {% if assoc.notes %}
+                                                                            <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    <!-- Associated Locations for this scene -->
+                                                    {% if scene_associations[scene.id].locations %}
+                                                    <div class="element-section">
+                                                        <div class="element-section-title">Scene Locations</div>
+                                                        {% for assoc in scene_associations[scene.id].locations %}
+                                                        <div class="tree-node" data-type="location" data-id="{{ assoc.location.id }}">
+                                                            <div class="tree-node-header" data-level="4"
+                                                                 data-bs-toggle="tooltip" 
+                                                                 data-bs-placement="right" 
+                                                                 title="{{ assoc.location.description or 'No description available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                                                <div class="expand-icon" style="visibility: hidden;"></div>
+                                                                <div class="node-icon default-location{% if assoc.location.image_url %} has-image{% endif %}"
+                                                                     {% if assoc.location.image_url %}style="background-image: url('{{ assoc.location.image_url }}');"{% endif %}></div>
+                                                                <div class="node-content">
+                                                                    <div class="node-title">
+                                                                        {{ assoc.location.name }}
+                                                                        {% if assoc.roles %}
+                                                                            <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                                        {% endif %}
+                                                                        {% if assoc.notes %}
+                                                                            <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    <!-- Associated Lore Items for this scene -->
+                                                    {% if scene_associations[scene.id].lore_items %}
+                                                    <div class="element-section">
+                                                        <div class="element-section-title">Scene Lore Items</div>
+                                                        {% for assoc in scene_associations[scene.id].lore_items %}
+                                                        <div class="tree-node" data-type="lore_item" data-id="{{ assoc.lore_item.id }}">
+                                                            <div class="tree-node-header" data-level="4"
+                                                                 data-bs-toggle="tooltip" 
+                                                                 data-bs-placement="right" 
+                                                                 title="{{ assoc.lore_item.content[:100] ~ '...' if assoc.lore_item.content and assoc.lore_item.content|length > 100 else assoc.lore_item.content or 'No content available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                                                <div class="expand-icon" style="visibility: hidden;"></div>
+                                                                <div class="node-icon default-lore{% if assoc.lore_item.image_url %} has-image{% endif %}"
+                                                                     {% if assoc.lore_item.image_url %}style="background-image: url('{{ assoc.lore_item.image_url }}');"{% endif %}></div>
+                                                                <div class="node-content">
+                                                                    <div class="node-title">
+                                                                        {{ assoc.lore_item.title }}
+                                                                        {% if assoc.roles %}
+                                                                            <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                                        {% endif %}
+                                                                        {% if assoc.notes %}
+                                                                            <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                <!-- Story-level associations -->
+                                {% if story_associations[story.id].characters %}
+                                <div class="element-section">
+                                    <div class="element-section-title">Story Characters</div>
+                                    {% for assoc in story_associations[story.id].characters %}
+                                    <div class="tree-node" data-type="character" data-id="{{ assoc.character.id }}">
+                                        <div class="tree-node-header" data-level="2"
+                                             data-bs-toggle="tooltip" 
+                                             data-bs-placement="right" 
+                                             title="{{ assoc.character.description or 'No description available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                            <div class="expand-icon" style="visibility: hidden;"></div>
+                                            <div class="node-icon default-character{% if assoc.character.image_url %} has-image{% endif %}" 
+                                                 {% if assoc.character.image_url %}style="background-image: url('{{ assoc.character.image_url }}');"{% endif %}></div>
+                                            <div class="node-content">
+                                                <div class="node-title">
+                                                    {{ assoc.character.name }}
+                                                    {% if assoc.roles %}
+                                                        <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                    {% endif %}
+                                                    {% if assoc.notes %}
+                                                        <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                {% if story_associations[story.id].locations %}
+                                <div class="element-section">
+                                    <div class="element-section-title">Story Locations</div>
+                                    {% for assoc in story_associations[story.id].locations %}
+                                    <div class="tree-node" data-type="location" data-id="{{ assoc.location.id }}">
+                                        <div class="tree-node-header" data-level="2"
+                                             data-bs-toggle="tooltip" 
+                                             data-bs-placement="right" 
+                                             title="{{ assoc.location.description or 'No description available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                            <div class="expand-icon" style="visibility: hidden;"></div>
+                                            <div class="node-icon default-location{% if assoc.location.image_url %} has-image{% endif %}"
+                                                 {% if assoc.location.image_url %}style="background-image: url('{{ assoc.location.image_url }}');"{% endif %}></div>
+                                            <div class="node-content">
+                                                <div class="node-title">
+                                                    {{ assoc.location.name }}
+                                                    {% if assoc.roles %}
+                                                        <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                    {% endif %}
+                                                    {% if assoc.notes %}
+                                                        <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                
+                                {% if story_associations[story.id].lore_items %}
+                                <div class="element-section">
+                                    <div class="element-section-title">Story Lore Items</div>
+                                    {% for assoc in story_associations[story.id].lore_items %}
+                                    <div class="tree-node" data-type="lore_item" data-id="{{ assoc.lore_item.id }}">
+                                        <div class="tree-node-header" data-level="2"
+                                             data-bs-toggle="tooltip" 
+                                             data-bs-placement="right" 
+                                             title="{{ assoc.lore_item.content[:100] ~ '...' if assoc.lore_item.content and assoc.lore_item.content|length > 100 else assoc.lore_item.content or 'No content available' }}{% if assoc.roles %} | Roles: {{ assoc.roles|join(', ') }}{% endif %}{% if assoc.notes %} | Notes: {{ assoc.notes }}{% endif %}">
+                                            <div class="expand-icon" style="visibility: hidden;"></div>
+                                            <div class="node-icon default-lore{% if assoc.lore_item.image_url %} has-image{% endif %}"
+                                                 {% if assoc.lore_item.image_url %}style="background-image: url('{{ assoc.lore_item.image_url }}');"{% endif %}></div>
+                                            <div class="node-content">
+                                                <div class="node-title">
+                                                    {{ assoc.lore_item.title }}
+                                                    {% if assoc.roles %}
+                                                        <span class="text-muted"> ({{ assoc.roles|join(', ') }})</span>
+                                                    {% endif %}
+                                                    {% if assoc.notes %}
+                                                        <span class="text-muted"> - {{ assoc.notes }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Unassociated World Elements -->
+                        {% if characters %}
+                        <div class="element-section">
+                            <div class="element-section-header" data-bs-toggle="collapse" data-bs-target="#availableCharacters" aria-expanded="true">
+                                <div class="element-section-title">
+                                    <i class="fas fa-chevron-down collapse-indicator"></i>
+                                    Available Characters ({{ characters|length }})
+                                </div>
+                            </div>
+                            <div id="availableCharacters" class="element-grid collapse show">
+                                {% for character in characters %}
+                                <div class="element-card" data-type="character" data-id="{{ character.id }}"
+                                     data-bs-toggle="tooltip" 
+                                     data-bs-placement="top" 
+                                     title="{{ character.description or 'No description available' }}">
+                                    <div class="element-card-icon default-character{% if character.image_url %} has-image{% endif %}" 
+                                         {% if character.image_url %}style="background-image: url('{{ character.image_url }}')"{% endif %}></div>
+                                    <div class="element-card-content">
+                                        <div class="element-card-title">{{ character.name }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if locations %}
+                        <div class="element-section">
+                            <div class="element-section-header" data-bs-toggle="collapse" data-bs-target="#availableLocations" aria-expanded="true">
+                                <div class="element-section-title">
+                                    <i class="fas fa-chevron-down collapse-indicator"></i>
+                                    Available Locations ({{ locations|length }})
+                                </div>
+                            </div>
+                            <div id="availableLocations" class="element-grid collapse show">
+                                {% for location in locations %}
+                                <div class="element-card" data-type="location" data-id="{{ location.id }}"
+                                     data-bs-toggle="tooltip" 
+                                     data-bs-placement="top" 
+                                     title="{{ location.description or 'No description available' }}">
+                                    <div class="element-card-icon default-location{% if location.image_url %} has-image{% endif %}"
+                                         {% if location.image_url %}style="background-image: url('{{ location.image_url }}')"{% endif %}></div>
+                                    <div class="element-card-content">
+                                        <div class="element-card-title">{{ location.name }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if lore_items %}
+                        <div class="element-section">
+                            <div class="element-section-header" data-bs-toggle="collapse" data-bs-target="#availableLoreItems" aria-expanded="true">
+                                <div class="element-section-title">
+                                    <i class="fas fa-chevron-down collapse-indicator"></i>
+                                    Available Lore Items ({{ lore_items|length }})
+                                </div>
+                            </div>
+                            <div id="availableLoreItems" class="element-grid collapse show">
+                                {% for lore_item in lore_items %}
+                                <div class="element-card" data-type="lore_item" data-id="{{ lore_item.id }}"
+                                     data-bs-toggle="tooltip" 
+                                     data-bs-placement="top" 
+                                     title="{{ lore_item.content[:200] ~ '...' if lore_item.content|length > 200 else lore_item.content or 'No description available' }}">
+                                    <div class="element-card-icon default-lore{% if lore_item.image_url %} has-image{% endif %}"
+                                         {% if lore_item.image_url %}style="background-image: url('{{ lore_item.image_url }}')"{% endif %}></div>
+                                    <div class="element-card-content">
+                                        <div class="element-card-title">{{ lore_item.title }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resize Handle -->
+        <div class="resize-handle" id="resize-handle"></div>
+        
+        <!-- Details Panel -->
+        <div class="details-panel">
+            <div id="quick-edit-form" style="display: none;">
+                <!-- Quick edit form will be dynamically populated here -->
+            </div>
+            <div id="element-details">
+                <div class="details-empty">
+                    <i class="fas fa-mouse-pointer fa-2x mb-3 text-muted"></i>
+                    <h5 class="text-muted mb-3">Element Details Panel</h5>
+                    <p class="text-muted mb-3">Select an element from the tree to view and edit details</p>
+                    
+                    <!-- Help Information -->
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-info-circle me-2 mt-1"></i>
+                            <div>
+                                <h6 class="alert-heading mb-2">How to use this panel:</h6>
+                                <ul class="mb-0 text-start">
+                                    <li><strong>Stories & Acts:</strong> Click to edit content with rich text editor</li>
+                                    <li><strong>Scenes:</strong> Edit scene content and manage associations</li>
+                                    <li><strong>Characters/Locations/Lore:</strong> View details and relationships</li>
+                                    <li><strong>Right-click:</strong> Access context menu for additional actions</li>
+                                    <li><strong>Associations:</strong> Manage how elements relate to stories and acts</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabbed Details for Act/Scene -->
+                <div id="tabbed-details" style="display: none;">
+                    <div class="card h-100">
+                        <div class="card-header py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 id="details-title" class="mb-0"></h6>
+                                    <i class="fas fa-question-circle text-muted" 
+                                       data-bs-toggle="tooltip" data-bs-placement="top"
+                                       title="This editor allows you to modify the content of acts and scenes. Changes are automatically tracked and you can save or discard them using the buttons on the right."></i>
+                                    <div id="unsaved-warning" class="alert alert-warning alert-sm py-1 px-2 mb-0 d-flex justify-content-between align-items-center" style="display: none;">
+                                        <div>
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            <small>You have unsaved changes</small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                onclick="hierarchyManager.clearUnsavedChanges()" 
+                                                style="font-size: 0.7rem; padding: 0.1rem 0.3rem;"
+                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Clear all unsaved changes and remove this warning">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" id="cancel-content-btn" class="btn btn-secondary btn-sm" disabled
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Discard all unsaved changes and restore the original content">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                    <button type="button" id="save-content-btn" class="btn btn-success btn-sm" disabled
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Save the content changes to the database">
+                                        <i class="fas fa-save me-1"></i>Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="content-editor">
+                                <!-- Quill editor will be initialized here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu" style="display: none;">
+        <div class="context-menu-item" data-action="view">
+            <i class="fas fa-eye me-2 text-primary"></i>View Details
+        </div>
+        <div class="context-menu-item" data-action="edit">
+            <i class="fas fa-edit me-2 text-primary"></i>Edit
+        </div>
+        <div class="context-menu-separator"></div>
+        
+        <!-- Creation options (shown conditionally) -->
+        <div class="context-menu-item" data-action="create-story" style="display: none;">
+            <i class="fas fa-plus me-2 text-success"></i>Create New Story
+        </div>
+        <div class="context-menu-item" data-action="create-act" style="display: none;">
+            <i class="fas fa-plus me-2 text-success"></i>Create New Act
+        </div>
+        <div class="context-menu-item" data-action="create-scene" style="display: none;">
+            <i class="fas fa-plus me-2 text-success"></i>Create New Scene
+        </div>
+        <div class="context-menu-separator context-menu-create-separator" style="display: none;"></div>
+        
+        <div class="context-menu-item" data-action="associate">
+            <i class="fas fa-link me-2 text-info"></i>Manage Associations
+        </div>
+        <div class="context-menu-item" data-action="edit-roles">
+            <i class="fas fa-user-tag me-2 text-info"></i>Edit Roles
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="remove-association" style="display: none;">
+            <i class="fas fa-unlink me-2 text-warning"></i>Remove Association
+        </div>
+        <div class="context-menu-item" data-action="delete" style="display: none;">
+            <i class="fas fa-trash me-2 text-danger"></i>Delete
+        </div>
+    </div>
+
+    <!-- Association Management Modal -->
+    <div class="modal fade" id="associationModal" tabindex="-1" aria-labelledby="associationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl-tall">
+            <div class="modal-content">
+                <div class="modal-header modal-header-compact d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                        <h5 class="modal-title mb-0 d-flex align-items-center" id="associationModalLabel">
+                            <i class="fas fa-link me-2"></i>Manage Act Association
+                            <i class="fas fa-question-circle text-muted ms-2" 
+                               data-bs-toggle="tooltip" data-bs-placement="top"
+                               title="Associate characters, locations, and lore items with this story element. Add roles to define how each element functions in your narrative."></i>
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Cancel changes and close the association manager without saving">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" id="saveAssociationsBtn"
+                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Save all association changes and update the hierarchy view">
+                                <i class="fas fa-save me-1"></i>Save Associations
+                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="alert alert-light mb-0 w-100" style="padding: 8px 12px;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>How to use:</strong> Check elements to associate them, then add roles for each. 
+                        Roles help define how each element functions in your story or act.
+                    </div>
+                </div>
+                <div class="modal-body modal-body-compact">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header card-header-compact bg-light text-dark">
+                                    <h6 class="mb-0 d-flex align-items-center">
+                                        <i class="fas fa-users me-2"></i>Characters
+                                        <i class="fas fa-question-circle text-muted ms-2" 
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           title="Select characters that appear or are mentioned in this story element. Add roles like 'protagonist', 'antagonist', or 'supporting character' to define their function."></i>
+                                    </h6>
+                                </div>
+                                <div class="card-body card-body-compact">
+                                    <div id="characterAssociations">
+                                        <div class="text-center py-3">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading characters...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header card-header-compact bg-light text-dark">
+                                    <h6 class="mb-0 d-flex align-items-center">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Locations
+                                        <i class="fas fa-question-circle text-muted ms-2" 
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           title="Select locations where this story element takes place. Add roles like 'primary setting', 'background location', or 'mentioned place' to specify importance."></i>
+                                    </h6>
+                                </div>
+                                <div class="card-body card-body-compact">
+                                    <div id="locationAssociations">
+                                        <div class="text-center py-3">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading locations...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header card-header-compact bg-light text-dark">
+                                    <h6 class="mb-0 d-flex align-items-center">
+                                        <i class="fas fa-scroll me-2"></i>Lore Items
+                                        <i class="fas fa-question-circle text-muted ms-2" 
+                                           data-bs-toggle="tooltip" data-bs-placement="top"
+                                           title="Select lore items relevant to this story element. These can include artifacts, events, cultures, or knowledge that influences the narrative."></i>
+                                    </h6>
+                                </div>
+                                <div class="card-body card-body-compact">
+                                    <div id="loreItemAssociations">
+                                        <div class="text-center py-3">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading lore items...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Edit Modal -->
+    <div class="modal fade" id="roleEditModal" tabindex="-1" aria-labelledby="roleEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center" id="roleEditModalLabel">
+                        <i class="fas fa-user-tag me-2"></i>Edit Roles
+                        <i class="fas fa-question-circle text-muted ms-2" 
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="Define how this element functions in the story. Roles help categorize and understand the element's narrative purpose."></i>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Element:</label>
+                        <div id="roleEditElementInfo" class="alert alert-light">
+                            <!-- Element info will be populated here -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roleInput" class="form-label d-flex align-items-center">
+                            Roles:
+                            <i class="fas fa-question-circle text-muted ms-2" 
+                               data-bs-toggle="tooltip" data-bs-placement="top"
+                               title="Add descriptive roles like 'protagonist', 'mentor', 'primary setting', or 'mystical artifact'. Type and press Enter or comma to add multiple roles."></i>
+                        </label>
+                        <div id="roleTagsContainer" class="mb-2">
+                            <!-- Role tags will be populated here -->
+                        </div>
+                        <input type="text" 
+                               id="roleInput" 
+                               class="form-control" 
+                               placeholder="Type a role and press Enter or comma">
+                        <div id="roleSuggestions" class="role-suggestions mt-1" style="display: none;">
+                            <!-- Role suggestions will appear here -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roleNotes" class="form-label d-flex align-items-center">
+                            Notes (Optional):
+                            <i class="fas fa-question-circle text-muted ms-2" 
+                               data-bs-toggle="tooltip" data-bs-placement="top"
+                               title="Add additional context about this element's role in the story. These notes help explain relationships and narrative significance."></i>
+                        </label>
+                        <textarea id="roleNotes" 
+                                  class="form-control note-field-fixed" 
+                                  placeholder="Additional notes about this element's role..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Cancel role editing and discard any unsaved changes">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveRolesBtn"
+                            data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Save the roles and notes for this element association">
+                        <i class="fas fa-save me-1"></i>Save Roles
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Story Generation Modal -->
+    {% include "partials/_story_generation_modal.html" %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="{{ url_for('static', path='js/world_hierarchy.js') }}"></script>
+<script src="{{ url_for('static', path='js/story_generation_modal.js') }}"></script>
+<script>
+// Content Editor Functionality
+class ContentEditor {
+    constructor() {
+        this.quill = null;
+        this.currentElement = null;
+        this.originalContent = '';
+        this.originalDelta = null; // For more accurate change detection
+        this.hasUnsavedChanges = false;
+        this.isLoading = false; // Flag to prevent change detection during loading
+        
+        this.initializeEditor();
+        this.setupEventListeners();
+    }
+    
+    // Dynamically get button references
+    get saveButton() {
+        return document.getElementById('save-content-btn');
+    }
+    
+    get cancelButton() {
+        return document.getElementById('cancel-content-btn');
+    }
+    
+    get unsavedWarning() {
+        return document.getElementById('unsaved-warning');
+    }
+    
+    initializeEditor() {
+        this.quill = new Quill('#content-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Enter the content...'
+        });
+        
+        // Listen for content changes
+        this.quill.on('text-change', () => {
+            if (this.currentElement && !this.isLoading) {
+                this.checkForChanges();
+            }
+        });
+    }
+    
+    setupEventListeners() {
+        // Use event delegation since buttons might not exist initially
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'save-content-btn') {
+                this.saveContent();
+            } else if (e.target.id === 'cancel-content-btn') {
+                this.cancelChanges();
+            }
+        });
+        
+        // Warn about unsaved changes when switching elements
+        window.addEventListener('beforeunload', (e) => {
+            if (this.hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    }
+    
+    loadContent(elementType, elementId, elementData) {
+        // Save current content if there are unsaved changes
+        if (this.hasUnsavedChanges) {
+            const confirmSwitch = confirm('You have unsaved changes. Do you want to discard them and switch to another element?');
+            if (!confirmSwitch) {
+                return false; // Prevent switching
+            }
+        }
+        
+        // Set loading flag to prevent change detection during content loading
+        this.isLoading = true;
+        
+        this.currentElement = { type: elementType, id: elementId, data: elementData };
+        
+        // Load content based on element type
+        let content = '';
+        if (elementType === 'act') {
+            content = elementData.description || '';
+        } else if (elementType === 'scene') {
+            content = elementData.content || '';
+        }
+        
+        this.originalContent = content;
+        this.quill.root.innerHTML = content;
+        
+        // Store the original content in Quill's Delta format for more accurate comparison
+        setTimeout(() => {
+            this.originalDelta = this.quill.getContents();
+        }, 100); // Small delay to ensure content is fully loaded
+        this.hasUnsavedChanges = false;
+        
+        // Clear loading flag after content is set
+        this.isLoading = false;
+        
+        this.updateUI();
+        
+        return true; // Allow switching
+    }
+    
+    checkForChanges() {
+        if (!this.originalDelta) {
+            // Fallback to HTML comparison if Delta comparison isn't ready
+            const currentContent = this.quill.root.innerHTML;
+            this.hasUnsavedChanges = currentContent !== this.originalContent;
+        } else {
+            // Use Quill's Delta comparison for more accurate change detection
+            const currentDelta = this.quill.getContents();
+            this.hasUnsavedChanges = !currentDelta.ops.every((op, index) => {
+                const originalOp = this.originalDelta.ops[index];
+                return originalOp && JSON.stringify(op) === JSON.stringify(originalOp);
+            }) || currentDelta.ops.length !== this.originalDelta.ops.length;
+        }
+        this.updateUI();
+    }
+    
+    updateUI() {
+        const saveButton = this.saveButton;
+        const cancelButton = this.cancelButton;
+        const unsavedWarning = this.unsavedWarning;
+        
+        if (saveButton) {
+            saveButton.disabled = !this.hasUnsavedChanges;
+        }
+        if (cancelButton) {
+            cancelButton.disabled = !this.hasUnsavedChanges;
+        }
+        if (unsavedWarning) {
+            unsavedWarning.style.display = this.hasUnsavedChanges ? 'block' : 'none';
+        }
+    }
+    
+    async saveContent() {
+        if (!this.currentElement || !this.hasUnsavedChanges) return;
+        
+        const content = this.quill.root.innerHTML;
+        const saveBtn = this.saveButton;
+        
+        // Show saving state
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+        saveBtn.disabled = true;
+        
+        try {
+            // Determine API endpoint and field name
+            let endpoint, fieldName;
+            if (this.currentElement.type === 'act') {
+                endpoint = `/api/v1/acts/${this.currentElement.id}`;
+                fieldName = 'description';
+            } else if (this.currentElement.type === 'scene') {
+                endpoint = `/api/v1/scenes/${this.currentElement.id}`;
+                fieldName = 'content';
+            }
+            
+            const response = await fetch(endpoint, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ [fieldName]: content })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save content');
+            }
+            
+            // Update original content and UI state
+            this.originalContent = content;
+            this.originalDelta = this.quill.getContents();
+            this.hasUnsavedChanges = false;
+            this.updateUI();
+            
+            // Show success message
+            hierarchyManager.showToast('Content saved successfully!', 'success');
+            
+        } catch (error) {
+            console.error('Error saving content:', error);
+            hierarchyManager.showToast('Failed to save content. Please try again.', 'error');
+        } finally {
+            // Restore button state
+            saveBtn.innerHTML = originalText;
+            this.updateUI();
+        }
+    }
+    
+    cancelChanges() {
+        if (!this.currentElement) return;
+        
+        if (this.hasUnsavedChanges) {
+            const confirmCancel = confirm('Are you sure you want to discard all unsaved changes?');
+            if (!confirmCancel) {
+                return;
+            }
+        }
+        
+        // Reload the original content
+        this.isLoading = true;
+        this.quill.root.innerHTML = this.originalContent;
+        this.hasUnsavedChanges = false;
+        this.isLoading = false;
+        
+        // Update the original delta after reloading
+        setTimeout(() => {
+            this.originalDelta = this.quill.getContents();
+        }, 100);
+        
+        this.updateUI();
+        hierarchyManager.showToast('Changes discarded', 'info');
+    }
+    
+    clearEditor() {
+        // Set loading flag to prevent change detection during clearing
+        this.isLoading = true;
+        
+        this.currentElement = null;
+        this.originalContent = '';
+        this.originalDelta = null;
+        this.hasUnsavedChanges = false;
+        this.quill.root.innerHTML = '';
+        
+        // Clear loading flag after content is cleared
+        this.isLoading = false;
+        
+        this.updateUI();
+    }
+}
+
+// Resize Handle Functionality
+class ResizeHandle {
+    constructor() {
+        this.resizeHandle = document.getElementById('resize-handle');
+        this.treePanel = document.querySelector('.tree-panel');
+        this.detailsPanel = document.querySelector('.details-panel');
+        this.container = document.querySelector('.hierarchy-container');
+        this.isResizing = false;
+        
+        this.setupEventListeners();
+    }
+    
+    setupEventListeners() {
+        this.resizeHandle.addEventListener('mousedown', (e) => {
+            this.isResizing = true;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!this.isResizing) return;
+            
+            const containerRect = this.container.getBoundingClientRect();
+            const newTreeWidth = e.clientX - containerRect.left;
+            const containerWidth = containerRect.width;
+            const handleWidth = 6; // resize handle width
+            
+            // Calculate percentages
+            const treePercent = (newTreeWidth / containerWidth) * 100;
+            const detailsPercent = ((containerWidth - newTreeWidth - handleWidth) / containerWidth) * 100;
+            
+            // Set minimum and maximum widths (20% to 80%)
+            if (treePercent >= 20 && treePercent <= 80) {
+                this.treePanel.style.flex = `0 0 ${treePercent}%`;
+                this.detailsPanel.style.flex = `0 0 ${detailsPercent}%`;
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (this.isResizing) {
+                this.isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+    }
+}
+
+// Initialize components when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    window.contentEditor = new ContentEditor();
+    window.resizeHandle = new ResizeHandle();
+    
+    // Initialize all Bootstrap tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"], .story-generation-trigger, [title]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover focus'
+        });
+    });
+    
+    // Special handling for story generation button tooltip
+    const storyGenButton = document.querySelector('.story-generation-trigger');
+    if (storyGenButton && !storyGenButton.hasAttribute('data-bs-toggle')) {
+        new bootstrap.Tooltip(storyGenButton, {
+            trigger: 'hover focus'
+        });
+    }
+});
+</script>
+{% endblock %}

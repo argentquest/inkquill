@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Interview Response Schema",
+  "description": "Schema for validating interview response JSON submissions",
+  "properties": {
+    "interview_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_]+$",
+      "minLength": 3,
+      "maxLength": 100,
+      "description": "Must match the interview_id from questions"
+    },
+    "user_id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Database ID of the user"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of completion"
+    },
+    "responses": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_]+$": {
+          "type": "object",
+          "properties": {
+            "question_id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_]+$"
+            },
+            "selected_values": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_]+$"
+              },
+              "maxItems": 20,
+              "uniqueItems": true
+            },
+            "text_value": {
+              "type": "string",
+              "maxLength": 10000
+            },
+            "answered_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "skipped": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": ["question_id", "answered_at"],
+          "additionalProperties": false,
+          "anyOf": [
+            {
+              "required": ["selected_values"]
+            },
+            {
+              "required": ["text_value"]
+            },
+            {
+              "properties": {"skipped": {"const": true}}
+            }
+          ]
+        }
+      },
+      "minProperties": 1,
+      "maxProperties": 50,
+      "additionalProperties": false
+    },
+    "navigation": {
+      "type": "object",
+      "properties": {
+        "final_destination": {
+          "type": "string",
+          "pattern": "^/[a-zA-Z0-9/_\\-]*$",
+          "maxLength": 200
+        },
+        "from_question_5": {
+          "type": "string",
+          "pattern": "^/[a-zA-Z0-9/_\\-]*$",
+          "maxLength": 200
+        },
+        "show_brainstorm_popup": {
+          "type": "boolean",
+          "default": false
+        },
+        "brainstorm_route": {
+          "type": ["string", "null"],
+          "pattern": "^/[a-zA-Z0-9/_\\-]*$",
+          "maxLength": 200
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "total_time_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7200
+        },
+        "questions_skipped": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "user_agent": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "completion_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "submitted_via": {
+          "type": "string",
+          "enum": ["web_interface", "api", "mobile_app"],
+          "default": "web_interface"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["interview_id", "user_id", "responses"],
+  "additionalProperties": false
+}

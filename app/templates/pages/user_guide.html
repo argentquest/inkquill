@@ -1,0 +1,489 @@
+{# /ai_rag_story_app/app/templates/pages/user_guide.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Quick Start - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-rocket me-3"></i>
+                    Quick Start Guide
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Complete guide to building worlds and writing stories with your AI co-author
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-book me-1"></i>
+                        User Guide
+                    </span>
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-graduation-cap me-1"></i>
+                        Tutorial
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-magic me-1"></i>
+                        AI Powered
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('user_guide')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with this guide">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_home') }}" class="btn btn-outline-light btn-sm"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Return to home page">
+                        <i class="fas fa-home me-1"></i>
+                        Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="row">
+        <!-- Tabler Navigation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card position-sticky" style="top: 1rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Navigation</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#introduction" class="list-group-item list-group-item-action">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Introduction
+                    </a>
+                    <a href="#worlds" class="list-group-item list-group-item-action">
+                        <i class="fas fa-globe me-2 text-success"></i>
+                        Step 1: Your World
+                    </a>
+                    <a href="#stories" class="list-group-item list-group-item-action">
+                        <i class="fas fa-book me-2 text-blue"></i>
+                        Step 2: Your Story
+                    </a>
+                    <a href="#writing" class="list-group-item list-group-item-action">
+                        <i class="fas fa-pen me-2 text-purple"></i>
+                        Step 3: AI Writing
+                    </a>
+                    <a href="#advanced-features" class="list-group-item list-group-item-action">
+                        <i class="fas fa-cogs me-2 text-orange"></i>
+                        Advanced Features
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabler Main Content -->
+        <div class="col-lg-9">
+            <div class="space-y-4">
+                <!-- Introduction Card -->
+                <div class="card" id="introduction">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Introduction: The Core Philosophy
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">Welcome to the AI Storytelling Assistant! This application is built on one core idea: <strong>a smarter AI companion is one that you teach.</strong></p>
+                        <p class="mb-3">Instead of relying on a generic AI, this tool uses a powerful <strong>Retrieval-Augmented Generation (RAG)</strong> system. This means the AI's "brain" is your own custom knowledge base. The more detail you provide about your fictional universe, the more consistent, creative, and context-aware its suggestions will be. The foundation of this knowledge base is the <strong>World</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- Step 1: Worlds Card -->
+                <div class="card" id="worlds">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-globe me-2 text-success"></i>
+                            Step 1: The Foundation - Your World
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Everything starts with a World. A World is the container for your universe's rules, history, and inhabitants. It is the single source of truth for the AI.</p>
+                        
+                        <div class="mb-4">
+                            <h4 class="text-success mb-3" id="creating-worlds">Creating Your First World</h4>
+                            <p class="mb-3">You have three powerful ways to create a world from the <a href="{{ url_for('ui_list_worlds') }}" class="text-decoration-none">My Worlds</a> page:</p>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="card card-sm border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="avatar avatar-lg bg-primary-lt me-3">
+                                                    <i class="fas fa-plus"></i>
+                                                </div>
+                                                <div>
+                                                    <h5>Create New World</h5>
+                                                    <div class="text-secondary small">Start from scratch</div>
+                                                </div>
+                                            </div>
+                                            <p class="small">Start with a blank slate. Give your universe a name and a description, and begin building from scratch.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card card-sm border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="avatar avatar-lg bg-success-lt me-3">
+                                                    <i class="fas fa-book"></i>
+                                                </div>
+                                                <div>
+                                                    <h5>Import from Book Title</h5>
+                                                    <div class="text-secondary small">Fastest way to start</div>
+                                                </div>
+                                            </div>
+                                            <p class="small">Enter a title like <code>The Hobbit</code> or <code>Dune</code>, and the AI will generate a foundational world complete with key characters, locations, and lore.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card card-sm border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="avatar avatar-lg bg-blue-lt me-3">
+                                                    <i class="fas fa-file-upload"></i>
+                                                </div>
+                                                <div>
+                                                    <h5>Create from Document</h5>
+                                                    <div class="text-secondary small">Upload existing content</div>
+                                                </div>
+                                            </div>
+                                            <p class="small">Upload a document (e.g., a story bible, an early draft). The AI will read it and attempt to extract all the world elements automatically.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info mt-4">
+                                <div class="d-flex">
+                                    <div class="avatar avatar-sm bg-info-lt me-3">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="alert-title">Job Tracking</h4>
+                                        <div class="text-secondary">Importing a world is a background job that can take a few minutes. The application will show you a real-time status so you can track its progress without waiting.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-success mb-3" id="populating-worlds">Populating Your World: The 3 Core Elements</h4>
+                            <p class="mb-3">Once a World is created, its true power comes from the elements you define within it. Every time you create or update one of these, the AI learns more about your universe.</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start">
+                                        <div class="avatar avatar-sm bg-success-lt me-3">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Characters</strong>
+                                            <div class="text-secondary">The "who." Define their personalities, backstories, and appearances. The more detail here, the better the AI can write their dialogue and actions true to their nature.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start">
+                                        <div class="avatar avatar-sm bg-blue-lt me-3">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Locations</strong>
+                                            <div class="text-secondary">The "where." Describe the atmosphere, appearance, and significance of key places. This helps the AI generate immersive, sensory descriptions.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start">
+                                        <div class="avatar avatar-sm bg-purple-lt me-3">
+                                            <i class="fas fa-scroll"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Lore Items</strong>
+                                            <div class="text-secondary">The "what" and "why." Define the rules of your universe—magic systems, historical events, unique artifacts, or political factions.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Stories Card -->
+                <div class="card" id="stories">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-book me-2 text-blue"></i>
+                            Step 2: The Narrative - Your Story
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">A <strong>Story</strong> is your main creative project (a novel, screenplay, etc.). From the <a href="{{ url_for('ui_list_stories') }}" class="text-decoration-none">My Stories</a> page, click "Create New Story."</p>
+                        
+                        <div class="mb-4">
+                            <h4 class="text-blue mb-3" id="linking-story-to-world">Linking Your Story to a World</h4>
+                            <div class="alert alert-blue">
+                                <div class="d-flex">
+                                    <div class="avatar avatar-sm bg-blue-lt me-3">
+                                        <i class="fas fa-link"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Important:</strong> You <strong>must</strong> associate your story with one of your existing Worlds. This link is what enables the AI to access all the characters, locations, and lore you've built.
+                                    </div>
+                                </div>
+                            </div>
+                            <p>After creating the story, you can further refine the context on the Story Detail page by linking the <em>specific</em> elements from your world that will be featured in that narrative. This helps the AI focus on the most relevant information.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Writing Card -->
+                <div class="card" id="writing">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-pen me-2 text-purple"></i>
+                            Step 3: Writing with Your AI Co-Author
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">The <strong>Act Editor</strong> is your primary workspace. Here, you can write your narrative and collaborate with the AI.</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-magic me-2 text-purple"></i>
+                                            Content Generation
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-3">In the "AI Assistant" tab, you have full control over the AI's creative process:</p>
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Generation Mode:</strong> Choose how the AI should interact with your text. You can have it <code>Continue/Append</code> to your writing, <code>Rewrite</code> a highlighted section, or <code>Elaborate/Expand</code> on a selected idea.
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Your Instruction:</strong> Be specific! Instead of "write more," try "Describe the tavern brawl from the perspective of the frightened bartender."
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Incorporate:</strong> The AI's response appears in a preview box. If you like it, click <strong>"Incorporate"</strong> to add it directly to your manuscript.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-search me-2 text-orange"></i>
+                                            AI Review & Feedback
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-3">For a higher-level analysis, use the <strong>"Review with AI"</strong> feature. The AI will read your entire act and provide structured feedback on:</p>
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Suggestions:</strong> Actionable advice on pacing, character motivation, plot coherence, and more. You can even click an "Apply" button for some suggestions to automatically implement the change.
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Metrics:</strong> A 1-5 rating across several categories like engagement, plot, and descriptive language, helping you identify areas for improvement.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced Features Card -->
+                <div class="card" id="advanced-features">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-cogs me-2 text-orange"></i>
+                            Advanced Features
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-orange-lt me-3">
+                                                <i class="fas fa-brain"></i>
+                                            </div>
+                                            <div>
+                                                <h4 id="rag-system">The RAG System: The AI's Memory</h4>
+                                                <div class="text-secondary">Retrieval-Augmented Generation</div>
+                                            </div>
+                                        </div>
+                                        <p class="mb-3">The AI's ability to remember your world comes from the RAG system. It's automatically fed by the <strong>Characters, Locations, and Lore Items</strong> you create.</p>
+                                        <p class="small">You can further enhance its knowledge by uploading your own documents (e.g., research notes, timelines, inspirational texts) via the <strong>Manage Documents</strong> page and associating them with a world.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-purple-lt me-3">
+                                                <i class="fas fa-list"></i>
+                                            </div>
+                                            <div>
+                                                <h4 id="prompt-library">The Prompt Library</h4>
+                                                <div class="text-secondary">Reusable AI instructions</div>
+                                            </div>
+                                        </div>
+                                        <p class="mb-3">The <a href="{{ url_for('ui_list_prompts') }}" class="text-decoration-none">Prompt Library</a> lets you save and reuse your most effective instructions for the AI. This is perfect for maintaining a consistent style or tone.</p>
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <span class="badge bg-primary me-2">Instructional Prompts</span>
+                                                <span class="text-secondary small">Reusable instructions for the "Your Instruction" box</span>
+                                            </div>
+                                            <div class="col-12">
+                                                <span class="badge bg-success me-2">System Prompts</span>
+                                                <span class="text-secondary small">Define the AI's core persona and writing style</span>
+                                            </div>
+                                            <div class="col-12">
+                                                <span class="badge bg-blue me-2">Image Style Prompts</span>
+                                                <span class="text-secondary small">Define consistent artistic styles for image generation</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-rocket me-2 text-success"></i>
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-primary-lt mb-3 mx-auto">
+                                            <i class="fas fa-globe"></i>
+                                        </div>
+                                        <h4>Create World</h4>
+                                        <p class="text-secondary">Start building your universe</p>
+                                        <a href="{{ url_for('ui_list_worlds') }}" class="btn btn-primary">My Worlds</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        <h4>Create Story</h4>
+                                        <p class="text-secondary">Begin your narrative project</p>
+                                        <a href="{{ url_for('ui_list_stories') }}" class="btn btn-success">My Stories</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-list"></i>
+                                        </div>
+                                        <h4>Prompt Library</h4>
+                                        <p class="text-secondary">Manage AI instructions</p>
+                                        <a href="{{ url_for('ui_list_prompts') }}" class="btn btn-blue">View Prompts</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Tip Alert -->
+                <div class="alert alert-success">
+                    <div class="d-flex">
+                        <div class="avatar avatar-sm bg-success-lt me-3">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">💡 Pro Tip</h4>
+                            <div class="text-secondary">The more you teach your AI about your world, the better it becomes at helping you write. Take time to build rich Characters, Locations, and Lore Items—your future writing sessions will thank you!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('.list-group-item-action').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Highlight active navigation item
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('[id]');
+        const navLinks = document.querySelectorAll('.list-group-item-action');
+        
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentSection) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

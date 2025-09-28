@@ -1,0 +1,130 @@
+{  
+  "world": {  
+    "name": "Asteroid B-612 and the Universe of Le Petit Prince",  
+    "description": "The world of Le Petit Prince, also known as Asteroid B-612, is a poignant and whimsical realm that exists in the vast expanse of the universe. This tiny asteroid, home to the Little Prince, is a symbol of innocence, friendship, and the human condition. The story unfolds as a journey through space and time, traversing various planets, each inhabited by a peculiar adult, highlighting the absurdities of human nature. The narrative is a delicate balance of melancholy and hope, underscoring the importance of human connections and the beauty of the natural world. The unique blend of science fiction and philosophical introspection creates a timeless and universal atmosphere, making this world both relatable and fantastical."  
+  },  
+  "characters": [  
+    {  
+      "name": "Le Petit Prince (The Little Prince)",  
+      "description": "A young prince from a distant asteroid, characterized by his innocence, curiosity, and longing for human connection. He is a small, blonde-haired boy with a kind heart and a deep sense of wonder.",  
+      "personality_traits": "Innocent, Curious, Empathetic, Determined, Melancholic",  
+      "backstory": "The Little Prince hails from Asteroid B-612, where he tends to a single rose. Feeling isolated and yearning for friendship, he sets out on a journey to explore the universe.",  
+      "importance_rating": 5,  
+      "relationships": "Shares a deep bond with the rose on his home asteroid, forms connections with the Pilot, the Fox, and other characters he meets during his journey.",  
+      "image_prompt_definition": "Young blonde boy in a simple white outfit, looking up at the stars with a mix of wonder and longing."  
+    },  
+    {  
+      "name": "The Fox",  
+      "description": "A wise and kind fox who teaches the Little Prince about the value of human connections and relationships. He has a warm and gentle demeanor.",  
+      "personality_traits": "Wise, Kind, Insightful, Gentle, Affectionate",  
+      "backstory": "The Fox has lived on a distant planet, where he has learned the importance of relationships and has been waiting for someone to share his wisdom with.",  
+      "importance_rating": 4,  
+      "relationships": "Forms a significant bond with the Little Prince, shares his wisdom on the importance of human connections.",  
+      "image_prompt_definition": "A fox with a gentle expression, sitting under a tree with the Little Prince."  
+    },  
+    {  
+      "name": "The Pilot",  
+      "description": "A stranded pilot who befriends the Little Prince and listens to his story. He is a kind and patient man.",  
+      "personality_traits": "Kind, Patient, Lonely, Resourceful",  
+      "backstory": "The Pilot has been stranded in the desert for years, surviving on his ingenuity and hope.",  
+      "importance_rating": 3,  
+      "relationships": "Shares a deep connection with the Little Prince, provides a listening ear and support.",  
+      "image_prompt_definition": "A grown man with a kind face, wearing a pilot's uniform, sitting in the desert with the Little Prince."  
+    },  
+    {  
+      "name": "The Rose",  
+      "description": "A unique and beautiful rose that the Little Prince cares for on his home asteroid. She is demanding but loved by the Little Prince.",  
+      "personality_traits": "Demanding, Beautiful, Fragile, Loved",  
+      "backstory": "The Rose has been growing on Asteroid B-612, and the Little Prince has devoted himself to her care.",  
+      "importance_rating": 4,  
+      "relationships": "Central to the Little Prince's life on Asteroid B-612, her loss and memory drive his journey.",  
+      "image_prompt_definition": "A delicate, beautiful rose with petals closed, set against the stark backdrop of Asteroid B-612."  
+    },  
+    {  
+      "name": "The King",  
+      "description": "A self-absorbed king who rules over a star, exemplifying the absurdity of adult society. He is pompous and commanding.",  
+      "personality_traits": "Pompous, Self-absorbed, Authoritative, Lonely",  
+      "backstory": "The King has been ruling his star, isolated and disconnected from the rest of the universe.",  
+      "importance_rating": 2,  
+      "relationships": "Meets the Little Prince during his journey, represents the theme of isolation and absurdity.",  
+      "image_prompt_definition": "An elderly king with a white beard, sitting on a throne, looking out into space."  
+    },  
+    {  
+      "name": "The Conceited Man",  
+      "description": "A man consumed by his own vanity, illustrating another facet of adult society that the Little Prince encounters.",  
+      "personality_traits": "Vain, Self-absorbed, Shallow",  
+      "backstory": "Lives on a planet where he is the only inhabitant, spending his time admiring his reflection.",  
+      "importance_rating": 2,  
+      "relationships": "Interacts with the Little Prince, symbolizing the theme of vanity.",  
+      "image_prompt_definition": "A man admiring his reflection in a polished surface, dressed in elegant but outdated attire."  
+    },  
+    {  
+      "name": "The Businessman",  
+      "description": "A busy man who is constantly occupied with counting stars, representing the theme of materialism.",  
+      "personality_traits": "Busy, Materialistic, Distracted",  
+      "backstory": "Spends his time counting and re-counting stars, blind to the beauty of the universe.",  
+      "importance_rating": 2,  
+      "relationships": "Meets the Little Prince, exemplifying the adult world's focus on materialism.",  
+      "image_prompt_definition": "A man with glasses, surrounded by papers and star charts, intensely focused on counting."  
+    },  
+    {  
+      "name": "The Lamplighter",  
+      "description": "A diligent but trapped lamplighter, stuck in an endless cycle of lighting and extinguishing his lamp.",  
+      "personality_traits": "Diligent, Trapped, Obedient",  
+      "backstory": "Lives on a planet with a strict schedule for lighting and extinguishing his lamp, illustrating the theme of blind obedience.",  
+      "importance_rating": 2,  
+      "relationships": "Encounters the Little Prince, symbolizing the theme of meaningless tasks.",  
+      "image_prompt_definition": "A man in a uniform, lighting a lamp on a small planet."  
+    },  
+    {  
+      "name": "The Geographer",  
+      "description": "A scholar who is more interested in facts and figures than in actual experiences, representing the theme of detached intellectualism.",  
+      "personality_traits": "Intellectual, Detached, Theoretical",  
+      "backstory": "Spends his time recording and categorizing geographical data, never experiencing the world firsthand.",  
+      "importance_rating": 2,  
+      "relationships": "Meets the Little Prince, embodying the disconnect between knowledge and experience.",  
+      "image_prompt_definition": "An older man with glasses, surrounded by books and maps, looking detached."  
+    }  
+  ],  
+  "locations": [  
+    {  
+      "name": "Asteroid B-612",  
+      "description": "The home of the Little Prince, a small, desolate asteroid where he cares for his rose. The asteroid is barren and rocky.",  
+      "atmosphere": "Melancholic and Isolated",  
+      "scale": "ASTEROID",  
+      "geography": "Barren, rocky surface with a single rose.",  
+      "cultural_context": "A place of simplicity and solitude, where the Little Prince and his rose share a deep bond.",  
+      "significance": "The central location of the Little Prince's story, symbolizing home and longing.",  
+      "importance_rating": 5,  
+      "connected_elements": "The Little Prince, the Rose",  
+      "image_prompt_definition": "A small, barren asteroid with a single rose blooming, set against a starry sky."  
+    },  
+    {  
+      "name": "The King's Star",  
+      "description": "A star ruled by the self-absorbed King, symbolizing power and isolation.",  
+      "atmosphere": "Regal and Isolated",  
+      "scale": "STAR",  
+      "geography": "Not specified",  
+      "cultural_context": "A place of absolute authority, yet deep loneliness.",  
+      "significance": "Represents the theme of power and loneliness in leadership.",  
+      "importance_rating": 3,  
+      "connected_elements": "The King",  
+      "image_prompt_definition": "A star with a king's throne room visible, the king sitting alone."  
+    },  
+    {  
+      "name": "The Desert",  
+      "description": "A vast, sandy desert where the Pilot and the Little Prince meet. It symbolizes isolation and the search for meaning.",  
+      "atmosphere": "Harsh and Lonely",  
+      "scale": "REGION",  
+      "geography": "Endless dunes of sand, with sparse vegetation.",  
+      "cultural_context": "Not specified",  
+      "significance": "A place of encounter and reflection for the Little Prince and the Pilot.",  
+      "importance_rating": 3,  
+      "connected_elements": "The Pilot, the Little Prince",  
+      "image_prompt_definition": "A vast desert landscape with the Little Prince and the Pilot sitting in the foreground."  
+    }  
+  ],  
+  "lore_items": [  
+    {  
+      "title": "The Rose",  
+      "description": "A unique and beautiful rose that the Little Prince cares for on Asteroid B-612. She demands attention and

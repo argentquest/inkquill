@@ -1,0 +1,79 @@
+{
+"world": {
+"name": "Asteroid Realm",
+"description": "Le Petit Prince's world is a fantastical universe composed of tiny planets and celestial bodies, each embodying a unique aspect of innocence, curiosity, and moral lessons. The central planet, where the Little Prince resides, is small, rocky, and lush with a single baobab tree and a delicate rose, symbolizing love and fragility. Surrounding this world are countless other asteroids, each inhabited by peculiar characters and strange civilizations that serve as allegories for human nature and societal values.\n\nThe atmosphere of this universe is both whimsical and contemplative, blending childlike wonder with profound philosophical insights. The environments range from the barren, vast wasteland of the asteroid inhabited by the little prince to the bustling, symbolic worlds of kings, businessmen, and drinkers—all emphasizing the absurdities and virtues of adult behavior.\n\nOverall, the "Asteroid Realm" transcends physical space, representing a universe of moral exploration conveyed through poetic storytelling and allegorical encounters. Its tone is gentle yet thought-provoking, inviting readers to consider deeper truths about love, responsibility, and the essence of seeing with the heart rather than just the eyes."
+},
+"characters": [
+{
+"name": "The Little Prince",
+"description": "A young boy with golden hair, dressed in a simple costume, and possessing an innocent, curious expression. He is the protagonist, journeying through the universe and learning about love and human nature.",
+"personality_traits": "Innocent, Curious, Thoughtful, Kind, Naive, Observant, Gentle, Hopeful",
+"backstory": "The Little Prince hails from a tiny asteroid called B-612, where he cares for a delicate rose and longs for understanding and companionship. His travels to other planets and Earth reveal his quest for friendship, love, and the meaning of life.",
+"importance_rating": 5,
+"relationships": "Has a special bond with his rose, befriends the fox on Earth, and encounters various planetary characters like the king and the drunkard.",
+"image_prompt_definition": "Young boy with golden hair, simple attire, gentle expression, standing on a small asteroid with a flower nearby."
+},
+{
+"name": "The Fox",
+"description": "A wise, elusive fox with golden fur and a gentle, knowing gaze. He serves as a moral guide, teaching the prince about love and understanding.",
+"personality_traits": "Wise, Compassionate, Playful, Patient, Cunning, Thoughtful",
+"backstory": "The fox is a loner who lives on Earth and desires to be tamed—forming a deep bond with the Little Prince and revealing the secret that 'one sees well only with the heart.'",
+"importance_rating": 4,
+"relationships": "Forms a significant relationship with the Little Prince, teaches him about love, and is pivotal to his understanding of relationships.",
+"image_prompt_definition": "Golden-furred fox with gentle eyes, sitting thoughtfully in a field, contemplating."
+},
+{
+"name": "The Rose",
+"description": "A delicate, beautiful rose with a long stem and thorns, often portrayed as vain yet loving. She symbolizes love, beauty, and vulnerability.",
+"personality_traits": "Proud, Sensitive, Loving, Vain, Fragile, Hopeful",
+"backstory": "The rose is the prince's cherished companion on his home planet, representing love and responsibility. Her vanity and vulnerability prompt the prince to learn about caring and devotion.",
+"importance_rating": 5,
+"relationships": "Central to the prince's journey; he cares for her and learns profound lessons about love and responsibility.",
+"image_prompt_definition": "Elegant rose with detailed petals, standing upright on a small planet under a soft sky."
+}
+],
+"locations": [
+{
+"name": "The Little Prince's Asteroid (B-612)",
+"description": "A tiny, rocky planet with a single volcano and a fragile rose. It’s a simple yet profound world that reflects innocence and the responsibilities of love.",
+"atmosphere": "Whimsical and Reflective",
+"scale": "BUILDING",
+"geography": "Small rocky terrain with sparse vegetation, including a single rose and three volcanoes.",
+"cultural_context": "Simple, childlike, yet imbued with deep symbolic meaning about love and responsibility.",
+"significance": "The birthplace of the Little Prince and the core setting for his reflections and growth.",
+"importance_rating": 5,
+"connected_elements": "Home of the Rose, the planets visited by the prince, and the starting point of his journey.",
+"image_prompt_definition": "Small rocky planet with a single delicate rose, tiny volcanoes, and a clear sky."
+},
+{
+"name": "Earth (The Humble Planet)",
+"description": "A vast, diverse world with cities, deserts, and countryside, on which the Little Prince lands and meets humans and animals. It’s a place of chaos and wonder, where profound lessons are learned.",
+"atmosphere": "Contemplative and Earthy",
+"scale": "CONTINENT",
+"geography": "Varied terrain including deserts, forests, cities, and rivers, symbolizing life’s complexity.",
+"cultural_context": "Diverse, often superficial adult behaviors contrasted with childlike innocence and wisdom.",
+"significance": "The setting for much of the moral and philosophical exploration, and where the prince learns about human nature.",
+"importance_rating": 4,
+"connected_elements": "Encounters with the narrator, the fox, the snake, and other humans.",
+"image_prompt_definition": "Majestic landscape with cities, deserts, and forests, featuring a small boy wandering among people and animals."
+}
+],
+"lore_items": [
+{
+"title": "The Baobabs",
+"description": "Tall, mischievous trees that threaten to swallow the asteroid if not carefully uprooted. They symbolize evil or bad habits that can overpower good if neglected.",
+"category": "OTHER_LORE",
+"importance_rating": 3,
+"related_elements": "Originates from the Little Prince's planet, representing the importance of responsibility.",
+"image_prompt_definition": "Tiny asteroid with tall, lush baobab trees looming over a small landscape."
+},
+{
+"title": "The Rose",
+"description": "A unique, beautiful flower that the Little Prince cares for and loves. She embodies love's vulnerability and beauty, and teaches him about responsibility.",
+"category": "ARTIFACT",
+"importance_rating": 5,
+"related_elements": "Central to the prince's understanding of love and responsibility on his home planet.",
+"image_prompt_definition": "Elegant, delicate rose with lush petals, glowing softly under a starry sky."
+}
+]
+}

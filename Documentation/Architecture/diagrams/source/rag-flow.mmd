@@ -1,0 +1,64 @@
+%% RAG (Retrieval Augmented Generation) Flow Diagram
+%% Title: RAG Implementation Flow
+%% Description: Detailed flow of RAG operations from query to enhanced response
+%% Last Updated: 2025-07-14
+%% Version: 1.0.0
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#00695c',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#004d40',
+    'lineColor: '#424242',
+    'secondaryColor': '#1976d2',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+sequenceDiagram
+    participant User
+    participant App as FastAPI Application
+    participant RAG as RAG Retrieval Plugin
+    participant Embedding as Embedding Service
+    participant Search as Azure AI Search
+    participant LLM as Language Model
+    participant Cost as Cost Tracker
+    
+    Note over User,Cost: Content Generation with RAG
+    
+    User->>App: Request content generation
+    App->>RAG: retrieve_rag_context(query, context_type)
+    
+    Note over RAG: Context Retrieval Phase
+    RAG->>Embedding: generate_embeddings([query])
+    Embedding->>Embedding: Create query vector
+    Embedding-->>RAG: Query embedding vector
+    
+    RAG->>Search: vector_search(embedding, top_k=3)
+    Search->>Search: Semantic similarity search
+    Search-->>RAG: Relevant documents with scores
+    
+    RAG->>RAG: Filter by relevance threshold (0.7)
+    RAG->>RAG: Format context for prompt
+    
+    Note over RAG: Content Generation Phase
+    RAG->>LLM: generate_with_context(prompt + context)
+    LLM->>LLM: Process enhanced prompt
+    LLM-->>RAG: Generated content
+    
+    RAG->>Cost: log_ai_call(usage, model_config)
+    Cost->>Cost: Calculate cost and update balance
+    
+    RAG-->>App: Enhanced response with context
+    App-->>User: Final generated content
+    
+    Note over User,Cost: Document Indexing Flow
+    
+    User->>App: Upload document
+    App->>App: Process and chunk document
+    App->>Embedding: generate_embeddings(chunks)
+    Embedding-->>App: Chunk embeddings
+    App->>Search: upload_documents(chunks + embeddings)
+    Search-->>App: Indexing confirmation
+    App-->>User: Upload complete

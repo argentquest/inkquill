@@ -1,0 +1,701 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Referral Program - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Referral Stats Cards */
+    .referral-stat-card {
+        transition: all 0.3s ease;
+    }
+    
+    .referral-stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tblr-shadow-lg);
+    }
+    
+    /* Progress Bar Animation */
+    .daily-progress {
+        transition: width 0.6s ease;
+    }
+    
+    /* Platform Icons */
+    .platform-icon {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    
+    /* Referral Link Box */
+    .referral-link-box {
+        background: var(--tblr-bg-surface-secondary);
+        border: 2px dashed var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.9rem;
+        word-break: break-all;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .referral-link-box:hover {
+        background: var(--tblr-bg-surface);
+        border-color: var(--tblr-primary);
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {# Page Header #}
+    {% set page_title = 'Referral Program' %}
+    {% set page_icon = 'fas fa-users' %}
+    {% set page_description = 'Earn coins by inviting friends to join our community' %}
+    {% set page_stats = [
+        {'icon': 'fas fa-coins', 'text': 'Total Earned: <span id="total-coins">0</span> coins'},
+        {'icon': 'fas fa-user-plus', 'text': 'Referrals: <span id="total-referrals">0</span>'}
+    ] %}
+    {% set back_url = url_for('ui_home') %}
+    {% set back_text = 'Back to Dashboard' %}
+    {% set help_topic = 'referrals' %}
+    {% include 'partials/_page_header.html' %}
+
+    <!-- Quick Info Banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info d-flex align-items-center">
+                <div class="me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <circle cx="12" cy="12" r="9"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <div class="flex-fill">
+                    <h4 class="alert-title">New to the Referral Program?</h4>
+                    <div class="text-muted">Learn how to earn coins by sharing with friends and get ready-to-use messages for social media.</div>
+                </div>
+                <div class="ms-auto">
+                    <a href="{{ url_for('ui_referrals_intro') }}" class="btn btn-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 6l4 6l5 -4l-2 10l-8 -2l-8 2l-2 -10l5 4z"/>
+                        </svg>
+                        Learn How It Works
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral Link Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-status-top bg-primary"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-link me-2"></i>Your Referral Link
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Share this link to earn coins when friends join and engage with the platform!</p>
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <div class="referral-link-box" id="referral-link" onclick="copyReferralLink()">
+                                Loading...
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mt-3 mt-lg-0">
+                            <button class="btn btn-primary w-100" onclick="copyReferralLink()">
+                                <i class="fas fa-copy me-2"></i>Copy Link
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Earn coins for: visitor clicks (5), registrations (50), first story (25), first publish (50)
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <button class="btn btn-sm btn-outline-primary" onclick="toggleCustomLinkSection()">
+                                <i class="fas fa-cog me-1"></i>Create Custom Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Link Generator (Hidden by default) -->
+    <div class="row mb-4" id="custom-link-section" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-status-top bg-secondary"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-tools me-2"></i>Custom Referral Link Generator
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Create referral links for specific pages to direct your friends exactly where you want them to go!</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Select Destination Page</label>
+                            <select class="form-select" id="destination-select" onchange="updateCustomLink()">
+                                <option value="/">Home Page</option>
+                                <option value="/ui/register">Registration Page</option>
+                                <option value="/ui/worlds">World Builder</option>
+                                <option value="/ui/stories">Story Creator</option>
+                                <option value="/ui/published-stories">Published Stories Gallery</option>
+                                <option value="custom">Custom URL...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="custom-url-input" style="display: none;">
+                            <label class="form-label">Custom URL Path</label>
+                            <input type="text" class="form-control" id="custom-path" placeholder="/ui/your-page" oninput="updateCustomLink()">
+                            <small class="text-muted">Enter the path starting with /</small>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Generated Link</label>
+                        <div class="referral-link-box" id="custom-referral-link" onclick="copyCustomLink()">
+                            Select a destination above...
+                        </div>
+                        <button class="btn btn-secondary mt-2" onclick="copyCustomLink()">
+                            <i class="fas fa-copy me-1"></i>Copy Custom Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <!-- Total Referrals -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card referral-stat-card">
+                <div class="card-status-top bg-azure"></div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-azure-lt">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="ms-3">
+                            <div class="text-muted small">Total Referrals</div>
+                            <div class="h3 mb-0" id="stat-total-referrals">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conversions -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card referral-stat-card">
+                <div class="card-status-top bg-success"></div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-success-lt">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="ms-3">
+                            <div class="text-muted small">Conversions</div>
+                            <div class="h3 mb-0"><span id="stat-conversions">0</span> <small class="text-muted">(<span id="stat-conversion-rate">0</span>%)</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Coins Earned -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card referral-stat-card">
+                <div class="card-status-top bg-yellow"></div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-yellow-lt">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="ms-3">
+                            <div class="text-muted small">Total Coins Earned</div>
+                            <div class="h3 mb-0" id="stat-total-coins">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Today's Earnings -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card referral-stat-card">
+                <div class="card-status-top bg-purple"></div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-purple-lt">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="ms-3">
+                            <div class="text-muted small">Today's Earnings</div>
+                            <div class="h3 mb-0"><span id="stat-today-coins">0</span> / <span id="stat-daily-limit">500</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Progress & Platform Breakdown -->
+    <div class="row mb-4">
+        <!-- Daily Progress -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line me-2"></i>Today's Progress
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Total Daily Progress -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Daily Coin Limit</span>
+                            <span class="text-muted"><span id="progress-coins">0</span> / <span id="progress-limit">500</span> coins</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar daily-progress bg-primary" id="daily-progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reward Type Limits -->
+                    <div class="space-y-3">
+                        <div>
+                            <div class="d-flex justify-content-between text-sm">
+                                <span>Visit Rewards</span>
+                                <span class="text-muted"><span id="limit-visits">0</span> / <span id="limit-visits-max">10</span></span>
+                            </div>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-azure" id="visits-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between text-sm">
+                                <span>Registration Rewards</span>
+                                <span class="text-muted"><span id="limit-registrations">0</span> / <span id="limit-registrations-max">5</span></span>
+                            </div>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-success" id="registrations-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between text-sm">
+                                <span>Story Creation Rewards</span>
+                                <span class="text-muted"><span id="limit-stories">0</span> / <span id="limit-stories-max">3</span></span>
+                            </div>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-yellow" id="stories-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between text-sm">
+                                <span>Publishing Rewards</span>
+                                <span class="text-muted"><span id="limit-publishes">0</span> / <span id="limit-publishes-max">3</span></span>
+                            </div>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-purple" id="publishes-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Platform Breakdown -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-share-alt me-2"></i>Traffic Sources
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="platform-chart"></canvas>
+                    </div>
+                    <div id="platform-legend" class="mt-3">
+                        <!-- Legend will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral Timeline -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history me-2"></i>Referral Activity (Last 30 Days)
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="timeline-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Global variables for charts
+let platformChart = null;
+let timelineChart = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadReferralStats();
+    setupCharts();
+});
+
+// Generate referral link with optional destination
+function generateReferralLink(destinationPath = '/') {
+    const baseUrl = window.location.origin;
+    const userId = {{ current_user.id if current_user else 0 }};
+    const referralLink = `${baseUrl}${destinationPath}?ref=${userId}`;
+    document.getElementById('referral-link').textContent = referralLink;
+    
+    // Store the current link for advanced usage
+    window.currentReferralLink = referralLink;
+}
+
+// Advanced referral link generator (can be called from console or other scripts)
+function generateCustomReferralLink(destinationPath = '/') {
+    const baseUrl = window.location.origin;
+    const userId = {{ current_user.id if current_user else 0 }};
+    return `${baseUrl}${destinationPath}?ref=${userId}`;
+}
+
+// Copy referral link to clipboard
+async function copyReferralLink() {
+    const linkElement = document.getElementById('referral-link');
+    const linkText = linkElement.textContent;
+    
+    try {
+        await navigator.clipboard.writeText(linkText);
+        showToast('success', 'Referral link copied to clipboard!');
+        
+        // Visual feedback
+        linkElement.style.background = 'var(--tblr-success-lt)';
+        setTimeout(() => {
+            linkElement.style.background = '';
+        }, 1000);
+    } catch (err) {
+        showToast('error', 'Failed to copy link. Please select and copy manually.');
+    }
+}
+
+// Load referral statistics
+async function loadReferralStats() {
+    try {
+        const response = await fetch('/api/v1/referrals/stats');
+        if (!response.ok) throw new Error('Failed to load stats');
+        
+        const stats = await response.json();
+        
+        // Update overview stats - check if elements exist first
+        const updateElementIfExists = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        };
+        
+        updateElementIfExists('total-coins', stats.total_coins_earned || 0);
+        updateElementIfExists('total-referrals', stats.total_referrals || 0);
+        updateElementIfExists('stat-total-referrals', stats.total_referrals || 0);
+        updateElementIfExists('stat-conversions', stats.converted_referrals || 0);
+        updateElementIfExists('stat-conversion-rate', (stats.conversion_rate || 0).toFixed(1));
+        updateElementIfExists('stat-total-coins', stats.total_coins_earned || 0);
+        updateElementIfExists('stat-today-coins', stats.today?.coins_earned || 0);
+        updateElementIfExists('stat-daily-limit', stats.limits?.total_coins || 500);
+        
+        // Update daily progress
+        if (stats.today && stats.limits) {
+            updateDailyProgress(stats.today, stats.limits);
+        }
+        
+        // Update platform chart
+        if (stats.platform_breakdown) {
+            updatePlatformChart(stats.platform_breakdown);
+        }
+        
+        // Generate referral link
+        generateReferralLink();
+        
+    } catch (error) {
+        console.error('Error loading referral stats:', error);
+        showToast('error', 'Failed to load referral statistics');
+    }
+}
+
+// Update daily progress bars
+function updateDailyProgress(today, limits) {
+    // Helper function to safely update elements
+    const updateElementIfExists = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    };
+    
+    const updateProgressIfExists = (id, width) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.width = `${width}%`;
+        }
+    };
+    
+    // Total daily progress
+    const dailyProgress = (today.coins_earned / limits.total_coins) * 100;
+    updateElementIfExists('progress-coins', today.coins_earned);
+    updateElementIfExists('progress-limit', limits.total_coins);
+    updateProgressIfExists('daily-progress-bar', dailyProgress);
+    
+    // Visit rewards
+    const visitsProgress = (today.visit_rewards / limits.visit_rewards) * 100;
+    updateElementIfExists('limit-visits', today.visit_rewards);
+    updateElementIfExists('limit-visits-max', limits.visit_rewards);
+    updateProgressIfExists('visits-progress', visitsProgress);
+    
+    // Registration rewards
+    const registrationsProgress = (today.registration_rewards / limits.registration_rewards) * 100;
+    updateElementIfExists('limit-registrations', today.registration_rewards);
+    updateElementIfExists('limit-registrations-max', limits.registration_rewards);
+    updateProgressIfExists('registrations-progress', registrationsProgress);
+    
+    // Story rewards
+    const storiesProgress = (today.story_rewards / limits.story_rewards) * 100;
+    updateElementIfExists('limit-stories', today.story_rewards);
+    updateElementIfExists('limit-stories-max', limits.story_rewards);
+    updateProgressIfExists('stories-progress', storiesProgress);
+    
+    // Publish rewards
+    const publishesProgress = (today.publish_rewards / limits.publish_rewards) * 100;
+    updateElementIfExists('limit-publishes', today.publish_rewards);
+    updateElementIfExists('limit-publishes-max', limits.publish_rewards);
+    updateProgressIfExists('publishes-progress', publishesProgress);
+}
+
+// Setup charts
+function setupCharts() {
+    // Platform breakdown chart
+    const platformCtx = document.getElementById('platform-chart').getContext('2d');
+    platformChart = new Chart(platformCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#1877f2', // Facebook
+                    '#1da1f2', // Twitter
+                    '#0077b5', // LinkedIn
+                    '#ff4500', // Reddit
+                    '#25d366', // WhatsApp
+                    '#bd081c', // Pinterest
+                    '#0088cc', // Telegram
+                    '#6c757d'  // Direct
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    
+    // Timeline chart
+    const timelineCtx = document.getElementById('timeline-chart').getContext('2d');
+    timelineChart = new Chart(timelineCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Referral Visits',
+                data: [],
+                borderColor: '#206bc4',
+                backgroundColor: 'rgba(32, 107, 196, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Conversions',
+                data: [],
+                borderColor: '#2fb344',
+                backgroundColor: 'rgba(47, 179, 68, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Update platform chart
+function updatePlatformChart(platformData) {
+    const labels = [];
+    const data = [];
+    const legendHtml = [];
+    
+    const platformIcons = {
+        facebook: 'fab fa-facebook',
+        twitter: 'fab fa-twitter',
+        linkedin: 'fab fa-linkedin',
+        reddit: 'fab fa-reddit',
+        whatsapp: 'fab fa-whatsapp',
+        pinterest: 'fab fa-pinterest',
+        telegram: 'fab fa-telegram',
+        direct: 'fas fa-link'
+    };
+    
+    for (const [platform, count] of Object.entries(platformData)) {
+        if (count > 0) {
+            labels.push(platform.charAt(0).toUpperCase() + platform.slice(1));
+            data.push(count);
+            
+            const icon = platformIcons[platform] || 'fas fa-share';
+            legendHtml.push(`
+                <span class="badge bg-light me-2 mb-2">
+                    <i class="${icon} me-1"></i>${platform}: ${count}
+                </span>
+            `);
+        }
+    }
+    
+    platformChart.data.labels = labels;
+    platformChart.data.datasets[0].data = data;
+    platformChart.update();
+    
+    document.getElementById('platform-legend').innerHTML = legendHtml.join('');
+}
+
+// Toggle custom link section visibility
+function toggleCustomLinkSection() {
+    const section = document.getElementById('custom-link-section');
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        updateCustomLink();
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+// Update custom link based on selection
+function updateCustomLink() {
+    const destinationSelect = document.getElementById('destination-select');
+    const customUrlInput = document.getElementById('custom-url-input');
+    const customPath = document.getElementById('custom-path');
+    const customLinkElement = document.getElementById('custom-referral-link');
+    
+    let path = destinationSelect.value;
+    
+    if (path === 'custom') {
+        customUrlInput.style.display = 'block';
+        path = customPath.value || '/';
+    } else {
+        customUrlInput.style.display = 'none';
+    }
+    
+    if (path && path !== 'custom') {
+        const link = generateCustomReferralLink(path);
+        customLinkElement.textContent = link;
+    }
+}
+
+// Copy custom link to clipboard
+async function copyCustomLink() {
+    const linkElement = document.getElementById('custom-referral-link');
+    const linkText = linkElement.textContent;
+    
+    if (linkText && linkText !== 'Select a destination above...') {
+        try {
+            await navigator.clipboard.writeText(linkText);
+            showToast('success', 'Custom referral link copied to clipboard!');
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            showToast('error', 'Failed to copy link. Please select and copy manually.');
+        }
+    }
+}
+
+// Utility function to show toast notifications
+function showToast(type, message) {
+    // Check if the global showToast function exists and is not the same function
+    if (window.showToast && typeof window.showToast === 'function' && window.showToast !== showToast) {
+        window.showToast(message, type);
+    } else {
+        // Fallback: create a simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed top-0 end-0 m-3`;
+        toast.style.zIndex = '9999';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M5 12l5 5l10 -10"/>
+                    </svg>
+                </div>
+                <div>${message}</div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
+    }
+}
+</script>
+{% endblock %}

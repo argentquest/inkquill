@@ -1,0 +1,69 @@
+{# Enhanced Tabler Premium Alerts #}
+
+{% if success_message %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin: var(--tblr-gutter-y) 0; border-radius: var(--tblr-border-radius); box-shadow: var(--tblr-box-shadow);">
+        <div class="d-flex">
+            <div class="me-3">
+                <span class="avatar bg-success-lt">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="flex-fill">
+                <h4 class="alert-title">Success!</h4>
+                <div class="text-secondary">{{ success_message | e }}</div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+{% if error_message %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: var(--tblr-gutter-y) 0; border-radius: var(--tblr-border-radius); box-shadow: var(--tblr-box-shadow);">
+        <div class="d-flex">
+            <div class="me-3">
+                <span class="avatar bg-red-lt">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </span>
+            </div>
+            <div class="flex-fill">
+                <h4 class="alert-title">Error</h4>
+                <div class="text-secondary">{{ error_message | e }}</div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+{% if warning_message %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin: var(--tblr-gutter-y) 0; border-radius: var(--tblr-border-radius); box-shadow: var(--tblr-box-shadow);">
+        <div class="d-flex">
+            <div class="me-3">
+                <span class="avatar bg-yellow-lt">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </span>
+            </div>
+            <div class="flex-fill">
+                <h4 class="alert-title">Warning</h4>
+                <div class="text-secondary">{{ warning_message | e }}</div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+{% if info_message %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert" style="margin: var(--tblr-gutter-y) 0; border-radius: var(--tblr-border-radius); box-shadow: var(--tblr-box-shadow);">
+        <div class="d-flex">
+            <div class="me-3">
+                <span class="avatar bg-blue-lt">
+                    <i class="fas fa-info-circle"></i>
+                </span>
+            </div>
+            <div class="flex-fill">
+                <h4 class="alert-title">Information</h4>
+                <div class="text-secondary">{{ info_message | e }}</div>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}

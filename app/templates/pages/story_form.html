@@ -1,0 +1,342 @@
+{# /ai_rag_story_app/app/templates/pages/story_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set page_action = "Create New" if story is none else "Edit" %}
+{% set button_action_text = "Create Story" if story is none else "Save Changes" %}
+{% set button_icon_class = "fas fa-plus-circle" if story is none else "fas fa-save" %}
+
+{% block title %}{{ page_action }} Story - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- TABLER PREMIUM FORM STYLES - Following UI Design Standards -->
+<style>
+    /* Enhanced story form layout with Tabler CSS variables */
+    .form-layout { 
+        display: flex; 
+        min-height: 70vh; 
+        gap: 0; 
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .form-main { 
+        flex: 1; 
+        min-width: 400px; 
+        background: var(--tblr-bg-surface); 
+        border: 1px solid var(--tblr-border-color); 
+        border-radius: var(--tblr-border-radius-lg) 0 0 var(--tblr-border-radius-lg); 
+        padding: 2rem; 
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .form-sidebar { 
+        width: 400px; 
+        min-width: 300px; 
+        max-width: 600px; 
+        background: var(--tblr-bg-surface-secondary); 
+        border: 1px solid var(--tblr-border-color); 
+        border-left: none; 
+        border-radius: 0 var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0; 
+        overflow-y: auto; 
+        position: relative;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        bottom: 0; 
+        width: 6px; 
+        background: var(--tblr-border-color); 
+        cursor: col-resize; 
+        z-index: 1000;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle:hover { 
+        background: var(--tblr-primary); 
+    }
+    
+    .form-sidebar-content { 
+        padding: 2rem; 
+        height: 100%; 
+    }
+    
+    .sidebar-section { 
+        margin-bottom: 2rem; 
+    }
+    
+    .sidebar-section h6 { 
+        margin-bottom: 1rem; 
+        font-weight: 600; 
+        color: var(--tblr-muted); 
+        border-bottom: 1px solid var(--tblr-border-color); 
+        padding-bottom: 0.5rem; 
+    }
+    
+    /* Enhanced image container */
+    #generated-image-container { 
+        position: relative; 
+        width: 100%; 
+        padding-top: 56.25%; 
+        background-color: var(--tblr-bg-surface-tertiary); 
+        border-radius: var(--tblr-border-radius); 
+        overflow: hidden; 
+        border: 1px solid var(--tblr-border-color);
+        transition: all 0.15s ease-in-out;
+    }
+    
+    #generated-image-display { 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+    }
+    
+    #image-generation-spinner { 
+        position: absolute; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+    }
+    
+    /* Enhanced gallery */
+    .image-gallery { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+        gap: 0.5rem; 
+    }
+    
+    .gallery-thumbnail { 
+        position: relative; 
+        border: 2px solid transparent; 
+        border-radius: var(--tblr-border-radius); 
+        overflow: hidden; 
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .gallery-thumbnail img { 
+        width: 100%; 
+        height: 80px; 
+        object-fit: cover; 
+    }
+    
+    .gallery-thumbnail:hover { 
+        border-color: var(--tblr-info); 
+        transform: translateY(-2px);
+    }
+    
+    .gallery-thumbnail.active { 
+        border-color: var(--tblr-primary); 
+        box-shadow: 0 0 0 2px var(--tblr-primary); 
+    }
+    
+    .gallery-thumbnail .set-current-btn { 
+        position: absolute; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        opacity: 0; 
+        transition: opacity 0.2s ease; 
+        pointer-events: none; 
+    }
+    
+    .gallery-thumbnail:hover .set-current-btn { 
+        opacity: 1; 
+        pointer-events: all; 
+    }
+
+    /* Enhanced form controls */
+    .form-control:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+
+    .form-select:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="story-form-page">
+    {# TABLER PREMIUM PAGE HEADER - Following UI Design Standards #}
+    {% set page_title = page_action + ' Story' %}
+    {% set page_icon = button_icon_class %}
+    {% set page_description = 'Create and manage story narratives with AI assistance' %}
+    {% if story %}
+        {% set page_stats = [
+            {'icon': 'fas fa-book', 'text': 'Editing: ' + story.title},
+            {'icon': 'fas fa-calendar-alt', 'text': 'Created: ' + story.created_at.strftime('%b %d, %Y') if story.created_at else 'Recently'}
+        ] %}
+    {% endif %}
+    {% set back_url = url_for('ui_list_stories') %}
+    {% set back_text = 'Back to My Stories' %}
+    {% set help_topic = 'story_detail' %}
+    {% include 'partials/_page_header.html' %}
+    
+    <div class="container-fluid">
+
+        <div class="form-layout">
+            <div class="form-main">
+                <form id="story-form" action="{{ form_action_url }}" method="post" data-page-action="{{ page_action }}">
+                    {# TABLER PREMIUM ALERT - Enhanced error display #}
+                    <div id="story-form-error-message" class="alert alert-danger alert-dismissible" style="display: none;" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="m0 0h24v24H0z" fill="none"></path>
+                                    <path d="m12 9v4"></path>
+                                    <path d="m10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"></path>
+                                    <path d="m12 16h.01"></path>
+                                </svg>
+                            </div>
+                            <div class="alert-message"></div>
+                        </div>
+                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                    </div>
+                    
+                    {% if no_worlds_exist_error %}
+                        <div class="alert alert-warning alert-dismissible">
+                            <div class="d-flex">
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="m0 0h24v24H0z" fill="none"></path>
+                                        <path d="m12 9v4"></path>
+                                        <path d="m10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"></path>
+                                        <path d="m12 16h.01"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="alert-title">No Worlds Found!</h4>
+                                    <div class="text-muted">You must <a href="{{ url_for('ui_create_world_form') }}" class="alert-link">create a world</a> first before creating stories.</div>
+                                </div>
+                            </div>
+                            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                        </div>
+                    {% endif %}
+                    {# WORLD SELECTOR - MOVED TO TOP AS REQUESTED #}
+                    <div class="mb-4">
+                        <label for="world_id_select" class="form-label d-flex align-items-center">
+                            <i class="fas fa-globe me-2 text-primary"></i>
+                            <span>Choose Your World</span>
+                            <i class="fas fa-info-circle ms-2 text-info" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="Select the world where your story takes place. This determines the setting, rules, and context for your story. You can build detailed worlds using the World Builder."></i>
+                        </label>
+                        <select class="form-select" id="world_id_select" name="world_id" 
+                                {% if not available_worlds_for_story_form %}disabled{% endif %} required>
+                            <option value="" disabled {% if not pre_selected_world_id %}selected{% endif %}>-- Select a World --</option>
+                            {% for w in available_worlds_for_story_form %}
+                            <option value="{{ w.id }}" {% if (story and story.world_id == w.id) or (pre_selected_world_id == w.id) %}selected{% endif %}>
+                                {{ w.name | e }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted mt-1">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            Need a new world? Try the <a href="{{ url_for('ui_world_builder_wizard') }}" target="_blank">World Builder Wizard</a> to create detailed worlds.
+                        </small>
+                    </div>
+
+                    {# STORY TITLE #}
+                    <div class="mb-3">
+                        <label for="title" class="form-label d-flex align-items-center">
+                            <i class="fas fa-book me-2 text-success"></i>
+                            <span>Story Title</span>
+                            <i class="fas fa-info-circle ms-2 text-info" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="Give your story a compelling title that captures the essence of your narrative. This will be displayed to readers and help them understand what your story is about."></i>
+                        </label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ story.title | e if story else '' }}" 
+                               placeholder="Enter your story title..." required>
+                    </div>
+
+                    {# WRITER'S SUMMARY #}
+                    <div class="mb-3">
+                        <label for="short_description" class="form-label d-flex align-items-center">
+                            <i class="fas fa-pen-fancy me-2 text-warning"></i>
+                            <span>Your Story Summary</span>
+                            <i class="fas fa-info-circle ms-2 text-info" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="Write a brief summary of your story from your perspective as the writer. Describe your intent, the main plot, themes, or what you want to achieve with this story. This helps you stay focused."></i>
+                        </label>
+                        <textarea class="form-control" id="short_description" name="short_description" rows="4" 
+                                  placeholder="Describe your story idea, plot, themes, or writing goals...">{{ story.short_description | e if story and story.short_description else '' }}</textarea>
+                    </div>
+
+                    {# AI SUMMARY - READ ONLY #}
+                    {% if story and story.ai_summary %}
+                    <div class="mb-3">
+                        <label for="ai_summary" class="form-label d-flex align-items-center">
+                            <i class="fas fa-robot me-2 text-info"></i>
+                            <span>AI Generated Summary</span>
+                            <i class="fas fa-info-circle ms-2 text-info" 
+                               data-bs-toggle="tooltip" data-bs-placement="right"
+                               title="This summary is automatically generated by AI based on your story content. It provides an objective overview of your story and is updated as you write."></i>
+                        </label>
+                        <textarea class="form-control" id="ai_summary" name="ai_summary" rows="4" 
+                                  readonly style="background-color: #f8f9fa; cursor: not-allowed;"
+                                  placeholder="AI will generate a summary based on your story content...">{{ story.ai_summary | e if story and story.ai_summary else '' }}</textarea>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-magic me-1"></i>This summary is automatically generated and updated by AI.
+                        </small>
+                    </div>
+                    {% endif %}
+                    {# TABLER PREMIUM FORM ACTIONS - Following UI Design Standards #}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('ui_list_stories') }}" class="btn btn-ghost-secondary me-md-2"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Discard changes and return to stories list">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" id="save-story-button" class="btn btn-primary" 
+                                {% if not available_worlds_for_story_form and not pre_selected_world_id %}disabled{% endif %}
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if story %}Save all changes to this story{% else %}Create a new story with the provided information{% endif %}">
+                            <i class="{{ button_icon_class }} me-1"></i>{{ button_action_text }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="form-sidebar">
+                <div class="form-resize-handle"></div>
+                <div class="form-sidebar-content">
+                    <div class="sidebar-section">
+                        <h6><i class="fas fa-image me-2"></i>Story Cover Image</h6>
+                        <div class="mb-3"><label for="image_style_select" class="form-label">Image Style:</label><select class="form-select" id="image_style_select" name="image_style_select"><option value="">-- Default Style --</option></select></div>
+                        <div class="mb-3"><label for="image_prompt_definition" class="form-label">AI Image Prompt:</label><textarea class="form-control" id="image_prompt_definition" name="image_prompt_definition" form="story-form" rows="4">{{ story.image_prompt_definition | e if story and story.image_prompt_definition else '' }}</textarea></div>
+                        <button type="button" class="btn btn-primary w-100" id="generate-image-btn" data-element-type="story" data-element-id="{{ story.id if story else '' }}" 
+                                {% if not story %}disabled{% endif %}
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if story %}Use AI to generate a cover image for this story{% else %}Save the story first to enable image generation{% endif %}"
+                                style="transition: all 0.15s ease-in-out;">
+                            <i class="fas fa-magic me-1"></i>Generate Cover Image
+                        </button>
+                        <div id="image-generation-status" class="small text-muted mt-2" style="display: none;"></div>
+                        <div id="generated-image-container" class="mt-3"><div id="image-generation-spinner" class="spinner-border text-primary" role="status" style="display: none;"><span class="visually-hidden">Loading...</span></div><img id="generated-image-display" src="{{ image_url if image_url else '' }}" alt="Generated story image" style="display: {{ 'block' if image_url else 'none' }};"></div>
+                        <a href="{{ image_url if image_url else '#' }}" id="generated-image-link" target="_blank" class="small text-truncate d-block mt-1">{{ image_url if image_url else '' }}</a>
+                        <div class="mt-4" id="image-gallery-section" {% if not story %}style="display: none;"{% endif %}><h6 class="h6">Version History</h6><div id="image-gallery-container" class="image-gallery"><p class="text-muted small">Loading versions...</p></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/story_form_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/location_form_resize.js') }}"></script> {# Re-used for layout #}
+    <script src="{{ url_for('static', path='/js/image_generator.js') }}"></script>
+{% endblock %}

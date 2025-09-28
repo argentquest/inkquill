@@ -1,0 +1,58 @@
+{
+    "hair_colors": [
+        "Black",
+        "Brown", 
+        "Blonde",
+        "Red",
+        "Auburn",
+        "Gray",
+        "White",
+        "Silver",
+        "Chestnut",
+        "Copper",
+        "Platinum",
+        "Dirty Blonde",
+        "Dark Brown",
+        "Light Brown",
+        "Strawberry Blonde"
+    ],
+    "eye_colors": [
+        "Brown",
+        "Blue", 
+        "Green",
+        "Hazel",
+        "Gray",
+        "Amber",
+        "Violet",
+        "Dark Brown",
+        "Light Blue",
+        "Dark Blue",
+        "Emerald",
+        "Golden",
+        "Steel Gray",
+        "Heterochromia (Two Colors)"
+    ],
+    "builds": [
+        "Slender",
+        "Athletic",
+        "Stocky",
+        "Tall and Lean",
+        "Short and Sturdy",
+        "Muscular",
+        "Petite",
+        "Average",
+        "Broad-shouldered",
+        "Curvy",
+        "Lanky",
+        "Compact",
+        "Robust",
+        "Willowy"
+    ],
+    "heights": [
+        "Very Short (Under 5'2\")",
+        "Short (5'2\" - 5'5\")",
+        "Average (5'6\" - 5'8\")", 
+        "Tall (5'9\" - 6'1\")",
+        "Very Tall (Over 6'1\")"
+    ]
+}

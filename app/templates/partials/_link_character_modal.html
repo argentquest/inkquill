@@ -1,0 +1,35 @@
+{# /ai_rag_story_app/app/templates/partials/_link_character_modal.html #}
+<div class="modal fade" id="linkCharacterModal" tabindex="-1" aria-labelledby="linkCharacterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkCharacterModalLabel">Link Character to Story</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="link-character-form"> 
+                    <div class="mb-3">
+                        <label for="select-world-character" class="form-label">Select Character from World:</label>
+                        <select class="form-select" id="select-world-character" name="character_id_to_link" required> 
+                            <option value="">Loading characters...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="character-role-in-story" class="form-label">Character's Role in this Story (Optional):</label>
+                        <select class="form-select" id="character-role-in-story" name="role_in_story_for_link">
+                            <option value="">Select a role...</option>
+                            <!-- Options will be loaded dynamically from prompts API -->
+                        </select>
+                        <div class="form-text" id="role-description" style="display: none;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirm-link-character-btn">
+                    <i class="fas fa-link me-1"></i> Link Character
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

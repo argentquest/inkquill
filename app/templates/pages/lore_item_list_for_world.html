@@ -1,0 +1,362 @@
+{# /ai_rag_story_app/app/templates/pages/lore_item_list_for_world.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Lore Items in {{ world.name | e }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced Tabler Premium Hero Header */
+    .lore-hero {
+        background: linear-gradient(135deg, var(--tblr-orange) 0%, var(--tblr-red) 100%);
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        position: relative;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .lore-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23ffffff15'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e");
+        pointer-events: none;
+    }
+    
+    .lore-hero .page-title {
+        position: relative;
+        z-index: 1;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .lore-hero .page-subtitle {
+        position: relative;
+        z-index: 1;
+        color: rgba(255,255,255,0.9);
+        font-size: 1rem;
+        margin-bottom: 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .lore-hero .hero-actions {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .lore-hero .btn {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .lore-hero .btn:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.4);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Enhanced Tabler Premium Lore Cards */
+    .lore-item {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface);
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    .lore-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-orange), var(--tblr-red));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1;
+    }
+    
+    .lore-item:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tblr-box-shadow-lg);
+        border-color: var(--tblr-orange);
+    }
+    
+    .lore-item:hover::before {
+        transform: translateX(0);
+    }
+
+    .lore-item .card-img-square-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+        border-bottom: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+        overflow: hidden;
+    }
+
+    .lore-item .card-img-top,
+    .lore-item .card-img-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .lore-item .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tblr-text-muted);
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+    }
+
+    .lore-item .card-img-placeholder .fas {
+        font-size: 3rem;
+        opacity: 0.6;
+    }
+    
+    .lore-item .card-title {
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .lore-item .badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .lore-item .actions .btn {
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        border-radius: var(--tblr-border-radius);
+        font-weight: 500;
+    }
+    
+    .lore-item .btn-primary {
+        background: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+    }
+    
+    .lore-item .btn-danger:hover {
+        background: var(--tblr-red);
+        border-color: var(--tblr-red);
+    }
+    
+    .lore-item .actions {
+        gap: 0.5rem;
+    }
+    
+    /* Enhanced Grid with Fade-in Animation */
+    .lore-item-container {
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .lore-item-container:nth-child(1) { animation-delay: 0.1s; }
+    .lore-item-container:nth-child(2) { animation-delay: 0.2s; }
+    .lore-item-container:nth-child(3) { animation-delay: 0.3s; }
+    .lore-item-container:nth-child(4) { animation-delay: 0.4s; }
+    .lore-item-container:nth-child(5) { animation-delay: 0.5s; }
+    .lore-item-container:nth-child(6) { animation-delay: 0.6s; }
+    .lore-item-container:nth-child(n+7) { animation-delay: 0.7s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Enhanced Tabler Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color);
+        margin-top: 2rem;
+    }
+    
+    .empty-state .empty-icon {
+        width: 4rem;
+        height: 4rem;
+        background: var(--tblr-orange);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        color: var(--tblr-body-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--tblr-text-muted);
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to {{ world.name }}">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white-50">Worlds</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50">{{ world.name }}</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Lore Items</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-scroll me-3"></i>
+                    Lore Items
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Manage the lore and mythology in {{ world.name }}
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-scroll me-1"></i>
+                        {{ lore_items|length }} Lore Item{{ 's' if lore_items|length != 1 else '' }}
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-globe me-1"></i>
+                        {{ world.name }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('lore_item_list')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with managing lore items">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_create_lore_item_for_world_form', world_id=world.id) }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-plus me-1"></i>
+                        New Lore Item
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    {% if lore_items %}
+        <div class="row row-cards">
+            {% for item in lore_items %}
+                <div class="col-sm-6 col-lg-4 lore-item-container">
+                    <div class="lore-item card h-100">
+                        
+                        <!-- FIX: Add image display for Lore Items -->
+                        <div class="card-img-square-container">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title | e }}">
+                        {% else %}
+                            <div class="card-img-placeholder">
+                                <i class="fas fa-scroll"></i>
+                            </div>
+                        {% endif %}
+                        </div>
+                        <!-- END FIX -->
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ item.title | e }}</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">{{ item.category.replace('_', ' ') | title if item.category else 'N/A' }}</span>
+                            </div>
+                            {% if item.description %}
+                            <p class="card-text text-muted small flex-grow-1">{{ item.description | e | truncate(120, True) }}</p>
+                            {% else %}
+                            <p class="card-text text-muted small flex-grow-1"><em>No description.</em></p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-list">
+                                <a href="{{ url_for('ui_edit_lore_item_form', lore_item_id=item.id) }}" class="btn btn-primary"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="Edit lore item details, description, and appearance">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <button class="delete-lore-item-btn btn btn-danger" 
+                                        data-lore-item-id="{{ item.id }}" 
+                                        data-lore-item-title="{{ item.title | e }}"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Permanently delete '{{ item.title | e }}'">
+                                    <i class="fas fa-trash-alt me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-scroll"></i>
+            </div>
+            <h3>No lore items yet</h3>
+            <p>This world doesn't have any lore items yet. Create your first lore item to start building the rich history and mythology of your world!</p>
+            <a href="{{ url_for('ui_create_lore_item_for_world_form', world_id=world.id) }}" class="btn btn-primary">
+                <i class="fas fa-book me-1"></i>Create Lore Item
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/lore_item_crud.js') }}"></script>
+{% endblock %}

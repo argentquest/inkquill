@@ -1,0 +1,123 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .interview-trigger-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+  }
+  .trigger-card {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h2 class="page-title">
+            Interview Portal
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="container-xl">
+      <div class="interview-trigger-page">
+        <div class="card trigger-card">
+          <div class="card-body">
+            <h3 class="card-title">
+              <i class="ti ti-clipboard-text me-2"></i>
+              Ready to Start Interview
+            </h3>
+            <p class="text-muted mb-4">
+              Interview ID: <strong>{{ interview_id }}</strong>
+            </p>
+            <div class="mb-3">
+              <button 
+                id="startInterviewBtn" 
+                class="btn btn-primary btn-lg"
+                data-interview-id="{{ interview_id }}"
+              >
+                <i class="ti ti-play me-2"></i>
+                Start Interview
+              </button>
+            </div>
+            <div class="text-muted small">
+              <p>This will open the interview in a modal window.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include the interview modal partial -->
+{% include "partials/interview_full.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startBtn = document.getElementById('startInterviewBtn');
+    const interviewId = startBtn.dataset.interviewId;
+    
+    // Initialize interview component
+    const interviewComponent = new InterviewComponent(interviewId);
+    
+    startBtn.addEventListener('click', function() {
+        console.log('Starting interview:', interviewId);
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('interviewModal'));
+        modal.show();
+        
+        // Initialize the interview
+        interviewComponent.init().catch(error => {
+            console.error('Error initializing interview:', error);
+            
+            // Show error message
+            const alertHtml = `
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <h4 class="alert-title">Interview Error</h4>
+                            <div class="text-muted">Failed to load interview: ${error.message || 'Unknown error'}</div>
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+            `;
+            
+            // Insert error before the card
+            const card = document.querySelector('.trigger-card');
+            card.insertAdjacentHTML('beforebegin', alertHtml);
+            
+            // Hide the modal
+            modal.hide();
+        });
+    });
+    
+    // Auto-trigger if URL parameter is present
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoStart = urlParams.get('auto_start');
+    if (autoStart === 'true') {
+        setTimeout(() => {
+            startBtn.click();
+        }, 500);
+    }
+});
+</script>
+{% endblock %}

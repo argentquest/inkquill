@@ -1,0 +1,50 @@
+<!-- Select Component -->
+<!-- Usage: {% include "components/forms/select.html" name="status" label="Status" options=status_options %} -->
+
+<div class="mb-3{% if class %} {{ class }}{% endif %}">
+    {% if label %}
+    <label class="form-label{% if required %} required{% endif %}" 
+           {% if for %}for="{{ for }}"{% elif name %}for="{{ name }}"{% endif %}>
+        {{ label }}
+        {% if description %}
+        <span class="form-label-description">{{ description }}</span>
+        {% endif %}
+    </label>
+    {% endif %}
+    
+    <select class="form-select{% if input_class %} {{ input_class }}{% endif %}" 
+            {% if name %}name="{{ name }}"{% endif %}
+            {% if id %}id="{{ id }}"{% elif name %}id="{{ name }}"{% endif %}
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}
+            {% if multiple %}multiple{% endif %}
+            {{ attrs | default('') }}>
+        
+        {% if placeholder %}
+        <option value="">{{ placeholder }}</option>
+        {% endif %}
+        
+        {% if options %}
+            {% for option in options %}
+                {% if option.value %}
+                <option value="{{ option.value }}" 
+                        {% if option.value == value or selected_values contains option.value %}selected{% endif %}
+                        {% if option.disabled %}disabled{% endif %}>
+                    {{ option.label | default(option.text) | default(option.value) }}
+                </option>
+                {% else %}
+                <option value="{{ option }}" 
+                        {% if option == value or selected_values contains option %}selected{% endif %}>
+                    {{ option }}
+                </option>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {{ content }}
+        {% endif %}
+    </select>
+    
+    {% if hint %}
+    <small class="form-hint">{{ hint }}</small>
+    {% endif %}
+</div>

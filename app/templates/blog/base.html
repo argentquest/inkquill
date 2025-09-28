@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}Blog{% endblock %} - Storytelling Platform</title>
+    <meta name="description" content="{% block meta_description %}Discover amazing stories, writing tips, and creative insights from our community of storytellers.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}storytelling, writing, blog, creative writing, stories{% endblock %}">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.meta_description() }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', path='images/logo.jpeg') }}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.url }}{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ self.og_title() }}">
+    <meta name="twitter:description" content="{{ self.og_description() }}">
+    <meta name="twitter:image" content="{{ self.og_image() }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.url }}{% endblock %}">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Tabler CSS -->
+    <link href="{{ url_for('static', path='tabler/css/tabler.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='tabler/css/tabler-flags.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='tabler/css/tabler-payments.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='tabler/css/tabler-socials.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='tabler/css/tabler-vendors.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='css/main.css') }}" rel="stylesheet"/>
+    
+    <!-- Additional head content -->
+    {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}blog-layout{% endblock %}">
+    <div class="page">
+        
+        <!-- Page Content -->
+        <div class="page-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+        
+        <!-- Blog Footer -->
+        <footer class="footer footer-transparent d-print-none">
+            <div class="container-xl">
+                <div class="row text-center align-items-center flex-row-reverse">
+                    <div class="col-lg-auto ms-lg-auto">
+                        <ul class="list-inline list-inline-dots mb-0">
+                            <li class="list-inline-item">
+                                <a href="{{ url_for('ui_home') }}" class="link-secondary">Main Site</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#" class="link-secondary">About</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#" class="link-secondary">RSS</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                        <ul class="list-inline list-inline-dots mb-0">
+                            <li class="list-inline-item">
+                                Copyright &copy; 2025 Storytelling Platform. All rights reserved.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Tabler Core -->
+    <script src="{{ url_for('static', path='tabler/js/tabler.min.js') }}" defer></script>
+    
+    <!-- Additional scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

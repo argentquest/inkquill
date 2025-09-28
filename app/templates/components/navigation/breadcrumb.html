@@ -1,0 +1,28 @@
+<!-- Breadcrumb Component -->
+<!-- Usage: {% include "components/navigation/breadcrumb.html" items=breadcrumb_items %} -->
+
+<nav aria-label="breadcrumb"{% if class %} class="{{ class }}"{% endif %}>
+    <ol class="breadcrumb{% if card %} breadcrumb-card{% endif %}">
+        {% if items %}
+            {% for item in items %}
+                {% if forloop.last %}
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ item.text | default(item.title) | default(item) }}
+                    </li>
+                {% else %}
+                    <li class="breadcrumb-item">
+                        {% if item.url or item.href %}
+                            <a href="{{ item.url | default(item.href) }}">
+                                {{ item.text | default(item.title) | default(item) }}
+                            </a>
+                        {% else %}
+                            {{ item.text | default(item.title) | default(item) }}
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {{ content }}
+        {% endif %}
+    </ol>
+</nav>

@@ -1,0 +1,669 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ character.name }} - Character Details{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Character Detail Page - Tabler Premium UI Standards */
+    .page {
+        background: var(--tblr-bg-surface-secondary);
+        min-height: 100vh;
+    }
+    
+    /* Enhanced Hero Header with Premium Gradient */
+    .character-hero-header {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        background-attachment: fixed;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    }
+    
+    .character-hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    /* Animated background pattern */
+    .character-hero-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(255,255,255,0.03) 10px,
+            rgba(255,255,255,0.03) 20px
+        );
+        animation: slide 20s linear infinite;
+        pointer-events: none;
+    }
+    
+    @keyframes slide {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+    
+    .character-hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 3rem 0;
+        color: white;
+    }
+    
+    /* Character Avatar */
+    .character-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        box-shadow: var(--tblr-box-shadow-lg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .character-avatar:hover {
+        transform: scale(1.05);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    .character-avatar-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.8);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .character-avatar-placeholder:hover {
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    .character-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .character-role {
+        font-size: 1.125rem;
+        color: rgba(255,255,255,0.9);
+        font-style: italic;
+        margin-bottom: 1rem;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .character-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .character-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .character-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    .character-actions .btn {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        border-radius: var(--tblr-border-radius);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .character-actions .btn:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.5);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .character-actions .btn-primary {
+        background: rgba(255,255,255,0.9);
+        color: var(--tblr-primary);
+        border-color: rgba(255,255,255,0.9);
+    }
+    
+    .character-actions .btn-primary:hover {
+        background: white;
+        color: var(--tblr-primary);
+        border-color: white;
+    }
+    
+    .character-actions .btn-warning {
+        background: var(--tblr-warning);
+        color: white;
+        border-color: var(--tblr-warning);
+    }
+    
+    .character-actions .btn-warning:hover {
+        background: var(--tblr-yellow);
+        color: white;
+        border-color: var(--tblr-yellow);
+    }
+    
+    .character-breadcrumb {
+        margin-top: 1rem;
+    }
+    
+    .character-breadcrumb .breadcrumb {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: var(--tblr-border-radius);
+        padding: 0.5rem 1rem;
+    }
+    
+    .character-breadcrumb .breadcrumb-item {
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .character-breadcrumb .breadcrumb-item a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+    }
+    
+    .character-breadcrumb .breadcrumb-item.active {
+        color: white;
+        font-weight: 500;
+    }
+    
+    /* Enhanced Cards with Animated Borders */
+    .detail-card {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-box-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .detail-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .detail-card:hover {
+        box-shadow: var(--tblr-box-shadow-lg);
+        transform: translateY(-4px);
+        border-color: var(--tblr-primary);
+    }
+    
+    .detail-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .detail-card .card-header {
+        background: var(--tblr-bg-surface-secondary);
+        border-bottom: 1px solid var(--tblr-border-color);
+        padding: 1.25rem;
+    }
+    
+    .detail-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Character Image Gallery */
+    .character-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--tblr-border-radius-lg);
+        margin-bottom: 2rem;
+    }
+    
+    .character-image {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-box-shadow-lg);
+        transition: all 0.3s ease;
+    }
+    
+    .character-image:hover {
+        transform: scale(1.02);
+    }
+    
+    /* Section Headers with Enhanced Design */
+    .section-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--tblr-border-color-translucent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-header::before {
+        content: '';
+        width: 4px;
+        height: 1.25rem;
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    /* Content Typography */
+    .character-content {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--tblr-text-secondary);
+    }
+    
+    .character-content p {
+        margin-bottom: 1rem;
+    }
+    
+    .character-content p:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Traits and Badges */
+    .trait-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.5rem 1rem;
+        background: var(--tblr-primary-lt);
+        color: var(--tblr-primary);
+        border: 1px solid var(--tblr-primary);
+        border-radius: var(--tblr-border-radius-lg);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .trait-badge:hover {
+        background: var(--tblr-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    /* Enhanced Metadata Display */
+    .metadata-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--tblr-border-color-translucent);
+    }
+    
+    .metadata-item:last-child {
+        border-bottom: none;
+    }
+    
+    .metadata-label {
+        font-weight: 500;
+        color: var(--tblr-text-muted);
+        min-width: 120px;
+        font-size: 0.875rem;
+    }
+    
+    .metadata-value {
+        color: var(--tblr-body-color);
+        font-size: 0.9375rem;
+    }
+    
+    /* Enhanced Alert for Story Associations */
+    .association-alert {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-left: 4px solid var(--tblr-blue);
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        box-shadow: var(--tblr-box-shadow-input);
+    }
+    
+    .association-alert .avatar {
+        flex-shrink: 0;
+    }
+    
+    .association-alert .alert-content {
+        flex: 1;
+    }
+    
+    .association-alert .alert-text {
+        color: var(--tblr-text-secondary);
+        margin-bottom: 1rem;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .character-hero-content {
+            padding: 2rem 0;
+        }
+        
+        .character-title {
+            font-size: 2rem;
+        }
+        
+        .character-avatar,
+        .character-avatar-placeholder {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .character-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .character-actions .btn {
+            justify-content: center;
+        }
+        
+        .metadata-label {
+            min-width: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 250px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_list_characters_for_world', world_id=world.id) }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to Characters">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50">{{ world.name }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_characters_for_world', world_id=world.id) }}" class="text-white-50">Characters</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">{{ character.name }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <div class="d-flex align-items-start gap-4 mb-4">
+                    <!-- Character Avatar -->
+                    <div>
+                        {% if character.image_url %}
+                            <img src="{{ character.image_url }}" alt="{{ character.name }}" class="character-avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">
+                        {% else %}
+                            <div style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.8);">
+                                <i class="fas fa-user" style="font-size: 2rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Character Info -->
+                    <div class="flex-grow-1">
+                        <h1 class="page-title text-white mb-2">
+                            <i class="fas fa-user me-3"></i>{{ character.name }}
+                        </h1>
+                        
+                        {% if character.role %}
+                        <div class="page-subtitle text-white mb-3">
+                            {{ character.role }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2 px-3 py-2">
+                                <i class="fas fa-globe me-1"></i>
+                                {{ world.name }}
+                            </span>
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <i class="fas fa-calendar me-1"></i>
+                                Created {{ character.created_at.strftime('%B %d, %Y') if character.created_at else 'Unknown' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('character_detail')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with character details">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_edit_character_form', character_id=character.id) }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-edit me-1"></i>
+                        Edit Character
+                    </a>
+                    <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sitemap me-1"></i>
+                        View in Hierarchy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Main Character Details Card -->
+                <div class="card detail-card mb-4">
+                    <div class="card-body">
+                        {% if character.image_url %}
+                        <div class="character-image-container">
+                            <img src="{{ character.image_url }}" alt="{{ character.name }}" class="character-image">
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Description Section -->
+                        <h5 class="section-header">
+                            <i class="fas fa-align-left"></i>
+                            Description
+                        </h5>
+                        <div class="character-content mb-4">
+                            <p>{{ character.description or 'No description available.' }}</p>
+                        </div>
+                        
+                        <!-- Personality Section -->
+                        {% if character.personality %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-smile"></i>
+                            Personality
+                        </h5>
+                        <div class="character-content mb-4">
+                            <p>{{ character.personality }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Background Section -->
+                        {% if character.background %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-history"></i>
+                            Background
+                        </h5>
+                        <div class="character-content mb-4">
+                            <p>{{ character.background }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Goals Section -->
+                        {% if character.goals %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-bullseye"></i>
+                            Goals
+                        </h5>
+                        <div class="character-content mb-4">
+                            <p>{{ character.goals }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Traits Section -->
+                        {% if character.traits %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-tags"></i>
+                            Character Traits
+                        </h5>
+                        <div class="mb-4">
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for trait in character.traits %}
+                                <div class="trait-badge">
+                                    <i class="fas fa-star"></i>
+                                    {{ trait }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Character Metadata Card -->
+                <div class="card detail-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Character Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="metadata-list">
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-calendar-plus me-2 text-muted"></i>Created
+                                </span>
+                                <span class="metadata-value">
+                                    {{ character.created_at.strftime('%B %d, %Y') if character.created_at else 'Unknown' }}
+                                </span>
+                            </li>
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-clock me-2 text-muted"></i>Updated
+                                </span>
+                                <span class="metadata-value">
+                                    {{ character.updated_at.strftime('%B %d, %Y') if character.updated_at else 'Unknown' }}
+                                </span>
+                            </li>
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-globe-americas me-2 text-muted"></i>World
+                                </span>
+                                <span class="metadata-value">
+                                    <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-decoration-none">
+                                        {{ world.name }}
+                                    </a>
+                                </span>
+                            </li>
+                            {% if character.role %}
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-user-tag me-2 text-muted"></i>Role
+                                </span>
+                                <span class="metadata-value">{{ character.role }}</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Story Associations Card -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-link me-2 text-primary"></i>
+                            Story Associations
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="association-alert">
+                            <div class="avatar avatar-sm bg-blue text-white">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <p class="alert-text">
+                                    View and manage this character's roles in stories and acts from the World Hierarchy view.
+                                </p>
+                                <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-sitemap me-2"></i>
+                                    View Hierarchy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{  
+  "world": {  
+    "name": "The Asteroid B-612 and Beyond",  
+    "description": "The world of Le Petit Prince is a delicate and poetic universe composed of small asteroids, vast deserts, and mysterious planets, each embodying deep philosophical and emotional truths. At its core lies the tiny asteroid B-612, home to the Little Prince, whose simplicity and purity contrast starkly with the often perplexing adult worlds he visits. The narrative unfolds through dreamy landscapes that blend surreal innocence with profound allegory, creating an atmosphere both tender and thought-provoking. Time feels fluid here, marked not by clocks or calendars but by the rhythms of reflection, wonder, and the poignant encounters of the Little Prince. The tone of the world is melancholic yet hopeful, celebrating the importance of seeing with the heart beyond surface appearances.",  
+    "characters": [  
+      {  
+        "name": "The Little Prince",  
+        "description": "A small, golden-haired boy from asteroid B-612, the Little Prince is endearing and innocent with a childlike yet insightful presence. He is characterized by his simple robes and curious eyes that hold a deep empathy for others. As the protagonist, he travels between planets, seeking understanding of life, love, and human nature.",  
+        "personality_traits": "Curious, Innocent, Wise, Compassionate, Thoughtful, Honest, Reflective, Lonely",  
+        "backstory": "Originating from a tiny asteroid with three volcanoes and a cherished rose, the Little Prince leaves his home to explore the universe after feeling misunderstood and yearning for connection. His journey introduces him to a range of adults and their eccentricities, which he contemplates empathetically.",  
+        "importance_rating": 5,  
+        "relationships": "Deeply connected to his rose on asteroid B-612, encounters with the aviator (the narrator), and various symbolic figures on other planets.",  
+        "image_prompt_definition": "Small golden-haired boy in simple clothes, standing on a tiny asteroid with a single rose, evocative and gentle expression"  
+      },  
+      {  
+        "name": "The Rose",  
+        "description": "A single, delicate and proud flower with a complex personality, the Rose is the Little Prince’s beloved yet sometimes demanding companion. She embodies love, beauty, and vulnerability, with soft pink petals and a subtle fragrance.",  
+        "personality_traits": "Proud, Sensitive, Beautiful, Tender, Complex, Loving, Vulnerable, Affectionate",  
+        "backstory": "The Rose grew on the Little Prince’s asteroid and became the focus of his affection and concern. Although she appears vain and contradictory, she teaches the Prince about love’s fragility and responsibility.",  
+        "importance_rating": 5,  
+        "relationships": "Beloved flower of the Little Prince, symbolizing his emotional attachment and the source of his motivation and heartache.",  
+        "image_prompt_definition": "Single elegant pink rose with soft petals, delicate and radiant, standing alone on a small asteroid"  
+      },  
+      {  
+        "name": "The Aviator (Narrator)",  
+        "description": "An unnamed pilot who crashes his plane in the Sahara Desert, the Aviator becomes the storyteller and friend of the Little Prince. With a worn aviator’s outfit and goggles, he serves as a grounded, reflective character bridging the reader’s world and the fantastical one.",  
+        "personality_traits": "Reflective, Lonely, Practical, Compassionate, Imaginative, Patient, Thoughtful",  
+        "backstory": "A grown man who once lost his sense of wonder as an adult, the Aviator rediscovers imagination and meaning through his encounter with the Little Prince in the desert.",  
+        "importance_rating": 5,  
+        "relationships": "Friend and confidant to the Little Prince, representing the adult perspective juxtaposed against the child’s idealism.",  
+        "image_prompt_definition": "Middle-aged aviator in desert gear

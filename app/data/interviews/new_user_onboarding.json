@@ -1,0 +1,499 @@
+{
+  "interview_id": "new_user_onboarding",
+  "interview_title": "Welcome! Let's get to know you better",
+  "interview_description": "This quick interview helps us personalize your writing experience",
+  "show_progress": true,
+  "questions": [
+    {
+      "id": "writing_experience",
+      "order": 1,
+      "question": "What best describes your writing background?",
+      "subtitle": "Check all that apply",
+      "purpose": "This helps us understand your skill level and tailor the AI assistance complexity accordingly.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "never_written",
+          "label": "I've never written a story before",
+          "value": "never_written"
+        },
+        {
+          "id": "write_for_fun",
+          "label": "I write stories for fun",
+          "value": "write_for_fun"
+        },
+        {
+          "id": "assignment",
+          "label": "I'm completing an assignment",
+          "value": "assignment"
+        },
+        {
+          "id": "published_book",
+          "label": "I've written a published book",
+          "value": "published_book"
+        },
+        {
+          "id": "professional_unpublished",
+          "label": "I write professionally (but not published yet)",
+          "value": "professional_unpublished"
+        },
+        {
+          "id": "blog_online",
+          "label": "I blog or write online content",
+          "value": "blog_online"
+        },
+        {
+          "id": "fanfiction",
+          "label": "I write fanfiction",
+          "value": "fanfiction"
+        },
+        {
+          "id": "unfinished_stories",
+          "label": "I've written stories but never finished one",
+          "value": "unfinished_stories"
+        },
+        {
+          "id": "poetry_short",
+          "label": "I write poetry or short pieces",
+          "value": "poetry_short"
+        },
+        {
+          "id": "journalist",
+          "label": "I'm a journalist/content writer",
+          "value": "journalist"
+        },
+        {
+          "id": "work_writing",
+          "label": "I write as part of my job",
+          "value": "work_writing"
+        },
+        {
+          "id": "self_published",
+          "label": "I've self-published my work",
+          "value": "self_published"
+        }
+      ]
+    },
+    {
+      "id": "genre_preferences",
+      "order": 2,
+      "question": "Select all the genres that appeal to you",
+      "subtitle": "Check all that apply",
+      "purpose": "This helps us suggest appropriate story templates, world-building elements, and genre-specific AI prompts tailored to your interests.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards_with_tooltip",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "scifi",
+          "label": "Sci-fi",
+          "value": "scifi",
+          "tooltip": "Stories set in the future or alternate realities, featuring advanced technology, space exploration, or scientific concepts"
+        },
+        {
+          "id": "romance",
+          "label": "Romance",
+          "value": "romance",
+          "tooltip": "Stories centered on romantic relationships and emotional connections between characters"
+        },
+        {
+          "id": "fantasy",
+          "label": "Fantasy",
+          "value": "fantasy",
+          "tooltip": "Stories with magical elements, mythical creatures, and imaginary worlds beyond reality"
+        },
+        {
+          "id": "mystery",
+          "label": "Mystery",
+          "value": "mystery",
+          "tooltip": "Stories focused on solving puzzles, crimes, or unexplained events through investigation"
+        },
+        {
+          "id": "horror",
+          "label": "Horror",
+          "value": "horror",
+          "tooltip": "Stories designed to frighten, unsettle, or create suspense through supernatural or psychological elements"
+        },
+        {
+          "id": "childrens",
+          "label": "Children's",
+          "value": "childrens",
+          "tooltip": "Stories written for young readers, featuring age-appropriate themes and simple language"
+        },
+        {
+          "id": "nonfiction",
+          "label": "Nonfiction",
+          "value": "nonfiction",
+          "tooltip": "True stories, educational content, or informational writing based on real events and facts"
+        },
+        {
+          "id": "adventure",
+          "label": "Adventure",
+          "value": "adventure",
+          "tooltip": "Action-packed stories featuring quests, exploration, and exciting challenges"
+        },
+        {
+          "id": "historical_fiction",
+          "label": "Historical Fiction",
+          "value": "historical_fiction",
+          "tooltip": "Stories set in the past that blend historical facts with fictional characters and events"
+        },
+        {
+          "id": "thriller_suspense",
+          "label": "Thriller/Suspense",
+          "value": "thriller_suspense",
+          "tooltip": "Fast-paced stories with high stakes, danger, and constant tension"
+        },
+        {
+          "id": "literary_fiction",
+          "label": "Literary Fiction",
+          "value": "literary_fiction",
+          "tooltip": "Character-driven stories focusing on theme, style, and psychological depth"
+        },
+        {
+          "id": "young_adult",
+          "label": "Young Adult (YA)",
+          "value": "young_adult",
+          "tooltip": "Stories for teens and young adults, often featuring coming-of-age themes"
+        },
+        {
+          "id": "dystopian",
+          "label": "Dystopian",
+          "value": "dystopian",
+          "tooltip": "Stories set in imagined societies with oppressive control or post-apocalyptic settings"
+        },
+        {
+          "id": "comedy_humor",
+          "label": "Comedy/Humor",
+          "value": "comedy_humor",
+          "tooltip": "Light-hearted stories designed to entertain and make readers laugh"
+        },
+        {
+          "id": "slice_of_life",
+          "label": "Slice of Life",
+          "value": "slice_of_life",
+          "tooltip": "Realistic stories focusing on everyday experiences and character relationships"
+        },
+        {
+          "id": "crime_detective",
+          "label": "Crime/Detective",
+          "value": "crime_detective",
+          "tooltip": "Stories following law enforcement or private investigators solving criminal cases"
+        },
+        {
+          "id": "paranormal",
+          "label": "Paranormal",
+          "value": "paranormal",
+          "tooltip": "Stories featuring supernatural beings like vampires, ghosts, or werewolves in modern settings"
+        },
+        {
+          "id": "western",
+          "label": "Western",
+          "value": "western",
+          "tooltip": "Stories set in the American Old West, featuring cowboys, outlaws, and frontier life"
+        },
+        {
+          "id": "war_military",
+          "label": "War/Military",
+          "value": "war_military",
+          "tooltip": "Stories centered on warfare, military life, or the impact of conflict on individuals"
+        },
+        {
+          "id": "sports",
+          "label": "Sports",
+          "value": "sports",
+          "tooltip": "Stories featuring athletic competition, team dynamics, and personal triumph through sports"
+        },
+        {
+          "id": "memoir_biography",
+          "label": "Memoir/Biography",
+          "value": "memoir_biography",
+          "tooltip": "Personal life stories and experiences, either your own or about real people"
+        },
+        {
+          "id": "self_help",
+          "label": "Self-help/How-to",
+          "value": "self_help",
+          "tooltip": "Instructional content designed to help readers improve skills or solve problems"
+        },
+        {
+          "id": "poetry",
+          "label": "Poetry",
+          "value": "poetry",
+          "tooltip": "Expressive writing using rhythm, imagery, and condensed language to convey emotions"
+        },
+        {
+          "id": "graphic_novel",
+          "label": "Graphic Novel/Comics",
+          "value": "graphic_novel",
+          "tooltip": "Visual storytelling combining illustrations with text in sequential panels"
+        },
+        {
+          "id": "magical_realism",
+          "label": "Magical Realism",
+          "value": "magical_realism",
+          "tooltip": "Stories blending realistic settings with subtle magical elements accepted as normal"
+        }
+      ]
+    },
+    {
+      "id": "help_needed",
+      "order": 3,
+      "question": "What aspects of writing would you like help with?",
+      "subtitle": "Check all that apply",
+      "purpose": "This helps us prioritize which features to highlight and customize your dashboard to show the most relevant tools for your needs.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "brainstorming",
+          "label": "Brainstorming ideas",
+          "value": "brainstorming"
+        },
+        {
+          "id": "characters",
+          "label": "Building compelling characters",
+          "value": "characters"
+        },
+        {
+          "id": "world_building",
+          "label": "Creating detailed worlds/settings",
+          "value": "world_building"
+        },
+        {
+          "id": "writing_habits",
+          "label": "Developing consistent writing habits",
+          "value": "writing_habits"
+        },
+        {
+          "id": "editing",
+          "label": "Editing and revision help",
+          "value": "editing"
+        },
+        {
+          "id": "writing_voice",
+          "label": "Finding my writing voice",
+          "value": "writing_voice"
+        },
+        {
+          "id": "genre_guidance",
+          "label": "Genre-specific guidance",
+          "value": "genre_guidance"
+        },
+        {
+          "id": "community_feedback",
+          "label": "Getting feedback from community",
+          "value": "community_feedback"
+        },
+        {
+          "id": "grammar_style",
+          "label": "Grammar and style improvement",
+          "value": "grammar_style"
+        },
+        {
+          "id": "ai_improvement",
+          "label": "Improve my writing with AI",
+          "value": "ai_improvement"
+        },
+        {
+          "id": "exploring",
+          "label": "Just looking around",
+          "value": "exploring"
+        },
+        {
+          "id": "writing_techniques",
+          "label": "Learning writing techniques",
+          "value": "writing_techniques"
+        },
+        {
+          "id": "writers_block",
+          "label": "Overcoming writer's block",
+          "value": "writers_block"
+        },
+        {
+          "id": "plot_structure",
+          "label": "Plotting and story structure",
+          "value": "plot_structure"
+        },
+        {
+          "id": "publishing",
+          "label": "Publishing guidance",
+          "value": "publishing"
+        },
+        {
+          "id": "read_stories",
+          "label": "Read others' stories",
+          "value": "read_stories"
+        },
+        {
+          "id": "research",
+          "label": "Research assistance",
+          "value": "research"
+        },
+        {
+          "id": "ai_review",
+          "label": "Review my story with AI",
+          "value": "ai_review"
+        },
+        {
+          "id": "writing_prompts",
+          "label": "Writing prompts and exercises",
+          "value": "writing_prompts"
+        },
+        {
+          "id": "dialogue",
+          "label": "Writing realistic dialogue",
+          "value": "dialogue"
+        }
+      ]
+    },
+    {
+      "id": "writing_stage",
+      "order": 4,
+      "question": "Which best describes your current writing situation?",
+      "subtitle": "Check all that apply",
+      "purpose": "This helps us understand where you are in your writing journey so we can provide the most relevant guidance and tools.",
+      "ui_type": "multiple_choice",
+      "display_type": "button_cards",
+      "required": true,
+      "min_selections": 1,
+      "options": [
+        {
+          "id": "no_ideas",
+          "label": "I have no ideas",
+          "value": "no_ideas"
+        },
+        {
+          "id": "beginning_ideas",
+          "label": "I have some beginning ideas",
+          "value": "beginning_ideas"
+        },
+        {
+          "id": "plot_chars_built",
+          "label": "I have plot/characters built out",
+          "value": "plot_chars_built"
+        },
+        {
+          "id": "writing_draft",
+          "label": "I'm actively writing my first draft",
+          "value": "writing_draft"
+        },
+        {
+          "id": "between_projects",
+          "label": "I'm between projects",
+          "value": "between_projects"
+        },
+        {
+          "id": "exploring_learning",
+          "label": "I'm just exploring and learning",
+          "value": "exploring_learning"
+        },
+        {
+          "id": "ready_publish",
+          "label": "I'm ready to publish",
+          "value": "ready_publish"
+        },
+        {
+          "id": "researching",
+          "label": "I'm researching before I start",
+          "value": "researching"
+        },
+        {
+          "id": "revising",
+          "label": "I'm revising/editing my draft",
+          "value": "revising"
+        },
+        {
+          "id": "stuck_middle",
+          "label": "I'm stuck in the middle of my story",
+          "value": "stuck_middle"
+        },
+        {
+          "id": "multiple_projects",
+          "label": "I have multiple projects in progress",
+          "value": "multiple_projects"
+        },
+        {
+          "id": "need_feedback",
+          "label": "I've finished a draft and need feedback",
+          "value": "need_feedback"
+        },
+        {
+          "id": "see_homepage",
+          "label": "I just want to see the home page for now",
+          "value": "see_homepage"
+        }
+      ]
+    },
+    {
+      "id": "next_step",
+      "order": 5,
+      "question": "Where would you like to start?",
+      "purpose": "This helps us take you to the right place based on your needs and experience level.",
+      "ui_type": "single_choice",
+      "display_type": "large_button_cards_with_icons",
+      "required": true,
+      "options": [
+        {
+          "id": "quick_story",
+          "label": "Start a Quick Story",
+          "value": "quick_story",
+          "description": "Jump right into writing with our Basic Story editor",
+          "icon": "fas fa-feather-alt",
+          "route": "/ui/stories/new/basic"
+        },
+        {
+          "id": "world_first",
+          "label": "Build a World First",
+          "value": "world_first",
+          "description": "Create characters, locations, and lore before writing",
+          "icon": "fas fa-globe",
+          "route": "/ui/worlds/new"
+        },
+        {
+          "id": "homepage",
+          "label": "Go to Homepage",
+          "value": "homepage",
+          "description": "Explore all features at your own pace",
+          "icon": "fas fa-home",
+          "route": "/ui/home"
+        }
+      ]
+    },
+    {
+      "id": "brainstorming_popup",
+      "order": 6,
+      "question": "Need some creative inspiration before you start?",
+      "purpose": "Our AI-powered brainstorming tool can help you develop story ideas, create characters, and explore plot possibilities through an interactive conversation.",
+      "ui_type": "single_choice",
+      "display_type": "modal_popup",
+      "required": false,
+      "skip_button_text": "Skip for now",
+      "modal_content": {
+        "title": "AI Brainstorming Assistant",
+        "description": "You'll chat with our AI assistant who will:\n• Ask questions about your interests and ideas\n• Suggest story concepts based on your favorite genres\n• Help develop characters, settings, and plot hooks\n• Build on any existing ideas you have\n• Generate creative 'what if' scenarios"
+      },
+      "options": [
+        {
+          "id": "yes_brainstorm",
+          "label": "Yes, let's brainstorm!",
+          "value": "yes_brainstorm",
+          "action": "redirect",
+          "route": "/ui/brainstorm"
+        },
+        {
+          "id": "no_continue",
+          "label": "No thanks, I'm ready",
+          "value": "no_continue",
+          "action": "continue"
+        }
+      ]
+    }
+  ]
+}

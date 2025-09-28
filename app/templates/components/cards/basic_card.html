@@ -1,0 +1,32 @@
+<!-- Basic Tabler Card Component -->
+<!-- Usage: {% include "components/cards/basic_card.html" title="Card Title" content="Card content here" %} -->
+
+<div class="card {{ class | default: '' }}">
+    {% if title %}
+    <div class="card-header {{ header_class | default: '' }}">
+        <h3 class="card-title">
+            {{ title }}
+            {% if subtitle %}<span class="card-subtitle">{{ subtitle }}</span>{% endif %}
+        </h3>
+        {% if actions %}
+        <div class="card-actions">
+            {{ actions }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="card-body {{ body_class | default: '' }}">
+        {% if content %}
+            {{ content }}
+        {% else %}
+            {{ body }}
+        {% endif %}
+    </div>
+    
+    {% if footer %}
+    <div class="card-footer {{ footer_class | default: '' }}">
+        {{ footer }}
+    </div>
+    {% endif %}
+</div>

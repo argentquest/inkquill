@@ -1,0 +1,189 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ image_title }} - AI Generated Image{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ image_title }} - AI Generated Image{% endblock %}
+{% block og_description %}{{ image_description }} - Created by {{ image_owner }} using advanced AI{% endblock %}
+{% block og_image %}{{ image_url }}{% endblock %}
+{% block og_url %}{{ share_url }}{% endblock %}
+
+{% block twitter_title %}{{ image_title }} - AI Generated Image{% endblock %}
+{% block twitter_description %}{{ image_description }} - Created by {{ image_owner }} using advanced AI{% endblock %}
+{% block twitter_image %}{{ image_url }}{% endblock %}
+
+{% block meta_description %}{{ image_description }} - Beautiful AI-generated artwork created by {{ image_owner }}{% endblock %}
+{% block meta_keywords %}AI art, generated image, {{ image_type }}, AI artwork, {{ image_owner }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .image-share-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .image-share-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .image-share-header {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .image-share-content {
+        padding: 2rem;
+    }
+    
+    .shared-image {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        border-radius: 8px;
+        margin: 0 auto 2rem;
+        display: block;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .image-metadata {
+        background: var(--tblr-bg-surface-secondary);
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: var(--tblr-text-muted);
+    }
+    
+    .metadata-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .metadata-item i {
+        margin-right: 0.75rem;
+        width: 20px;
+        color: var(--tblr-primary);
+    }
+    
+    .share-actions {
+        text-align: center;
+        padding: 1.5rem;
+        border-top: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface-secondary);
+    }
+    
+    .cta-section {
+        text-align: center;
+        margin-top: 2rem;
+        padding: 2rem;
+        background: var(--tblr-bg-surface);
+        border-radius: 12px;
+        border: 1px solid var(--tblr-border-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="image-share-container">
+    <!-- Enhanced Gradient Hero Header -->
+    <div class="image-share-card">
+        <div class="image-share-header">
+            <h1 class="mb-2">{{ image_title }}</h1>
+            <p class="mb-0 opacity-90">{{ image_description }}</p>
+        </div>
+        
+        <div class="image-share-content">
+            <!-- Shared Composite Image -->
+            <img src="{{ image_url }}" alt="{{ image_title }}" class="shared-image">
+            
+            <!-- Image Metadata -->
+            <div class="image-metadata">
+                <h5 class="mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Image Details
+                </h5>
+                {% for meta in image_meta %}
+                <div class="metadata-item">
+                    <i class="{{ meta.icon }}"></i>
+                    <span>{{ meta.text }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Description -->
+            {% if image_description %}
+            <div class="mb-3">
+                <h6>Description</h6>
+                <p class="text-muted">{{ image_description }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Share Actions -->
+        <div class="share-actions">
+            <h6 class="mb-3">Share this AI artwork</h6>
+            <div class="btn-group" role="group">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url | urlencode }}" 
+                   target="_blank" class="btn btn-outline-primary">
+                    <i class="fab fa-facebook-f me-1"></i>Facebook
+                </a>
+                <a href="https://twitter.com/intent/tweet?url={{ share_url | urlencode }}&text={{ share_title | urlencode }}" 
+                   target="_blank" class="btn btn-outline-info">
+                    <i class="fab fa-twitter me-1"></i>Twitter
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_url | urlencode }}" 
+                   target="_blank" class="btn btn-outline-primary">
+                    <i class="fab fa-linkedin-in me-1"></i>LinkedIn
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="cta-section">
+        <h3 class="mb-3">Create Your Own AI Art</h3>
+        <p class="text-muted mb-4">
+            Join our AI storytelling platform and create amazing images like this one using advanced AI models.
+        </p>
+        <a href="{{ url_for('ui_home') }}" class="btn btn-primary">
+            <i class="fas fa-rocket me-2"></i>Start Creating
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Track social sharing clicks
+    document.querySelectorAll('.share-actions a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            const platform = this.textContent.toLowerCase().trim();
+            console.log('Shared AI image on:', platform);
+            
+            // Track with analytics if available
+            if (window.gtag) {
+                gtag('event', 'social_share', {
+                    content_type: 'ai_image',
+                    item_id: '{{ image_title | e }}',
+                    platform: platform
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

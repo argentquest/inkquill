@@ -1,0 +1,9 @@
+# Assets Directory
+
+This directory contains images, screenshots, and other documentation assets.
+
+## Directory Structure
+- `screenshots/` - Application screenshots
+- `images/` - General images and graphics
+- `icons/` - Icons and small graphics
+- `exports/` - Exported diagrams and charts

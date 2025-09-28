@@ -1,0 +1,406 @@
+{# /ai_rag_story_app/app/templates/pages/prompt_list.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Prompt Library{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced Tabler Premium Hero Header */
+    .prompts-hero {
+        background: linear-gradient(135deg, var(--tblr-yellow) 0%, var(--tblr-orange) 100%);
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        position: relative;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .prompts-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='%23ffffff15'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e");
+        pointer-events: none;
+    }
+    
+    .prompts-hero .page-title {
+        position: relative;
+        z-index: 1;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .prompts-hero .page-subtitle {
+        position: relative;
+        z-index: 1;
+        color: rgba(255,255,255,0.9);
+        font-size: 1rem;
+        margin-bottom: 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .prompts-hero .hero-actions {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .prompts-hero .btn {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .prompts-hero .btn:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.4);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Enhanced Filter Form */
+    .filter-form {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .filter-form .card-title {
+        color: var(--tblr-body-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-form .form-label {
+        font-weight: 500;
+        color: var(--tblr-body-color);
+    }
+    
+    .filter-form .btn {
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    /* Enhanced Table */
+    .table {
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius);
+        overflow: hidden;
+        box-shadow: var(--tblr-box-shadow);
+        margin-bottom: 0;
+    }
+    
+    .table thead th {
+        background: var(--tblr-bg-surface-secondary);
+        border-bottom: 1px solid var(--tblr-border-color);
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        padding: 1rem 0.75rem;
+    }
+    
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .table tbody tr:hover {
+        background: var(--tblr-bg-surface-secondary);
+    }
+    
+    .table tbody td {
+        padding: 1rem 0.75rem;
+        border-bottom: 1px solid var(--tblr-border-color);
+        vertical-align: middle;
+    }
+    
+    .table .btn {
+        border-radius: var(--tblr-border-radius);
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .table .badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    /* Enhanced Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color);
+        margin-top: 2rem;
+    }
+    
+    .empty-state .empty-icon {
+        width: 4rem;
+        height: 4rem;
+        background: var(--tblr-yellow);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        color: var(--tblr-body-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--tblr-text-muted);
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Table responsive wrapper */
+    .table-responsive {
+        border-radius: var(--tblr-border-radius);
+        box-shadow: var(--tblr-box-shadow);
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                    <i class="fas fa-lightbulb me-3"></i>
+                    Prompt Library
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Manage your personal and shared prompts for AI generation
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-magic me-1"></i>
+                        AI Prompts
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-list me-1"></i>
+                        {{ prompts|length if prompts else 0 }} Prompts
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('prompts')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with managing prompts">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_create_prompt_form') }}" class="btn btn-outline-light btn-sm"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Create a new prompt for AI generation">
+                        <i class="fas fa-plus me-1"></i>
+                        New Prompt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Enhanced Filter Form -->
+    <form id="prompt-filter-form" method="get" action="{{ url_for('ui_list_prompts') }}" class="filter-form">
+        <h4 class="card-title">Filter Prompts</h4>
+        <div class="row g-3 align-items-end">
+            <div class="col-md">
+                <label for="filter_scope" class="form-label">Scope:</label>
+                <select name="filter_scope" id="filter_scope" class="form-select form-select-sm">
+                    <option value="my" {% if current_filters.scope == 'my' %}selected{% endif %}>My Prompts</option>
+                    <option value="shared" {% if current_filters.scope == 'shared' %}selected{% endif %}>Shared Prompts</option>
+                </select>
+            </div>
+            <div class="col-md">
+                <label for="filter_prompt_type" class="form-label">Prompt Type:</label>
+                <select name="filter_prompt_type" id="filter_prompt_type" class="form-select form-select-sm">
+                    <option value="">All Types</option>
+                    {% for p_type_enum_member in prompt_types %}
+                        <option value="{{ p_type_enum_member.value }}"
+                                {% if current_filters.prompt_type == p_type_enum_member.value %}selected{% endif %}>
+                            {{ p_type_enum_member.value.replace('_', ' ') | title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md">
+                <label for="filter_age_target" class="form-label">Age Group:</label>
+                <select name="filter_age_target" id="filter_age_target" class="form-select form-select-sm">
+                    <option value="">All Ages</option>
+                    {% for age_enum_member in age_targets %}
+                        <option value="{{ age_enum_member.value }}"
+                                {% if current_filters.age_target == age_enum_member.value %}selected{% endif %}>
+                            {% if age_enum_member.value == 'ALL_AGES' %}
+                                All Ages (General)
+                            {% else %}
+                                Ages {{ age_enum_member.value.replace('AGES_', '').replace('_', '-') }}
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-auto d-flex align-items-center">
+                <div class="form-check form-switch pt-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="filter_is_active" name="filter_is_active_str" value="true" 
+                           {% if current_filters.is_active_str == 'true' or current_filters.is_active_str is none %}checked{% endif %}>
+                    <label class="form-check-label" for="filter_is_active">Active Only</label>
+                </div>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-warning w-100"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        title="Apply the selected filters to the prompt list">
+                    <i class="fas fa-filter me-1"></i>Apply Filters
+                </button>
+            </div>
+        </div>
+    </form>
+
+
+    <div id="prompts-list-container">
+    {% if prompts %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Age Group</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prompt in prompts %}
+                        <tr>
+                            <td>
+                                <strong>{{ prompt.title | e }}</strong>
+                                <small class="d-block text-muted">{{ prompt.prompt_content | e | truncate(100) }}</small>
+                            </td>
+                            <td><span class="badge bg-info">{{ prompt.prompt_type.value.replace('_', ' ') | title if prompt.prompt_type else 'N/A' }}</span></td>
+                            <td><span class="badge bg-secondary">{{ prompt.age_target.value.replace('AGES_', '').replace('_', '-') if prompt.age_target else 'N/A' }}</span></td>
+                            <td>
+                                {% if prompt.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-list">
+                                    {% if prompt.user_id == current_user.id %}
+                                        <a href="{{ url_for('ui_edit_prompt_form', prompt_id=prompt.id) }}" class="btn btn-primary" 
+                                           data-bs-toggle="tooltip" data-bs-placement="top" 
+                                           title="Edit this prompt's content and settings">
+                                            <i class="fas fa-edit me-1"></i>Edit
+                                        </a>
+                                        <button class="btn btn-danger delete-prompt-btn" data-prompt-id="{{ prompt.id }}" 
+                                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                title="Permanently delete this prompt">
+                                            <i class="fas fa-trash me-1"></i>Delete
+                                        </button>
+                                    {% endif %}
+                                    <button class="btn btn-success use-prompt-btn" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="Use this prompt in an editor"
+                                            data-prompt-content="{{ prompt.prompt_content | e }}">
+                                        <i class="fas fa-play me-1"></i>Use
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <h3>No prompts found</h3>
+            <p>No prompts found matching your criteria. Try adjusting the filters or create a new prompt to get started!</p>
+            <a href="{{ url_for('ui_create_prompt_form') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i>Create New Prompt
+            </a>
+        </div>
+    {% endif %}
+    </div>
+
+</div>
+
+
+<!-- "Use Prompt" Modal -->
+{% include 'partials/_use_prompt_modal.html' %} 
+
+{% endblock %}
+
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/prompt_crud.js') }}"></script>
+    
+    <!-- FIX: ADDED SCRIPT TO HANDLE FORM FILTERING -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterForm = document.getElementById('prompt-filter-form');
+            if (filterForm) {
+                filterForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Stop the default submission
+                    const formData = new FormData(filterForm);
+                    const params = new URLSearchParams();
+
+                    // The 'is_active' checkbox needs special handling
+                    const isActiveCheckbox = document.getElementById('filter_is_active');
+                    const isActiveValue = isActiveCheckbox.checked ? 'true' : 'false';
+                    params.append('filter_is_active_str', isActiveValue);
+
+                    // Append other form fields only if they have a value
+                    formData.forEach((value, key) => {
+                        // Skip the checkbox as we handled it above
+                        if (key === 'filter_is_active_str') return; 
+                        
+                        if (value && value.trim() !== '') {
+                            params.append(key, value);
+                        }
+                    });
+
+                    // Build the final URL and navigate to it
+                    const newUrl = `${filterForm.action}?${params.toString()}`;
+                    window.location.href = newUrl;
+                });
+            }
+        });
+    </script>
+    <!-- END FIX -->
+{% endblock %}

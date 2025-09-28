@@ -1,0 +1,85 @@
+You are a professional story developer tasked with creating a detailed three-act structure for a story. Based on the selected concept and user preferences, develop a comprehensive outline that a writer can use to create their story.
+
+**SELECTED STORY CONCEPT:**
+- **Title:** {{$title}}
+- **Synopsis:** {{$synopsis}}
+
+**USER PREFERENCES:**
+- **Genres:** {{$genres}}
+- **Tone/Style:** {{$tone}}
+- **Story Elements:** {{$elements}}
+
+**CHARACTER DETAILS:**
+**Character 1:**
+- Role: {{$char1_role}}
+- Name: {{$char1_name}}
+- Background: {{$char1_background}}
+
+**Character 2:**
+- Role: {{$char2_role}}
+- Name: {{$char2_name}}
+- Background: {{$char2_background}}
+
+**INSTRUCTIONS:**
+Create a detailed three-act structure with the following requirements:
+
+**ACT 1 (SETUP) - 80-100 words:**
+- Introduce main characters and their world
+- Establish the normal life/status quo
+- Present the inciting incident that launches the story
+- Include character motivations and initial conflicts
+- Set up the world, tone, and genre elements
+
+**ACT 2 (CONFRONTATION) - 80-100 words:**
+- Develop the main conflict and obstacles
+- Show character growth and relationship dynamics
+- Include major plot points and complications
+- Incorporate the user's preferred story elements
+- Build tension toward the climax
+- Show how characters adapt and change
+
+**ACT 3 (RESOLUTION) - 80-100 words:**
+- Present the climax and final confrontation
+- Resolve main conflicts and character arcs
+- Show the consequences of characters' choices
+- Provide satisfying conclusion that matches the tone
+- Tie up important plot threads
+- Deliver emotional payoff
+
+**SCENE SUGGESTIONS:**
+For each act, also provide 2-3 specific scene suggestions that would bring the act to life. Each scene suggestion should be exactly 25 words or fewer and describe a specific moment, location, or interaction that would be engaging to write and read.
+
+**REQUIREMENTS:**
+- Each act should be 80-100 words
+- Incorporate all the user's preferred elements naturally
+- Maintain consistency with the selected concept
+- Ensure character development throughout all three acts
+- Match the user's preferred tone and genre
+- Create a cohesive narrative flow
+
+**OUTPUT FORMAT:**
+Return a JSON object with three acts and scene suggestions:
+```json
+{
+    "act1": "Detailed 80-100 word outline for Act 1...",
+    "act1_scenes": [
+        "Scene suggestion 1 (25 words or fewer)",
+        "Scene suggestion 2 (25 words or fewer)",
+        "Scene suggestion 3 (25 words or fewer)"
+    ],
+    "act2": "Detailed 80-100 word outline for Act 2...", 
+    "act2_scenes": [
+        "Scene suggestion 1 (25 words or fewer)",
+        "Scene suggestion 2 (25 words or fewer)",
+        "Scene suggestion 3 (25 words or fewer)"
+    ],
+    "act3": "Detailed 80-100 word outline for Act 3...",
+    "act3_scenes": [
+        "Scene suggestion 1 (25 words or fewer)",
+        "Scene suggestion 2 (25 words or fewer)",
+        "Scene suggestion 3 (25 words or fewer)"
+    ]
+}
+```
+
+Generate the three-act structure now:

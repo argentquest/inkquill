@@ -1,0 +1,61 @@
+%% Middleware Stack Diagram
+%% Title: FastAPI Middleware Processing Order
+%% Description: Order and flow of middleware processing in the application
+%% Last Updated: 2025-07-14
+%% Version: 1.0.0
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#7b1fa2',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#6a1b9a',
+    'lineColor': '#424242',
+    'secondaryColor': '#1976d2',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+graph TB
+    subgraph "Incoming Request Flow"
+        REQUEST[HTTP Request]
+        PROXY[ProxyHeadersMiddleware<br/>- Handle X-Forwarded headers<br/>- Trust all hosts]
+        CORS[CORSMiddleware<br/>- Cross-origin handling<br/>- Configurable origins<br/>- Credentials support]
+        SESSION[SessionMiddleware<br/>- OAuth session management<br/>- Secure cookies<br/>- 1-hour expiration]
+        LOGGING_CTX[LoggingContextMiddleware<br/>- Request ID generation<br/>- Context propagation]
+        USER_ACTIVITY[UserActivityMiddleware<br/>- Request/response logging<br/>- Performance metrics<br/>- Sensitive field filtering]
+    end
+    
+    subgraph "Application Processing"
+        ROUTER[Router Processing<br/>- Route matching<br/>- Dependency injection<br/>- Business logic]
+        RESPONSE_GEN[Response Generation<br/>- Data serialization<br/>- Status codes<br/>- Headers]
+    end
+    
+    subgraph "Outgoing Response Flow"
+        RESPONSE_MW[Response Middleware<br/>- Reverse processing order<br/>- Response modification<br/>- Cleanup]
+        FINAL_RESPONSE[HTTP Response]
+    end
+    
+    %% Request flow
+    REQUEST --> PROXY
+    PROXY --> CORS
+    CORS --> SESSION
+    SESSION --> LOGGING_CTX
+    LOGGING_CTX --> USER_ACTIVITY
+    USER_ACTIVITY --> ROUTER
+    
+    %% Application processing
+    ROUTER --> RESPONSE_GEN
+    
+    %% Response flow
+    RESPONSE_GEN --> RESPONSE_MW
+    RESPONSE_MW --> FINAL_RESPONSE
+    
+    %% Styling
+    classDef middleware fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef application fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef flow fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    
+    class PROXY,CORS,SESSION,LOGGING_CTX,USER_ACTIVITY,RESPONSE_MW middleware
+    class ROUTER,RESPONSE_GEN application
+    class REQUEST,FINAL_RESPONSE flow

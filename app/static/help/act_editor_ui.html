@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Act Editor - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Act Editor</h1>
+            <p class="help-subtitle">AI-powered writing environment for story acts</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"interface\"]').click()">
+                <div class="quick-action-icon">🖥️</div>
+                <div class="quick-action-text">Interface</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-writing\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Writing</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"best-practices\"]').click()">
+                <div class="quick-action-icon">⭐</div>
+                <div class="quick-action-text">Best Practices</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="interface">Interface</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-writing">AI Writing</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="collaboration">Collaboration</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="best-practices">Best Practices</button></li>
+            </ul>
+        </div>
+
+        <!-- Interface Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="interface">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Editor Interface Overview
+                </h2>
+                <p>The Act Editor provides a focused writing environment where you can craft major story sections with AI assistance. It combines traditional text editing with intelligent suggestions based on your world context.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📝 Main Editor</h3>
+                        <p class="feature-card-description">Rich text editing area with formatting tools, word count, and real-time AI suggestions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎯 Context Panel</h3>
+                        <p class="feature-card-description">Shows associated characters, locations, and lore relevant to this act.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🤖 AI Assistant</h3>
+                        <p class="feature-card-description">Real-time writing help, suggestions, and content generation tools.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📊 Progress Tracker</h3>
+                        <p class="feature-card-description">Word count goals, completion percentage, and writing statistics.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">First Time Using the Editor</h3>
+                        <span class="recipe-card-time">5 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Review act metadata (title, summary, goals) in the header</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Check the context panel for associated world elements</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Set word count goals using the progress tracker</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Start typing in the main editor - AI will offer suggestions</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Use Ctrl+S regularly to save your progress</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Editor Features</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Text Formatting Tools</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Shortcut</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bold</td>
+                                    <td><span class="keyboard-shortcut">Ctrl + B</span></td>
+                                    <td>Emphasize important text</td>
+                                </tr>
+                                <tr>
+                                    <td>Italic</td>
+                                    <td><span class="keyboard-shortcut">Ctrl + I</span></td>
+                                    <td>Thoughts, emphasis, foreign words</td>
+                                </tr>
+                                <tr>
+                                    <td>Underline</td>
+                                    <td><span class="keyboard-shortcut">Ctrl + U</span></td>
+                                    <td>Special emphasis or titles</td>
+                                </tr>
+                                <tr>
+                                    <td>Headers</td>
+                                    <td><span class="keyboard-shortcut">Ctrl + 1-6</span></td>
+                                    <td>Structure sections and chapters</td>
+                                </tr>
+                                <tr>
+                                    <td>Quote Block</td>
+                                    <td><span class="keyboard-shortcut">Ctrl + Q</span></td>
+                                    <td>Letters, documents, thoughts</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Focus and Distraction-Free Modes</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>Full Screen Mode (F11):</strong> Hide browser UI for immersive writing</li>
+                            <li><strong>Zen Mode:</strong> Hide all panels except the main editor</li>
+                            <li><strong>Typewriter Mode:</strong> Keep current line centered on screen</li>
+                            <li><strong>Dark Mode:</strong> Reduce eye strain during long writing sessions</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">🌙</span>
+                            <div>
+                                <strong>Night Writing:</strong> Dark mode and typewriter mode combination is excellent for late-night writing sessions.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Auto-Save and Version Control</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Your work is protected with:</p>
+                        <ul>
+                            <li><strong>Auto-Save:</strong> Saves every 30 seconds automatically</li>
+                            <li><strong>Version History:</strong> Tracks major revision points</li>
+                            <li><strong>Draft Recovery:</strong> Restores work if session is interrupted</li>
+                            <li><strong>Conflict Resolution:</strong> Handles simultaneous edits in collaboration</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Save Status Indicators:\n💾 Saved - All changes committed\n⏳ Saving - Auto-save in progress\n❗ Unsaved - Manual save needed\n🔄 Syncing - Collaborative sync active')">Copy</button>
+                            <pre>Save Status Indicators:
+💾 Saved - All changes committed
+⏳ Saving - Auto-save in progress
+❗ Unsaved - Manual save needed
+🔄 Syncing - Collaborative sync active</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Writing Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-writing">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    AI Writing Assistance
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧠 Contextual Writing AI</h3>
+                    <p class="ai-feature-description">The AI understands your world context, character relationships, and story direction to provide relevant, consistent writing assistance.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Real-Time Suggestions</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>As you write, AI provides:</p>
+                        <ul>
+                            <li><strong>Auto-Complete:</strong> Finishes sentences based on context</li>
+                            <li><strong>Paragraph Extensions:</strong> Continues narrative flow</li>
+                            <li><strong>Character Dialogue:</strong> Voice-appropriate speech for each character</li>
+                            <li><strong>Scene Descriptions:</strong> Rich environmental and emotional details</li>
+                            <li><strong>Transition Phrases:</strong> Smooth connections between ideas</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Using AI Suggestions Effectively</h3>
+                                <span class="recipe-card-time">3 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Write 1-2 sentences to establish context</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Pause at natural break points (end of sentence/paragraph)</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Wait for AI suggestion to appear (gray text)</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Press Tab to accept, or keep typing to dismiss</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Edit accepted suggestions to match your voice</div>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 1-2 credits per suggestion, 3-5 credits per paragraph generation
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Content Generation Tools</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Access advanced AI tools via the toolbar:</p>
+                        <ul>
+                            <li><strong>Expand Scene:</strong> Generates detailed content for outlined events</li>
+                            <li><strong>Character Development:</strong> Adds depth to character moments</li>
+                            <li><strong>Dialogue Enhancement:</strong> Improves conversation flow and subtext</li>
+                            <li><strong>Action Sequences:</strong> Creates dynamic, engaging action scenes</li>
+                            <li><strong>Emotional Beats:</strong> Develops character emotional arcs</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'AI Generation Prompts:\n\"Expand this outline into a full scene\"\n\"Add more tension to this dialogue\"\n\"Describe the setting in more detail\"\n\"Show character emotions through actions\"\n\"Create a smooth transition to the next scene\"')">Copy</button>
+                            <pre>AI Generation Prompts:
+"Expand this outline into a full scene"
+"Add more tension to this dialogue"
+"Describe the setting in more detail"
+"Show character emotions through actions"
+"Create a smooth transition to the next scene"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Context Awareness</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI leverages your world knowledge:</p>
+                        <ul>
+                            <li><strong>Character Consistency:</strong> Maintains established personalities and relationships</li>
+                            <li><strong>Location Details:</strong> Uses associated location descriptions and atmosphere</li>
+                            <li><strong>Lore Integration:</strong> Incorporates relevant world knowledge naturally</li>
+                            <li><strong>Story Continuity:</strong> References previous events and character development</li>
+                            <li><strong>Tone Matching:</strong> Maintains the established story tone and genre</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">✨</span>
+                            <div>
+                                <strong>Pro Tip:</strong> The more detailed your character and location associations, the better AI suggestions become. Invest time in world-building for richer AI assistance.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">AI Writing Shortcuts</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                            <th>Context</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Tab</span></td>
+                            <td>Accept AI suggestion</td>
+                            <td>When gray suggestion text appears</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + /</span></td>
+                            <td>Request AI continuation</td>
+                            <td>At end of paragraph or sentence</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + /</span></td>
+                            <td>Get multiple AI options</td>
+                            <td>When you want to see alternatives</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Esc</span></td>
+                            <td>Dismiss AI suggestions</td>
+                            <td>When suggestions aren't helpful</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Alt + E</span></td>
+                            <td>Expand selected text</td>
+                            <td>Turn outline into full content</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Alt + D</span></td>
+                            <td>Enhance dialogue</td>
+                            <td>Improve selected conversation</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Collaboration Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="collaboration">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Collaborative Writing
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Real-Time Collaboration</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>When multiple authors work on the same act:</p>
+                        <ul>
+                            <li><strong>Live Cursors:</strong> See where other authors are working</li>
+                            <li><strong>Real-Time Sync:</strong> Changes appear instantly for all users</li>
+                            <li><strong>Conflict Prevention:</strong> Automatic merging of simultaneous edits</li>
+                            <li><strong>User Presence:</strong> Know who's online and actively editing</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">👥</span>
+                            <div>
+                                <strong>Collaboration Limits:</strong> Up to 5 simultaneous editors per act for optimal performance. Additional users can view in read-only mode.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Comment and Review System</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Provide feedback without changing the text:</p>
+                        <ul>
+                            <li><strong>Inline Comments:</strong> Attach notes to specific text sections</li>
+                            <li><strong>Suggestion Mode:</strong> Propose changes without overwriting</li>
+                            <li><strong>Review Threads:</strong> Have discussions about specific sections</li>
+                            <li><strong>Resolve Tracking:</strong> Mark comments as addressed</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Leaving Effective Comments</h3>
+                                <span class="recipe-card-time">2 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Select the text you want to comment on</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Click the comment icon or press Ctrl+M</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-content">Be specific about what needs improvement</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Offer constructive suggestions, not just criticism</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Use @mentions to notify specific collaborators</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Permission Levels</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Permission Level</th>
+                                    <th>Can View</th>
+                                    <th>Can Comment</th>
+                                    <th>Can Edit</th>
+                                    <th>Can Share</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Viewer</td>
+                                    <td>✅</td>
+                                    <td>❌</td>
+                                    <td>❌</td>
+                                    <td>❌</td>
+                                </tr>
+                                <tr>
+                                    <td>Commenter</td>
+                                    <td>✅</td>
+                                    <td>✅</td>
+                                    <td>❌</td>
+                                    <td>❌</td>
+                                </tr>
+                                <tr>
+                                    <td>Editor</td>
+                                    <td>✅</td>
+                                    <td>✅</td>
+                                    <td>✅</td>
+                                    <td>❌</td>
+                                </tr>
+                                <tr>
+                                    <td>Co-Author</td>
+                                    <td>✅</td>
+                                    <td>✅</td>
+                                    <td>✅</td>
+                                    <td>✅</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Version Management</h2>
+                <p>Track changes and manage different versions:</p>
+                <ul>
+                    <li><strong>Automatic Versions:</strong> Created at major milestones</li>
+                    <li><strong>Manual Snapshots:</strong> Save specific versions with custom names</li>
+                    <li><strong>Compare Versions:</strong> Side-by-side view of different drafts</li>
+                    <li><strong>Restore Points:</strong> Rollback to previous versions if needed</li>
+                    <li><strong>Branch Creation:</strong> Explore alternate directions without losing work</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Best Practices Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="best-practices">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Writing Best Practices
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Effective AI Collaboration</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Get the best results from AI assistance:</p>
+                        <ul>
+                            <li><strong>Clear Direction:</strong> Start with strong opening sentences to guide AI</li>
+                            <li><strong>Specific Context:</strong> Include character emotions and motivations</li>
+                            <li><strong>Review and Edit:</strong> Always review AI suggestions for consistency</li>
+                            <li><strong>Personal Voice:</strong> Edit AI content to match your writing style</li>
+                            <li><strong>Incremental Building:</strong> Work in small chunks rather than large generations</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Good AI Prompts:\n\"Sarah felt betrayed as she opened the letter...\"\n\"The ancient library held secrets that...\"\n\"During the tense negotiation, Marcus...\"\n\nAvoid vague starts:\n\"Something happened...\"\n\"There was a place...\"\n\"A person did...\"')">Copy</button>
+                            <pre>Good AI Prompts:
+"Sarah felt betrayed as she opened the letter..."
+"The ancient library held secrets that..."
+"During the tense negotiation, Marcus..."
+
+Avoid vague starts:
+"Something happened..."
+"There was a place..."
+"A person did..."</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Act Structure Guidelines</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Structure your acts for maximum impact:</p>
+                        <ul>
+                            <li><strong>Clear Purpose:</strong> Each act should advance the story meaningfully</li>
+                            <li><strong>Character Focus:</strong> Center acts around character development or conflict</li>
+                            <li><strong>Pacing Variety:</strong> Mix action, dialogue, and reflection</li>
+                            <li><strong>Scene Breaks:</strong> Use natural transitions between different scenes</li>
+                            <li><strong>Cliffhangers:</strong> End acts with hooks to maintain reader engagement</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Common Pitfall:</strong> Don't try to include everything in one act. Focus on a specific story thread or character arc per act.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Maintaining Consistency</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Keep your narrative coherent:</p>
+                        <ul>
+                            <li><strong>Character Voice:</strong> Each character should speak and think distinctly</li>
+                            <li><strong>World Rules:</strong> Follow established magic systems, technology, and physics</li>
+                            <li><strong>Timeline:</strong> Track time progression and character ages</li>
+                            <li><strong>Relationship Dynamics:</strong> Maintain established character relationships</li>
+                            <li><strong>Emotional Arcs:</strong> Ensure character growth feels natural and earned</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Productivity Tips</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Write more effectively:</p>
+                        <ul>
+                            <li><strong>Set Daily Goals:</strong> Use word count targets to maintain momentum</li>
+                            <li><strong>Write First, Edit Later:</strong> Get the story down before perfecting prose</li>
+                            <li><strong>Use Placeholders:</strong> Mark research needs with [RESEARCH: topic] tags</li>
+                            <li><strong>Regular Breaks:</strong> Step away periodically to maintain fresh perspective</li>
+                            <li><strong>Read Aloud:</strong> Catch awkward phrasing and rhythm issues</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost Management:</strong> Use AI for first drafts and difficult scenes, then edit manually to control credit usage.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Troubleshooting Common Issues</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Problem</th>
+                            <th>Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AI suggestions don't fit my style</td>
+                            <td>Edit accepted suggestions; AI learns from your edits</td>
+                        </tr>
+                        <tr>
+                            <td>Characters acting out of character</td>
+                            <td>Check character associations and add more personality details</td>
+                        </tr>
+                        <tr>
+                            <td>Repetitive AI suggestions</td>
+                            <td>Add more context or try different phrasing for variety</td>
+                        </tr>
+                        <tr>
+                            <td>Slow AI response</td>
+                            <td>Check internet connection; try shorter request blocks</td>
+                        </tr>
+                        <tr>
+                            <td>Lost work after refresh</td>
+                            <td>Check auto-save; restore from version history if needed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

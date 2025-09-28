@@ -1,0 +1,77 @@
+%% Component Interaction Diagram
+%% Title: FastAPI Component Interaction Flow
+%% Description: Detailed component interaction and request processing flow
+%% Last Updated: 2025-07-14
+%% Version: 1.0.0
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#1976d2',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#1565c0',
+    'lineColor': '#424242',
+    'secondaryColor': '#388e3c',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+sequenceDiagram
+    participant Client
+    participant LB as Load Balancer
+    participant MW as Middleware Stack
+    participant Auth as Authentication
+    participant Router as API Router
+    participant Service as Business Service
+    participant CRUD as CRUD Layer
+    participant DB as Database
+    participant AI as AI Services
+    participant Search as Search Service
+    
+    Note over Client,Search: Request Processing Flow
+    
+    Client->>LB: HTTP Request
+    LB->>MW: Forward Request
+    
+    Note over MW: Middleware Processing
+    MW->>MW: ProxyHeadersMiddleware
+    MW->>MW: CORSMiddleware
+    MW->>MW: SessionMiddleware
+    MW->>MW: LoggingContextMiddleware
+    MW->>MW: UserActivityMiddleware
+    
+    MW->>Auth: Authentication Check
+    Auth->>Auth: Validate JWT Token
+    Auth->>DB: Lookup User
+    DB-->>Auth: User Data
+    Auth-->>MW: Authenticated User
+    
+    MW->>Router: Route Request
+    Router->>Service: Business Logic Call
+    
+    alt AI-Enhanced Operation
+        Service->>AI: AI Service Call
+        AI->>Search: Vector Search
+        Search-->>AI: Search Results
+        AI-->>Service: AI Response
+    end
+    
+    Service->>CRUD: Data Operation
+    CRUD->>DB: SQL Query
+    DB-->>CRUD: Query Result
+    CRUD-->>Service: Data Model
+    
+    Service-->>Router: Business Result
+    Router-->>MW: HTTP Response
+    MW-->>LB: Processed Response
+    LB-->>Client: Final Response
+    
+    Note over Client,Search: Error Handling Flow
+    
+    alt Error Scenario
+        Service->>Service: Error Occurs
+        Service->>Service: Log Error
+        Service-->>Router: HTTP Exception
+        Router-->>MW: Error Response
+        MW-->>Client: Error Response
+    end

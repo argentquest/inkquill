@@ -1,0 +1,645 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ lore_item.title }} - Lore Item Details{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Lore Item Detail Page - Tabler Premium UI Standards */
+    .page {
+        background: var(--tblr-bg-surface-secondary);
+        min-height: 100vh;
+    }
+    
+    /* Enhanced Hero Header */
+    .lore-hero-header {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    }
+    
+    .lore-hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .lore-hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 3rem 0;
+        color: white;
+    }
+    
+    .lore-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.75rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .lore-meta-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .lore-category-badge,
+    .lore-importance-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(10px);
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--tblr-border-radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .lore-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    .lore-actions .btn {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .lore-actions .btn:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.5);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .lore-actions .btn-warning {
+        background: var(--tblr-warning);
+        border-color: var(--tblr-warning);
+    }
+    
+    .lore-actions .btn-warning:hover {
+        background: var(--tblr-yellow);
+        border-color: var(--tblr-yellow);
+    }
+    
+    .lore-breadcrumb .breadcrumb {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: var(--tblr-border-radius);
+        padding: 0.5rem 1rem;
+    }
+    
+    .lore-breadcrumb .breadcrumb-item {
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .lore-breadcrumb .breadcrumb-item a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+    }
+    
+    .lore-breadcrumb .breadcrumb-item.active {
+        color: white;
+        font-weight: 500;
+    }
+    
+    /* Enhanced Cards */
+    .detail-card {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-box-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .detail-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .detail-card:hover {
+        box-shadow: var(--tblr-box-shadow-lg);
+        transform: translateY(-4px);
+        border-color: var(--tblr-primary);
+    }
+    
+    .detail-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    /* Lore Item Avatar (reuse character styles) */
+    .character-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        box-shadow: var(--tblr-box-shadow-lg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .character-avatar:hover {
+        transform: scale(1.05);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    .character-avatar-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.8);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .character-avatar-placeholder:hover {
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    .character-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .character-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Enhanced Image Container */
+    .character-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--tblr-border-radius-lg);
+        margin-bottom: 2rem;
+    }
+    
+    .lore-image {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-box-shadow-lg);
+        transition: all 0.3s ease;
+    }
+    
+    .lore-image:hover {
+        transform: scale(1.02);
+    }
+    
+    /* Content Typography */
+    .character-content {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--tblr-text-secondary);
+    }
+    
+    .character-content p {
+        margin-bottom: 1rem;
+    }
+    
+    .character-content p:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Traits and Badges */
+    .trait-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.5rem 1rem;
+        background: var(--tblr-primary-lt);
+        color: var(--tblr-primary);
+        border: 1px solid var(--tblr-primary);
+        border-radius: var(--tblr-border-radius-lg);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .trait-badge:hover {
+        background: var(--tblr-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    /* Enhanced Metadata Display */
+    .metadata-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--tblr-border-color-translucent);
+    }
+    
+    .metadata-item:last-child {
+        border-bottom: none;
+    }
+    
+    .metadata-label {
+        font-weight: 500;
+        color: var(--tblr-text-muted);
+        min-width: 120px;
+        font-size: 0.875rem;
+    }
+    
+    .metadata-value {
+        color: var(--tblr-body-color);
+        font-size: 0.9375rem;
+    }
+    
+    /* Enhanced Alert for Story Associations */
+    .association-alert {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-left: 4px solid var(--tblr-blue);
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        box-shadow: var(--tblr-box-shadow-input);
+    }
+    
+    .association-alert .avatar {
+        flex-shrink: 0;
+    }
+    
+    .association-alert .alert-content {
+        flex: 1;
+    }
+    
+    .association-alert .alert-text {
+        color: var(--tblr-text-secondary);
+        margin-bottom: 1rem;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+    
+    .section-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--tblr-border-color-translucent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-header::before {
+        content: '';
+        width: 4px;
+        height: 1.25rem;
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    .lore-content {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        color: var(--tblr-text-secondary);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .lore-hero-content {
+            padding: 2rem 0;
+        }
+        
+        .lore-title {
+            font-size: 2rem;
+        }
+        
+        .lore-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .lore-actions .btn {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 250px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_list_lore_items_for_world', world_id=world.id) }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to Lore Items">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-white-50">{{ world.name }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_lore_items_for_world', world_id=world.id) }}" class="text-white-50">Lore Items</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">{{ lore_item.title }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <div class="d-flex align-items-start gap-4 mb-4">
+                    <!-- Lore Item Icon/Avatar -->
+                    <div>
+                        {% if lore_item.image_url %}
+                            <img src="{{ lore_item.image_url }}" alt="{{ lore_item.title }}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">
+                        {% else %}
+                            <div style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.8);">
+                                <i class="fas fa-scroll" style="font-size: 2rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Lore Item Info -->
+                    <div class="flex-grow-1">
+                        <h1 class="page-title text-white mb-2">
+                            <i class="fas fa-scroll me-3"></i>{{ lore_item.title }}
+                        </h1>
+                        
+                        {% if lore_item.category %}
+                        <div class="page-subtitle text-white mb-3">
+                            <i class="fas fa-tag me-1"></i>{{ lore_item.category.value|title }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2 px-3 py-2">
+                                <i class="fas fa-globe me-1"></i>
+                                {{ world.name }}
+                            </span>
+                            {% if lore_item.importance %}
+                            <span class="badge bg-light text-dark me-2 px-3 py-2">
+                                <i class="fas fa-star me-1"></i>
+                                {{ lore_item.importance.value|title }} Importance
+                            </span>
+                            {% endif %}
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <i class="fas fa-calendar me-1"></i>
+                                Created {{ lore_item.created_at.strftime('%B %d, %Y') if lore_item.created_at else 'Unknown' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('lore_item_detail')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with lore item details">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_edit_lore_item_form', lore_item_id=lore_item.id) }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-edit me-1"></i>
+                        Edit Lore Item
+                    </a>
+                    <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sitemap me-1"></i>
+                        View in Hierarchy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Main Lore Item Details Card -->
+                <div class="card detail-card mb-4">
+                    <div class="card-body">
+                        {% if lore_item.image_url %}
+                        <div class="character-image-container">
+                            <img src="{{ lore_item.image_url }}" alt="{{ lore_item.title }}" class="lore-image">
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Content Section -->
+                        <h5 class="section-header">
+                            <i class="fas fa-align-left"></i>
+                            Content
+                        </h5>
+                        <div class="character-content mb-4">
+                            <div class="lore-content">{{ lore_item.content or 'No content available.' }}</div>
+                        </div>
+                        
+                        <!-- Significance Section -->
+                        {% if lore_item.significance %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Significance
+                        </h5>
+                        <div class="character-content mb-4">
+                            <p>{{ lore_item.significance }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Origin Section -->
+                        {% if lore_item.origin %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-history"></i>
+                            Origin
+                        </h5>
+                        <div class="character-content mb-4">
+                            <p>{{ lore_item.origin }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Related Characters Section -->
+                        {% if lore_item.related_characters %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-users"></i>
+                            Related Characters
+                        </h5>
+                        <div class="mb-4">
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for character in lore_item.related_characters %}
+                                <div class="trait-badge">
+                                    <i class="fas fa-user"></i>
+                                    {{ character }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Related Events Section -->
+                        {% if lore_item.related_events %}
+                        <h5 class="section-header mt-4">
+                            <i class="fas fa-calendar-alt"></i>
+                            Related Events
+                        </h5>
+                        <div class="mb-4">
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for event in lore_item.related_events %}
+                                <div class="trait-badge">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ event }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Lore Item Metadata Card -->
+                <div class="card detail-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Lore Item Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="metadata-list">
+                            {% if lore_item.category %}
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-tag me-2 text-muted"></i>Category
+                                </span>
+                                <span class="metadata-value">
+                                    <span class="badge bg-secondary">{{ lore_item.category.value|title }}</span>
+                                </span>
+                            </li>
+                            {% endif %}
+                            
+                            {% if lore_item.importance %}
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-star me-2 text-muted"></i>Importance
+                                </span>
+                                <span class="metadata-value">
+                                    <span class="badge bg-warning text-dark">{{ lore_item.importance.value|title }}</span>
+                                </span>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-calendar-plus me-2 text-muted"></i>Created
+                                </span>
+                                <span class="metadata-value">
+                                    {{ lore_item.created_at.strftime('%B %d, %Y') if lore_item.created_at else 'Unknown' }}
+                                </span>
+                            </li>
+                            
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-clock me-2 text-muted"></i>Updated
+                                </span>
+                                <span class="metadata-value">
+                                    {{ lore_item.updated_at.strftime('%B %d, %Y') if lore_item.updated_at else 'Unknown' }}
+                                </span>
+                            </li>
+                            
+                            <li class="metadata-item">
+                                <span class="metadata-label">
+                                    <i class="fas fa-globe-americas me-2 text-muted"></i>World
+                                </span>
+                                <span class="metadata-value">
+                                    <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" class="text-decoration-none">
+                                        {{ world.name }}
+                                    </a>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Story Associations Card -->
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-link me-2 text-primary"></i>
+                            Story Associations
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="association-alert">
+                            <div class="avatar avatar-sm bg-blue text-white">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <p class="alert-text">
+                                    View and manage this lore item's roles in stories and acts from the World Hierarchy view.
+                                </p>
+                                <a href="{{ url_for('ui_world_hierarchy', world_id=world.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-sitemap me-2"></i>
+                                    View Hierarchy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

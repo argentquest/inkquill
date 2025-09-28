@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Detail - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Location Detail</h1>
+            <p class="help-subtitle">Build immersive settings that enhance your story</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"basics\"]').click()">
+                <div class="quick-action-icon">🏰</div>
+                <div class="quick-action-text">Location Basics</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"atmosphere\"]').click()">
+                <div class="quick-action-icon">🌟</div>
+                <div class="quick-action-text">Atmosphere</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-tools\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Tools</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="basics">Basics</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="atmosphere">Atmosphere</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="connections">Connections</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-tools">AI Tools</button></li>
+            </ul>
+        </div>
+
+        <!-- Basics Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="basics">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Creating Compelling Locations
+                </h2>
+                <p>Locations are more than just backdrops - they're active participants in your story that can influence mood, create conflict, and reveal character. A well-designed location enhances every scene that takes place within it.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📍 Physical Details</h3>
+                        <p class="feature-card-description">Size, layout, architectural features, and geographical characteristics.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🌅 Atmosphere</h3>
+                        <p class="feature-card-description">Mood, lighting, sounds, smells, and emotional feel of the space.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Significance</h3>
+                        <p class="feature-card-description">Why this place matters to your story and characters.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🔗 Connections</h3>
+                        <p class="feature-card-description">How it relates to other locations, characters, and story elements.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Designing Your First Location</h3>
+                        <span class="recipe-card-time">10 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Start with the location's purpose in your story</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Choose the appropriate scale (room, building, city, region)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Describe physical characteristics and layout</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Define the atmosphere and emotional tone</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Connect it to characters and other locations</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">6</div>
+                            <div class="recipe-step-content">Consider how it might change throughout your story</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Location Scale System</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Understanding Location Scales</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Scale</th>
+                                    <th>Examples</th>
+                                    <th>Typical Use</th>
+                                    <th>Detail Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Region</td>
+                                    <td>Kingdoms, provinces, continents</td>
+                                    <td>World-building, journey planning</td>
+                                    <td>Climate, culture, politics</td>
+                                </tr>
+                                <tr>
+                                    <td>City</td>
+                                    <td>Towns, villages, urban areas</td>
+                                    <td>Multiple scenes, character homes</td>
+                                    <td>Districts, landmarks, population</td>
+                                </tr>
+                                <tr>
+                                    <td>Building</td>
+                                    <td>Houses, castles, shops, temples</td>
+                                    <td>Key story locations</td>
+                                    <td>Architecture, purpose, history</td>
+                                </tr>
+                                <tr>
+                                    <td>Room</td>
+                                    <td>Chambers, halls, offices</td>
+                                    <td>Specific scenes</td>
+                                    <td>Furniture, decorations, atmosphere</td>
+                                </tr>
+                                <tr>
+                                    <td>Area</td>
+                                    <td>Forests, battlefields, markets</td>
+                                    <td>Outdoor scenes, travel</td>
+                                    <td>Terrain, features, dangers</td>
+                                </tr>
+                                <tr>
+                                    <td>Object</td>
+                                    <td>Thrones, altars, ships</td>
+                                    <td>Focal points within scenes</td>
+                                    <td>Materials, craftsmanship, symbolism</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Hierarchical Relationships</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Organize locations by containment relationships:</p>
+                        <ul>
+                            <li><strong>Parent Locations:</strong> Larger spaces that contain this location</li>
+                            <li><strong>Child Locations:</strong> Smaller spaces contained within this location</li>
+                            <li><strong>Adjacent Locations:</strong> Spaces at the same level that connect to this one</li>
+                            <li><strong>Related Locations:</strong> Places with thematic or functional connections</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Location Hierarchy Example:\n\nKingdom of Astoria (Region)\n├── Capital City of Goldenhaven (City)\n│   ├── Royal Palace (Building)\n│   │   ├── Throne Room (Room)\n│   │   ├── Royal Library (Room)\n│   │   └── Palace Gardens (Area)\n│   ├── Market District (Area)\n│   └── Harbor District (Area)\n├── Northern Mountains (Area)\n└── Whispering Forest (Area)')">Copy</button>
+                            <pre>Location Hierarchy Example:
+
+Kingdom of Astoria (Region)
+├── Capital City of Goldenhaven (City)
+│   ├── Royal Palace (Building)
+│   │   ├── Throne Room (Room)
+│   │   ├── Royal Library (Room)
+│   │   └── Palace Gardens (Area)
+│   ├── Market District (Area)
+│   └── Harbor District (Area)
+├── Northern Mountains (Area)
+└── Whispering Forest (Area)</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Physical Characteristics</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Essential physical details to define:</p>
+                        <ul>
+                            <li><strong>Size and Dimensions:</strong> How big is the space? Use specific measurements when helpful</li>
+                            <li><strong>Shape and Layout:</strong> Circular, rectangular, irregular? Multiple levels?</li>
+                            <li><strong>Materials and Construction:</strong> Stone, wood, metal? Ancient or modern?</li>
+                            <li><strong>Key Features:</strong> Distinctive elements that make it memorable</li>
+                            <li><strong>Access Points:</strong> How do people enter and exit?</li>
+                            <li><strong>Hidden Elements:</strong> Secret passages, concealed rooms, buried treasures</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">💡</span>
+                            <div>
+                                <strong>Writing Tip:</strong> Focus on the details that matter to your story. A cozy tavern needs different details than a fortress under siege.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Atmosphere Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="atmosphere">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Creating Atmospheric Settings
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🌟 Sensory World-Building</h3>
+                    <p class="ai-feature-description">Great locations engage all five senses and create emotional resonance with characters and readers alike.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>The Five Senses in Location Design</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Sense</th>
+                                    <th>Elements to Consider</th>
+                                    <th>Emotional Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sight</td>
+                                    <td>Colors, lighting, shadows, textures, movement</td>
+                                    <td>Sets mood and guides attention</td>
+                                </tr>
+                                <tr>
+                                    <td>Sound</td>
+                                    <td>Ambient noise, echoes, music, silence</td>
+                                    <td>Creates tension or comfort</td>
+                                </tr>
+                                <tr>
+                                    <td>Smell</td>
+                                    <td>Natural scents, cooking, decay, perfumes</td>
+                                    <td>Triggers memories and emotions</td>
+                                </tr>
+                                <tr>
+                                    <td>Touch</td>
+                                    <td>Temperature, humidity, textures, air movement</td>
+                                    <td>Affects physical comfort and unease</td>
+                                </tr>
+                                <tr>
+                                    <td>Taste</td>
+                                    <td>Dust, salt air, metallic flavors, food</td>
+                                    <td>Enhances realism and environment</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Building Sensory Atmosphere</h3>
+                                <span class="recipe-card-time">15 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Choose 2-3 dominant sensory elements</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Connect each sense to the location's purpose</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Consider how senses change at different times</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Link sensory details to character emotions</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Use contrast to create memorable moments</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Lighting and Time of Day</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Light dramatically affects location atmosphere:</p>
+                        <ul>
+                            <li><strong>Dawn:</strong> Soft, hopeful, new beginnings, gradual revelation</li>
+                            <li><strong>Midday:</strong> Harsh, clear, active, revealing, exposed</li>
+                            <li><strong>Afternoon:</strong> Warm, comfortable, productive, golden</li>
+                            <li><strong>Dusk:</strong> Transitional, melancholy, romantic, mysterious</li>
+                            <li><strong>Night:</strong> Dark, hidden, dangerous, intimate, secretive</li>
+                            <li><strong>Artificial Lighting:</strong> Torches, candles, electric - each creates different moods</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Atmospheric Examples:\n\nCozy Tavern:\n- Warm firelight dancing on stone walls\n- Rich aroma of stew and fresh bread\n- Low murmur of conversation\n- Wooden tables worn smooth by countless hands\n\nAncient Library:\n- Dusty sunbeams through stained glass\n- Musty scent of old parchment\n- Whispered echoes in vaulted ceiling\n- Cool, dry air that preserves knowledge')">Copy</button>
+                            <pre>Atmospheric Examples:
+
+Cozy Tavern:
+- Warm firelight dancing on stone walls
+- Rich aroma of stew and fresh bread
+- Low murmur of conversation
+- Wooden tables worn smooth by countless hands
+
+Ancient Library:
+- Dusty sunbeams through stained glass
+- Musty scent of old parchment
+- Whispered echoes in vaulted ceiling
+- Cool, dry air that preserves knowledge</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Cultural and Historical Atmosphere</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Locations reflect the cultures that created them:</p>
+                        <ul>
+                            <li><strong>Architectural Style:</strong> Reflects cultural values and available materials</li>
+                            <li><strong>Religious Influence:</strong> Sacred symbols, ritual spaces, spiritual atmosphere</li>
+                            <li><strong>Social Structure:</strong> Public vs. private spaces, hierarchy indicators</li>
+                            <li><strong>Historical Layers:</strong> Evidence of past events, renovations, abandonment</li>
+                            <li><strong>Current Use:</strong> How the location functions today vs. its original purpose</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Seasonal and Weather Effects</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Environmental conditions transform locations:</p>
+                        <ul>
+                            <li><strong>Weather Impact:</strong> Rain, snow, wind, heat affect accessibility and mood</li>
+                            <li><strong>Seasonal Changes:</strong> How the location transforms throughout the year</li>
+                            <li><strong>Natural Cycles:</strong> Tides, growth seasons, migration patterns</li>
+                            <li><strong>Climate Extremes:</strong> Storms, droughts, floods create dramatic moments</li>
+                            <li><strong>Adaptation:</strong> How inhabitants modify the space for different conditions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Emotional Geography</h2>
+                <p>Locations can evoke specific emotional responses:</p>
+                <ul>
+                    <li><strong>Comfort Zones:</strong> Safe spaces that provide security and familiarity</li>
+                    <li><strong>Tension Areas:</strong> Places that create unease or anticipation</li>
+                    <li><strong>Memory Triggers:</strong> Locations tied to character's past experiences</li>
+                    <li><strong>Symbolic Spaces:</strong> Places that represent themes or character growth</li>
+                    <li><strong>Neutral Grounds:</strong> Locations where conflicts are temporarily set aside</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Connections Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="connections">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Location Relationships and Connections
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Location-to-Location Connections</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Define how locations relate to each other:</p>
+                        <ul>
+                            <li><strong>Physical Connections:</strong> Roads, passages, teleportation circles</li>
+                            <li><strong>Hierarchical Relationships:</strong> Parent/child location structures</li>
+                            <li><strong>Functional Relationships:</strong> Complementary purposes (forge and mine)</li>
+                            <li><strong>Historical Connections:</strong> Locations with shared past events</li>
+                            <li><strong>Cultural Links:</strong> Places created by the same civilization</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">🗺️</span>
+                            <div>
+                                <strong>World Map Integration:</strong> Well-connected locations create believable geography and enable interesting travel narratives.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Associations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Connect characters to locations meaningfully:</p>
+                        <ul>
+                            <li><strong>Home Base:</strong> Where character lives or feels most comfortable</li>
+                            <li><strong>Workplace:</strong> Professional or functional association</li>
+                            <li><strong>Memory Location:</strong> Site of important past events</li>
+                            <li><strong>Aspirational Place:</strong> Where character wants to go or achieve something</li>
+                            <li><strong>Forbidden Ground:</strong> Places character avoids or cannot access</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Mapping Character-Location Bonds</h3>
+                                <span class="recipe-card-time">10 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">List all major characters in your story</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Identify each character's most important locations</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Define the nature of each relationship</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Consider how relationships might change</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Look for potential conflicts or story opportunities</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story-Level Integration</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Connect locations to narrative elements:</p>
+                        <ul>
+                            <li><strong>Story Significance:</strong> Why this location matters to the plot</li>
+                            <li><strong>Act Placement:</strong> Which story acts feature this location</li>
+                            <li><strong>Scene Requirements:</strong> Specific scenes that must happen here</li>
+                            <li><strong>Conflict Potential:</strong> How the location creates or resolves conflicts</li>
+                            <li><strong>Thematic Resonance:</strong> How the location supports story themes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Lore and World Knowledge</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Integrate locations with world-building elements:</p>
+                        <ul>
+                            <li><strong>Magic Systems:</strong> How magical forces affect or originate from this place</li>
+                            <li><strong>Historical Events:</strong> Important occurrences that happened here</li>
+                            <li><strong>Cultural Practices:</strong> Rituals, traditions, or customs tied to this location</li>
+                            <li><strong>Artifacts and Objects:</strong> Important items associated with or found here</li>
+                            <li><strong>Legends and Stories:</strong> Myths or tales told about this place</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Travel and Transportation</h2>
+                <p>Consider how characters move between locations:</p>
+                <ul>
+                    <li><strong>Travel Time:</strong> How long it takes to get from place to place</li>
+                    <li><strong>Transportation Methods:</strong> Walking, riding, sailing, teleportation</li>
+                    <li><strong>Route Challenges:</strong> Obstacles, dangers, or delays along the way</li>
+                    <li><strong>Rest Stops:</strong> Where travelers stay, resupply, or recover</li>
+                    <li><strong>Border Controls:</strong> Political or magical barriers between locations</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- AI Tools Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-tools">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI-Enhanced Location Development
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🏗️ Intelligent World Building</h3>
+                    <p class="ai-feature-description">AI can help create rich, detailed locations by expanding your basic concepts into fully realized settings with appropriate atmosphere and cultural details.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Location Description Enhancement</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can expand your location descriptions:</p>
+                        <ul>
+                            <li><strong>Sensory Details:</strong> Add sight, sound, smell, touch, and taste elements</li>
+                            <li><strong>Atmospheric Elements:</strong> Enhance mood and emotional resonance</li>
+                            <li><strong>Cultural Integration:</strong> Add appropriate historical and social details</li>
+                            <li><strong>Functional Aspects:</strong> Explain how the location works and is used</li>
+                            <li><strong>Hidden Elements:</strong> Suggest secrets, mysteries, or hidden aspects</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 8-15 credits for location enhancement, 20-30 credits for comprehensive development
+                        </div>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'AI Enhancement Prompts:\n\"Expand this location description with sensory details\"\n\"Add cultural elements appropriate for [specific culture]\"\n\"Suggest hidden features or secrets for this location\"\n\"Enhance the atmosphere to feel more [mood/emotion]\"\n\"Add functional details about how this place operates\"')">Copy</button>
+                            <pre>AI Enhancement Prompts:
+"Expand this location description with sensory details"
+"Add cultural elements appropriate for [specific culture]"
+"Suggest hidden features or secrets for this location"
+"Enhance the atmosphere to feel more [mood/emotion]"
+"Add functional details about how this place operates"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Location Image Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create visual representations of your locations:</p>
+                        <ul>
+                            <li><strong>Exterior Views:</strong> How the location looks from outside</li>
+                            <li><strong>Interior Spaces:</strong> Detailed views of internal areas</li>
+                            <li><strong>Panoramic Views:</strong> Wide shots showing context and scale</li>
+                            <li><strong>Detail Shots:</strong> Focus on specific architectural or decorative elements</li>
+                            <li><strong>Different Times:</strong> Same location at various times of day or seasons</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <span class="alert-icon">🎨</span>
+                            <div>
+                                <strong>Image Prompts:</strong> Include lighting conditions, weather, architectural style, and cultural influences for more accurate results.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Integration Assistance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI helps integrate locations into scenes:</p>
+                        <ul>
+                            <li><strong>Scene Setting:</strong> Natural ways to establish location in narrative</li>
+                            <li><strong>Character Interaction:</strong> How characters move through and interact with space</li>
+                            <li><strong>Atmospheric Writing:</strong> Weaving location details into action and dialogue</li>
+                            <li><strong>Conflict Enhancement:</strong> Using location features to create or resolve conflicts</li>
+                            <li><strong>Transition Passages:</strong> Smooth movements between different locations</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Consistency Checking</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can analyze location consistency:</p>
+                        <ul>
+                            <li><strong>Geographic Logic:</strong> Ensure locations make sense geographically</li>
+                            <li><strong>Cultural Consistency:</strong> Check that locations fit their cultures</li>
+                            <li><strong>Scale Relationships:</strong> Verify that size relationships are logical</li>
+                            <li><strong>Historical Continuity:</strong> Ensure location history is consistent</li>
+                            <li><strong>Function Verification:</strong> Check that locations serve their intended purposes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Location-Specific AI Tools</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Architecture and Design Assistance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can help with architectural elements:</p>
+                        <ul>
+                            <li><strong>Style Suggestions:</strong> Architectural styles that fit your world</li>
+                            <li><strong>Material Choices:</strong> Appropriate building materials for climate and culture</li>
+                            <li><strong>Functional Layout:</strong> Logical arrangement of rooms and spaces</li>
+                            <li><strong>Defensive Features:</strong> Fortifications and security measures</li>
+                            <li><strong>Decorative Elements:</strong> Cultural artwork, symbols, and ornamentation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Natural Environment Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>For natural locations, AI can suggest:</p>
+                        <ul>
+                            <li><strong>Flora and Fauna:</strong> Plants and animals appropriate to climate</li>
+                            <li><strong>Geological Features:</strong> Rock formations, water sources, soil types</li>
+                            <li><strong>Weather Patterns:</strong> Seasonal and daily weather variations</li>
+                            <li><strong>Ecological Relationships:</strong> How different elements interact</li>
+                            <li><strong>Resource Availability:</strong> What materials or food sources exist</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Best Practices for AI Location Development</h2>
+                <ul>
+                    <li><strong>Start with Purpose:</strong> Define the location's story role before asking for details</li>
+                    <li><strong>Cultural Context:</strong> Provide cultural background for more authentic suggestions</li>
+                    <li><strong>Iterative Development:</strong> Build locations gradually through multiple AI interactions</li>
+                    <li><strong>Selective Integration:</strong> Choose only AI suggestions that serve your story</li>
+                    <li><strong>Consistency Checking:</strong> Regularly verify that AI additions fit your world</li>
+                </ul>
+
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div>
+                        <strong>Maintain Creative Control:</strong> AI should enhance your vision, not replace it. The most memorable locations come from your unique creative perspective.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

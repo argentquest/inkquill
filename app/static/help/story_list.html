@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Management - AI Storytelling Assistant</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header centered">
+            <h1 class="help-title">📚 Story Management</h1>
+            <p class="help-subtitle">Organize your writing projects and collaborate with AI for compelling narratives</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Quick Navigation -->
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#overview">Story Management Overview</a></li>
+                    <li><a href="#creating-stories">Creating Stories</a></li>
+                    <li><a href="#story-structure">Story Structure</a></li>
+                    <li><a href="#ai-writing">AI Writing Features</a></li>
+                    <li><a href="#organization">Organization Tips</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="scrollToSection('creating-stories')">
+                    <div class="quick-action-icon">✨</div>
+                    <div class="quick-action-text">Create Story</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('story-structure')">
+                    <div class="quick-action-icon">📖</div>
+                    <div class="quick-action-text">Structure</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('ai-writing')">
+                    <div class="quick-action-icon">🤖</div>
+                    <div class="quick-action-text">AI Writing</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('organization')">
+                    <div class="quick-action-icon">📁</div>
+                    <div class="quick-action-text">Organization</div>
+                </div>
+            </div>
+
+            <section id="overview" class="help-section">
+                <h2 class="help-section-title">Story Management Overview</h2>
+                <p>Manage all your writing projects in one organized workspace. Stories are linked to worlds for intelligent AI context and can be structured with acts and scenes for clear organization and better writing flow.</p>
+                
+                <div class="help-alert help-alert-success">
+                    <div class="help-alert-icon">🎯</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">The Power of Connected Stories</div>
+                        <div class="help-alert-text">When you link stories to worlds, the AI gains access to your characters, locations, and lore for contextually aware writing assistance that maintains consistency throughout your narrative.</div>
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/stories" class="help-action-button">
+                        📚 View My Stories
+                    </a>
+                    <a href="/ui/stories/new" class="help-action-button-secondary">
+                        ➕ Create New Story
+                    </a>
+                </div>
+            </section>
+
+            <section id="creating-stories" class="help-section">
+                <h2 class="help-section-title">Creating and Setting Up Stories</h2>
+                
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Create New Stories</div>
+                            <div class="help-step-description">Click "Create New Story" and provide basic information like title, description, and target audience. Choose a compelling title that reflects your story's essence.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Link to a World</div>
+                            <div class="help-step-description"><strong>Critical Step:</strong> Select one of your worlds from the dropdown. This connection enables the AI to use your world's context during writing for intelligent, consistent assistance.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Choose Story Class & Genre</div>
+                            <div class="help-step-description">Select the appropriate genre (Fantasy, Sci-Fi, Romance, etc.) and story class to help the AI understand the tone and style expectations for your narrative.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Set Up Initial Structure</div>
+                            <div class="help-step-description">Create your first Act with a descriptive name. You can add more acts and scenes as your story develops and grows in complexity.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">💡</i>
+                        World Connection Tip
+                    </div>
+                    <div class="help-tip-content">
+                        If you don't have a world yet, create one first using the World Builder Wizard or import from a book. Stories without world connections won't have access to intelligent AI context.
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/generator/world" class="help-action-button">
+                        🌍 Create World First
+                    </a>
+                    <a href="/ui/stories/new" class="help-action-button-secondary">
+                        📝 Create Story
+                    </a>
+                </div>
+            </section>
+
+            <section id="story-structure" class="help-section">
+                <h2 class="help-section-title">Story Structure & Organization</h2>
+                
+                <h3 class="help-section-subtitle">Acts and Scenes</h3>
+                <p>Break your story into logical, manageable pieces for better organization and writing flow:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">📖 Acts (Major Sections)</div>
+                        <div class="feature-card-description">
+                            Large story divisions that represent major plot movements or time periods. Think of acts as chapters or major story beats.
+                            <ul class="mt-sm">
+                                <li><strong>Act 1:</strong> "The Discovery" - Introduction and setup</li>
+                                <li><strong>Act 2:</strong> "The Journey" - Main conflict development</li>
+                                <li><strong>Act 3:</strong> "The Resolution" - Climax and conclusion</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🎬 Scenes (Specific Events)</div>
+                        <div class="feature-card-description">
+                            Focused moments within acts that cover specific events, conversations, or locations. Scenes help maintain pacing and focus.
+                            <ul class="mt-sm">
+                                <li><strong>Scene 1:</strong> "Meeting at the Tavern"</li>
+                                <li><strong>Scene 2:</strong> "The Chase Through Town"</li>
+                                <li><strong>Scene 3:</strong> "Revelation in the Forest"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-card mt-lg">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">📝 Story Structure Best Practices</div>
+                        <div class="recipe-card-time">⏱️ Planning Time: 15-30 minutes</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Outline Before Writing:</strong> Plan your major story beats and key scenes before diving into detailed writing
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Use Descriptive Names:</strong> Name acts and scenes clearly so you can navigate easily later
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Keep Scenes Focused:</strong> Each scene should have a clear purpose and advance the plot or develop characters
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Link Key Characters:</strong> Connect important characters to your story for enhanced AI context and consistency
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="ai-writing" class="help-section">
+                <h2 class="help-section-title">AI Writing Features</h2>
+                <p>Once your story is linked to a world, you unlock powerful AI writing capabilities:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">🎭 Contextual Character Writing</div>
+                        <div class="feature-card-description">
+                            The AI knows your characters' personalities, speaking patterns, and relationships. Ask it to write dialogue or actions that are true to each character's nature.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🏰 Location-Aware Descriptions</div>
+                        <div class="feature-card-description">
+                            When you mention locations from your world, the AI can provide rich, consistent descriptions that match your established world details.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📜 Lore Integration</div>
+                        <div class="feature-card-description">
+                            The AI remembers your world's magic systems, history, and rules, ensuring that story elements remain consistent with your established lore.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">✍️ Multiple Writing Modes</div>
+                        <div class="feature-card-description">
+                            Use continue, expand, or rewrite modes depending on what you need. The AI adapts its approach based on your specific writing request.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-alert help-alert-info mt-lg">
+                    <div class="help-alert-icon">🤖</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">AI Writing Best Practices</div>
+                        <div class="help-alert-text">Be specific in your requests. Instead of "write more," try "write dialogue between John and Sarah where John reveals his secret" for much better, more targeted results.</div>
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/help/act_editor.html" class="help-action-button">
+                        📝 Act Editor Guide
+                    </a>
+                    <a href="/ui/prompts" class="help-action-button-secondary">
+                        📋 Prompt Library
+                    </a>
+                </div>
+            </section>
+
+            <section id="organization" class="help-section">
+                <h2 class="help-section-title">Story Organization & Management</h2>
+                
+                <h3 class="help-section-subtitle">Story List Features</h3>
+                <ul>
+                    <li><strong>📊 Progress Tracking:</strong> View word counts, completion status, and last modified dates</li>
+                    <li><strong>🔍 Search & Filter:</strong> Find stories by title, genre, or world connection</li>
+                    <li><strong>📂 World Grouping:</strong> See which stories belong to which worlds</li>
+                    <li><strong>⭐ Priority Marking:</strong> Mark important stories for quick access</li>
+                    <li><strong>📈 Statistics:</strong> Track your writing progress over time</li>
+                </ul>
+                
+                <h3 class="help-section-subtitle">Collaboration & Sharing</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">👥 Story Sharing</div>
+                        <div class="feature-card-description">Share completed stories with the community or keep them private for personal projects.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">💬 Community Feedback</div>
+                        <div class="feature-card-description">Get feedback from other writers and discover inspiration from published community stories.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📤 Export Options</div>
+                        <div class="feature-card-description">Export your stories to external formats for backup or publication in other platforms.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🔄 Version Control</div>
+                        <div class="feature-card-description">Track changes and revisions to see how your story evolves over time.</div>
+                    </div>
+                </div>
+
+                <div class="help-tip mt-lg">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">🎯</i>
+                        Organization Pro Tip
+                    </div>
+                    <div class="help-tip-content">
+                        Use consistent naming conventions for your acts and scenes. For example: "Act 1: The Beginning" followed by "Scene 1: First Encounter" makes navigation much easier as your story grows.
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/stories" class="help-action-button">
+                        📚 Manage My Stories
+                    </a>
+                    <a href="/published/stories" class="help-action-button-secondary">
+                        🌟 Browse Published Stories
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

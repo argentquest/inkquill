@@ -1,0 +1,505 @@
+{# /ai_rag_story_app/app/templates/partials/_horizontal_navbar.html #}
+
+<style>
+    /* Enhanced Horizontal Navigation with Gradient - Tabler Premium */
+    .horizontal-nav {
+        background: linear-gradient(135deg, 
+            rgba(32, 107, 196, 0.03) 0%, 
+            rgba(168, 85, 247, 0.03) 100%),
+            linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%) !important;
+        border-bottom: 2px solid transparent !important;
+        border-image: linear-gradient(90deg, 
+            var(--tblr-primary) 0%, 
+            var(--tblr-purple) 50%, 
+            var(--tblr-primary) 100%) !important;
+        border-image-slice: 1 !important;
+        padding: 1.5rem 0 !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08), 
+                    0 2px 4px rgba(0, 0, 0, 0.04),
+                    inset 0 -1px 0 rgba(255, 255, 255, 0.5) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        backdrop-filter: blur(12px) saturate(180%) !important;
+        background-color: rgba(255, 255, 255, 0.92) !important;
+    }
+    
+    .horizontal-nav::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 1px !important;
+        background: linear-gradient(90deg, transparent, rgba(var(--tblr-primary-rgb), 0.3), transparent) !important;
+        animation: shimmer 3s infinite !important;
+    }
+    
+    @keyframes shimmer {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+    }
+    
+    .horizontal-nav.scrolled {
+        padding: 0.45rem 0 !important; /* 40% less than original 0.75rem */
+        background: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .app-logo {
+        height: 90px !important; /* Increased to match 3x nav height */
+        width: auto !important;
+        transition: all 0.3s ease !important;
+        margin-right: 2rem !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
+    }
+    
+    .horizontal-nav.scrolled .app-logo {
+        height: 32px !important; /* Smaller when scrolled */
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05)) !important;
+    }
+    
+    .logo-container {
+        display: flex !important;
+        align-items: center !important;
+        text-decoration: none !important;
+        margin-right: 2rem !important;
+        position: relative !important;
+    }
+    
+    .logo-container::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 120% !important;
+        height: 120% !important;
+        background: radial-gradient(circle, rgba(var(--tblr-primary-rgb), 0.1), transparent 70%) !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+        pointer-events: none !important;
+    }
+    
+    .logo-container:hover::after {
+        opacity: 1 !important;
+    }
+    
+    .logo-text {
+        margin-left: 0.75rem !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: var(--tblr-primary) !important;
+        transition: font-size 0.3s ease !important;
+    }
+    
+    .horizontal-nav.scrolled .logo-text {
+        font-size: 1.25rem !important;
+    }
+    
+    .horizontal-nav .nav-link {
+        color: #4b5563 !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 0.75rem !important;
+        border-radius: 10px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: relative !important;
+        overflow: visible !important;
+        text-decoration: none !important;
+    }
+    
+    /* Add gradient hover effect */
+    .horizontal-nav .nav-link::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: linear-gradient(135deg, 
+            rgba(var(--tblr-primary-rgb), 0.1) 0%, 
+            rgba(var(--tblr-purple-rgb), 0.1) 100%) !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+        border-radius: 10px !important;
+    }
+    
+    .horizontal-nav .nav-link:hover::before,
+    .horizontal-nav .nav-link.active::before {
+        opacity: 1 !important;
+    }
+    
+    .horizontal-nav .nav-link:hover,
+    .horizontal-nav .nav-link.active {
+        color: var(--tblr-primary) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    .horizontal-nav .nav-link span {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    .horizontal-nav .nav-link i {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    .horizontal-nav .nav-link i {
+        margin: 0 !important;
+        width: 20px !important;
+        height: 20px !important;
+        text-align: center !important;
+        font-size: 1.1rem !important;
+        display: inline-block !important;
+        line-height: 1 !important;
+    }
+    
+    /* Ensure navigation stays in one line */
+    .horizontal-nav .container-fluid {
+        max-width: 100% !important;
+    }
+    
+    .horizontal-nav .d-flex {
+        flex-wrap: nowrap !important;
+    }
+    
+    /* Hide tooltip spans completely - they should never be visible as text */
+    .nav-tooltip {
+        display: none !important;
+    }
+    
+    /* Use CSS :after for tooltips instead */
+    .horizontal-nav .nav-link {
+        position: relative !important;
+    }
+    
+    .horizontal-nav .nav-link:hover::after {
+        content: attr(data-tooltip) !important;
+        position: absolute !important;
+        bottom: -35px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        background: rgba(0, 0, 0, 0.9) !important;
+        color: white !important;
+        padding: 6px 10px !important;
+        border-radius: 6px !important;
+        font-size: 0.85rem !important;
+        white-space: nowrap !important;
+        z-index: 1050 !important;
+        pointer-events: none !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    
+    /* User Section Styles */
+    .user-section {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+    
+    .user-info {
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    .user-section .btn {
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .user-section .btn-primary {
+        background: var(--tblr-primary) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    .user-section .btn-outline-primary {
+        color: var(--tblr-primary) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    .user-section .btn-outline-primary:hover {
+        background: var(--tblr-primary) !important;
+        border-color: var(--tblr-primary) !important;
+        color: white !important;
+    }
+    
+    .user-section .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+    }
+    
+    .user-section .btn-outline-secondary:hover {
+        background: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+    }
+    
+    .coin-balance {
+        display: flex !important;
+        align-items: center !important;
+        background: rgba(var(--tblr-primary-rgb), 0.1) !important;
+        border-radius: 20px !important;
+        padding: 0.25rem 0.75rem !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .coin-balance i {
+        color: var(--tblr-warning) !important;
+        margin-right: 0.5rem !important;
+    }
+    
+    
+    /* Mobile Hamburger Menu */
+    .mobile-menu-toggle {
+        display: none !important;
+        background: none !important;
+        border: none !important;
+        font-size: 1.5rem !important;
+        color: #374151 !important;
+        cursor: pointer !important;
+    }
+    
+    .nav-items {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .horizontal-nav {
+            padding: 1.5rem 0 !important; /* Reduced for mobile */
+        }
+        
+        .horizontal-nav.scrolled {
+            padding: 0.4rem 0 !important;
+        }
+        
+        .app-logo {
+            height: 60px !important; /* Adjusted for mobile */
+        }
+        
+        .horizontal-nav.scrolled .app-logo {
+            height: 28px !important; /* Smaller on mobile when scrolled */
+        }
+        
+        .logo-text {
+            font-size: 1.25rem !important;
+        }
+        
+        .horizontal-nav.scrolled .logo-text {
+            font-size: 1rem !important;
+        }
+        
+        .logo-container {
+            margin-right: 1rem !important;
+        }
+        
+        .mobile-menu-toggle {
+            display: block !important;
+        }
+        
+        .nav-items {
+            display: none !important;
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: white !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+            padding: 1rem !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.5rem !important;
+        }
+        
+        .nav-items.show {
+            display: flex !important;
+        }
+        
+        /* Hide tooltips on mobile to prevent overlap */
+        .nav-tooltip {
+            display: none !important;
+        }
+        
+        .user-section {
+            justify-content: space-between !important;
+            margin-top: 1rem !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
+    }
+</style>
+
+<!-- Horizontal Navigation -->
+<nav class="horizontal-nav" id="horizontalNav">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <!-- Logo -->
+                <a href="{{ url_for('ui_home') }}" class="logo-container">
+                    <img src="/static/images/logo.jpeg" alt="AI Storytelling Assistant" class="app-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="logo-text" style="display: none;">AI Story Assistant</div>
+                </a>
+                
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="nav-items" id="navItems">
+                    <!-- Home -->
+                    <a href="{{ url_for('ui_home') }}" class="nav-link {% if request.url.path == (url_for('ui_home') | string) %}active{% endif %}" data-tooltip="Home - Dashboard and overview">
+                        <i class="fas fa-home"></i>
+                    </a>
+                    
+                    <!-- Authenticated User Items -->
+                    {% if current_user %}
+                        <a href="{{ url_for('ui_list_worlds') }}" class="nav-link {% if request.url.path.startswith((url_for('ui_list_worlds') | string)) or request.url.path.startswith((url_for('ui_import_world_from_book_form') | string)) %}active{% endif %}" data-tooltip="My Worlds - Create and manage story worlds">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        
+                        <a href="{{ url_for('brainstorm_page') }}" class="nav-link {% if request.url.path.startswith('/ui/brainstorm') %}active{% endif %}" data-tooltip="My Brainstorms - AI-powered story ideation">
+                            <i class="fas fa-lightbulb"></i>
+                        </a>
+                        
+                        <a href="{{ url_for('ui_my_account') }}" class="nav-link {% if request.url.path == (url_for('ui_my_account') | string) %}active{% endif %}" data-tooltip="My Account - Profile and settings">
+                            <i class="fas fa-user-cog"></i>
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Public Links -->
+                    <a href="{{ url_for('ui_list_stories') }}" class="nav-link {% if request.url.path.startswith((url_for('ui_list_stories') | string)) %}active{% endif %}" data-tooltip="My Stories - Write and edit your stories">
+                        <i class="fas fa-book"></i>
+                    </a>
+                    
+                    <a href="{{ url_for('blog_home') }}" class="nav-link {% if request.url.path.startswith('/blog') %}active{% endif %}" data-tooltip="Blog - Writing tips and updates">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    
+                    <a href="{{ url_for('ui_forum_home') }}" class="nav-link {% if request.url.path.startswith('/forum') %}active{% endif %}" data-tooltip="Forum - Community discussions">
+                        <i class="fas fa-comments"></i>
+                    </a>
+                    
+                    <a href="{{ url_for('public_world_gallery') }}" class="nav-link {% if request.url.path.startswith('/public') %}active{% endif %}" data-tooltip="Chat Gallery - Browse AI conversations">
+                        <i class="fas fa-robot"></i>
+                    </a>
+                    
+                    <a href="{{ url_for('published_stories_gallery') }}" class="nav-link {% if request.url.path.startswith('/published') %}active{% endif %}" data-tooltip="Published Stories - Read published works">
+                        <i class="fas fa-book-open"></i>
+                    </a>
+                    
+                    <!-- Admin Links -->
+                    {% if current_user and current_user.is_admin %}
+                        <a href="{{ url_for('ui_admin_dashboard') }}" class="nav-link {% if request.url.path.startswith('/admin') or request.url.path == (url_for('ui_admin_users') | string) %}active{% endif %}" data-tooltip="Admin - System administration">
+                            <i class="fas fa-shield-alt"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Side: User Section -->
+            <div class="d-flex align-items-center">
+                <!-- User Section -->
+                <div class="user-section">
+                    {% if current_user %}
+                        <!-- Coin Balance -->
+                        <div class="coin-balance me-2">
+                            <span id="coin-balance-badge">Loading...</span>
+                        </div>
+                        
+                        <!-- Logout Button -->
+                        <form action="{{ url_for('logout') }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-sign-out-alt me-1"></i>
+                                <span class="d-none d-md-inline">Logout</span>
+                            </button>
+                        </form>
+                        
+                    {% else %}
+                        <!-- Login/Register for anonymous users -->
+                        <a href="{{ url_for('ui_login_form') }}" class="btn btn-primary btn-sm me-2">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                        <a href="{{ url_for('ui_register_form') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Navigation JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Navigation scroll effect
+    const horizontalNav = document.getElementById('horizontalNav');
+    let scrolled = false;
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > 0 && !scrolled) {
+            horizontalNav.classList.add('scrolled');
+            scrolled = true;
+        } else if (scrollTop === 0 && scrolled) {
+            horizontalNav.classList.remove('scrolled');
+            scrolled = false;
+        }
+    });
+
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navItems = document.getElementById('navItems');
+    
+    if (mobileMenuToggle && navItems) {
+        mobileMenuToggle.addEventListener('click', function() {
+            navItems.classList.toggle('show');
+            
+            // Toggle hamburger icon
+            const icon = this.querySelector('i');
+            if (navItems.classList.contains('show')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+    }
+
+    // Load coin balance (same as sidebar)
+    async function loadCoinBalance() {
+        try {
+            const response = await fetch('/api/v1/billing/balance');
+            if (response.ok) {
+                const data = await response.json();
+                const balanceElement = document.getElementById('coin-balance-badge');
+                if (balanceElement) {
+                    balanceElement.textContent = data.balance || '0';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading coin balance:', error);
+        }
+    }
+
+    // Load balance if user is authenticated
+    {% if current_user %}
+    loadCoinBalance();
+    {% endif %}
+});
+</script>

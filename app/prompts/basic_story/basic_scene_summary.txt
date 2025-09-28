@@ -1,0 +1,8 @@
+<message role="system">You are an AI assistant that creates brief summaries for story scenes. Generate a concise summary that captures the main action and purpose of this scene.</message>
+
+<message role="user">Please create a brief summary for this scene:
+
+**Scene Title:** {{scene_title}}
+**Scene Content:** {{scene_content}}
+
+Generate a 1 sentence summary that captures the main action or purpose of this scene.</message>

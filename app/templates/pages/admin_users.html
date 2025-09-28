@@ -1,0 +1,232 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Admin - Manage Users{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="text-center">
+                    <h1 class="page-title text-white mb-3">
+                        <i class="fas fa-users-cog me-3"></i>
+                        User Management
+                    </h1>
+                    <div class="page-subtitle text-white mb-4">
+                        Manage user accounts, permissions, and access controls across the platform
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Admin Panel
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-users me-1"></i>
+                            User Management
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('admin_users')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with user management">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="admin-users-page">
+    
+    <div class="container-fluid">
+        
+        <!-- Impersonation Notice -->
+        <div id="impersonationNotice" class="alert alert-warning d-none mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm bg-warning-lt me-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="flex-fill">
+                    <strong>Impersonation Mode:</strong> 
+                    You are currently impersonating user <span id="impersonatedUser"></span>
+                </div>
+                <button id="stopImpersonationBtn" class="btn btn-danger btn-sm ms-3">
+                    <i class="fas fa-stop me-1"></i>Stop Impersonation
+                </button>
+            </div>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="errorMessage" class="alert alert-danger d-none mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm bg-danger-lt me-3">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div id="errorText"></div>
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="card">
+            <div class="card-body text-center py-5">
+                <div class="avatar avatar-lg bg-primary-lt mb-3">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                </div>
+                <h4>Loading Users</h4>
+                <p class="text-secondary">Please wait while we fetch user data...</p>
+            </div>
+        </div>
+        
+        <!-- Users Table -->
+        <div id="usersTable" class="card d-none">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-users me-2"></i>User Accounts
+                </h3>
+                <div class="card-actions">
+                    <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Refresh user list">
+                        <i class="fas fa-refresh me-1"></i>Refresh
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Role</th>
+                            <th>Member Since</th>
+                            <th class="w-1">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+.admin-users-page {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.toggle-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-btn:hover {
+    transform: scale(1.05);
+}
+
+.user-status {
+    font-weight: 500;
+}
+
+.table-vcenter td {
+    vertical-align: middle;
+}
+
+.card-table {
+    margin-bottom: 0;
+}
+
+.card-table th {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-top: none;
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    font-size: 0.875rem;
+}
+
+.card-table tbody tr:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+}
+
+.avatar.avatar-sm {
+    width: 2rem;
+    height: 2rem;
+}
+
+.admin-badge {
+    background: linear-gradient(135deg, var(--tblr-warning) 0%, var(--tblr-orange) 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.status-badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.card-actions .btn {
+    box-shadow: none;
+}
+
+/* User avatar initials */
+.user-avatar {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    color: white;
+    font-weight: 600;
+}
+
+/* Enhanced button styles */
+.btn-primary {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--tblr-purple) 0%, var(--tblr-primary) 100%);
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/admin_users.js') }}"></script>
+{% endblock %}

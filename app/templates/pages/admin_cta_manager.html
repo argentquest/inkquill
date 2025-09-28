@@ -1,0 +1,1626 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}CTA Content Manager - Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- Quill.js CSS -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+    /* CTA Manager Page Styles */
+    .cta-preview {
+        border: 2px solid var(--tblr-border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: var(--tblr-bg-surface);
+    }
+    
+    .position-badge {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .cta-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-item input {
+        flex: 1;
+    }
+    
+    /* Modal scrollbar styles */
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding-right: 20px; /* Account for scrollbar */
+    }
+    
+    /* Custom scrollbar styling for webkit browsers */
+    .modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .modal-body::-webkit-scrollbar-track {
+        background: var(--tblr-bg-surface-secondary);
+        border-radius: 4px;
+    }
+    
+    .modal-body::-webkit-scrollbar-thumb {
+        background: var(--tblr-primary);
+        border-radius: 4px;
+    }
+    
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background: var(--tblr-primary-darken);
+    }
+    
+    /* For Firefox */
+    .modal-body {
+        scrollbar-width: thin;
+        scrollbar-color: var(--tblr-primary) var(--tblr-bg-surface-secondary);
+    }
+    
+    /* Fix all form-select dropdown padding */
+    .form-select {
+        padding: 0.375rem 2rem 0.375rem 0.75rem !important;
+    }
+    
+    /* Specific fix for position filter */
+    #positionFilter {
+        padding: 0.5rem 2rem 0.5rem 0.75rem !important;
+    }
+    
+    /* Make background color/gradient row 200px high */
+    .col-12:has(#ctaBackground) {
+        height: 200px !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .col-12:has(#ctaBackground) .form-label {
+        flex-shrink: 0 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Make input-group fill remaining height */
+    .input-group:has(#ctaBackground) {
+        flex: 1 !important;
+        display: flex !important;
+        align-items: stretch !important;
+    }
+    
+    /* Make all children fill full height */
+    .input-group:has(#ctaBackground) .form-control,
+    .input-group:has(#ctaBackground) .btn {
+        height: 100% !important;
+        min-height: 100% !important;
+    }
+    
+    /* Adjust background input specific styles */
+    .input-group #ctaBackground.form-control {
+        font-size: 13px !important;
+        font-family: monospace !important;
+        padding: 0.75rem !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Ensure background preset dropdown is visible in modal */
+    .modal .dropdown-menu {
+        z-index: 10000 !important;
+    }
+    
+    /* Background preset dropdown specific styles */
+    .input-group .dropdown-menu {
+        max-height: 300px !important;
+        overflow-y: auto !important;
+        min-width: 350px !important;
+        z-index: 10001 !important;
+        position: absolute !important;
+        inset: auto 0px auto auto !important;
+        margin: 0px !important;
+        transform: translate3d(0px, 40px, 0px) !important;
+    }
+    
+    /* Prevent dropdown from closing when clicked inside */
+    .input-group .dropdown-menu .dropdown-item {
+        white-space: nowrap !important;
+    }
+    
+    /* Icon picker styles */
+    .icon-picker {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid var(--tblr-border-color);
+        border-radius: 4px;
+        background: var(--tblr-bg-surface);
+        position: absolute;
+        z-index: 1050;
+        width: 100%;
+        display: none;
+    }
+    
+    .icon-picker-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid var(--tblr-border-color-light);
+    }
+    
+    .icon-picker-item:hover {
+        background: var(--tblr-bg-surface-secondary);
+    }
+    
+    .icon-picker-item:last-child {
+        border-bottom: none;
+    }
+    
+    .icon-preview {
+        width: 16px;
+        text-align: center;
+    }
+    
+    /* Tooltip styling */
+    .form-label-tooltip {
+        position: relative;
+        cursor: help;
+    }
+    
+    .form-label-tooltip .tooltip-icon {
+        margin-left: 4px;
+        color: var(--tblr-secondary);
+        font-size: 0.875rem;
+    }
+    
+    /* Quill editor styling */
+    .quill-container {
+        height: 200px;
+        border: 1px solid var(--tblr-border-color);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .ql-toolbar {
+        border-bottom: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface-secondary);
+    }
+    
+    .ql-container {
+        border: none;
+        font-family: inherit;
+        height: calc(200px - 42px); /* Account for toolbar height */
+    }
+    
+    .ql-editor {
+        padding: 12px 15px;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+    
+    .ql-editor.ql-blank::before {
+        color: var(--tblr-secondary);
+        font-style: normal;
+    }
+    
+    /* Dark theme adjustments */
+    [data-bs-theme="dark"] .ql-toolbar {
+        background: var(--tblr-bg-surface-dark);
+        border-color: var(--tblr-border-color);
+    }
+    
+    [data-bs-theme="dark"] .ql-container {
+        background: var(--tblr-bg-surface);
+        color: var(--tblr-body-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <!-- Hero Header -->
+    <div class="page-header d-print-none text-white" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);">
+        <div class="container-fluid">
+            <div class="page-header-content py-5">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="page-title text-white">
+                            <i class="fas fa-bullhorn me-2"></i>
+                            CTA Content Manager
+                        </h1>
+                        <div class="text-white-50 mt-1">Manage Call-to-Action content across the platform</div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-light" onclick="createNewCTA()">
+                            <i class="fas fa-plus me-2"></i>
+                            Create New CTA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Filter by Position</label>
+                            <select class="form-select" id="positionFilter" onchange="loadCTAs()">
+                                <option value="">All Positions</option>
+                                <optgroup label="Main Content Positions">
+                                    <option value="HOME_MAIN_TOP">1. Home Main Top</option>
+                                    <option value="HOME_WELCOME_TOP">2. Home Welcome Top</option>
+                                    <option value="HOME_WELCOME_BOTTOM">3. Home Welcome Bottom</option>
+                                    <option value="HOME_QUICK_ACTIONS_TOP">4. Home Quick Actions Top</option>
+                                    <option value="HOME_QUICK_ACTIONS_BOTTOM">5. Home Quick Actions Bottom</option>
+                                    <option value="HOME_LOGIN_REGISTER_TOP">6. Home Login/Register Top</option>
+                                    <option value="HOME_LOGIN_REGISTER_BOTTOM">7. Home Login/Register Bottom</option>
+                                    <option value="HOME_BLOG_SECTION_TOP">8. Home Blog Section Top</option>
+                                    <option value="HOME_BLOG_SECTION_BOTTOM">9. Home Blog Section Bottom</option>
+                                    <option value="HOME_MAIN_BOTTOM">10. Home Main Bottom</option>
+                                </optgroup>
+                                <optgroup label="Sidebar Positions">
+                                    <option value="HOME_SIDEBAR_TOP">11. Home Sidebar Top</option>
+                                    <option value="HOME_AI_CHAT_WORLDS_TOP">12. Home AI Chat Worlds Top</option>
+                                    <option value="HOME_AI_CHAT_WORLDS_BOTTOM">13. Home AI Chat Worlds Bottom</option>
+                                    <option value="HOME_PUBLISHED_STORIES_TOP">14. Home Published Stories Top</option>
+                                    <option value="HOME_PUBLISHED_STORIES_BOTTOM">15. Home Published Stories Bottom</option>
+                                    <option value="HOME_GENERATED_IMAGES_TOP">16. Home Generated Images Top</option>
+                                    <option value="HOME_GENERATED_IMAGES_BOTTOM">17. Home Generated Images Bottom</option>
+                                    <option value="HOME_SIDEBAR_BOTTOM">18. Home Sidebar Bottom</option>
+                                </optgroup>
+                                <optgroup label="Other Page Positions">
+                                    <option value="STORY_LIST_TOP">Story List Top</option>
+                                    <option value="WORLD_LIST_TOP">World List Top</option>
+                                    <option value="BLOG_SIDEBAR">Blog Sidebar</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Show Inactive</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="showInactive" onchange="loadCTAs()">
+                                <label class="form-check-label" for="showInactive">
+                                    Include inactive CTAs
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Quick Actions</label>
+                            <div class="btn-list">
+                                <button class="btn btn-sm btn-primary" onclick="createDefaultCTA()">
+                                    <i class="fas fa-magic me-1"></i>Create Default
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="loadCTAs()">
+                                    <i class="fas fa-sync me-1"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA List -->
+            <div id="ctaList" class="row row-cards">
+                <!-- CTAs will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Edit Modal -->
+<div class="modal fade" id="ctaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ctaModalTitle">Edit CTA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ctaForm">
+                    <input type="hidden" id="ctaId">
+                    
+                    <div class="row g-3">
+                        <!-- Basic Info -->
+                        <div class="col-12">
+                            <h4>Basic Information</h4>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label form-label-tooltip">
+                                Title
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="The main headline text that will be displayed prominently in the CTA"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaTitle" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-tooltip">
+                                Icon Class
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="FontAwesome icon class (e.g., 'fas fa-rocket'). Click the input to see available icons."></i>
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control icon-input" id="ctaIcon" 
+                                       placeholder="fas fa-rocket" 
+                                       autocomplete="off"
+                                       onclick="showIconPicker(this)"
+                                       onkeyup="filterIcons(this)">
+                                <div class="icon-picker" id="iconPicker"></div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label form-label-tooltip">
+                                Subtitle
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Optional secondary text that appears below the title to provide additional context"></i>
+                            </label>
+                            <textarea class="form-control" id="ctaSubtitle" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label form-label-tooltip">
+                                Content (Rich Text)
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Main description text for the CTA. Use the rich text editor to format text with bold, italic, lists, and links"></i>
+                            </label>
+                            <div class="quill-container">
+                                <div id="ctaContentEditor"></div>
+                            </div>
+                            <input type="hidden" id="ctaContent">
+                        </div>
+                        
+                        <!-- Position & Style -->
+                        <div class="col-12 mt-4">
+                            <h4>Position & Style</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-tooltip">
+                                Position
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Where the CTA will appear on the website (e.g., Home Sidebar Top appears above AI Chat Worlds)"></i>
+                            </label>
+                            <select class="form-select" id="ctaPosition" required>
+                                <optgroup label="Main Content Positions">
+                                    <option value="HOME_MAIN_TOP">1. Home Main Top</option>
+                                    <option value="HOME_WELCOME_TOP">2. Home Welcome Top</option>
+                                    <option value="HOME_WELCOME_BOTTOM">3. Home Welcome Bottom</option>
+                                    <option value="HOME_QUICK_ACTIONS_TOP">4. Home Quick Actions Top</option>
+                                    <option value="HOME_QUICK_ACTIONS_BOTTOM">5. Home Quick Actions Bottom</option>
+                                    <option value="HOME_LOGIN_REGISTER_TOP">6. Home Login/Register Top</option>
+                                    <option value="HOME_LOGIN_REGISTER_BOTTOM">7. Home Login/Register Bottom</option>
+                                    <option value="HOME_BLOG_SECTION_TOP">8. Home Blog Section Top</option>
+                                    <option value="HOME_BLOG_SECTION_BOTTOM">9. Home Blog Section Bottom</option>
+                                    <option value="HOME_MAIN_BOTTOM">10. Home Main Bottom</option>
+                                </optgroup>
+                                <optgroup label="Sidebar Positions">
+                                    <option value="HOME_SIDEBAR_TOP">11. Home Sidebar Top</option>
+                                    <option value="HOME_AI_CHAT_WORLDS_TOP">12. Home AI Chat Worlds Top</option>
+                                    <option value="HOME_AI_CHAT_WORLDS_BOTTOM">13. Home AI Chat Worlds Bottom</option>
+                                    <option value="HOME_PUBLISHED_STORIES_TOP">14. Home Published Stories Top</option>
+                                    <option value="HOME_PUBLISHED_STORIES_BOTTOM">15. Home Published Stories Bottom</option>
+                                    <option value="HOME_GENERATED_IMAGES_TOP">16. Home Generated Images Top</option>
+                                    <option value="HOME_GENERATED_IMAGES_BOTTOM">17. Home Generated Images Bottom</option>
+                                    <option value="HOME_SIDEBAR_BOTTOM">18. Home Sidebar Bottom</option>
+                                </optgroup>
+                                <optgroup label="Other Page Positions">
+                                    <option value="STORY_LIST_TOP">Story List Top</option>
+                                    <option value="WORLD_LIST_TOP">World List Top</option>
+                                    <option value="BLOG_SIDEBAR">Blog Sidebar</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-tooltip">
+                                Style
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Visual appearance: Gradient (colorful), Solid (single color), Bordered (outline), Minimal (simple), Hero (large)"></i>
+                            </label>
+                            <select class="form-select" id="ctaStyle">
+                                <option value="GRADIENT">Gradient</option>
+                                <option value="SOLID">Solid</option>
+                                <option value="BORDERED">Bordered</option>
+                                <option value="MINIMAL">Minimal</option>
+                                <option value="HERO">Hero</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label form-label-tooltip">
+                                Sort Order
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Display order when multiple CTAs are in the same position (lower numbers appear first)"></i>
+                            </label>
+                            <input type="number" class="form-control" id="ctaSortOrder" value="0">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label form-label-tooltip">
+                                Background Color/Gradient
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Choose from presets or enter custom CSS background value"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="ctaBackground" 
+                                       placeholder="linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%)"
+                                       style="font-family: monospace; font-size: 13px;">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        style="min-width: 60px;">
+                                    <i class="fas fa-palette me-1"></i> Presets
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><h6 class="dropdown-header">Solid Colors</h6></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#3b82f6', event); return false;">
+                                        <span class="d-inline-block" style="background: #3b82f6; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Blue</strong> <code>#3b82f6</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#10b981', event); return false;">
+                                        <span class="d-inline-block" style="background: #10b981; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Green</strong> <code>#10b981</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#8b5cf6', event); return false;">
+                                        <span class="d-inline-block" style="background: #8b5cf6; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Purple</strong> <code>#8b5cf6</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#ef4444', event); return false;">
+                                        <span class="d-inline-block" style="background: #ef4444; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Red</strong> <code>#ef4444</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#f59e0b', event); return false;">
+                                        <span class="d-inline-block" style="background: #f59e0b; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Orange</strong> <code>#f59e0b</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#ec4899', event); return false;">
+                                        <span class="d-inline-block" style="background: #ec4899; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Pink</strong> <code>#ec4899</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#14b8a6', event); return false;">
+                                        <span class="d-inline-block" style="background: #14b8a6; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Teal</strong> <code>#14b8a6</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('#6366f1', event); return false;">
+                                        <span class="d-inline-block" style="background: #6366f1; width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Indigo</strong> <code>#6366f1</code></span>
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">Gradients</h6></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #667eea 0%, #764ba2 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Purple Dream</strong> <code>linear-gradient(135deg, #667eea 0%, #764ba2 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Pink Sunset</strong> <code>linear-gradient(135deg, #f093fb 0%, #f5576c 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Ocean Blue</strong> <code>linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Fresh Mint</strong> <code>linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #fa709a 0%, #fee140 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Warm Glow</strong> <code>linear-gradient(135deg, #fa709a 0%, #fee140 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #30cfd0 0%, #330867 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Deep Space</strong> <code>linear-gradient(135deg, #30cfd0 0%, #330867 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Soft Pastel</strong> <code>linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Peach Cream</strong> <code>linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Rose Blush</strong> <code>linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Lavender Sky</strong> <code>linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Cotton Candy</strong> <code>linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('linear-gradient(135deg, #f6d365 0%, #fda085 100%)', event); return false;">
+                                        <span class="d-inline-block" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Golden Hour</strong> <code>linear-gradient(135deg, #f6d365 0%, #fda085 100%)</code></span>
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">Tabler Theme Colors</h6></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('var(--tblr-primary)', event); return false;">
+                                        <span class="d-inline-block bg-primary" style="width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Primary</strong> <code>var(--tblr-primary)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('var(--tblr-secondary)', event); return false;">
+                                        <span class="d-inline-block bg-secondary" style="width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Secondary</strong> <code>var(--tblr-secondary)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('var(--tblr-success)', event); return false;">
+                                        <span class="d-inline-block bg-success" style="width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Success</strong> <code>var(--tblr-success)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('var(--tblr-info)', event); return false;">
+                                        <span class="d-inline-block bg-info" style="width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Info</strong> <code>var(--tblr-info)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('var(--tblr-warning)', event); return false;">
+                                        <span class="d-inline-block bg-warning" style="width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Warning</strong> <code>var(--tblr-warning)</code></span>
+                                    </a></li>
+                                    <li><a class="dropdown-item py-2" href="#" onclick="setBackgroundPreset('var(--tblr-danger)', event); return false;">
+                                        <span class="d-inline-block bg-danger" style="width: 30px; height: 30px; border-radius: 4px; margin-right: 12px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <span style="vertical-align: middle;"><strong>Danger</strong> <code>var(--tblr-danger)</code></span>
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Text Color
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Color for all text in the CTA (hex code like #FFFFFF for white, or CSS color name)"></i>
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="ctaTextColor" value="#FFFFFF" 
+                                       onchange="document.getElementById('ctaTextColorPicker').value = this.value">
+                                <input type="color" class="form-control form-control-color" id="ctaTextColorPicker" 
+                                       value="#FFFFFF" style="max-width: 60px;"
+                                       onchange="document.getElementById('ctaTextColor').value = this.value"
+                                       title="Click to pick a color">
+                            </div>
+                        </div>
+                        
+                        <!-- Features -->
+                        <div class="col-12 mt-4">
+                            <h4>
+                                Features
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Bullet points or key features to highlight in the CTA (e.g., checkmarks with benefits)"></i>
+                            </h4>
+                            <div id="featuresList"></div>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="addFeature()">
+                                <i class="fas fa-plus me-1"></i>Add Feature
+                            </button>
+                        </div>
+                        
+                        <!-- Buttons -->
+                        <div class="col-12 mt-4">
+                            <h4>
+                                Buttons
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Call-to-action buttons that users can click. Primary button is more prominent than secondary."></i>
+                            </h4>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Primary Button Text
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Text displayed on the main action button (e.g., 'Get Started', 'Sign Up Now')"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaPrimaryText">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Primary Button URL
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Where the primary button links to (full URL or relative path like '/signup')"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaPrimaryUrl">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Primary Button Icon
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Optional icon to display in the primary button (e.g., 'fas fa-arrow-right')"></i>
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control icon-input" id="ctaPrimaryIcon" 
+                                       placeholder="fas fa-arrow-right"
+                                       autocomplete="off"
+                                       onclick="showIconPicker(this)"
+                                       onkeyup="filterIcons(this)">
+                            </div>
+                        </div>
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Secondary Button Text
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Text for the optional secondary action button (less prominent than primary)"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaSecondaryText">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Secondary Button URL
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Where the secondary button links to (full URL or relative path)"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaSecondaryUrl">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label form-label-tooltip">
+                                Secondary Button Icon
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Optional icon for the secondary button (e.g., 'fas fa-user-plus')"></i>
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control icon-input" id="ctaSecondaryIcon" 
+                                       placeholder="fas fa-user-plus"
+                                       autocomplete="off"
+                                       onclick="showIconPicker(this)"
+                                       onkeyup="filterIcons(this)">
+                            </div>
+                        </div>
+                        
+                        <!-- Targeting -->
+                        <div class="col-12 mt-4">
+                            <h4>
+                                Targeting
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Control which types of users will see this CTA based on their authentication status"></i>
+                            </h4>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ctaShowAnonymous" checked>
+                                <label class="form-check-label form-label-tooltip" for="ctaShowAnonymous">
+                                    Show for Anonymous Users
+                                    <i class="fas fa-question-circle tooltip-icon" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Display to visitors who are not logged in"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ctaShowAuthenticated" checked>
+                                <label class="form-check-label form-label-tooltip" for="ctaShowAuthenticated">
+                                    Show for Authenticated Users
+                                    <i class="fas fa-question-circle tooltip-icon" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Display to logged-in users (not admins)"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ctaShowAdmin" checked>
+                                <label class="form-check-label form-label-tooltip" for="ctaShowAdmin">
+                                    Show for Admins
+                                    <i class="fas fa-question-circle tooltip-icon" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Display to users with administrator privileges"></i>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Campaign Tracking -->
+                        <div class="col-12 mt-4">
+                            <h4>
+                                Campaign Tracking
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="UTM parameters for tracking the effectiveness of this CTA in analytics tools"></i>
+                            </h4>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-tooltip">
+                                Campaign Name
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Internal name for this marketing campaign (e.g., 'Summer_Signup_2024')"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaCampaignName">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-tooltip">
+                                UTM Source
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Traffic source (e.g., 'homepage', 'sidebar', 'newsletter') - added to button URLs as utm_source"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaUtmSource">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-tooltip">
+                                UTM Medium
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Marketing medium (e.g., 'cta', 'banner', 'popup') - added to button URLs as utm_medium"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaUtmMedium">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-tooltip">
+                                UTM Campaign
+                                <i class="fas fa-question-circle tooltip-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   title="Specific campaign identifier (e.g., 'free_trial') - added to button URLs as utm_campaign"></i>
+                            </label>
+                            <input type="text" class="form-control" id="ctaUtmCampaign">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveCTA()">Save CTA</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quill.js JavaScript -->
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+<script>
+let ctaModal;
+let features = [];
+let quillEditor = null;
+
+// Comprehensive FontAwesome icons list (500+ icons)
+const iconList = [
+    // General & Popular
+    'fas fa-rocket', 'fas fa-star', 'fas fa-heart', 'fas fa-thumbs-up', 'fas fa-fire',
+    'fas fa-bolt', 'fas fa-magic', 'fas fa-crown', 'fas fa-gem', 'fas fa-award',
+    'fas fa-trophy', 'fas fa-medal', 'fas fa-certificate', 'fas fa-ribbon', 'fas fa-flag',
+    'fas fa-bookmark', 'fas fa-lightbulb', 'fas fa-sun', 'fas fa-moon', 'fas fa-star-half-alt',
+    
+    // Arrows & Navigation
+    'fas fa-arrow-right', 'fas fa-arrow-left', 'fas fa-arrow-up', 'fas fa-arrow-down',
+    'fas fa-arrow-circle-right', 'fas fa-arrow-circle-left', 'fas fa-arrow-circle-up', 'fas fa-arrow-circle-down',
+    'fas fa-chevron-right', 'fas fa-chevron-left', 'fas fa-chevron-up', 'fas fa-chevron-down',
+    'fas fa-chevron-circle-right', 'fas fa-chevron-circle-left', 'fas fa-chevron-circle-up', 'fas fa-chevron-circle-down',
+    'fas fa-angle-right', 'fas fa-angle-left', 'fas fa-angle-up', 'fas fa-angle-down',
+    'fas fa-angle-double-right', 'fas fa-angle-double-left', 'fas fa-angle-double-up', 'fas fa-angle-double-down',
+    'fas fa-caret-right', 'fas fa-caret-left', 'fas fa-caret-up', 'fas fa-caret-down',
+    'fas fa-sort-up', 'fas fa-sort-down', 'fas fa-sort', 'fas fa-external-link-alt',
+    'fas fa-link', 'fas fa-unlink', 'fas fa-share', 'fas fa-share-alt',
+    
+    // Users & People
+    'fas fa-user', 'fas fa-user-plus', 'fas fa-user-minus', 'fas fa-user-times',
+    'fas fa-user-check', 'fas fa-user-edit', 'fas fa-user-circle', 'fas fa-user-alt',
+    'fas fa-users', 'fas fa-user-friends', 'fas fa-user-tie', 'fas fa-user-ninja',
+    'fas fa-user-secret', 'fas fa-user-astronaut', 'fas fa-user-graduate', 'fas fa-user-md',
+    'fas fa-user-nurse', 'fas fa-user-injured', 'fas fa-user-shield', 'fas fa-user-lock',
+    'fas fa-user-cog', 'fas fa-user-tag', 'fas fa-id-badge', 'fas fa-id-card',
+    'fas fa-address-card', 'fas fa-portrait', 'fas fa-baby', 'fas fa-child',
+    'fas fa-male', 'fas fa-female', 'fas fa-transgender', 'fas fa-person-booth',
+    
+    // Communication & Social
+    'fas fa-envelope', 'fas fa-envelope-open', 'fas fa-envelope-square', 'fas fa-mail-bulk',
+    'fas fa-phone', 'fas fa-phone-alt', 'fas fa-phone-square', 'fas fa-phone-square-alt',
+    'fas fa-phone-slash', 'fas fa-phone-volume', 'fas fa-mobile-alt', 'fas fa-fax',
+    'fas fa-comments', 'fas fa-comment', 'fas fa-comment-alt', 'fas fa-comment-dots',
+    'fas fa-comment-slash', 'fas fa-sms', 'fas fa-inbox', 'fas fa-at',
+    'fas fa-bell', 'fas fa-bell-slash', 'fas fa-bullhorn', 'fas fa-microphone',
+    'fas fa-microphone-alt', 'fas fa-microphone-slash', 'fas fa-broadcast-tower', 'fas fa-satellite',
+    'fas fa-wifi', 'fas fa-signal', 'fas fa-rss', 'fas fa-rss-square',
+    
+    // Actions & Controls
+    'fas fa-play', 'fas fa-play-circle', 'fas fa-pause', 'fas fa-pause-circle',
+    'fas fa-stop', 'fas fa-stop-circle', 'fas fa-step-forward', 'fas fa-step-backward',
+    'fas fa-fast-forward', 'fas fa-fast-backward', 'fas fa-eject', 'fas fa-random',
+    'fas fa-repeat', 'fas fa-volume-up', 'fas fa-volume-down', 'fas fa-volume-off',
+    'fas fa-volume-mute', 'fas fa-download', 'fas fa-upload', 'fas fa-save',
+    'fas fa-undo', 'fas fa-redo', 'fas fa-reply', 'fas fa-reply-all',
+    'fas fa-forward', 'fas fa-retweet', 'fas fa-copy', 'fas fa-cut',
+    'fas fa-paste', 'fas fa-clone', 'fas fa-compress', 'fas fa-expand',
+    'fas fa-compress-arrows-alt', 'fas fa-expand-arrows-alt', 'fas fa-crop', 'fas fa-crop-alt',
+    
+    // Edit & Modify
+    'fas fa-edit', 'fas fa-pen', 'fas fa-pen-alt', 'fas fa-pen-fancy',
+    'fas fa-pen-nib', 'fas fa-pen-square', 'fas fa-pencil-alt', 'fas fa-pencil-ruler',
+    'fas fa-marker', 'fas fa-highlighter', 'fas fa-eraser', 'fas fa-paint-brush',
+    'fas fa-paint-roller', 'fas fa-palette', 'fas fa-spray-can', 'fas fa-fill',
+    'fas fa-fill-drip', 'fas fa-tint', 'fas fa-tint-slash', 'fas fa-eyedropper',
+    'fas fa-swatchbook', 'fas fa-magic', 'fas fa-wand-magic-sparkles',
+    
+    // Add/Remove/Check
+    'fas fa-plus', 'fas fa-plus-circle', 'fas fa-plus-square', 'fas fa-minus',
+    'fas fa-minus-circle', 'fas fa-minus-square', 'fas fa-times', 'fas fa-times-circle',
+    'fas fa-times-square', 'fas fa-check', 'fas fa-check-circle', 'fas fa-check-square',
+    'fas fa-check-double', 'fas fa-exclamation', 'fas fa-exclamation-circle', 'fas fa-exclamation-triangle',
+    'fas fa-question', 'fas fa-question-circle', 'fas fa-info', 'fas fa-info-circle',
+    'fas fa-ban', 'fas fa-slash', 'fas fa-not-equal', 'fas fa-equals',
+    
+    // Search & Filter
+    'fas fa-search', 'fas fa-search-plus', 'fas fa-search-minus', 'fas fa-search-location',
+    'fas fa-search-dollar', 'fas fa-filter', 'fas fa-sort', 'fas fa-sort-alpha-down',
+    'fas fa-sort-alpha-up', 'fas fa-sort-amount-down', 'fas fa-sort-amount-up', 'fas fa-sort-numeric-down',
+    'fas fa-sort-numeric-up', 'fas fa-sliders-h', 'fas fa-adjust', 'fas fa-random',
+    
+    // Business & Commerce
+    'fas fa-dollar-sign', 'fas fa-euro-sign', 'fas fa-pound-sign', 'fas fa-yen-sign',
+    'fas fa-rupee-sign', 'fas fa-won-sign', 'fas fa-ruble-sign', 'fas fa-coins',
+    'fas fa-money-bill', 'fas fa-money-bill-alt', 'fas fa-money-bill-wave', 'fas fa-money-bill-wave-alt',
+    'fas fa-money-check', 'fas fa-money-check-alt', 'fas fa-credit-card', 'fas fa-wallet',
+    'fas fa-cash-register', 'fas fa-receipt', 'fas fa-piggy-bank', 'fas fa-chart-line',
+    'fas fa-chart-area', 'fas fa-chart-bar', 'fas fa-chart-pie', 'fas fa-analytics',
+    'fas fa-briefcase', 'fas fa-business-time', 'fas fa-handshake', 'fas fa-deal',
+    'fas fa-shopping-cart', 'fas fa-shopping-basket', 'fas fa-shopping-bag', 'fas fa-store',
+    'fas fa-storefront', 'fas fa-cash-register', 'fas fa-tag', 'fas fa-tags',
+    'fas fa-percentage', 'fas fa-gift', 'fas fa-box', 'fas fa-boxes',
+    'fas fa-truck', 'fas fa-shipping-fast', 'fas fa-warehouse', 'fas fa-inventory',
+    
+    // Technology & Computing
+    'fas fa-laptop', 'fas fa-laptop-code', 'fas fa-desktop', 'fas fa-computer',
+    'fas fa-mobile-alt', 'fas fa-mobile', 'fas fa-tablet-alt', 'fas fa-tablet',
+    'fas fa-keyboard', 'fas fa-mouse', 'fas fa-mouse-pointer', 'fas fa-tv',
+    'fas fa-monitor', 'fas fa-camera', 'fas fa-camera-retro', 'fas fa-video',
+    'fas fa-video-slash', 'fas fa-webcam', 'fas fa-microchip', 'fas fa-memory',
+    'fas fa-server', 'fas fa-database', 'fas fa-hdd', 'fas fa-save',
+    'fas fa-cloud', 'fas fa-cloud-download-alt', 'fas fa-cloud-upload-alt', 'fas fa-cloud-arrow-up',
+    'fas fa-cloud-arrow-down', 'fas fa-wifi', 'fas fa-ethernet', 'fas fa-network-wired',
+    'fas fa-code', 'fas fa-code-branch', 'fas fa-terminal', 'fas fa-window-maximize',
+    'fas fa-window-minimize', 'fas fa-window-restore', 'fas fa-window-close', 'fas fa-browser',
+    'fas fa-bug', 'fas fa-wrench', 'fas fa-screwdriver', 'fas fa-hammer',
+    'fas fa-tools', 'fas fa-cog', 'fas fa-cogs', 'fas fa-sliders-h',
+    
+    // Files & Documents
+    'fas fa-file', 'fas fa-file-alt', 'fas fa-file-archive', 'fas fa-file-audio',
+    'fas fa-file-code', 'fas fa-file-csv', 'fas fa-file-download', 'fas fa-file-excel',
+    'fas fa-file-export', 'fas fa-file-image', 'fas fa-file-import', 'fas fa-file-invoice',
+    'fas fa-file-medical', 'fas fa-file-pdf', 'fas fa-file-powerpoint', 'fas fa-file-prescription',
+    'fas fa-file-signature', 'fas fa-file-upload', 'fas fa-file-video', 'fas fa-file-word',
+    'fas fa-folder', 'fas fa-folder-open', 'fas fa-folder-plus', 'fas fa-folder-minus',
+    'fas fa-archive', 'fas fa-book', 'fas fa-book-open', 'fas fa-bookmark',
+    'fas fa-journal-whills', 'fas fa-newspaper', 'fas fa-sticky-note', 'fas fa-clipboard',
+    'fas fa-clipboard-list', 'fas fa-clipboard-check', 'fas fa-tasks', 'fas fa-list',
+    'fas fa-list-alt', 'fas fa-list-ol', 'fas fa-list-ul', 'fas fa-indent',
+    'fas fa-outdent', 'fas fa-quote-left', 'fas fa-quote-right', 'fas fa-paragraph',
+    
+    // Media & Entertainment
+    'fas fa-image', 'fas fa-images', 'fas fa-photo-video', 'fas fa-camera',
+    'fas fa-camera-retro', 'fas fa-film', 'fas fa-video', 'fas fa-video-slash',
+    'fas fa-music', 'fas fa-headphones', 'fas fa-headphones-alt', 'fas fa-volume-up',
+    'fas fa-volume-down', 'fas fa-volume-off', 'fas fa-volume-mute', 'fas fa-microphone',
+    'fas fa-podcast', 'fas fa-broadcast-tower', 'fas fa-radio', 'fas fa-compact-disc',
+    'fas fa-record-vinyl', 'fas fa-guitar', 'fas fa-drum', 'fas fa-gamepad',
+    'fas fa-puzzle-piece', 'fas fa-dice', 'fas fa-dice-one', 'fas fa-dice-two',
+    'fas fa-dice-three', 'fas fa-dice-four', 'fas fa-dice-five', 'fas fa-dice-six',
+    'fas fa-chess', 'fas fa-chess-king', 'fas fa-chess-queen', 'fas fa-chess-rook',
+    'fas fa-chess-bishop', 'fas fa-chess-knight', 'fas fa-chess-pawn',
+    
+    // Security & Safety
+    'fas fa-lock', 'fas fa-lock-open', 'fas fa-unlock', 'fas fa-unlock-alt',
+    'fas fa-key', 'fas fa-fingerprint', 'fas fa-user-lock', 'fas fa-user-shield',
+    'fas fa-shield-alt', 'fas fa-shield-check', 'fas fa-security', 'fas fa-user-secret',
+    'fas fa-mask', 'fas fa-eye', 'fas fa-eye-slash', 'fas fa-low-vision',
+    'fas fa-glasses', 'fas fa-binoculars', 'fas fa-search-location', 'fas fa-crosshairs',
+    'fas fa-bullseye', 'fas fa-fire-extinguisher', 'fas fa-fire-alt', 'fas fa-first-aid',
+    'fas fa-band-aid', 'fas fa-syringe', 'fas fa-pills', 'fas fa-thermometer',
+    
+    // Transportation & Vehicles
+    'fas fa-car', 'fas fa-car-alt', 'fas fa-car-side', 'fas fa-taxi',
+    'fas fa-bus', 'fas fa-bus-alt', 'fas fa-truck', 'fas fa-truck-pickup',
+    'fas fa-truck-monster', 'fas fa-motorcycle', 'fas fa-bicycle', 'fas fa-skateboard',
+    'fas fa-plane', 'fas fa-helicopter', 'fas fa-rocket', 'fas fa-shuttle-van',
+    'fas fa-ship', 'fas fa-anchor', 'fas fa-sailboat', 'fas fa-subway',
+    'fas fa-train', 'fas fa-tram', 'fas fa-walking', 'fas fa-running',
+    'fas fa-biking', 'fas fa-swimming-pool', 'fas fa-horse', 'fas fa-horse-head',
+    
+    // Location & Geography
+    'fas fa-map', 'fas fa-map-marked', 'fas fa-map-marked-alt', 'fas fa-map-marker-alt',
+    'fas fa-map-pin', 'fas fa-location-arrow', 'fas fa-compass', 'fas fa-directions',
+    'fas fa-route', 'fas fa-road', 'fas fa-traffic-light', 'fas fa-street-view',
+    'fas fa-globe', 'fas fa-globe-americas', 'fas fa-globe-asia', 'fas fa-globe-africa',
+    'fas fa-globe-europe', 'fas fa-mountain', 'fas fa-flag', 'fas fa-flag-checkered',
+    'fas fa-city', 'fas fa-building', 'fas fa-home', 'fas fa-hotel',
+    'fas fa-store', 'fas fa-warehouse', 'fas fa-industry', 'fas fa-monument',
+    'fas fa-landmark', 'fas fa-university', 'fas fa-school', 'fas fa-hospital',
+    
+    // Time & Calendar
+    'fas fa-clock', 'fas fa-stopwatch', 'fas fa-hourglass', 'fas fa-hourglass-start',
+    'fas fa-hourglass-half', 'fas fa-hourglass-end', 'fas fa-history', 'fas fa-calendar',
+    'fas fa-calendar-alt', 'fas fa-calendar-check', 'fas fa-calendar-times', 'fas fa-calendar-plus',
+    'fas fa-calendar-minus', 'fas fa-calendar-day', 'fas fa-calendar-week', 'fas fa-timer',
+    'fas fa-alarm-clock', 'fas fa-business-time', 'fas fa-user-clock', 'fas fa-clock-rotate-left',
+    
+    // Weather & Nature
+    'fas fa-sun', 'fas fa-moon', 'fas fa-star', 'fas fa-cloud',
+    'fas fa-cloud-rain', 'fas fa-cloud-sun', 'fas fa-cloud-moon', 'fas fa-bolt',
+    'fas fa-snowflake', 'fas fa-icicles', 'fas fa-temperature-high', 'fas fa-temperature-low',
+    'fas fa-thermometer-full', 'fas fa-thermometer-half', 'fas fa-thermometer-empty', 'fas fa-wind',
+    'fas fa-tornado', 'fas fa-rainbow', 'fas fa-umbrella', 'fas fa-umbrella-beach',
+    'fas fa-tree', 'fas fa-leaf', 'fas fa-seedling', 'fas fa-pagelines',
+    'fas fa-flower', 'fas fa-rose', 'fas fa-cannabis', 'fas fa-mushroom',
+    'fas fa-bug', 'fas fa-spider', 'fas fa-frog', 'fas fa-fish',
+    'fas fa-dove', 'fas fa-crow', 'fas fa-feather', 'fas fa-paw',
+    
+    // Food & Dining
+    'fas fa-utensils', 'fas fa-fork', 'fas fa-spoon', 'fas fa-knife',
+    'fas fa-plate', 'fas fa-bowl', 'fas fa-glass', 'fas fa-wine-glass',
+    'fas fa-wine-glass-alt', 'fas fa-beer', 'fas fa-cocktail', 'fas fa-coffee',
+    'fas fa-mug-hot', 'fas fa-tea', 'fas fa-birthday-cake', 'fas fa-cookie',
+    'fas fa-cookie-bite', 'fas fa-bread-slice', 'fas fa-cheese', 'fas fa-hamburger',
+    'fas fa-hotdog', 'fas fa-pizza-slice', 'fas fa-ice-cream', 'fas fa-candy-cane',
+    'fas fa-apple-alt', 'fas fa-carrot', 'fas fa-pepper-hot', 'fas fa-lemon',
+    
+    // Sports & Recreation
+    'fas fa-running', 'fas fa-walking', 'fas fa-biking', 'fas fa-swimming-pool',
+    'fas fa-skiing', 'fas fa-snowboarding', 'fas fa-skating', 'fas fa-football-ball',
+    'fas fa-basketball-ball', 'fas fa-baseball-ball', 'fas fa-tennis-ball', 'fas fa-golf-ball',
+    'fas fa-bowling-ball', 'fas fa-volleyball-ball', 'fas fa-table-tennis', 'fas fa-hockey-puck',
+    'fas fa-dumbbell', 'fas fa-weight-hanging', 'fas fa-medal', 'fas fa-trophy',
+    'fas fa-stopwatch', 'fas fa-whistle', 'fas fa-fist-raised', 'fas fa-gamepad',
+    
+    // Health & Medical
+    'fas fa-heart', 'fas fa-heartbeat', 'fas fa-heart-broken', 'fas fa-stethoscope',
+    'fas fa-user-md', 'fas fa-user-nurse', 'fas fa-hospital', 'fas fa-hospital-alt',
+    'fas fa-ambulance', 'fas fa-first-aid', 'fas fa-band-aid', 'fas fa-pills',
+    'fas fa-prescription-bottle', 'fas fa-prescription-bottle-alt', 'fas fa-syringe', 'fas fa-thermometer',
+    'fas fa-x-ray', 'fas fa-dna', 'fas fa-microscope', 'fas fa-virus',
+    'fas fa-bacteria', 'fas fa-smoking', 'fas fa-smoking-ban', 'fas fa-bed',
+    
+    // Home & Lifestyle
+    'fas fa-home', 'fas fa-house-user', 'fas fa-bed', 'fas fa-couch',
+    'fas fa-bath', 'fas fa-shower', 'fas fa-toilet', 'fas fa-door-open',
+    'fas fa-door-closed', 'fas fa-key', 'fas fa-broom', 'fas fa-spray-can',
+    'fas fa-lightbulb', 'fas fa-fan', 'fas fa-temperature-high', 'fas fa-temperature-low',
+    'fas fa-blender', 'fas fa-blender-phone', 'fas fa-microwave', 'fas fa-toaster',
+    'fas fa-fire', 'fas fa-fire-alt', 'fas fan-fireplace', 'fas fa-campground',
+    
+    // Education & Learning
+    'fas fa-graduation-cap', 'fas fa-user-graduate', 'fas fa-school', 'fas fa-university',
+    'fas fa-book', 'fas fa-book-open', 'fas fa-books', 'fas fa-bookmark',
+    'fas fa-journal-whills', 'fas fa-atlas', 'fas fa-globe', 'fas fa-calculator',
+    'fas fa-ruler', 'fas fa-ruler-combined', 'fas fa-ruler-horizontal', 'fas fa-ruler-vertical',
+    'fas fa-drafting-compass', 'fas fa-pen', 'fas fa-pencil-alt', 'fas fa-eraser',
+    'fas fa-chalkboard', 'fas fa-chalkboard-teacher', 'fas fa-apple-alt', 'fas fa-microscope',
+    'fas fa-telescope', 'fas fa-flask', 'fas fa-test-tube', 'fas fa-atom'
+];
+
+let currentIconInput = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    ctaModal = new bootstrap.Modal(document.getElementById('ctaModal'));
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Close icon picker when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.icon-input') && !e.target.closest('.icon-picker')) {
+            hideIconPicker();
+        }
+    });
+    
+    loadCTAs();
+    initializeQuillEditor();
+});
+
+function initializeQuillEditor() {
+    // Initialize Quill editor with a comprehensive toolbar
+    quillEditor = new Quill('#ctaContentEditor', {
+        theme: 'snow',
+        placeholder: 'Enter your CTA description here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'align': [] }],
+                ['link', 'blockquote'],
+                ['clean']
+            ]
+        }
+    });
+    
+    // Update hidden field when editor content changes
+    quillEditor.on('text-change', function() {
+        const htmlContent = quillEditor.root.innerHTML;
+        document.getElementById('ctaContent').value = htmlContent;
+    });
+}
+
+async function loadCTAs() {
+    const position = document.getElementById('positionFilter').value;
+    const includeInactive = document.getElementById('showInactive').checked;
+    
+    let url = '/api/v1/admin/cta-content?';
+    if (position) url += `position=${position}&`;
+    url += `include_inactive=${includeInactive}`;
+    
+    try {
+        console.log('Loading CTAs from:', url);
+        const response = await fetch(url);
+        console.log('Load CTAs response status:', response.status);
+        
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Load CTAs error response:', errorData);
+            throw new Error(`Failed to load CTAs (${response.status}): ${errorData}`);
+        }
+        
+        const ctas = await response.json();
+        console.log('Loaded CTAs:', ctas);
+        displayCTAs(ctas);
+    } catch (error) {
+        console.error('LoadCTAs error:', error);
+        showToast('error', 'Failed to load CTAs: ' + error.message);
+    }
+}
+
+function displayCTAs(ctas) {
+    const container = document.getElementById('ctaList');
+    
+    if (ctas.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                        <h3>No CTAs Found</h3>
+                        <p class="text-muted">Create your first CTA to get started.</p>
+                        <button class="btn btn-primary" onclick="createNewCTA()">
+                            <i class="fas fa-plus me-2"></i>Create CTA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = ctas.map(cta => `
+        <div class="col-lg-6">
+            <div class="card ${!cta.is_active ? 'bg-secondary-lt' : ''}">
+                <div class="card-status-top ${cta.style === 'gradient' ? 'bg-primary' : 'bg-secondary'}"></div>
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <h3 class="card-title">
+                                ${cta.icon_class ? `<i class="${cta.icon_class} me-2"></i>` : ''}
+                                ${cta.title}
+                            </h3>
+                            <div class="mb-2">
+                                <span class="badge position-badge bg-primary-lt">
+                                    ${formatPosition(cta.position)}
+                                </span>
+                                <span class="badge bg-secondary-lt">
+                                    ${cta.style}
+                                </span>
+                                ${!cta.is_active ? '<span class="badge bg-danger-lt">Inactive</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="#" onclick="editCTA(${cta.id})">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </a>
+                                <a class="dropdown-item" href="#" onclick="toggleCTAStatus(${cta.id})">
+                                    <i class="fas fa-toggle-${cta.is_active ? 'off' : 'on'} me-2"></i>
+                                    ${cta.is_active ? 'Deactivate' : 'Activate'}
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="deleteCTA(${cta.id})">
+                                    <i class="fas fa-trash me-2"></i>Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${cta.subtitle ? `<p class="text-muted">${cta.subtitle}</p>` : ''}
+                    
+                    ${cta.features && cta.features.length > 0 ? `
+                        <ul class="list-unstyled mb-3">
+                            ${cta.features.map(f => `
+                                <li class="mb-1">
+                                    <i class="${f.icon}" style="color: ${f.color}"></i>
+                                    ${f.text}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+                    
+                    <div class="cta-actions">
+                        ${cta.primary_button ? `
+                            <span class="badge bg-primary-lt">
+                                ${cta.primary_button.icon ? `<i class="${cta.primary_button.icon} me-1"></i>` : ''}
+                                ${cta.primary_button.text}
+                            </span>
+                        ` : ''}
+                        ${cta.secondary_button ? `
+                            <span class="badge bg-secondary-lt">
+                                ${cta.secondary_button.icon ? `<i class="${cta.secondary_button.icon} me-1"></i>` : ''}
+                                ${cta.secondary_button.text}
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    ${cta.campaign ? `
+                        <div class="mt-3 text-muted small">
+                            <i class="fas fa-chart-line me-1"></i>
+                            Campaign: ${cta.campaign.name}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Initialize Bootstrap dropdowns for dynamically created content
+    setTimeout(() => {
+        // Dispose of any existing dropdown instances first
+        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(element) {
+            const existingDropdown = bootstrap.Dropdown.getInstance(element);
+            if (existingDropdown) {
+                existingDropdown.dispose();
+            }
+        });
+        
+        // Initialize new dropdown instances
+        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(dropdownToggleEl) {
+            try {
+                new bootstrap.Dropdown(dropdownToggleEl);
+                console.log('Initialized dropdown for element:', dropdownToggleEl);
+            } catch (error) {
+                console.error('Failed to initialize dropdown:', error, dropdownToggleEl);
+            }
+        });
+        
+        console.log('Dropdown initialization complete');
+    }, 200);
+    
+    // Alternative: Add event delegation for dropdown clicks
+    setTimeout(() => {
+        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Dropdown button clicked', this);
+                
+                // Find the dropdown menu
+                const dropdownMenu = this.nextElementSibling;
+                if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                    // Toggle dropdown visibility
+                    const isVisible = dropdownMenu.classList.contains('show');
+                    
+                    // Hide all other dropdowns
+                    document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                    
+                    // Toggle this dropdown
+                    if (!isVisible) {
+                        dropdownMenu.classList.add('show');
+                    }
+                }
+            });
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+    }, 300);
+}
+
+function formatPosition(position) {
+    // Map positions to user-friendly descriptions
+    const positionDescriptions = {
+        'HOME_MAIN_TOP': '1. Home Main Top - Very top of main content',
+        'HOME_WELCOME_TOP': '2. Home Welcome Top - Before progress steps',
+        'HOME_WELCOME_BOTTOM': '3. Home Welcome Bottom - After progress steps',
+        'HOME_QUICK_ACTIONS_TOP': '4. Home Quick Actions Top - Before action buttons',
+        'HOME_QUICK_ACTIONS_BOTTOM': '5. Home Quick Actions Bottom - After action buttons',
+        'HOME_LOGIN_REGISTER_TOP': '6. Home Login/Register Top - Before login cards',
+        'HOME_LOGIN_REGISTER_BOTTOM': '7. Home Login/Register Bottom - After login cards',
+        'HOME_BLOG_SECTION_TOP': '8. Home Blog Section Top - Before blog posts',
+        'HOME_BLOG_SECTION_BOTTOM': '9. Home Blog Section Bottom - After blog posts',
+        'HOME_MAIN_BOTTOM': '10. Home Main Bottom - Very bottom of main content',
+        'HOME_SIDEBAR_TOP': '11. Home Sidebar Top - Top of sidebar',
+        'HOME_AI_CHAT_WORLDS_TOP': '12. Home AI Chat Worlds Top - Before AI Chat Worlds',
+        'HOME_AI_CHAT_WORLDS_BOTTOM': '13. Home AI Chat Worlds Bottom - After AI Chat Worlds',
+        'HOME_PUBLISHED_STORIES_TOP': '14. Home Published Stories Top - Before Published Stories',
+        'HOME_PUBLISHED_STORIES_BOTTOM': '15. Home Published Stories Bottom - After Published Stories',
+        'HOME_GENERATED_IMAGES_TOP': '16. Home Generated Images Top - Before Generated Images',
+        'HOME_GENERATED_IMAGES_BOTTOM': '17. Home Generated Images Bottom - After Generated Images',
+        'HOME_SIDEBAR_BOTTOM': '18. Home Sidebar Bottom - Bottom of sidebar',
+        'STORY_LIST_TOP': 'Story List Top - Above story listings',
+        'WORLD_LIST_TOP': 'World List Top - Above world listings',
+        'BLOG_SIDEBAR': 'Blog Sidebar - Blog page sidebar'
+    };
+    
+    return positionDescriptions[position] || position.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+
+async function editCTA(id) {
+    try {
+        const response = await fetch(`/api/v1/admin/cta-content/${id}`);
+        if (!response.ok) throw new Error('Failed to load CTA');
+        
+        const cta = await response.json();
+        
+        document.getElementById('ctaModalTitle').textContent = 'Edit CTA';
+        document.getElementById('ctaId').value = cta.id;
+        document.getElementById('ctaTitle').value = cta.title || '';
+        document.getElementById('ctaSubtitle').value = cta.subtitle || '';
+        document.getElementById('ctaContent').value = cta.content || '';
+        document.getElementById('ctaIcon').value = cta.icon_class || '';
+        
+        // Set Quill editor content
+        if (quillEditor && cta.content) {
+            // If content is HTML, set it directly
+            quillEditor.root.innerHTML = cta.content;
+        } else if (quillEditor) {
+            quillEditor.setContents([]);
+        }
+        document.getElementById('ctaPosition').value = cta.position;
+        document.getElementById('ctaStyle').value = cta.style;
+        document.getElementById('ctaSortOrder').value = cta.sort_order || 0;
+        document.getElementById('ctaBackground').value = cta.background_color || '';
+        document.getElementById('ctaTextColor').value = cta.text_color || '#FFFFFF';
+        document.getElementById('ctaTextColorPicker').value = cta.text_color || '#FFFFFF';
+        
+        // Features
+        features = cta.features || [];
+        updateFeaturesList();
+        
+        // Buttons
+        if (cta.primary_button) {
+            document.getElementById('ctaPrimaryText').value = cta.primary_button.text || '';
+            document.getElementById('ctaPrimaryUrl').value = cta.primary_button.url || '';
+            document.getElementById('ctaPrimaryIcon').value = cta.primary_button.icon || '';
+        }
+        if (cta.secondary_button) {
+            document.getElementById('ctaSecondaryText').value = cta.secondary_button.text || '';
+            document.getElementById('ctaSecondaryUrl').value = cta.secondary_button.url || '';
+            document.getElementById('ctaSecondaryIcon').value = cta.secondary_button.icon || '';
+        }
+        
+        // Targeting
+        document.getElementById('ctaShowAnonymous').checked = cta.show_for_anonymous !== false;
+        document.getElementById('ctaShowAuthenticated').checked = cta.show_for_authenticated !== false;
+        document.getElementById('ctaShowAdmin').checked = cta.show_for_admin !== false;
+        
+        // Campaign
+        if (cta.campaign) {
+            document.getElementById('ctaCampaignName').value = cta.campaign.name || '';
+            document.getElementById('ctaUtmSource').value = cta.campaign.utm_source || '';
+            document.getElementById('ctaUtmMedium').value = cta.campaign.utm_medium || '';
+            document.getElementById('ctaUtmCampaign').value = cta.campaign.utm_campaign || '';
+        }
+        
+        // Re-initialize tooltips for the modal
+        setTimeout(() => {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('#ctaModal [data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }, 100);
+        
+        ctaModal.show();
+    } catch (error) {
+        showToast('error', 'Failed to load CTA: ' + error.message);
+    }
+}
+
+function addFeature() {
+    features.push({
+        icon: 'fas fa-check-circle',
+        text: '',
+        color: '#10B981'
+    });
+    updateFeaturesList();
+}
+
+function removeFeature(index) {
+    features.splice(index, 1);
+    updateFeaturesList();
+}
+
+function updateFeaturesList() {
+    const container = document.getElementById('featuresList');
+    container.innerHTML = features.map((f, i) => `
+        <div class="feature-item mb-2">
+            <input type="text" class="form-control form-control-sm" 
+                   placeholder="Icon class" value="${f.icon || 'fas fa-check-circle'}"
+                   onchange="features[${i}].icon = this.value">
+            <input type="text" class="form-control form-control-sm" 
+                   placeholder="Feature text" value="${f.text || ''}"
+                   onchange="features[${i}].text = this.value">
+            <div class="input-group" style="width: 150px;">
+                <input type="text" class="form-control form-control-sm" 
+                       id="featureColor_${i}"
+                       placeholder="#10B981" value="${f.color || '#10B981'}"
+                       onchange="features[${i}].color = this.value; document.getElementById('featureColorPicker_${i}').value = this.value">
+                <input type="color" class="form-control form-control-sm form-control-color" 
+                       id="featureColorPicker_${i}"
+                       value="${f.color || '#10B981'}" style="width: 40px;"
+                       onchange="features[${i}].color = this.value; document.getElementById('featureColor_${i}').value = this.value"
+                       title="Click to pick a color">
+            </div>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeFeature(${i})">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+async function saveCTA() {
+    const id = document.getElementById('ctaId').value;
+    const isEdit = !!id;
+    
+    // Get content from Quill editor
+    const quillContent = quillEditor ? quillEditor.root.innerHTML : document.getElementById('ctaContent').value;
+    
+    const data = {
+        title: document.getElementById('ctaTitle').value,
+        subtitle: document.getElementById('ctaSubtitle').value,
+        content: quillContent,
+        icon_class: document.getElementById('ctaIcon').value,
+        position: document.getElementById('ctaPosition').value,
+        style: document.getElementById('ctaStyle').value,
+        sort_order: parseInt(document.getElementById('ctaSortOrder').value) || 0,
+        background_color: document.getElementById('ctaBackground').value,
+        text_color: document.getElementById('ctaTextColor').value,
+        features: features.filter(f => f.text),
+        primary_button_text: document.getElementById('ctaPrimaryText').value,
+        primary_button_url: document.getElementById('ctaPrimaryUrl').value,
+        primary_button_icon: document.getElementById('ctaPrimaryIcon').value,
+        secondary_button_text: document.getElementById('ctaSecondaryText').value,
+        secondary_button_url: document.getElementById('ctaSecondaryUrl').value,
+        secondary_button_icon: document.getElementById('ctaSecondaryIcon').value,
+        show_for_anonymous: document.getElementById('ctaShowAnonymous').checked,
+        show_for_authenticated: document.getElementById('ctaShowAuthenticated').checked,
+        show_for_admin: document.getElementById('ctaShowAdmin').checked,
+        campaign_name: document.getElementById('ctaCampaignName').value,
+        utm_source: document.getElementById('ctaUtmSource').value,
+        utm_medium: document.getElementById('ctaUtmMedium').value,
+        utm_campaign: document.getElementById('ctaUtmCampaign').value
+    };
+    
+    try {
+        const url = isEdit ? `/api/v1/admin/cta-content/${id}` : '/api/v1/admin/cta-content';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        console.log('Saving CTA:', { method, url, data });
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Error response:', errorData);
+            throw new Error(`Failed to save CTA (${response.status}): ${errorData}`);
+        }
+        
+        showToast('success', `CTA ${isEdit ? 'updated' : 'created'} successfully`);
+        ctaModal.hide();
+        loadCTAs();
+    } catch (error) {
+        showToast('error', 'Failed to save CTA: ' + error.message);
+    }
+}
+
+async function toggleCTAStatus(id) {
+    try {
+        const response = await fetch(`/api/v1/admin/cta-content/${id}/toggle-active`, {
+            method: 'POST'
+        });
+        
+        if (!response.ok) throw new Error('Failed to toggle CTA status');
+        
+        const result = await response.json();
+        showToast('success', result.message);
+        loadCTAs();
+    } catch (error) {
+        showToast('error', 'Failed to toggle CTA status: ' + error.message);
+    }
+}
+
+async function deleteCTA(id) {
+    if (!confirm('Are you sure you want to delete this CTA?')) return;
+    
+    try {
+        const response = await fetch(`/api/v1/admin/cta-content/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) throw new Error('Failed to delete CTA');
+        
+        showToast('success', 'CTA deleted successfully');
+        loadCTAs();
+    } catch (error) {
+        showToast('error', 'Failed to delete CTA: ' + error.message);
+    }
+}
+
+async function createDefaultCTA() {
+    if (!confirm('This will create a default home page CTA. Continue?')) return;
+    
+    try {
+        const response = await fetch('/api/v1/admin/cta-content/create-default', {
+            method: 'POST'
+        });
+        
+        if (!response.ok) throw new Error('Failed to create default CTA');
+        
+        showToast('success', 'Default CTA created successfully');
+        loadCTAs();
+    } catch (error) {
+        showToast('error', 'Failed to create default CTA: ' + error.message);
+    }
+}
+
+function showIconPicker(input) {
+    currentIconInput = input;
+    const picker = document.getElementById('iconPicker');
+    
+    // Position the picker relative to the input
+    const rect = input.getBoundingClientRect();
+    const container = input.closest('.position-relative');
+    
+    // Clear existing picker and create new one for this input
+    let existingPicker = container.querySelector('.icon-picker');
+    if (!existingPicker) {
+        existingPicker = document.createElement('div');
+        existingPicker.className = 'icon-picker';
+        container.appendChild(existingPicker);
+    }
+    
+    // Populate icons
+    existingPicker.innerHTML = iconList.map(icon => `
+        <div class="icon-picker-item" onclick="selectIcon('${icon}')">
+            <span class="icon-preview">
+                <i class="${icon}"></i>
+            </span>
+            <span>${icon}</span>
+        </div>
+    `).join('');
+    
+    // Show picker
+    existingPicker.style.display = 'block';
+    
+    // Filter if there's existing text
+    if (input.value) {
+        filterIcons(input);
+    }
+}
+
+function hideIconPicker() {
+    const pickers = document.querySelectorAll('.icon-picker');
+    pickers.forEach(picker => {
+        picker.style.display = 'none';
+    });
+    currentIconInput = null;
+}
+
+function selectIcon(iconClass) {
+    if (currentIconInput) {
+        currentIconInput.value = iconClass;
+        hideIconPicker();
+    }
+}
+
+function filterIcons(input) {
+    if (!currentIconInput) return;
+    
+    const container = input.closest('.position-relative');
+    const picker = container.querySelector('.icon-picker');
+    if (!picker || picker.style.display === 'none') return;
+    
+    const searchTerm = input.value.toLowerCase();
+    const items = picker.querySelectorAll('.icon-picker-item');
+    
+    items.forEach(item => {
+        const iconName = item.textContent.toLowerCase();
+        if (iconName.includes(searchTerm)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function createNewCTA() {
+    document.getElementById('ctaModalTitle').textContent = 'Create New CTA';
+    document.getElementById('ctaForm').reset();
+    document.getElementById('ctaId').value = '';
+    features = [];
+    updateFeaturesList();
+    
+    // Reset color pickers to default values
+    document.getElementById('ctaTextColor').value = '#FFFFFF';
+    document.getElementById('ctaTextColorPicker').value = '#FFFFFF';
+    
+    // Clear Quill editor
+    if (quillEditor) {
+        quillEditor.setContents([]);
+    }
+    
+    // Re-initialize tooltips for the modal
+    setTimeout(() => {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('#ctaModal [data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }, 100);
+    
+    ctaModal.show();
+}
+
+function setBackgroundPreset(value, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    document.getElementById('ctaBackground').value = value;
+    // Optional: Show a preview or feedback
+    const input = document.getElementById('ctaBackground');
+    input.focus();
+    input.select();
+    
+    // Keep dropdown open
+    const dropdown = document.querySelector('.input-group .dropdown-menu');
+    if (dropdown) {
+        dropdown.classList.add('show');
+    }
+}
+
+function showToast(type, message) {
+    // Implement your toast notification here
+    alert(`${type.toUpperCase()}: ${message}`);
+}
+</script>
+{% endblock %}

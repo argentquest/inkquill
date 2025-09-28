@@ -1,0 +1,41 @@
+{
+  "interview_id": "new_user_onboarding",
+  "user_id": 12345,
+  "completed_at": "2024-01-15T10:30:00Z",
+  "responses": {
+    "writing_experience": {
+      "question_id": "writing_experience",
+      "selected_values": ["write_for_fun", "unfinished_stories"],
+      "answered_at": "2024-01-15T10:28:00Z"
+    },
+    "genre_preferences": {
+      "question_id": "genre_preferences",
+      "selected_values": ["fantasy", "mystery", "adventure"],
+      "answered_at": "2024-01-15T10:28:30Z"
+    },
+    "help_needed": {
+      "question_id": "help_needed",
+      "selected_values": ["brainstorming", "characters", "plot_structure", "ai_improvement"],
+      "answered_at": "2024-01-15T10:29:00Z"
+    },
+    "writing_stage": {
+      "question_id": "writing_stage",
+      "selected_values": ["beginning_ideas", "stuck_middle"],
+      "answered_at": "2024-01-15T10:29:30Z"
+    },
+    "next_step": {
+      "question_id": "next_step",
+      "selected_values": ["world_first"],
+      "answered_at": "2024-01-15T10:29:45Z"
+    },
+    "brainstorming_popup": {
+      "question_id": "brainstorming_popup",
+      "selected_values": ["yes_brainstorm"],
+      "answered_at": "2024-01-15T10:30:00Z"
+    }
+  },
+  "navigation": {
+    "final_destination": "/ui/brainstorm",
+    "from_question_5": "/ui/worlds/new"
+  }
+}

@@ -1,0 +1,430 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Admin Billing Dashboard{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <h1 class="page-title text-white mb-3">
+                    <i class="fas fa-credit-card me-3"></i>
+                    Admin Billing Dashboard
+                </h1>
+                <div class="page-subtitle text-white mb-4">
+                    Monitor and manage billing, payments, and financial metrics across all users
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Admin Panel
+                    </span>
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-chart-line me-1"></i>
+                        Financial Analytics
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-dollar-sign me-1"></i>
+                        Revenue Tracking
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('admin_billing')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with billing management">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- System Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Users</h5>
+                    <h3 id="total-users">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Balance</h5>
+                    <h3 id="total-balance">0 Coins</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Added</h5>
+                    <h3 id="total-credits">0 Coins</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Spent</h5>
+                    <h3 id="total-spent">0 Coins</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Transactions</h5>
+                    <h3 id="total-transactions">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">24h Activity</h5>
+                    <h3 id="recent-activity">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manual Credit Adjustment -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Manual Credit Adjustment</h5>
+                </div>
+                <div class="card-body">
+                    <form id="credit-adjustment-form" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="user-select" class="form-label">Select User</label>
+                            <select class="form-control" id="user-select" required>
+                                <option value="">Choose a user...</option>
+                                <!-- Users will be populated here -->
+                            </select>
+                            <input type="hidden" id="user-id" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="amount" class="form-label">Amount (Coins)</label>
+                            <input type="number" class="form-control" id="amount" step="0.01" required>
+                            <div class="form-text">Positive = Add, Negative = Deduct</div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="description" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="description" maxlength="500" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">Adjust Credits</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Accounts Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>User Accounts Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Current Balance</th>
+                                    <th>Total Added</th>
+                                    <th>Total Spent</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- User accounts will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Transactions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Transactions (All Users)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="admin-transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Balance After</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Transactions will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+#admin-transactions-table th,
+#admin-transactions-table td,
+#users-table th,
+#users-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+</style>
+<script>
+console.log('Admin billing dashboard script loaded!');
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('DOM loaded, loading admin billing dashboard...');
+    
+    await loadAdminDashboardData();
+    setupEventListeners();
+});
+
+async function loadAdminDashboardData() {
+    try {
+        console.log('Loading admin billing dashboard data...');
+        const response = await fetch('/api/v1/admin/billing/dashboard');
+        console.log('Admin dashboard API response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Admin dashboard data received:', data);
+        
+        updateSystemStats(data.system_stats);
+        console.log('User accounts data:', data.user_accounts);
+        console.log('Recent transactions data:', data.recent_transactions);
+        renderUserAccounts(data.user_accounts);
+        renderAdminTransactions(data.recent_transactions);
+        
+    } catch (error) {
+        console.error('Error loading admin billing dashboard:', error);
+        showNotification('Error loading admin dashboard: ' + error.message, 'error');
+    }
+}
+
+function updateSystemStats(stats) {
+    console.log('Updating system stats:', stats);
+    
+    document.getElementById('total-users').textContent = stats.total_users || 0;
+    document.getElementById('total-balance').textContent = `${parseFloat(stats.total_balance || 0).toFixed(4)} Coins`;
+    document.getElementById('total-credits').textContent = `${parseFloat(stats.total_credits_added || 0).toFixed(4)} Coins`;
+    document.getElementById('total-spent').textContent = `${parseFloat(stats.total_spent || 0).toFixed(4)} Coins`;
+    document.getElementById('total-transactions').textContent = stats.total_transactions || 0;
+    document.getElementById('recent-activity').textContent = stats.recent_transactions_24h || 0;
+}
+
+function renderUserAccounts(accounts) {
+    console.log('Rendering user accounts:', accounts);
+    const tbody = document.querySelector('#users-table tbody');
+    
+    if (!accounts || accounts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No user accounts found</td></tr>';
+        return;
+    }
+    
+    // Populate user dropdown
+    const userSelect = document.getElementById('user-select');
+    userSelect.innerHTML = '<option value="">Choose a user...</option>' + 
+        accounts.map(account => {
+            const displayName = account.user?.display_name || account.user?.username || 'N/A';
+            const username = account.user?.username || 'N/A';
+            const email = account.user?.email || 'N/A';
+            return `
+                <option value="${account.user_id}" data-username="${username}" data-email="${email}">
+                    ${displayName} (${username}) - ${email}
+                </option>
+            `;
+        }).join('');
+    
+    tbody.innerHTML = accounts.map(account => {
+        const displayName = account.user?.display_name || account.user?.username || 'N/A';
+        const username = account.user?.username || 'N/A';
+        const email = account.user?.email || 'N/A';
+        return `
+            <tr>
+                <td>${displayName}</td>
+                <td>${email}</td>
+                <td>${parseFloat(account.current_balance).toFixed(4)} Coins</td>
+                <td>${parseFloat(account.total_credits_added).toFixed(4)} Coins</td>
+                <td>${parseFloat(account.total_spent).toFixed(4)} Coins</td>
+                <td>${new Date(account.updated_at).toLocaleString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="quickAdjustCredits(${account.user_id}, '${displayName}')">
+                        Adjust
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderAdminTransactions(transactions) {
+    console.log('Rendering admin transactions:', transactions);
+    const tbody = document.querySelector('#admin-transactions-table tbody');
+    
+    if (!transactions || transactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No transactions found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = transactions.map(tx => {
+        const amount = parseFloat(tx.amount);
+        const balanceAfter = parseFloat(tx.balance_after);
+        const amountClass = amount >= 0 ? 'text-success' : 'text-danger';
+        const amountSign = amount >= 0 ? '+' : '';
+        const typeDisplay = tx.transaction_type.replace(/_/g, ' ')
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        
+        const userDisplayName = tx.user_account?.user?.display_name || tx.user_account?.user?.username || 'N/A';
+        
+        return `
+            <tr>
+                <td><code>${tx.id}</code></td>
+                <td>
+                    <small class="text-muted">${userDisplayName}</small>
+                </td>
+                <td>${new Date(tx.created_at).toLocaleString()}</td>
+                <td><span class="badge bg-secondary">${typeDisplay}</span></td>
+                <td class="${amountClass}">${amountSign}${Math.abs(amount).toFixed(4)} Coins</td>
+                <td>${balanceAfter.toFixed(4)} Coins</td>
+                <td>${tx.description || ''}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function setupEventListeners() {
+    document.getElementById('credit-adjustment-form').addEventListener('submit', handleCreditAdjustment);
+    
+    // Handle user selection from dropdown
+    document.getElementById('user-select').addEventListener('change', function() {
+        const selectedUserId = this.value;
+        document.getElementById('user-id').value = selectedUserId;
+    });
+}
+
+async function handleCreditAdjustment(event) {
+    event.preventDefault();
+    
+    const userId = document.getElementById('user-id').value;
+    const amount = document.getElementById('amount').value;
+    const description = document.getElementById('description').value;
+    
+    if (!userId || !amount || !description) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/v1/admin/billing/adjust-credits', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: parseInt(userId),
+                amount: parseFloat(amount),
+                description: description
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showNotification(result.message, 'success');
+            document.getElementById('credit-adjustment-form').reset();
+            // Reload dashboard data
+            await loadAdminDashboardData();
+        } else {
+            showNotification(result.detail || 'Failed to adjust credits', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error adjusting credits:', error);
+        showNotification('Error processing credit adjustment', 'error');
+    }
+}
+
+function quickAdjustCredits(userId, username) {
+    // Set the dropdown to the selected user
+    const userSelect = document.getElementById('user-select');
+    userSelect.value = userId;
+    
+    // Set the hidden user ID field
+    document.getElementById('user-id').value = userId;
+    
+    // Focus on the amount field
+    document.getElementById('amount').focus();
+}
+
+function showNotification(message, type) {
+    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertAdjacentHTML('afterbegin', alertHtml);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        const alert = container.querySelector('.alert');
+        if (alert) {
+            alert.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

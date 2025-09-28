@@ -1,0 +1,309 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ page_title }} - {{ project_name }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- Quill Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('ui_forum_home') }}">Forum</a>
+                    </li>
+                    <li class="breadcrumb-item active">Create New Thread</li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="mb-4">
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-plus text-primary me-2"></i>
+                    Create New Thread
+                </h1>
+                <p class="text-muted">Start a new discussion in the community forum.</p>
+            </div>
+
+            <!-- Error Message -->
+            {% if error_message %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ error_message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            <!-- Thread Creation Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Thread Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('ui_create_thread') }}" id="threadForm">
+                        <!-- Category Selection -->
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label required">
+                                <i class="fas fa-folder me-1"></i>
+                                Category
+                            </label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                <option value="">Select a category...</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" 
+                                        {% if category.id == selected_category_id %}selected{% endif %}>
+                                    {% if category.icon %}{{ category.icon }} {% endif %}
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Choose the most appropriate category for your discussion.</div>
+                        </div>
+
+                        <!-- Thread Title -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label required">
+                                <i class="fas fa-heading me-1"></i>
+                                Thread Title
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="title" 
+                                   name="title" 
+                                   value="{{ form_data.title if form_data else '' }}"
+                                   placeholder="Enter a descriptive title for your thread..."
+                                   minlength="3"
+                                   maxlength="255"
+                                   required>
+                            <div class="form-text">
+                                Choose a clear, descriptive title that summarizes your topic (3-255 characters).
+                            </div>
+                        </div>
+
+                        <!-- Optional World/Story Linking -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="world_id" class="form-label">
+                                    <i class="fas fa-globe me-1"></i>
+                                    Link to World (Optional)
+                                </label>
+                                <select class="form-select" id="world_id" name="world_id">
+                                    <option value="">No world selected</option>
+                                    {% for world in user_worlds %}
+                                    <option value="{{ world.id }}"
+                                            {% if form_data and form_data.world_id and form_data.world_id|string == world.id|string %}selected{% endif %}>
+                                        {{ world.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Link this discussion to one of your worlds.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="story_id" class="form-label">
+                                    <i class="fas fa-book me-1"></i>
+                                    Link to Story (Optional)
+                                </label>
+                                <select class="form-select" id="story_id" name="story_id">
+                                    <option value="">No story selected</option>
+                                    {% for story in user_stories %}
+                                    <option value="{{ story.id }}"
+                                            {% if form_data and form_data.story_id and form_data.story_id|string == story.id|string %}selected{% endif %}>
+                                        {{ story.title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Link this discussion to one of your stories.</div>
+                            </div>
+                        </div>
+
+                        <!-- Thread Content -->
+                        <div class="mb-3">
+                            <label for="content" class="form-label required">
+                                <i class="fas fa-comment me-1"></i>
+                                Initial Post Content
+                            </label>
+                            
+                            <!-- Quill Editor -->
+                            <div id="content-editor" style="min-height: 200px; background: white; border: 1px solid #dee2e6; border-radius: 0.375rem;"></div>
+                            
+                            <!-- Hidden textarea for form submission -->
+                            <textarea class="d-none" 
+                                      id="content" 
+                                      name="content" 
+                                      required>{{ form_data.content if form_data else '' }}</textarea>
+                            
+                            <div class="form-text mt-2">
+                                Use the rich text editor to format your post with headings, lists, links, and more.
+                                Provide a detailed description or question to start the discussion.
+                            </div>
+                        </div>
+
+                        <!-- Character Counter -->
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <span id="charCount">0</span> characters
+                            </small>
+                        </div>
+
+                        <!-- Guidelines -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Tips for Great Threads
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Use a clear, descriptive title that explains your topic</li>
+                                <li>Choose the most appropriate category for better visibility</li>
+                                <li>Provide enough context in your initial post</li>
+                                <li>Be respectful and constructive in your discussions</li>
+                                <li>Link to your worlds or stories when relevant</li>
+                            </ul>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('ui_forum_home') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-paper-plane me-1"></i>
+                                Create Thread
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Forum Rules Reminder -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-gavel me-2"></i>
+                        Community Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Stay on topic for the selected category
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Be respectful to all community members
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Provide constructive feedback and discussion
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    No spam or duplicate content
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    No personal attacks or harassment
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    No inappropriate or offensive content
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Quill Editor JavaScript -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script src="{{ url_for('static', path='js/quill_manager.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill editor for thread content
+    const quillEditor = QuillManager.initialize('content-editor', 'content', {
+        placeholder: 'Start your discussion here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['link'],
+                ['blockquote'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Setup character counter
+    QuillManager.setupCharacterCounter('content-editor', 'charCount');
+
+    // Override form validation to work with Quill
+    const form = document.getElementById('threadForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const content = QuillManager.getContentText('content-editor').trim();
+            const categoryId = document.getElementById('category_id').value;
+
+            if (!title || title.length < 3) {
+                e.preventDefault();
+                alert('Please enter a title with at least 3 characters.');
+                document.getElementById('title').focus();
+                return;
+            }
+
+            if (!content || content.length < 10) {
+                e.preventDefault();
+                alert('Please enter content with at least 10 characters.');
+                QuillManager.focusEditor('content-editor');
+                return;
+            }
+
+            if (!categoryId) {
+                e.preventDefault();
+                alert('Please select a category.');
+                document.getElementById('category_id').focus();
+                return;
+            }
+
+            // Disable submit button to prevent double submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+        });
+    }
+});
+</script>
+{% endblock %}

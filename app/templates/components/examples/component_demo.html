@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Tabler Components Demo{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="page-header d-print-none">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Tabler Components Demo
+                    </h2>
+                    <div class="text-muted mt-1">
+                        Showcase of reusable UI components extracted from Tabler
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cards">
+            <!-- Cards Demo -->
+            <div class="col-12">
+                <h3 class="mb-3">Cards</h3>
+            </div>
+            
+            <div class="col-md-4">
+                {% include "components/cards/basic_card.html" 
+                   title="Basic Card" 
+                   content="This is a basic card with header, body, and footer."
+                   footer="Card footer content" %}
+            </div>
+            
+            <div class="col-md-4">
+                {% include "components/cards/status_card.html" 
+                   title="Active Users" 
+                   value="2,847" 
+                   status="success" 
+                   change="+12%" 
+                   change_color="success" 
+                   change_icon="up"
+                   description="Users online in the last 24 hours" %}
+            </div>
+            
+            <div class="col-md-4">
+                {% include "components/cards/action_card.html" 
+                   title="Create Story" 
+                   description="Start writing your next great story" 
+                   icon="edit" 
+                   action_text="Get Started"
+                   hover_effect="pop" %}
+            </div>
+
+            <!-- Alerts Demo -->
+            <div class="col-12 mt-4">
+                <h3 class="mb-3">Alerts</h3>
+            </div>
+            
+            <div class="col-md-6">
+                {% include "components/alerts/alert.html" 
+                   type="success" 
+                   title="Success!" 
+                   message="Your story has been saved successfully."
+                   dismissible=true %}
+            </div>
+            
+            <div class="col-md-6">
+                {% include "components/alerts/alert.html" 
+                   type="warning" 
+                   title="Warning" 
+                   message="Please check your internet connection."
+                   action_text="Retry"
+                   action_url="#" %}
+            </div>
+
+            <!-- Forms Demo -->
+            <div class="col-12 mt-4">
+                <h3 class="mb-3">Forms</h3>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Form Example</h3>
+                    </div>
+                    <div class="card-body">
+                        {% include "components/forms/input.html" 
+                           name="email" 
+                           label="Email Address" 
+                           type="email" 
+                           icon="email" 
+                           placeholder="Enter your email"
+                           required=true %}
+                        
+                        {% include "components/forms/textarea.html" 
+                           name="description" 
+                           label="Description" 
+                           placeholder="Enter description"
+                           rows=3
+                           maxlength=200 %}
+                        
+                        {% assign status_options = "draft,published,archived" | split: "," %}
+                        {% include "components/forms/select.html" 
+                           name="status" 
+                           label="Status" 
+                           options=status_options
+                           placeholder="Select status" %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons Demo -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Buttons</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {% include "components/buttons/button.html" 
+                               text="Primary" 
+                               color="primary" 
+                               class="me-2" %}
+                            
+                            {% include "components/buttons/button.html" 
+                               text="Success" 
+                               color="success" 
+                               icon="check"
+                               class="me-2" %}
+                            
+                            {% include "components/buttons/button.html" 
+                               text="Outline" 
+                               color="secondary" 
+                               outline=true %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {% include "components/buttons/button.html" 
+                               text="Loading" 
+                               color="info" 
+                               loading=true
+                               class="me-2" %}
+                            
+                            {% include "components/buttons/button.html" 
+                               icon="download" 
+                               color="primary" 
+                               square=true
+                               title="Download" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress & Badges Demo -->
+            <div class="col-12 mt-4">
+                <h3 class="mb-3">Progress & Badges</h3>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Progress Bars</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Story Progress</label>
+                            {% include "components/progress/progress_bar.html" 
+                               value=75 
+                               color="primary" 
+                               show_text=true %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">World Building</label>
+                            {% include "components/progress/progress_bar.html" 
+                               value=45 
+                               color="success" 
+                               striped=true %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Badges</h3>
+                    </div>
+                    <div class="card-body">
+                        {% include "components/badges/badge.html" 
+                           text="New" 
+                           color="success" 
+                           class="me-2" %}
+                        
+                        {% include "components/badges/badge.html" 
+                           text="Featured" 
+                           color="primary" 
+                           icon="star"
+                           class="me-2" %}
+                        
+                        {% include "components/badges/badge.html" 
+                           text="Draft" 
+                           color="secondary" 
+                           outline=true
+                           class="me-2" %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Demo -->
+            <div class="col-12 mt-4">
+                <h3 class="mb-3">Navigation</h3>
+            </div>
+            
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        {% assign breadcrumb_items = "Home,Stories,My Story" | split: "," %}
+                        {% include "components/navigation/breadcrumb.html" 
+                           items=breadcrumb_items %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Triggers -->
+            <div class="col-12 mt-4">
+                <h3 class="mb-3">Modals</h3>
+            </div>
+            
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#demo-modal">
+                            Basic Modal
+                        </button>
+                        
+                        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#success-modal">
+                            Success Modal
+                        </button>
+                        
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirm-modal">
+                            Confirmation Modal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Demo Modals -->
+{% include "components/modals/base_modal.html" 
+   modal_id="demo-modal" 
+   title="Demo Modal" 
+   content="This is a demonstration of the base modal component. It can contain any content you want."
+   show_footer=true
+   primary_button="Save Changes" %}
+
+{% include "components/modals/success_modal.html" 
+   modal_id="success-modal" 
+   title="Operation Successful!" 
+   message="Your changes have been saved successfully and are now live."
+   primary_button="Continue" %}
+
+{% include "components/modals/confirmation_modal.html" 
+   modal_id="confirm-modal" 
+   title="Delete Story?" 
+   message="This will permanently delete your story and cannot be undone."
+   danger_mode=true
+   confirm_text="Delete Story" %}
+
+{% endblock %}

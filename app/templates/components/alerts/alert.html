@@ -1,0 +1,93 @@
+<!-- Alert Component -->
+<!-- Usage: {% include "components/alerts/alert.html" type="success" title="Success!" message="Operation completed." %} -->
+
+{% assign alert_type = type | default('info') %}
+{% assign alert_icon = icon %}
+
+{% unless alert_icon %}
+    {% case alert_type %}
+        {% when 'success' %}
+            {% assign alert_icon = 'check' %}
+        {% when 'warning' %}
+            {% assign alert_icon = 'alert-triangle' %}
+        {% when 'danger' %}
+            {% assign alert_icon = 'alert-circle' %}
+        {% when 'info' %}
+            {% assign alert_icon = 'info-circle' %}
+        {% else %}
+            {% assign alert_icon = 'info-circle' %}
+    {% endcase %}
+{% endunless %}
+
+<div class="alert alert-{{ alert_type }}{% if dismissible %} alert-dismissible{% endif %}{% if important %} alert-important{% endif %}{% if class %} {{ class }}{% endif %}" 
+     role="alert"
+     {% if id %}id="{{ id }}"{% endif %}
+     {{ attrs | default('') }}>
+     
+    {% if show_icon != false %}
+    <div class="d-flex">
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                {% case alert_icon %}
+                    {% when 'check' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M5 12l5 5l10 -10"/>
+                    {% when 'alert-triangle' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M12 9v2m0 4v.01"/>
+                        <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"/>
+                    {% when 'alert-circle' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <circle cx="12" cy="12" r="9"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    {% when 'info-circle' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <circle cx="12" cy="12" r="9"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        <line x1="12" y1="12" x2="12" y2="16"/>
+                    {% else %}
+                        <circle cx="12" cy="12" r="1"/>
+                {% endcase %}
+            </svg>
+        </div>
+        <div>
+    {% endif %}
+    
+    {% if title and message %}
+        <h4 class="alert-title">{{ title }}</h4>
+        <div class="text-muted">{{ message }}</div>
+    {% elsif title %}
+        <strong>{{ title }}</strong>
+    {% elsif message %}
+        {{ message }}
+    {% else %}
+        {{ content }}
+    {% endif %}
+    
+    {% if list %}
+        {% assign list_items = list | split: ',' %}
+        <ul class="mt-2 mb-0">
+            {% for item in list_items %}
+            <li>{{ item | strip }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+    {% if action_text %}
+        <div class="mt-2">
+            <a href="{{ action_url | default('#') }}" class="btn btn-{{ alert_type }} btn-sm">
+                {{ action_text }}
+            </a>
+        </div>
+    {% endif %}
+    
+    {% if show_icon != false %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if dismissible %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% endif %}
+</div>

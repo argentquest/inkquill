@@ -1,0 +1,696 @@
+/* Basic Story Editor - Standardized CSS following design system */
+
+/* Main Editor Container */
+.basic-story-editor {
+    background: var(--bg-body);
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Section */
+.basic-story-editor .header {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-primary);
+    padding: var(--space-5) 0;
+    margin-bottom: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.basic-story-editor .header h1 {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.basic-story-editor .header .story-meta {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.basic-story-editor .header .story-meta .badge {
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+}
+
+/* Title Editing */
+.basic-story-editor .title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+.basic-story-editor .story-title-display {
+    margin-bottom: 0;
+    margin-right: var(--space-2);
+}
+
+.basic-story-editor .story-title-input {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-right: var(--space-2);
+    flex: 1;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--radius-md);
+}
+
+.basic-story-editor .story-title-input:focus {
+    outline: none;
+    border-color: var(--primary-color-dark);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+/* Editor Container */
+.basic-story-editor .editor-container {
+    width: 100%;
+    margin: var(--space-10) 0;
+    padding: 0 var(--space-5);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Toolbar */
+.basic-story-editor .editor-toolbar {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-4) var(--space-5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.basic-story-editor .toolbar-left {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+}
+
+.basic-story-editor .toolbar-right {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+}
+
+/* Word Count & Save Status */
+.basic-story-editor .word-count {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.basic-story-editor .save-status {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.basic-story-editor .save-status.saving {
+    color: var(--warning-color);
+}
+
+.basic-story-editor .save-status.error {
+    color: var(--danger-color);
+}
+
+/* Editor */
+.basic-story-editor .editor-wrapper {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-top: none;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.basic-story-editor #story-editor {
+    background: var(--bg-surface);
+    min-height: 500px;
+}
+
+.basic-story-editor .ql-container {
+    font-family: var(--font-family-body);
+    font-size: var(--text-base);
+    border: none;
+}
+
+.basic-story-editor .ql-editor {
+    padding: var(--space-8) !important;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.basic-story-editor .ql-toolbar {
+    background: var(--bg-surface-secondary);
+    border: none;
+    border-bottom: 1px solid var(--border-secondary);
+    padding: var(--space-3);
+}
+
+/* Action Buttons */
+.basic-story-editor .action-buttons {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+}
+
+.basic-story-editor .action-buttons .btn {
+    font-weight: 500;
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+/* AI Assistant Panel */
+.ai-assistant-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-lg);
+    z-index: 1040;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-assistant-panel.show {
+    right: 0;
+}
+
+.basic-story-editor.ai-assistant-open {
+    margin-right: 400px;
+    transition: margin-right 0.3s ease;
+}
+
+/* AI Assistant Header */
+.ai-assistant-panel .panel-header {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-primary);
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-assistant-panel .panel-header h5 {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ai-assistant-panel .panel-close-btn {
+    background: none;
+    border: none;
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.ai-assistant-panel .panel-close-btn:hover {
+    background: var(--bg-surface-secondary);
+    color: var(--text-primary);
+}
+
+/* AI Assistant Body */
+.ai-assistant-panel .panel-body {
+    flex: 1;
+    padding: var(--space-5) var(--space-6);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Allow shrinking below content size */
+}
+
+/* Instructions */
+.ai-assistant-panel .assistance-instructions {
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-secondary);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+}
+
+.ai-assistant-panel .assistance-instructions i {
+    color: var(--primary-color);
+}
+
+/* Assistance Types Grid */
+.ai-assistant-panel .assistance-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.ai-assistant-panel .assistance-type-btn {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 36px;
+    position: relative !important; /* Ensure buttons are on top */
+    z-index: 10 !important; /* Higher z-index for clickability */
+    pointer-events: auto !important; /* Ensure buttons are clickable */
+}
+
+.ai-assistant-panel .assistance-type-btn:hover {
+    background: var(--bg-surface-secondary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.ai-assistant-panel .assistance-type-btn.active {
+    background: transparent !important; /* No background */
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    pointer-events: auto !important; /* Ensure buttons remain clickable */
+    cursor: pointer !important;
+}
+
+/* More specific selector to override other active button styles - only target assistance type buttons */
+#query-panel > div.assistance-types > div.assistance-type-btn.btn.active,
+#query-panel .assistance-types .assistance-type-btn.active {
+    background: transparent !important; /* No background */
+    background-color: transparent !important; /* Ensure background-color is also transparent */
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Ensure Generate button remains functional */
+.ai-assistant-panel .btn:not(.assistance-type-btn) {
+    pointer-events: auto !important;
+    z-index: 15 !important; /* Higher than assistance buttons */
+    position: relative !important;
+}
+
+/* Custom Request */
+.ai-assistant-panel .custom-request {
+    margin-bottom: var(--space-4);
+}
+
+.ai-assistant-panel .custom-request textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: var(--space-3);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    resize: vertical;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.ai-assistant-panel .custom-request textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+/* AI Response */
+.ai-assistant-panel .ai-response {
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    position: relative;
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.ai-assistant-panel .ai-response.show {
+    display: flex;
+}
+
+.ai-assistant-panel .ai-response .response-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-secondary);
+    padding: 0;
+    margin-bottom: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.ai-assistant-panel .ai-response .response-header-row {
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border-tertiary);
+}
+
+.ai-assistant-panel .ai-response .response-header-row:last-child {
+    border-bottom: none;
+}
+
+.ai-assistant-panel .ai-response .response-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-3);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: var(--text-primary);
+    font-family: var(--font-family-body);
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+    min-height: 200px;
+}
+
+/* AI Assistant Footer */
+.ai-assistant-panel .panel-footer {
+    padding: var(--space-5) var(--space-6);
+    border-top: 1px solid var(--border-primary);
+    background: var(--bg-surface-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-assistant-panel .ai-status {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ai-assistant-panel .ai-status.generating {
+    color: var(--warning-color);
+}
+
+.ai-assistant-panel .ai-status.error {
+    color: var(--danger-color);
+}
+
+.ai-assistant-panel .ai-status.success {
+    color: var(--success-color);
+}
+
+/* Tab Styles */
+.ai-assistant-panel .nav-tabs {
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.ai-assistant-panel .nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border: none;
+    background: none;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.ai-assistant-panel .nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    background: var(--bg-surface-secondary);
+}
+
+.ai-assistant-panel .nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background: none;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.ai-assistant-panel .tab-content {
+    padding-top: var(--space-3);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0; /* Allow shrinking below content size */
+    position: relative !important; /* Required for absolute positioned tab panes */
+}
+
+/* No Response Message */
+.ai-assistant-panel .no-response-message {
+    text-align: center;
+    padding: var(--space-10) var(--space-5);
+    color: var(--text-secondary);
+}
+
+.ai-assistant-panel .no-response-message i {
+    font-size: 2rem;
+    margin-bottom: var(--space-3);
+    display: block;
+    opacity: 0.5;
+}
+
+/* Preview Modal */
+.preview-header {
+    background: var(--bg-surface-secondary);
+    border-bottom: 2px solid var(--border-primary);
+    padding: var(--space-5) var(--space-6);
+}
+
+.preview-content {
+    padding: var(--space-10);
+    background: var(--bg-surface);
+}
+
+.story-content {
+    font-family: var(--font-family-serif);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    max-width: 800px;
+    margin: 0 auto var(--space-10);
+    text-align: left;
+}
+
+/* Preview Theme Variations */
+.preview-content.theme-dark {
+    background: var(--bg-body-dark);
+    color: var(--text-primary-dark);
+}
+
+.preview-content.theme-sepia {
+    background: #F7F3E8;
+    color: #5D4E37;
+}
+
+/* Publish Modal */
+.publish-story-info h5 {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.story-card-preview {
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+.story-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    transition: box-shadow 0.2s ease;
+}
+
+.story-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] .basic-story-editor {
+    background: var(--bg-body);
+}
+
+[data-theme="dark"] .basic-story-editor .header {
+    background: var(--bg-surface);
+    border-bottom-color: var(--border-primary);
+}
+
+[data-theme="dark"] .ai-assistant-panel {
+    background: var(--bg-surface);
+    border-left-color: var(--border-primary);
+}
+
+[data-theme="dark"] .ql-editor {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .ql-toolbar {
+    background: var(--bg-surface-secondary);
+    border-bottom-color: var(--border-secondary);
+}
+
+[data-theme="dark"] .ql-toolbar button {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .ql-toolbar button:hover {
+    color: var(--primary-color) !important;
+}
+
+[data-theme="dark"] .ql-toolbar button.ql-active {
+    color: var(--primary-color) !important;
+}
+
+/* Utility Classes */
+.font-size-sm {
+    font-size: 0.7rem !important;
+}
+
+.font-size-md {
+    font-size: 0.9rem !important;
+}
+
+.font-size-lg {
+    font-size: 1.1rem !important;
+}
+
+/* Tab pane full height fix */
+.ai-assistant-panel .tab-pane {
+    display: none !important; /* Hidden by default */
+    position: absolute !important; /* Remove from flex flow */
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    flex-direction: column !important;
+    overflow-y: auto !important; /* Add vertical scrollbar */
+    overflow-x: hidden !important; /* Hide horizontal scrollbar */
+    padding: var(--space-3) !important; /* Add some padding */
+}
+
+.ai-assistant-panel .tab-pane.active {
+    display: flex !important;
+    position: absolute !important; /* Take full container space */
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow-y: auto !important; /* Add vertical scrollbar */
+    overflow-x: hidden !important; /* Hide horizontal scrollbar */
+}
+
+/* AI Assistant Tab Content - override inline styles */
+#aiAssistantTabContent {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-grow: 1 !important;
+    height: 100% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Query and Result panels full height with scrolling */
+#query-panel,
+#result-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow-y: auto !important; /* Vertical scrollbar */
+    overflow-x: hidden !important; /* No horizontal scrollbar */
+    padding: var(--space-3) !important; /* Consistent padding */
+    margin: 0 !important; /* Remove margins */
+}
+
+/* Specific fix for query panel tab pane */
+#query-panel.tab-pane.fade.show.active,
+#result-panel.tab-pane.fade.show.active {
+    display: flex !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow-y: auto !important; /* Scrollable content */
+    overflow-x: hidden !important;
+    padding: var(--space-3) !important;
+    margin: 0 !important;
+}
+
+/* Ensure content inside panels can scroll */
+#query-panel > *,
+#result-panel > * {
+    flex-shrink: 0;
+}
+
+/* Custom request textarea container */
+.ai-assistant-panel .custom-request {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+/* AI response container - only take space when shown */
+.ai-assistant-panel .ai-response {
+    background: var(--bg-surface-secondary) !important;
+    border: 1px solid var(--border-secondary) !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--space-3) !important;
+    position: relative !important;
+    display: none !important; /* Hidden by default */
+    flex-direction: column !important;
+    overflow: hidden !important;
+    min-height: 200px !important;
+    flex-grow: 0 !important; /* Override inline flex-grow */
+    height: auto !important; /* Override inline height */
+}
+
+.ai-assistant-panel .ai-response.show {
+    display: flex !important;
+    flex: 1 !important; /* Only grow to fill space when visible */
+    flex-grow: 1 !important; /* Override inline flex-grow when shown */
+    height: auto !important; /* Let flex handle height when shown */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .basic-story-editor .editor-container {
+        padding: 0 var(--space-4);
+    }
+    
+    .basic-story-editor .ql-editor {
+        padding: var(--space-5) !important;
+    }
+    
+    .basic-story-editor .action-buttons {
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+    
+    .ai-assistant-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .basic-story-editor.ai-assistant-open {
+        margin-right: 0;
+        transform: translateX(-100%);
+    }
+    
+    .ai-assistant-panel .assistance-types {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+}

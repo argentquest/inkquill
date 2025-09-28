@@ -1,0 +1,484 @@
+{# /ai_rag_story_app/app/templates/basic_story/detail.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ story.title if story else "Basic Story" }} - Basic Story{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .basic-story-detail-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+    
+    .story-header {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .basic-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-full);
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .story-title {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .story-description {
+        color: var(--text-secondary);
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .story-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .upgrade-prompt {
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        color: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .upgrade-prompt h5 {
+        color: white;
+        margin-bottom: 0.75rem;
+    }
+    
+    .acts-section {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+    }
+    
+    .act-item {
+        background: var(--bg-surface-secondary);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .act-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .act-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .act-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .act-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .act-stats {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+    
+    .act-content-preview {
+        color: var(--text-secondary);
+        font-style: italic;
+        margin-bottom: 1rem;
+    }
+    
+    .act-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .restricted-feature {
+        opacity: 0.6;
+        cursor: not-allowed;
+        position: relative;
+    }
+    
+    .feature-tooltip {
+        position: absolute;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--radius-sm);
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--text-primary);
+        top: -2.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        z-index: 10;
+        display: none;
+    }
+    
+    .restricted-feature:hover .feature-tooltip {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="basic-story-detail-page">
+    {% if story %}
+        <!-- Story Header -->
+        <div class="story-header">
+            <div class="basic-badge">
+                <i class="fas fa-pen-fancy me-1"></i>
+                Basic Story
+            </div>
+            
+            <h1 class="story-title">{{ story.title }}</h1>
+            
+            {% if story.short_description %}
+                <p class="story-description">{{ story.short_description }}</p>
+            {% else %}
+                <p class="story-description text-muted">
+                    <em>No description provided</em>
+                </p>
+            {% endif %}
+            
+            <div class="story-actions">
+                <a href="{{ url_for('ui_list_stories') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Stories
+                </a>
+                
+                <button class="btn btn-success" onclick="showUpgradeModal()">
+                    <i class="fas fa-arrow-up me-1"></i>
+                    Upgrade to Advanced
+                </button>
+                
+                <a href="{{ url_for('ui_edit_story_form', story_id=story.id) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i>
+                    Edit Details
+                </a>
+                
+                <!-- Publishing -->
+                {% if story.published_version %}
+                    <a href="{{ url_for('view_published_story', story_id=story.id) }}" 
+                       class="btn btn-outline-success" target="_blank">
+                        <i class="fas fa-eye me-1"></i>
+                        View Published
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('ui_publish_story', story_id=story.id) }}" class="btn btn-outline-info">
+                        <i class="fas fa-share me-1"></i>
+                        Publish Story
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Upgrade Prompt -->
+        <div class="upgrade-prompt">
+            <h5><i class="fas fa-star me-1"></i>Ready for More Features?</h5>
+            <p class="mb-3">
+                Upgrade to an Advanced Story to unlock character management, 
+                location tracking, world-building tools, and more!
+            </p>
+            <button class="btn btn-light" onclick="showUpgradeModal()">
+                <i class="fas fa-arrow-up me-1"></i>
+                Upgrade Now
+            </button>
+        </div>
+        
+        <!-- Acts Section -->
+        <div class="acts-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3><i class="fas fa-book-open me-2"></i>Your Story</h3>
+                {% if acts and acts|length > 1 %}
+                    <span class="badge bg-primary">{{ acts|length }} Acts</span>
+                {% endif %}
+            </div>
+            
+            {% if acts %}
+                {% for act in acts %}
+                    <div class="act-item">
+                        <div class="act-header">
+                            <h4 class="act-title">
+                                {% if acts|length == 1 %}
+                                    {{ act.title or "Your Story" }}
+                                {% else %}
+                                    Act {{ act.act_number }}: {{ act.title or "Untitled Act" }}
+                                {% endif %}
+                            </h4>
+                            <div class="act-stats">
+                                <i class="fas fa-clock me-1"></i>
+                                Updated {{ act.updated_at.strftime('%b %d, %Y') if act.updated_at else 'Never' }}
+                            </div>
+                        </div>
+                        
+                        {% if act.content %}
+                            <div class="act-content-preview">
+                                "{{ act.content[:150] }}{% if act.content|length > 150 %}...{% endif %}"
+                            </div>
+                        {% else %}
+                            <div class="act-content-preview text-muted">
+                                <em>No content written yet</em>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="act-actions">
+                            <a href="/ui/stories/basic/{{ story.id }}/act/{{ act.id }}/edit" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-pen me-1"></i>
+                                {% if act.content %}Edit{% else %}Start Writing{% endif %}
+                            </a>
+                            
+                            {% if acts|length > 1 %}
+                                <button class="btn btn-outline-danger btn-sm" 
+                                        onclick="deleteAct({{ act.id }})">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Delete
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Add New Act (only show if story has content) -->
+                {% if acts|length == 1 and acts[0].content %}
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-primary" onclick="addNewAct()">
+                            <i class="fas fa-plus me-1"></i>
+                            Add New Act
+                        </button>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center text-muted">
+                    <i class="fas fa-book-open fa-3x mb-3"></i>
+                    <p>No acts created yet.</p>
+                    <a href="/ui/stories/basic/{{ story.id }}/act/1/edit" class="btn btn-primary">
+                        <i class="fas fa-pen me-1"></i>
+                        Start Writing
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Restricted Features Info -->
+        <div class="mt-4 p-3 bg-light border rounded">
+            <h6><i class="fas fa-lock me-1"></i>Locked Features</h6>
+            <p class="small mb-2">
+                The following features are available in Advanced Stories:
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="restricted-feature mb-2">
+                        <i class="fas fa-users me-1"></i>
+                        Character Management
+                        <div class="feature-tooltip">Upgrade to manage characters</div>
+                    </div>
+                    <div class="restricted-feature mb-2">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        Location Tracking
+                        <div class="feature-tooltip">Upgrade to manage locations</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="restricted-feature mb-2">
+                        <i class="fas fa-sitemap me-1"></i>
+                        Story Hierarchy
+                        <div class="feature-tooltip">Upgrade to view story structure</div>
+                    </div>
+                    <div class="restricted-feature mb-2">
+                        <i class="fas fa-globe me-1"></i>
+                        World Management
+                        <div class="feature-tooltip">Upgrade to access world tools</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <h1>Story Not Found</h1>
+            <p>The requested Basic Story could not be found.</p>
+            <a href="{{ url_for('ui_list_stories') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Back to Stories
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Upgrade Modal -->
+<div class="modal fade" id="upgradeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-arrow-up me-2"></i>
+                    Upgrade to Advanced Story
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Upgrading will unlock:</p>
+                <ul>
+                    <li>Character and location management</li>
+                    <li>Advanced world-building tools</li>
+                    <li>Story hierarchy view</li>
+                    <li>Multi-act story structure</li>
+                    <li>Enhanced AI assistance with world context</li>
+                </ul>
+                <div class="mb-3">
+                    <label for="worldName" class="form-label">
+                        World Name (optional)
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="worldName" 
+                           placeholder="{{ story.title + ' World' if story else 'My World' }}"
+                           value="{{ story.title + ' World' if story else '' }}">
+                    <div class="form-text">
+                        You can change this later in world settings.
+                    </div>
+                </div>
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success" onclick="upgradeStory()">
+                    <i class="fas fa-arrow-up me-1"></i>
+                    Upgrade Story
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function showUpgradeModal() {
+    const modal = new bootstrap.Modal(document.getElementById('upgradeModal'));
+    modal.show();
+}
+
+async function upgradeStory() {
+    const worldName = document.getElementById('worldName').value.trim();
+    
+    try {
+        const response = await fetch(`/api/stories/basic/{{ story.id if story else 0 }}/upgrade`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                new_world_name: worldName || null
+            })
+        });
+        
+        if (response.ok) {
+            const upgradedStory = await response.json();
+            
+            // Show success notification
+            showNotification('Story upgraded successfully! Redirecting...', 'success');
+            
+            // Redirect to Advanced story detail page
+            setTimeout(() => {
+                window.location.href = `/ui/stories/${upgradedStory.id}`;
+            }, 1500);
+        } else {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to upgrade story');
+        }
+    } catch (error) {
+        console.error('Failed to upgrade story:', error);
+        showNotification(`Failed to upgrade story: ${error.message}`, 'error');
+    }
+}
+
+async function addNewAct() {
+    try {
+        const response = await fetch(`/api/stories/{{ story.id if story else 0 }}/acts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: `Act ${{{ acts|length + 1 if acts else 2 }}}`,
+                content: ''
+            })
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            throw new Error('Failed to create new act');
+        }
+    } catch (error) {
+        console.error('Failed to add new act:', error);
+        showNotification('Failed to add new act', 'error');
+    }
+}
+
+async function deleteAct(actId) {
+    if (!confirm('Are you sure you want to delete this act? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/acts/${actId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            throw new Error('Failed to delete act');
+        }
+    } catch (error) {
+        console.error('Failed to delete act:', error);
+        showNotification('Failed to delete act', 'error');
+    }
+}
+
+function showNotification(message, type) {
+    if (window.showToast) {
+        window.showToast(message, type);
+    } else {
+        alert(message);
+    }
+}
+</script>
+{% endblock %}

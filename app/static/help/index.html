@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Storytelling Assistant - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+    <style>
+        /* Basic vs Advanced Story Styling */
+        .story-type-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .story-type-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        
+        .story-type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .story-type-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .story-type-time {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .story-type-features {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        
+        .story-type-features li {
+            padding: 3px 0;
+            font-size: 14px;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .feature-availability-matrix {
+            margin: 20px 0;
+        }
+        
+        .feature-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .feature-matrix th,
+        .feature-matrix td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .feature-matrix th {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        .ai-feature-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .ai-feature-column {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .ai-feature-column h4 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        
+        .ai-approach-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .ai-approach-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        
+        .ai-approach-card h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .workflow-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .workflow-tab {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .workflow-tab h4 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        
+        .navigation-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .navigation-column {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .navigation-column h4 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .story-type-comparison,
+            .ai-feature-comparison,
+            .ai-approach-comparison,
+            .workflow-tabs,
+            .navigation-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">AI Storytelling Assistant</h1>
+            <p class="help-subtitle">Your complete guide to AI-powered creative writing</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"getting-started\"]').click()">
+                <div class="quick-action-icon">🚀</div>
+                <div class="quick-action-text">Getting Started</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"features\"]').click()">
+                <div class="quick-action-icon">⚡</div>
+                <div class="quick-action-text">Key Features</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-guide\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Guide</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="getting-started">Getting Started</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="features">Features</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-guide">AI Guide</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="shortcuts">Shortcuts</button></li>
+            </ul>
+        </div>
+
+        <!-- Getting Started Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="getting-started">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Welcome to AI-Powered Storytelling
+                </h2>
+                <p>The AI Storytelling Assistant offers two approaches to creative writing: <strong>Basic Stories</strong> for immediate writing focus and <strong>Advanced Stories</strong> for comprehensive world-building. Choose the path that matches your current needs and creative goals.</p>
+                
+                <div class="story-type-comparison">
+                    <div class="story-type-card basic-story">
+                        <div class="story-type-header">
+                            <h3><span class="badge badge-success">Basic Story</span> Quick Start</h3>
+                            <span class="story-type-time">Start writing in 2 minutes</span>
+                        </div>
+                        <div class="story-type-content">
+                            <p><strong>Perfect for:</strong> New writers, quick ideas, focused writing sessions</p>
+                            <ul class="story-type-features">
+                                <li>✅ Instant story creation (title + description)</li>
+                                <li>✅ Automatic Act 1 setup</li>
+                                <li>✅ AI writing assistance</li>
+                                <li>✅ Story chat discussions</li>
+                                <li>✅ Full publishing capabilities</li>
+                                <li>❌ No world-building tools</li>
+                                <li>❌ No character/location management</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="story-type-card advanced-story">
+                        <div class="story-type-header">
+                            <h3><span class="badge badge-primary">Advanced Story</span> Full Power</h3>
+                            <span class="story-type-time">Setup in 30 minutes</span>
+                        </div>
+                        <div class="story-type-content">
+                            <p><strong>Perfect for:</strong> Complex narratives, series, detailed world-building</p>
+                            <ul class="story-type-features">
+                                <li>✅ All Basic Story features</li>
+                                <li>✅ Character development & management</li>
+                                <li>✅ Location world-building</li>
+                                <li>✅ Lore items & mythology</li>
+                                <li>✅ World consistency checking</li>
+                                <li>✅ RAG-powered AI context</li>
+                                <li>✅ Document integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Basic Story: Your First 5 Minutes</h3>
+                        <span class="recipe-card-time">5 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content"><strong>Click "Start Writing"</strong> - Choose Basic Story for immediate access</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content"><strong>Enter title and description</strong> - Just the basics to get started</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content"><strong>Start writing in Act 1</strong> - The system creates your first act automatically</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content"><strong>Use AI assistance</strong> - Get writing help without world-building complexity</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content"><strong>Upgrade when ready</strong> - Add world-building features anytime</div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Advanced Story: Your First 30 Minutes</h3>
+                        <span class="recipe-card-time">30 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content"><strong>Create your first world</strong> - Start with a simple concept like "medieval fantasy kingdom" or "space station colony"</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content"><strong>Add a main character</strong> - Define their goal, motivation, and one major personality trait</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content"><strong>Create a key location</strong> - Where does your story begin? Focus on atmosphere and significance</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content"><strong>Start an Advanced Story</strong> - Create your first story and outline basic structure with 3 acts</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content"><strong>Write your opening scene</strong> - Use the Scene Editor with full world-aware AI assistance</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Pro Tip:</strong> Don't worry about perfection in your first attempt. Focus on getting familiar with the tools and workflow. You can always refine and expand later.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Core Concepts</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📚 Stories</h3>
+                        <p class="feature-card-description">Narrative projects with acts and scenes. <strong>Basic Stories</strong> focus on pure writing, while <strong>Advanced Stories</strong> integrate with world elements.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🌍 Worlds</h3>
+                        <p class="feature-card-description">Container for all your creative elements. <span class="badge badge-primary">Advanced Only</span> - Basic Stories use hidden shadow worlds.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎭 Elements</h3>
+                        <p class="feature-card-description">Characters, locations, and lore items. <span class="badge badge-primary">Advanced Only</span> - Available when you upgrade from Basic Stories.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🔗 Associations</h3>
+                        <p class="feature-card-description">Role-based connections between elements. <span class="badge badge-primary">Advanced Only</span> - Help AI understand context and relationships.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Navigation Overview</h2>
+                
+                <div class="navigation-comparison">
+                    <div class="navigation-column">
+                        <h4><span class="badge badge-success">Basic Story Navigation</span></h4>
+                        <ul>
+                            <li><strong>My Stories:</strong> All your stories with type badges</li>
+                            <li><strong>Story Detail:</strong> Story management and chat</li>
+                            <li><strong>Act/Scene Editors:</strong> AI-assisted writing environments</li>
+                            <li><strong>Story Chat:</strong> Writing-focused AI discussions</li>
+                            <li><strong>Publishing:</strong> Share your completed stories</li>
+                        </ul>
+                    </div>
+                    <div class="navigation-column">
+                        <h4><span class="badge badge-primary">Advanced Story Navigation</span></h4>
+                        <ul>
+                            <li><strong>All Basic Story pages</strong> plus:</li>
+                            <li><strong>World List:</strong> Manage all your creative universes</li>
+                            <li><strong>World Detail:</strong> Overview and quick access to world elements</li>
+                            <li><strong>World Hierarchy:</strong> Visual tree view of your world's structure</li>
+                            <li><strong>Element Detail Pages:</strong> Develop characters, locations, and lore</li>
+                            <li><strong>Story Chat:</strong> World-aware comprehensive discussions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="features">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Platform Features Overview
+                </h2>
+                
+                <div class="feature-availability-matrix">
+                    <div class="matrix-header">
+                        <h3>Feature Availability by Story Type</h3>
+                        <p>Choose the story type that matches your current needs:</p>
+                    </div>
+                    <table class="help-table feature-matrix">
+                        <thead>
+                            <tr>
+                                <th>Feature Category</th>
+                                <th><span class="badge badge-success">Basic Story</span></th>
+                                <th><span class="badge badge-primary">Advanced Story</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Story Creation</strong></td>
+                                <td>✅ Instant setup</td>
+                                <td>✅ Full configuration</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Writing Tools</strong></td>
+                                <td>✅ Full editor + AI</td>
+                                <td>✅ Full editor + AI</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Story Chat</strong></td>
+                                <td>✅ Writing-focused</td>
+                                <td>✅ World-aware</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Publishing</strong></td>
+                                <td>✅ Full publishing</td>
+                                <td>✅ Full publishing</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Character Management</strong></td>
+                                <td>❌ Not available</td>
+                                <td>✅ Full system</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Location Building</strong></td>
+                                <td>❌ Not available</td>
+                                <td>✅ Full system</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lore Items</strong></td>
+                                <td>❌ Not available</td>
+                                <td>✅ Full system</td>
+                            </tr>
+                            <tr>
+                                <td><strong>World Hierarchy</strong></td>
+                                <td>❌ Not available</td>
+                                <td>✅ Full system</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RAG Context</strong></td>
+                                <td>❌ Context-free AI</td>
+                                <td>✅ Full world context</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Document Integration</strong></td>
+                                <td>❌ Not available</td>
+                                <td>✅ Full RAG system</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World-Building Tools <span class="badge badge-primary">Advanced Only</span></span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>Character Development:</strong> Detailed personality, backstory, and relationship tracking</li>
+                            <li><strong>Location Design:</strong> Multi-scale environments from rooms to continents</li>
+                            <li><strong>Lore Management:</strong> Magic systems, history, culture, and artifacts</li>
+                            <li><strong>Visual Generation:</strong> AI-created images for characters and locations</li>
+                            <li><strong>Hierarchical Organization:</strong> Parent-child relationships between elements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story Structure and Writing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>Three-Tier Structure:</strong> Stories → Acts → Scenes organization</li>
+                            <li><strong>Rich Text Editors:</strong> Full formatting and styling options</li>
+                            <li><strong>Version Control:</strong> Automatic saves and revision history</li>
+                            <li><strong>Collaborative Writing:</strong> Real-time multi-author support</li>
+                            <li><strong>Export Options:</strong> PDF, EPUB, Word, and other formats</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Integration (Different for Each Story Type)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="ai-feature-comparison">
+                            <div class="ai-feature-column">
+                                <h4><span class="badge badge-success">Basic Story AI</span></h4>
+                                <ul>
+                                    <li><strong>Writing Craft Focus:</strong> Pure storytelling assistance</li>
+                                    <li><strong>Plot Development:</strong> Structure and pacing guidance</li>
+                                    <li><strong>Character Development:</strong> Narrative-focused character growth</li>
+                                    <li><strong>Context-Free AI:</strong> No world complexity</li>
+                                    <li><strong>Story Chat:</strong> Writing technique discussions</li>
+                                </ul>
+                            </div>
+                            <div class="ai-feature-column">
+                                <h4><span class="badge badge-primary">Advanced Story AI</span></h4>
+                                <ul>
+                                    <li><strong>All Basic Features</strong> plus:</li>
+                                    <li><strong>Character Voice:</strong> Dialogue suggestions matching character personality</li>
+                                    <li><strong>World Consistency:</strong> AI checks for contradictions and continuity</li>
+                                    <li><strong>RAG Technology:</strong> AI remembers and references your world knowledge</li>
+                                    <li><strong>Story Chat:</strong> World-aware comprehensive discussions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Association System <span class="badge badge-primary">Advanced Only</span></span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Note:</strong> Association features are not available in Basic Stories. Basic Stories focus on pure writing without world-building complexity.</p>
+                        <ul>
+                            <li><strong>Role-Based Connections:</strong> Define specific relationships between elements</li>
+                            <li><strong>Story Integration:</strong> Connect elements to stories, acts, and scenes</li>
+                            <li><strong>Context Notes:</strong> Add details about relationships and interactions</li>
+                            <li><strong>AI Context:</strong> Associations provide rich context for AI assistance</li>
+                            <li><strong>Visual Tracking:</strong> See connections in the World Hierarchy</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Collaboration and Sharing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>Privacy Controls:</strong> Private, shared, or public worlds</li>
+                            <li><strong>Permission Levels:</strong> Viewer, commenter, editor, co-author access</li>
+                            <li><strong>Comment System:</strong> Feedback and discussion on specific content</li>
+                            <li><strong>Real-Time Sync:</strong> See changes as collaborators make them</li>
+                            <li><strong>Community Features:</strong> Public galleries and forums</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Credit System</h2>
+                <p>Understanding AI costs and credit usage:</p>
+                <ul>
+                    <li><strong>Free Operations:</strong> World building, organization, and basic editing don't cost credits</li>
+                    <li><strong>AI Writing:</strong> 1-5 credits per suggestion, 5-15 credits per generation</li>
+                    <li><strong>Image Creation:</strong> 10-25 credits per image depending on complexity</li>
+                    <li><strong>Analysis Tools:</strong> 5-20 credits for consistency checks and story analysis</li>
+                    <li><strong>Credit Packages:</strong> Available for purchase, with bulk discounts</li>
+                </ul>
+
+                <div class="credit-usage">
+                    💰 <strong>Cost Management Tips:</strong> Use AI for challenging creative blocks, not routine writing. Edit AI suggestions rather than generating entirely new content.
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Guide Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-guide">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI Writing Assistant Guide
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧠 How RAG Technology Works</h3>
+                    <p class="ai-feature-description">Retrieval Augmented Generation (RAG) allows AI to access and reference your specific world knowledge, characters, and story history for contextually relevant suggestions.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Getting the Best AI Results</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Optimize your AI interactions:</p>
+                        <ul>
+                            <li><strong>Rich Context:</strong> Detailed character and location descriptions improve AI suggestions</li>
+                            <li><strong>Clear Associations:</strong> Well-defined relationships help AI understand story dynamics</li>
+                            <li><strong>Specific Requests:</strong> "Make this more tense" works better than "improve this"</li>
+                            <li><strong>Iterative Building:</strong> Work in small chunks rather than large generations</li>
+                            <li><strong>Personal Voice:</strong> Always edit AI suggestions to match your style</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Basic Story AI Prompts:\n\n✅ Good: \"Add more tension to this dialogue between the two characters\"\n❌ Poor: \"Make this better\"\n\n✅ Good: \"Describe the library using sensory details that emphasize mystery\"\n❌ Poor: \"Add description\"\n\n✅ Good: \"Continue this scene showing the protagonist\'s growing suspicion\"\n❌ Poor: \"Write more\"\n\nAdvanced Story AI Prompts:\n\n✅ Good: \"Add tension considering Sarah and Marcus\' romantic history\"\n✅ Good: \"Describe the ancient library matching the mystical tone of Eldoria\"\n✅ Good: \"Continue with John\'s suspicion, referencing his detective background\"')">Copy</button>
+                            <pre>Basic Story AI Prompts:
+
+✅ Good: "Add more tension to this dialogue between the two characters"
+❌ Poor: "Make this better"
+
+✅ Good: "Describe the library using sensory details that emphasize mystery"
+❌ Poor: "Add description"
+
+✅ Good: "Continue this scene showing the protagonist's growing suspicion"
+❌ Poor: "Write more"
+
+Advanced Story AI Prompts:
+
+✅ Good: "Add tension considering Sarah and Marcus' romantic history"
+✅ Good: "Describe the ancient library matching the mystical tone of Eldoria"
+✅ Good: "Continue with John's suspicion, referencing his detective background"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Writing Workflow</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="workflow-tabs">
+                            <div class="workflow-tab">
+                                <h4><span class="badge badge-success">Basic Story Workflow</span></h4>
+                                <ol>
+                                    <li><strong>Plan Structure:</strong> Outline your scene or chapter goals first</li>
+                                    <li><strong>Write Opening:</strong> Start with 1-2 sentences to establish direction</li>
+                                    <li><strong>Use AI for Craft:</strong> Request help with pacing, dialogue, description</li>
+                                    <li><strong>Edit and Refine:</strong> Customize AI suggestions to match your voice</li>
+                                    <li><strong>Review Flow:</strong> Check that AI additions maintain narrative consistency</li>
+                                </ol>
+                            </div>
+                            <div class="workflow-tab">
+                                <h4><span class="badge badge-primary">Advanced Story Workflow</span></h4>
+                                <ol>
+                                    <li><strong>Plan Structure:</strong> Outline your scene or chapter goals first</li>
+                                    <li><strong>Set Context:</strong> Ensure relevant characters/locations are associated</li>
+                                    <li><strong>Write Opening:</strong> Start with 1-2 sentences to establish direction</li>
+                                    <li><strong>Use AI with Context:</strong> Request help referencing specific world elements</li>
+                                    <li><strong>Edit and Refine:</strong> Customize AI suggestions to match your voice</li>
+                                    <li><strong>Review Consistency:</strong> Check that AI additions fit your world and characters</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Limitation Awareness</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Understanding what AI can and cannot do:</p>
+                        <ul>
+                            <li><strong>Strengths:</strong> Pattern recognition, language fluency, consistent tone, rapid content generation</li>
+                            <li><strong>Limitations:</strong> No true creativity, may repeat patterns, lacks emotional depth, can be inconsistent</li>
+                            <li><strong>Best Uses:</strong> Overcoming writer's block, expanding outlines, dialogue suggestions, description enhancement</li>
+                            <li><strong>Human Essential:</strong> Story vision, character depth, thematic meaning, emotional authenticity</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Creative Partnership:</strong> AI is a sophisticated tool, not a replacement for human creativity. The best results come from human vision guided by AI assistance.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Troubleshooting AI Issues</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Problem</th>
+                                    <th>Likely Cause</th>
+                                    <th>Solution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Generic suggestions</td>
+                                    <td>Insufficient context</td>
+                                    <td>Add more character/location details and associations</td>
+                                </tr>
+                                <tr>
+                                    <td>Character inconsistency</td>
+                                    <td>Unclear character definition</td>
+                                    <td>Enhance character personality and voice description</td>
+                                </tr>
+                                <tr>
+                                    <td>Repetitive content</td>
+                                    <td>Limited prompt variation</td>
+                                    <td>Use different phrasing and provide more context</td>
+                                </tr>
+                                <tr>
+                                    <td>Wrong tone/style</td>
+                                    <td>Unclear story metadata</td>
+                                    <td>Set genre, tone, and target audience clearly</td>
+                                </tr>
+                                <tr>
+                                    <td>Slow responses</td>
+                                    <td>High server load</td>
+                                    <td>Try smaller requests or wait for off-peak times</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Advanced AI Techniques</h2>
+                <p>Power user strategies:</p>
+                <ul>
+                    <li><strong>Prompt Chaining:</strong> Use one AI response to inform the next request</li>
+                    <li><strong>Style Training:</strong> Provide examples of your preferred writing style</li>
+                    <li><strong>Constraint Setting:</strong> Give AI specific limitations (word count, tone, perspective)</li>
+                    <li><strong>Multi-Pass Editing:</strong> Use AI for different editing passes (structure, dialogue, description)</li>
+                    <li><strong>Collaborative Ideation:</strong> Brainstorm with AI before writing</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Shortcuts Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="shortcuts">
+            <div class="help-section">
+                <h2 class="help-section-title">Master Keyboard Shortcuts</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Universal Shortcuts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Shortcut</th>
+                                    <th>Action</th>
+                                    <th>Works In</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + S</span></td>
+                                    <td>Save current work</td>
+                                    <td>All editors</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + F</span></td>
+                                    <td>Search/Find</td>
+                                    <td>Most pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Z</span></td>
+                                    <td>Undo</td>
+                                    <td>Text editors</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Y</span></td>
+                                    <td>Redo</td>
+                                    <td>Text editors</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">F11</span></td>
+                                    <td>Full-screen mode</td>
+                                    <td>Editors</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>AI Writing Shortcuts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Shortcut</th>
+                                    <th>Action</th>
+                                    <th>Context</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Tab</span></td>
+                                    <td>Accept AI suggestion</td>
+                                    <td>When suggestion appears</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + /</span></td>
+                                    <td>Request AI continuation</td>
+                                    <td>End of sentence/paragraph</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Shift + /</span></td>
+                                    <td>Multiple AI options</td>
+                                    <td>When you want alternatives</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Esc</span></td>
+                                    <td>Dismiss AI suggestions</td>
+                                    <td>When suggestions aren't helpful</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Alt + E</span></td>
+                                    <td>Expand selected text</td>
+                                    <td>Turn outline into full content</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Navigation Shortcuts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Shortcut</th>
+                                    <th>Action</th>
+                                    <th>Where</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + N</span></td>
+                                    <td>Create new item</td>
+                                    <td>Context-dependent</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + E</span></td>
+                                    <td>Edit current item</td>
+                                    <td>Detail pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + H</span></td>
+                                    <td>Open world hierarchy</td>
+                                    <td>World-related pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + M</span></td>
+                                    <td>Open world map</td>
+                                    <td>World-related pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + A</span></td>
+                                    <td>Manage associations</td>
+                                    <td>Element detail pages</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Quick Creation Shortcuts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Shortcut</th>
+                                    <th>Creates</th>
+                                    <th>From</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Shift + C</span></td>
+                                    <td>New character</td>
+                                    <td>World pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Shift + L</span></td>
+                                    <td>New location</td>
+                                    <td>World pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Shift + S</span></td>
+                                    <td>New story</td>
+                                    <td>World pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Shift + A</span></td>
+                                    <td>New act</td>
+                                    <td>Story pages</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="keyboard-shortcut">Ctrl + Shift + E</span></td>
+                                    <td>New scene</td>
+                                    <td>Story/act pages</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Productivity Tips</h2>
+                <ul>
+                    <li><strong>Learn Core Shortcuts:</strong> Focus on Save (Ctrl+S), AI Assist (Ctrl+/), and navigation shortcuts first</li>
+                    <li><strong>Customize Workflow:</strong> Use shortcuts that match your writing style and frequency</li>
+                    <li><strong>Batch Operations:</strong> Use Ctrl+Click and Shift+Click for multiple selections</li>
+                    <li><strong>Quick Access:</strong> Set up world and story favorites for rapid navigation</li>
+                    <li><strong>Focus Mode:</strong> Use F11 full-screen and Zen mode for distraction-free writing</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Final Tip -->
+        <div class="final-tip">
+            <h4>🏠 Final Tip</h4>
+            <p>The AI Storytelling Assistant is designed to grow with you. Start simple with basic world-building and gradually explore advanced features as you become comfortable. Remember: AI enhances creativity, it doesn't replace it. Your imagination and vision drive the story!</p>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

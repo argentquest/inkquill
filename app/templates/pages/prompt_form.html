@@ -1,0 +1,126 @@
+{# /ai_rag_story_app/app/templates/pages/prompt_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set page_action = "Create New" if prompt is none else "Edit" %}
+{% set button_action_text = "Create Prompt" if prompt is none else "Save Changes" %}
+{% set button_icon_class = "fas fa-plus-circle" if prompt is none else "fas fa-save" %}
+
+{% block title %}{{ page_action }} Prompt{% endblock %}
+
+{% block content %}
+<div class="prompt-form-page">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7"> 
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="card-title mb-0">{{ page_action }} Prompt</h2>
+                        <button type="button" class="btn help-button" onclick="openHelpModal('prompts')"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="View quick start guide for prompt management">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+
+                    <div class="mb-3">
+                        <a href="{{ url_for('ui_list_prompts') }}" class="text-decoration-none"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Return to your prompt library">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Prompt Library
+                        </a>
+                    </div>
+
+                    <div id="prompt-form-error-message" class="alert alert-danger" style="display: none;" role="alert">
+                    </div>
+
+                    <form id="prompt-form" action="{{ form_action_url }}" method="post" data-page-action="{{ page_action }}">
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Prompt Title:</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                   value="{{ prompt.title | e if prompt and prompt.title else '' }}"
+                                   required minlength="1" maxlength="200"
+                                   placeholder="e.g., My Gritty Noir Style">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="prompt_content" class="form-label">Prompt Content:</label>
+                            <textarea class="form-control" id="prompt_content" name="prompt_content"
+                                      rows="10"
+                                      required minlength="1" maxlength="5000"
+                                      placeholder="e.g., photorealistic, grainy film texture, dramatic chiaroscuro lighting, 8k, cinematic">{{ prompt.prompt_content | e if prompt and prompt.prompt_content else '' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="prompt_type" class="form-label">Prompt Type:</label>
+                                <select class="form-select" name="prompt_type" id="prompt_type" required>
+                                    {% for p_type_enum_member in prompt_types %}
+                                        <option value="{{ p_type_enum_member.value }}"
+                                                {% if prompt and prompt.prompt_type == p_type_enum_member %}selected{% endif %}>
+                                            {{ p_type_enum_member.value.replace('_', ' ') | title }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="age_target" class="form-label">Age Group:</label>
+                                <select class="form-select" name="age_target" id="age_target" required>
+                                    {% for age_enum_member in age_targets %}
+                                        <option value="{{ age_enum_member.value }}"
+                                                {% if prompt and prompt.age_target == age_enum_member %}selected{% endif %}>
+                                            {% if age_enum_member.value == 'ALL_AGES' %}
+                                                All Ages (General)
+                                            {% else %}
+                                                Ages {{ age_enum_member.value.replace('AGES_', '').replace('_', '-') }}
+                                            {% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="reason_to_use" class="form-label">Reason to Use (Optional):</label>
+                            <textarea class="form-control" id="reason_to_use" name="reason_to_use" rows="2" placeholder="When or why should this prompt be used?">{{ prompt.reason_to_use | e if prompt and prompt.reason_to_use else '' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comments (Optional):</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="2" placeholder="Any additional notes or comments.">{{ prompt.comment | e if prompt and prompt.comment else '' }}</textarea>
+                        </div>
+
+                        <!-- FIX: ADDED THE 'IS ACTIVE' CHECKBOX -->
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active" 
+                                   value="true" {% if prompt is none or prompt.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Is Active
+                            </label>
+                            <div class="form-text">Inactive prompts will not appear in editor dropdowns.</div>
+                        </div>
+                        <!-- END FIX -->
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('ui_list_prompts') }}" class="btn btn-secondary me-md-2"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Discard changes and return to prompt library">Cancel</a>
+                            <button type="submit" id="save-prompt-button" class="btn btn-primary"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                    title="{% if prompt %}Save all changes to this prompt{% else %}Create a new prompt with the provided information{% endif %}">
+                                <i class="{{ button_icon_class }} me-1"></i>{{ button_action_text }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    <script src="{{ url_for('static', path='/js/prompt_form_handler.js') }}"></script>
+{% endblock %}

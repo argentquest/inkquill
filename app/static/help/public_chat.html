@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Chat - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">💬 AI World Chat</h1>
+            <p class="help-subtitle">Immerse yourself in AI-powered conversations within rich storytelling worlds</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Navigation -->
+            <div class="help-navigation">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#overview">Chat Overview</a></li>
+                    <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#chat-features">Chat Features</a></li>
+                    <li><a href="#conversation-tips">Conversation Tips</a></li>
+                    <li><a href="#world-exploration">Exploring the World</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[onclick*=clearCurrentChat]')?.click()">
+                    <div class="quick-action-icon">🧹</div>
+                    <div class="quick-action-text">Clear Chat</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[onclick*=showWorldDetailsModal]')?.click()">
+                    <div class="quick-action-icon">ℹ️</div>
+                    <div class="quick-action-text">World Details</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); window.location.href='/public/gallery'">
+                    <div class="quick-action-icon">🌍</div>
+                    <div class="quick-action-text">Browse Gallery</div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="help-content">
+                <section id="overview" class="help-section">
+                    <h2>Chat Overview</h2>
+                    <p>Welcome to AI World Chat! You're now exploring a carefully crafted world through interactive AI conversations. This system allows you to engage with characters, explore locations, and discover rich lore through natural dialogue.</p>
+                    
+                    <div class="info-box info-box-primary">
+                        <div class="info-box-icon">🎯</div>
+                        <div class="info-box-content">
+                            <h4>What You Can Do</h4>
+                            <ul>
+                                <li>Have conversations with AI characters</li>
+                                <li>Explore locations through descriptive dialogue</li>
+                                <li>Learn about world history and lore</li>
+                                <li>Ask questions about anything in the world</li>
+                                <li>Experience dynamic, context-aware responses</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-box-success">
+                        <div class="info-box-icon">🤖</div>
+                        <div class="info-box-content">
+                            <h4>AI-Powered Experience</h4>
+                            <p>The AI has been trained on this specific world's content, including character personalities, location details, and historical events. Your conversations will be rich, consistent, and true to the world's established lore.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="getting-started" class="help-section">
+                    <h2>Getting Started</h2>
+                    <p>Ready to explore this world? Here's how to make the most of your chat experience:</p>
+                    
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Start Simple</h4>
+                                <p>Begin with basic questions to understand the world:</p>
+                                <ul>
+                                    <li>"Tell me about this world"</li>
+                                    <li>"Who are the main characters?"</li>
+                                    <li>"What are the important locations?"</li>
+                                    <li>"What's the history of this place?"</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Engage Naturally</h4>
+                                <p>Treat the AI like you're having a conversation with someone knowledgeable about the world. Ask follow-up questions and dive deeper into topics that interest you.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Explore Interactively</h4>
+                                <p>Ask the AI to describe scenes, explain character motivations, or walk you through locations as if you're experiencing them firsthand.</p>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Use the Interface</h4>
+                                <p>Take advantage of the chat features:</p>
+                                <ul>
+                                    <li>Clear chat to start fresh</li>
+                                    <li>View world details for context</li>
+                                    <li>Adjust AI model if available</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="chat-features" class="help-section">
+                    <h2>Chat Features</h2>
+                    <p>Understanding the chat interface and available features:</p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎭</div>
+                            <h4>Character Access</h4>
+                            <p>Choose which characters are available for chat:</p>
+                            <ul>
+                                <li>All characters</li>
+                                <li>Selected characters only</li>
+                                <li>Exclude specific characters</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📍</div>
+                            <h4>Location Access</h4>
+                            <p>Control which locations users can explore:</p>
+                            <ul>
+                                <li>All public locations</li>
+                                <li>Starting areas only</li>
+                                <li>Custom location list</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">📚</div>
+                            <h4>Lore Visibility</h4>
+                            <p>Manage what lore is discoverable:</p>
+                            <ul>
+                                <li>All lore items</li>
+                                <li>Public lore only</li>
+                                <li>Progressive discovery</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">💬</div>
+                            <h4>Chat Modes</h4>
+                            <p>Set available interaction styles:</p>
+                            <ul>
+                                <li>Character conversations</li>
+                                <li>Narrator mode</li>
+                                <li>Mixed exploration</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔒</div>
+                            <h4>Content Filters</h4>
+                            <p>Apply content restrictions:</p>
+                            <ul>
+                                <li>Age-appropriate content</li>
+                                <li>Violence level</li>
+                                <li>Language filters</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">⏰</div>
+                            <h4>Session Limits</h4>
+                            <p>Control chat duration:</p>
+                            <ul>
+                                <li>Time per session</li>
+                                <li>Messages per session</li>
+                                <li>Daily user limits</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="management" class="help-section">
+                    <h2>Managing Public Chats</h2>
+                    <p>Monitor and manage how users interact with your world:</p>
+                    
+                    <div class="management-feature">
+                        <h4>🎛️ Control Panel</h4>
+                        <p>Access your public chat dashboard to:</p>
+                        <ul>
+                            <li>View active chat sessions</li>
+                            <li>Monitor real-time interactions</li>
+                            <li>Pause or stop public access</li>
+                            <li>Update settings on the fly</li>
+                        </ul>
+                    </div>
+
+                    <div class="management-feature">
+                        <h4>🚨 Moderation Tools</h4>
+                        <p>Keep your world safe and enjoyable:</p>
+                        <ul>
+                            <li>Review flagged conversations</li>
+                            <li>Block problematic users</li>
+                            <li>Set automatic content filters</li>
+                            <li>Receive moderation alerts</li>
+                        </ul>
+                    </div>
+
+                    <div class="management-feature">
+                        <h4>📋 Chat Logs</h4>
+                        <p>Access conversation history to:</p>
+                        <ul>
+                            <li>Review user interactions</li>
+                            <li>Identify popular content</li>
+                            <li>Improve world elements</li>
+                            <li>Export interesting conversations</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="analytics" class="help-section">
+                    <h2>Analytics & Insights</h2>
+                    <p>Understand how users engage with your world:</p>
+                    
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <div class="analytics-icon">📊</div>
+                            <h4>Usage Statistics</h4>
+                            <ul>
+                                <li>Total chat sessions</li>
+                                <li>Unique visitors</li>
+                                <li>Average session length</li>
+                                <li>Return visitor rate</li>
+                            </ul>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-icon">🎭</div>
+                            <h4>Character Popularity</h4>
+                            <ul>
+                                <li>Most chatted characters</li>
+                                <li>Character interaction rates</li>
+                                <li>Conversation quality scores</li>
+                                <li>User favorites</li>
+                            </ul>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-icon">🗺️</div>
+                            <h4>Location Visits</h4>
+                            <ul>
+                                <li>Most explored locations</li>
+                                <li>Discovery patterns</li>
+                                <li>Time spent per location</li>
+                                <li>Navigation flows</li>
+                            </ul>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-icon">💭</div>
+                            <h4>User Feedback</h4>
+                            <ul>
+                                <li>Chat ratings</li>
+                                <li>User comments</li>
+                                <li>Favorite moments</li>
+                                <li>Improvement suggestions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-box-success">
+                        <div class="info-box-icon">📈</div>
+                        <div class="info-box-content">
+                            <h4>Using Analytics</h4>
+                            <p>Analytics help you understand what works and what doesn't. Use these insights to refine your world, develop popular characters further, and create new content that resonates with your audience.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="best-practices" class="help-section">
+                    <h2>Best Practices</h2>
+                    
+                    <div class="best-practice">
+                        <h4>🌟 Quality Over Quantity</h4>
+                        <ul>
+                            <li>Focus on well-developed characters with clear personalities</li>
+                            <li>Create detailed location descriptions</li>
+                            <li>Ensure lore items are informative and interesting</li>
+                            <li>Test interactions before going public</li>
+                        </ul>
+                    </div>
+
+                    <div class="best-practice">
+                        <h4>🎨 Consistency is Key</h4>
+                        <ul>
+                            <li>Maintain consistent world rules and logic</li>
+                            <li>Ensure character behaviors align with their backgrounds</li>
+                            <li>Keep location descriptions coherent</li>
+                            <li>Update content regularly based on feedback</li>
+                        </ul>
+                    </div>
+
+                    <div class="best-practice">
+                        <h4>👥 Community Engagement</h4>
+                        <ul>
+                            <li>Respond to user feedback</li>
+                            <li>Announce major world updates</li>
+                            <li>Create special events or scenarios</li>
+                            <li>Collaborate with other world creators</li>
+                        </ul>
+                    </div>
+
+                    <div class="best-practice">
+                        <h4>🛡️ Safety First</h4>
+                        <ul>
+                            <li>Set appropriate content ratings</li>
+                            <li>Monitor for inappropriate interactions</li>
+                            <li>Maintain clear usage guidelines</li>
+                            <li>Report any technical issues promptly</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>💡 Pro Tips</h4>
+                        <ul>
+                            <li><strong>Start Small:</strong> Begin with a few key characters and expand based on popularity</li>
+                            <li><strong>Listen to Users:</strong> Pay attention to what aspects users enjoy most</li>
+                            <li><strong>Regular Updates:</strong> Keep your world fresh with new content</li>
+                            <li><strong>Cross-Promote:</strong> Share your world on social media and forums</li>
+                            <li><strong>Collaborate:</strong> Connect with other creators for crossover opportunities</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

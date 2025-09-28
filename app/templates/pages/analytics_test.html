@@ -1,0 +1,655 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Analytics Testing Page{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .test-section {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .test-button {
+        margin: 5px;
+    }
+    
+    .event-log {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 12px;
+    }
+    
+    .log-entry {
+        margin-bottom: 10px;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .log-entry.success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .log-entry.error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Google Analytics Testing Page</h1>
+    <p class="text-muted">Use this page to test the enhanced Google Analytics tracking implementation.</p>
+    
+    {% if current_user and current_user.is_authenticated %}
+    <div class="alert alert-info">
+        <strong>Logged in as:</strong> {{ current_user.username }} (ID: {{ current_user.id }}, Type: {{ "Admin" if current_user.is_admin else "Regular" }})
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+        <strong>Not logged in:</strong> User ID tracking will not be available. <a href="{{ url_for('ui_login_form') }}">Login</a> to test user tracking.
+    </div>
+    {% endif %}
+    
+    <!-- Test Section 0: Layout & Consent Management -->
+    <div class="test-section">
+        <h3>0. Layout & Consent Management</h3>
+        <p>Test navigation layout and manage analytics consent:</p>
+        
+        <button class="btn btn-info test-button" onclick="testToggleNavLayout()">
+            <i class="fas fa-exchange-alt me-1"></i>Toggle Navigation Layout
+        </button>
+        
+        <button class="btn btn-warning test-button" onclick="window.location.href='/ui/analytics-test?nav_layout=topbar'">
+            <i class="fas fa-arrow-up me-1"></i>Force Top Navigation
+        </button>
+        
+        <button class="btn btn-primary test-button" onclick="window.location.href='/ui/analytics-test?nav_layout=sidebar'">
+            <i class="fas fa-bars me-1"></i>Force Sidebar Navigation
+        </button>
+        
+        <div id="layoutStatus" class="mt-2 p-2 bg-light border rounded" style="display: none;">
+            <strong>Current Layout:</strong> <span id="layoutStatusText">Unknown</span>
+        </div>
+        
+        <hr class="my-3">
+        
+        <button class="btn btn-success test-button" onclick="grantConsent()">
+            Grant Analytics Consent
+        </button>
+        
+        <button class="btn btn-danger test-button" onclick="denyConsent()">
+            Deny Analytics Consent
+        </button>
+        
+        <button class="btn btn-info test-button" onclick="checkConsentStatus()">
+            Check Consent Status
+        </button>
+        
+        <div id="consentStatus" class="mt-2 p-2 bg-light border rounded" style="display: none;">
+            <strong>Consent Status:</strong> <span id="consentStatusText">Unknown</span>
+        </div>
+    </div>
+
+    <!-- Test Section 1: Basic Tracking -->
+    <div class="test-section">
+        <h3>1. Basic Event Tracking</h3>
+        <p>Test fundamental tracking functions:</p>
+        
+        <button class="btn btn-primary test-button" onclick="testFeatureUse()">
+            Test Feature Use
+        </button>
+        
+        <button class="btn btn-info test-button" onclick="testPageView()">
+            Test Page View
+        </button>
+        
+        <button class="btn btn-warning test-button" onclick="testError()">
+            Test Error Tracking
+        </button>
+    </div>
+    
+    <!-- Test Section 2: Authentication -->
+    <div class="test-section">
+        <h3>2. Authentication Events</h3>
+        <p>Test authentication tracking:</p>
+        
+        <button class="btn btn-success test-button" onclick="testAuthEvent('login', 'email')">
+            Test Login (Email)
+        </button>
+        
+        <button class="btn btn-success test-button" onclick="testAuthEvent('signup', 'google')">
+            Test Signup (Google)
+        </button>
+        
+        <button class="btn btn-danger test-button" onclick="testAuthEvent('logout', 'manual')">
+            Test Logout
+        </button>
+    </div>
+    
+    <!-- Test Section 3: Content Management -->
+    <div class="test-section">
+        <h3>3. Content Management</h3>
+        <p>Test story and world tracking:</p>
+        
+        <button class="btn btn-primary test-button" onclick="testStoryAction('create')">
+            Test Story Create
+        </button>
+        
+        <button class="btn btn-info test-button" onclick="testStoryAction('publish')">
+            Test Story Publish
+        </button>
+        
+        <button class="btn btn-success test-button" onclick="testWorldAction('create')">
+            Test World Create
+        </button>
+        
+        <button class="btn btn-warning test-button" onclick="testWorldAction('import_from_book')">
+            Test Book Import
+        </button>
+    </div>
+    
+    <!-- Test Section 4: AI Interactions -->
+    <div class="test-section">
+        <h3>4. AI Interactions</h3>
+        <p>Test AI usage tracking:</p>
+        
+        <button class="btn btn-info test-button" onclick="testAIInteraction('gpt-4', 1500)">
+            Test GPT-4 Usage
+        </button>
+        
+        <button class="btn btn-info test-button" onclick="testAIInteraction('gpt-3.5-turbo', 250)">
+            Test GPT-3.5 Usage
+        </button>
+        
+        <button class="btn btn-success test-button" onclick="testImageGeneration()">
+            Test Image Generation
+        </button>
+    </div>
+    
+    <!-- Test Section 5: Custom Events -->
+    <div class="test-section">
+        <h3>5. Custom Event with All Parameters</h3>
+        <p>Test a complex event with multiple parameters:</p>
+        
+        <button class="btn btn-dark test-button" onclick="testComplexEvent()">
+            Test Complex Event
+        </button>
+    </div>
+    
+    <!-- Event Log -->
+    <div class="test-section">
+        <h3>Event Log</h3>
+        <p>Events sent to Google Analytics will appear here:</p>
+        <div id="eventLog" class="event-log">
+            <div class="text-muted">No events logged yet. Click buttons above to test.</div>
+        </div>
+        <button class="btn btn-sm btn-secondary mt-2" onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <!-- GA4 DebugView Link -->
+    <div class="alert alert-success mt-4">
+        <h5>How to Verify in GA4:</h5>
+        <ol>
+            <li>Open GA4 and go to <strong>Admin → DebugView</strong></li>
+            <li>Or add <code>?_dbg=1</code> to this page URL to enable debug mode</li>
+            <li>Click the test buttons above</li>
+            <li>Watch events appear in DebugView in real-time</li>
+            <li>Click on events in DebugView to see all parameters</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+// Event logging
+function logEvent(eventName, parameters, success = true) {
+    const log = document.getElementById('eventLog');
+    const timestamp = new Date().toLocaleTimeString();
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${success ? 'success' : 'error'}`;
+    entry.innerHTML = `
+        <strong>[${timestamp}] ${eventName}</strong><br>
+        <pre>${JSON.stringify(parameters, null, 2)}</pre>
+    `;
+    
+    // Remove placeholder text
+    if (log.querySelector('.text-muted')) {
+        log.innerHTML = '';
+    }
+    
+    log.insertBefore(entry, log.firstChild);
+}
+
+function clearLog() {
+    document.getElementById('eventLog').innerHTML = '<div class="text-muted">No events logged yet. Click buttons above to test.</div>';
+}
+
+// Consent management functions
+function grantConsent() {
+    console.log('🔧 Manually granting analytics consent...');
+    if (window.grantAnalyticsConsent) {
+        window.grantAnalyticsConsent();
+        console.log('✅ Analytics consent granted');
+        logEvent('consent_granted', { method: 'manual_test' });
+        updateConsentStatus();
+    } else {
+        console.error('❌ grantAnalyticsConsent function not available');
+        logEvent('consent_error', { error: 'grantAnalyticsConsent not available' }, false);
+    }
+}
+
+function denyConsent() {
+    console.log('🔧 Manually denying analytics consent...');
+    if (window.denyAnalyticsConsent) {
+        window.denyAnalyticsConsent();
+        console.log('❌ Analytics consent denied');
+        logEvent('consent_denied', { method: 'manual_test' });
+        updateConsentStatus();
+    } else {
+        console.error('❌ denyAnalyticsConsent function not available');
+        logEvent('consent_error', { error: 'denyAnalyticsConsent not available' }, false);
+    }
+}
+
+function checkConsentStatus() {
+    updateConsentStatus();
+}
+
+function updateConsentStatus() {
+    const status = window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown';
+    const statusElement = document.getElementById('consentStatus');
+    const statusTextElement = document.getElementById('consentStatusText');
+    
+    if (statusElement && statusTextElement) {
+        statusElement.style.display = 'block';
+        statusTextElement.textContent = status || 'unknown';
+        
+        // Update styling based on status
+        statusElement.className = 'mt-2 p-2 border rounded';
+        if (status === 'granted') {
+            statusElement.className += ' bg-success text-white';
+        } else if (status === 'denied') {
+            statusElement.className += ' bg-danger text-white';
+        } else {
+            statusElement.className += ' bg-warning text-dark';
+        }
+    }
+    
+    console.log('Current consent status:', status);
+    logEvent('consent_check', { status: status });
+}
+
+// Test functions
+function testFeatureUse() {
+    const params = {
+        feature: 'analytics_test_page',
+        action: 'test_click',
+        test_timestamp: new Date().toISOString()
+    };
+    
+    console.log('🔍 Testing feature use tracking...');
+    console.log('trackFeatureUse available:', typeof window.trackFeatureUse);
+    
+    if (window.trackFeatureUse) {
+        console.log('📤 Sending feature_use event:', params);
+        window.trackFeatureUse('analytics_test_page', 'test_click', params);
+        logEvent('feature_use', params);
+        console.log('✅ feature_use event sent');
+    } else {
+        console.error('❌ trackFeatureUse not available');
+        logEvent('feature_use', { error: 'trackFeatureUse not available' }, false);
+    }
+}
+
+function testPageView() {
+    const params = {
+        test_param: 'test_value',
+        page_type: 'test_page'
+    };
+    
+    console.log('🔍 Testing page view tracking...');
+    console.log('trackPageView available:', typeof window.trackPageView);
+    console.log('Current consent status:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown');
+    
+    if (window.trackPageView) {
+        console.log('📤 Sending page_view event with params:', params);
+        window.trackPageView('Analytics Test Page', params);
+        console.log('✅ trackPageView function called');
+        logEvent('page_view', params);
+    } else {
+        console.error('❌ trackPageView not available');
+        logEvent('page_view', { error: 'trackPageView not available' }, false);
+    }
+}
+
+function testError() {
+    console.log('🔍 Testing error tracking...');
+    console.log('trackError available:', typeof window.trackError);
+    console.log('Current consent status:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown');
+    
+    if (window.trackError) {
+        console.log('📤 Sending exception event...');
+        window.trackError('Test error message', 'test_page');
+        console.log('✅ trackError function called');
+        logEvent('exception', {
+            description: 'Test error message',
+            error_source: 'test_page'
+        });
+    } else {
+        console.error('❌ trackError not available');
+        logEvent('exception', { error: 'trackError not available' }, false);
+    }
+}
+
+function testAuthEvent(action, method) {
+    console.log('🔍 Testing auth event:', action, method);
+    console.log('trackAuthEvent available:', typeof window.trackAuthEvent);
+    console.log('Current consent status:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown');
+    
+    if (window.trackAuthEvent) {
+        console.log('📤 Sending auth event with params:', { action, method });
+        window.trackAuthEvent(action, method);
+        console.log('✅ trackAuthEvent function called');
+        logEvent(action, {
+            event_category: 'authentication',
+            event_label: method
+        });
+    } else {
+        console.error('❌ trackAuthEvent not available');
+        logEvent(action, { error: 'trackAuthEvent not available' }, false);
+    }
+}
+
+function testStoryAction(action) {
+    console.log('🔍 Testing story action:', action);
+    console.log('trackStoryAction available:', typeof window.trackStoryAction);
+    
+    const storyId = Math.floor(Math.random() * 1000);
+    const storyTitle = `Test Story ${storyId}`;
+    
+    if (window.trackStoryAction) {
+        console.log('📤 Sending story action event...');
+        window.trackStoryAction(action, storyId, storyTitle);
+        console.log('✅ Story action event sent');
+        logEvent(`story_${action}`, {
+            event_category: 'story_management',
+            story_id: storyId,
+            event_label: storyTitle
+        });
+    } else {
+        console.error('❌ trackStoryAction not available');
+        logEvent(`story_${action}`, { error: 'trackStoryAction not available' }, false);
+    }
+}
+
+function testWorldAction(action) {
+    const worldId = Math.floor(Math.random() * 1000);
+    const worldName = `Test World ${worldId}`;
+    
+    console.log('🔍 Testing world action:', action);
+    console.log('trackWorldAction available:', typeof window.trackWorldAction);
+    console.log('Current consent status:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown');
+    
+    if (window.trackWorldAction) {
+        console.log('📤 Sending world action event with params:', { action, worldId, worldName });
+        window.trackWorldAction(action, worldId, worldName);
+        console.log('✅ trackWorldAction function called');
+        logEvent(`world_${action}`, {
+            event_category: 'world_building',
+            world_id: worldId,
+            event_label: worldName
+        });
+    } else {
+        console.error('❌ trackWorldAction not available');
+        logEvent(`world_${action}`, { error: 'trackWorldAction not available' }, false);
+    }
+}
+
+function testAIInteraction(model, tokens) {
+    const cost = tokens * 0.00003; // Example cost calculation
+    
+    console.log('🔍 Testing AI interaction tracking...');
+    console.log('trackAIInteraction available:', typeof window.trackAIInteraction);
+    console.log('Current consent status:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown');
+    console.log('Test parameters:', { model, tokens, cost });
+    
+    if (window.trackAIInteraction) {
+        console.log('📤 Sending AI interaction event with params:', { type: 'test_interaction', model, tokens, cost });
+        window.trackAIInteraction('test_interaction', model, tokens, cost);
+        console.log('✅ trackAIInteraction function called');
+        logEvent('ai_interaction', {
+            event_category: 'ai_usage',
+            event_label: 'test_interaction',
+            ai_model: model,
+            token_count: tokens,
+            estimated_cost: cost
+        });
+    } else {
+        console.error('❌ trackAIInteraction not available');
+        logEvent('ai_interaction', { error: 'trackAIInteraction not available' }, false);
+    }
+}
+
+function testImageGeneration() {
+    const elementId = Math.floor(Math.random() * 1000);
+    const prompt = 'A fantasy castle on a mountain';
+    
+    console.log('🔍 Testing image generation tracking...');
+    console.log('trackImageGeneration available:', typeof window.trackImageGeneration);
+    console.log('Current consent status:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown');
+    console.log('Test parameters:', { elementType: 'location', elementId, prompt });
+    
+    if (window.trackImageGeneration) {
+        console.log('📤 Sending image generation event...');
+        window.trackImageGeneration('location', elementId, prompt);
+        console.log('✅ trackImageGeneration function called');
+        logEvent('image_generation', {
+            event_category: 'content_creation',
+            event_label: 'location',
+            element_id: elementId,
+            prompt_length: prompt.length
+        });
+    } else {
+        console.error('❌ trackImageGeneration not available');
+        logEvent('image_generation', { error: 'trackImageGeneration not available' }, false);
+    }
+}
+
+function testComplexEvent() {
+    const complexData = {
+        story_id: 123,
+        world_id: 456,
+        action_type: 'complex_test',
+        custom_string: 'test_value',
+        custom_number: 42,
+        custom_boolean: true,
+        nested_data: {
+            level1: 'value1',
+            level2: 'value2'
+        },
+        array_data: ['item1', 'item2', 'item3'],
+        timestamp: new Date().toISOString()
+    };
+    
+    if (window.trackFeatureUse) {
+        window.trackFeatureUse('complex_test', 'execute', complexData);
+        logEvent('feature_use (complex)', complexData);
+    } else {
+        logEvent('feature_use (complex)', { error: 'trackFeatureUse not available' }, false);
+    }
+}
+
+// Auto-enable debug mode
+if (!window.location.search.includes('_dbg=1')) {
+    console.log('💡 Tip: Add ?_dbg=1 to the URL to enable GA4 debug mode');
+}
+
+// For testing purposes, automatically grant analytics consent
+console.log('🔧 Auto-granting analytics consent for testing...');
+setTimeout(function() {
+    console.log('Checking consent functions availability...');
+    console.log('grantAnalyticsConsent available:', typeof window.grantAnalyticsConsent);
+    console.log('getAnalyticsConsent available:', typeof window.getAnalyticsConsent);
+    
+    if (window.grantAnalyticsConsent) {
+        const currentConsent = window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown';
+        console.log('Current consent status:', currentConsent);
+        
+        if (currentConsent !== 'granted') {
+            window.grantAnalyticsConsent();
+            console.log('✅ Analytics consent automatically granted for testing');
+        } else {
+            console.log('✅ Analytics consent already granted');
+        }
+        
+        // Verify consent after granting
+        setTimeout(function() {
+            const newConsent = window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'unknown';
+            console.log('Final consent status:', newConsent);
+            updateConsentStatus(); // Update the UI
+        }, 100);
+    } else {
+        console.warn('⚠️ grantAnalyticsConsent function not available');
+    }
+    
+    // Also check initial consent status
+    setTimeout(function() {
+        updateConsentStatus();
+    }, 100);
+}, 500); // Wait 500ms for GA to load
+
+// Show current GA configuration
+console.log('Google Analytics Configuration:', {
+    ga_id: '{{ google_analytics_id if google_analytics_id else "Not configured" }}',
+    consent_mode: {{ 'true' if google_analytics_consent_mode else 'false' }},
+    user_authenticated: {{ 'true' if current_user and current_user.is_authenticated else 'false' }}
+});
+
+// Debug GA4 setup
+console.log('Debugging GA4 Setup...');
+console.log('window.gtag available:', typeof window.gtag);
+console.log('window.dataLayer available:', typeof window.dataLayer);
+console.log('Analytics consent:', window.getAnalyticsConsent ? window.getAnalyticsConsent() : 'not available');
+
+// Check which tracking functions are available
+console.log('Available tracking functions:');
+console.log('trackFeatureUse:', typeof window.trackFeatureUse);
+console.log('trackStoryAction:', typeof window.trackStoryAction);
+console.log('trackWorldAction:', typeof window.trackWorldAction);
+console.log('trackAIInteraction:', typeof window.trackAIInteraction);
+console.log('trackAuthEvent:', typeof window.trackAuthEvent);
+console.log('trackImageGeneration:', typeof window.trackImageGeneration);
+console.log('trackPageView:', typeof window.trackPageView);
+console.log('trackError:', typeof window.trackError);
+
+// Test direct gtag call
+function testDirectGtag() {
+    console.log('🔍 Testing direct gtag call...');
+    if (typeof window.gtag === 'function') {
+        console.log('📤 Sending test event directly via gtag...');
+        const eventData = {
+            event_category: 'debug',
+            event_label: 'direct_test',
+            debug_timestamp: new Date().toISOString()
+        };
+        console.log('Event data:', eventData);
+        window.gtag('event', 'test_direct_event', eventData);
+        console.log('✅ Direct gtag event sent');
+        logEvent('test_direct_event (gtag)', eventData);
+    } else {
+        console.error('❌ gtag function not available');
+        logEvent('test_direct_event', { error: 'gtag not available' }, false);
+    }
+}
+
+// Navigation layout toggle function
+function testToggleNavLayout() {
+    console.log('🔄 Testing navigation layout toggle...');
+    
+    try {
+        const currentLayout = getCookie('nav_layout') || 'sidebar';
+        console.log('Current layout:', currentLayout);
+        
+        const newLayout = currentLayout === 'sidebar' ? 'topbar' : 'sidebar';
+        console.log('Switching to layout:', newLayout);
+        
+        // Set cookie for 30 days
+        setCookie('nav_layout', newLayout, 30);
+        console.log('Cookie set, reloading page...');
+        
+        // Reload page to apply new layout
+        window.location.reload();
+    } catch (error) {
+        console.error('❌ Error toggling navigation layout:', error);
+        alert('Error toggling navigation layout: ' + error.message);
+    }
+}
+
+function setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+    console.log('Cookie set:', name, '=', value);
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+// Add test button for direct gtag
+document.addEventListener('DOMContentLoaded', function() {
+    const testSection = document.querySelector('.test-section');
+    const directTestBtn = document.createElement('button');
+    directTestBtn.className = 'btn btn-danger test-button';
+    directTestBtn.textContent = 'Test Direct gtag';
+    directTestBtn.onclick = testDirectGtag;
+    testSection.appendChild(directTestBtn);
+    
+    // Debug current layout on page load
+    const currentLayout = getCookie('nav_layout') || 'sidebar';
+    console.log('📍 Current navigation layout:', currentLayout);
+    console.log('📍 Available cookies:', document.cookie);
+    
+    // Update layout status display
+    updateLayoutStatus();
+});
+
+function updateLayoutStatus() {
+    const currentLayout = getCookie('nav_layout') || 'sidebar';
+    const statusElement = document.getElementById('layoutStatus');
+    const statusTextElement = document.getElementById('layoutStatusText');
+    
+    if (statusElement && statusTextElement) {
+        statusElement.style.display = 'block';
+        statusTextElement.textContent = currentLayout.charAt(0).toUpperCase() + currentLayout.slice(1);
+        
+        // Update styling based on layout
+        statusElement.className = 'mt-2 p-2 border rounded';
+        if (currentLayout === 'topbar') {
+            statusElement.className += ' bg-info text-white';
+        } else {
+            statusElement.className += ' bg-secondary text-white';
+        }
+    }
+}
+</script>
+{% endblock %}

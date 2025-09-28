@@ -1,0 +1,147 @@
+{
+    "Mystery": [
+        {
+            "question": "When confronted with a suspicious individual, how does your character typically react?",
+            "options": [
+                "Directly confronts them, seeking answers immediately.",
+                "Observes from a distance, gathering information discreetly.",
+                "Tries to charm information out of them using subtle tactics.",
+                "Becomes agitated or defensive, potentially revealing too much."
+            ]
+        },
+        {
+            "question": "What is your character's primary skill or tool in uncovering secrets?",
+            "options": [
+                "Sharp observational skills and attention to detail.",
+                "An extensive network of contacts and informants.",
+                "Advanced technological knowledge or hacking abilities.",
+                "A knack for psychological profiling and reading people."
+            ]
+        },
+        {
+            "question": "If your character discovers a critical piece of evidence, what is their first instinct?",
+            "options": [
+                "Immediately presents it to the authorities.",
+                "Hides it to investigate further on their own.",
+                "Shares it only with a trusted confidant.",
+                "Analyzes it meticulously before deciding on a next step."
+            ]
+        }
+    ],
+    "Romance": [
+        {
+            "question": "When your character first meets someone they're attracted to, how do they typically behave?",
+            "options": [
+                "Confidently initiates conversation and flirts openly.",
+                "Becomes shy or awkward, observing from a distance.",
+                "Tries to impress them by showcasing their talents or achievements.",
+                "Acts cool and aloof, trying not to show their interest."
+            ]
+        },
+        {
+            "question": "What is your character's biggest emotional obstacle in forming a deep romantic connection?",
+            "options": [
+                "A fear of vulnerability or getting hurt.",
+                "A tendency to overthink or analyze every interaction.",
+                "Past romantic failures that make them hesitant to try again.",
+                "Prioritizing their career or personal goals above relationships."
+            ]
+        },
+        {
+            "question": "If a romantic misunderstanding occurs, how does your character usually handle it?",
+            "options": [
+                "Directly communicates their feelings and seeks clarification.",
+                "Withdraws emotionally, waiting for the other person to reach out.",
+                "Tries to fix things through grand gestures or apologies.",
+                "Becomes defensive or irritable, escalating the tension."
+            ]
+        }
+    ],
+    "Fantasy": [
+        {
+            "question": "How does your character view magic and supernatural forces?",
+            "options": [
+                "Embraces them as natural parts of the world.",
+                "Fears them and tries to avoid magical encounters.",
+                "Studies them academically, seeking to understand their nature.",
+                "Uses them pragmatically as tools to achieve goals."
+            ]
+        },
+        {
+            "question": "When faced with a moral dilemma involving greater good vs. personal loyalty, what does your character choose?",
+            "options": [
+                "Always prioritizes the greater good, even at personal cost.",
+                "Protects those they love above all else.",
+                "Seeks a creative solution that serves both purposes.",
+                "Struggles with the decision and may change their mind."
+            ]
+        },
+        {
+            "question": "How does your character approach ancient prophecies or destiny?",
+            "options": [
+                "Believes in fate and accepts their predetermined role.",
+                "Rebels against prophecy, determined to forge their own path.",
+                "Views prophecies as guidelines that can be interpreted flexibly.",
+                "Ignores prophecies entirely, focusing on immediate concerns."
+            ]
+        }
+    ],
+    "Sci-Fi": [
+        {
+            "question": "How does your character adapt to advanced technology?",
+            "options": [
+                "Quickly masters new tech and stays on the cutting edge.",
+                "Uses technology cautiously, preferring proven methods.",
+                "Struggles with complex systems but perseveres.",
+                "Relies on others for technical support and guidance."
+            ]
+        },
+        {
+            "question": "When encountering alien life or AI consciousness, what is your character's primary response?",
+            "options": [
+                "Approaches with scientific curiosity and openness.",
+                "Maintains skeptical caution about their intentions.",
+                "Treats them as equals deserving of respect.",
+                "Views them as potential threats to be monitored."
+            ]
+        },
+        {
+            "question": "How does your character handle the ethical implications of advanced science?",
+            "options": [
+                "Believes scientific progress justifies necessary risks.",
+                "Prioritizes safety and ethical considerations above advancement.",
+                "Adapts their ethics based on the specific situation.",
+                "Struggles with the moral complexity of modern science."
+            ]
+        }
+    ],
+    "Horror": [
+        {
+            "question": "When confronted with something terrifying and unexplainable, how does your character react?",
+            "options": [
+                "Freezes in terror, unable to act decisively.",
+                "Fights back aggressively, using violence to cope with fear.",
+                "Tries to rationalize the experience and find logical explanations.",
+                "Flees immediately, prioritizing survival above all else."
+            ]
+        },
+        {
+            "question": "What is your character's greatest psychological vulnerability?",
+            "options": [
+                "Past trauma that haunts their decisions.",
+                "Guilt over something they've done or failed to do.",
+                "Deep-seated fear of abandonment or isolation.",
+                "Obsessive need for control over their environment."
+            ]
+        },
+        {
+            "question": "How does your character cope with extreme stress or supernatural pressure?",
+            "options": [
+                "Relies on dark humor and sarcasm as a defense mechanism.",
+                "Becomes hyper-focused and methodical to maintain control.",
+                "Seeks comfort in relationships and human connection.",
+                "Develops unhealthy habits or addictions as escape mechanisms."
+            ]
+        }
+    ]
+}

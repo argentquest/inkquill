@@ -1,0 +1,371 @@
+{# /ai_rag_story_app/app/templates/pages/admin_dashboard.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="text-center">
+                    <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700;">
+                        <i class="fas fa-shield-alt me-3"></i>
+                        Admin Dashboard
+                    </h1>
+                    <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                        Administrative tools and system overview
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-users me-1"></i>
+                            User Management
+                        </span>
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-bullhorn me-1"></i>
+                            CTA Management
+                        </span>
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-cogs me-1"></i>
+                            System Administration
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-chart-line me-1"></i>
+                            Analytics & Reporting
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('admin')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with admin features">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard-page">
+    
+    <div class="container-fluid">
+
+        <!-- Admin Quick Actions -->
+        <div class="row row-cards mb-4">
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-primary"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-primary-lt mb-3">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <h5 class="card-title">User Management</h5>
+                        <p class="card-text text-secondary">Manage users, permissions, and account settings</p>
+                        <a href="{{ url_for('ui_admin_users') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Access user management tools">
+                            <i class="fas fa-users-cog me-1"></i>Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-info"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-info-lt mb-3">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <h5 class="card-title">News Management</h5>
+                        <p class="card-text text-secondary">Create and manage news articles and announcements</p>
+                        <a href="{{ url_for('admin_news_list') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Manage platform news and announcements">
+                            <i class="fas fa-newspaper me-1"></i>Manage News
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-success"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-success-lt mb-3">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="card-title">Billing Dashboard</h5>
+                        <p class="card-text text-secondary">Monitor usage, billing, and system analytics</p>
+                        <a href="{{ url_for('ui_admin_billing_dashboard') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="View billing analytics and system metrics">
+                            <i class="fas fa-chart-line me-1"></i>View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-warning"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-warning-lt mb-3">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h5 class="card-title">Maintenance Mode</h5>
+                        <p class="card-text text-secondary">Control system maintenance and platform status</p>
+                        <a href="/ui/admin/maintenance" class="btn btn-primary" data-bs-toggle="tooltip" title="Manage platform maintenance settings">
+                            <i class="fas fa-tools me-1"></i>Maintenance
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-purple"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-purple-lt mb-3">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <h5 class="card-title">Image Generation Jobs</h5>
+                        <p class="card-text text-secondary">Monitor and manage AI image generation tasks</p>
+                        <a href="/ui/admin/image-jobs" class="btn btn-primary" data-bs-toggle="tooltip" title="Monitor AI image generation jobs">
+                            <i class="fas fa-images me-1"></i>Image Jobs
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-dark"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-dark-lt mb-3">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <h5 class="card-title">Story Classes</h5>
+                        <p class="card-text text-secondary">Manage story classification and categorization system</p>
+                        <a href="{{ url_for('story_classes_list_ui') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Manage story classification system">
+                            <i class="fas fa-tags me-1"></i>Story Classes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-azure"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-azure-lt mb-3">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h5 class="card-title">Help Editor</h5>
+                        <p class="card-text text-secondary">Edit and manage help documentation files</p>
+                        <a href="{{ url_for('admin_help_editor') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Edit help documentation files">
+                            <i class="fas fa-edit me-1"></i>Edit Help Files
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-teal"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-teal-lt mb-3">
+                            <i class="fas fa-pen-nib"></i>
+                        </div>
+                        <h5 class="card-title">Blog Management</h5>
+                        <p class="card-text text-secondary">Manage blog posts, categories, and author profiles</p>
+                        <a href="{{ url_for('blog_dashboard') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Manage blog content and settings">
+                            <i class="fas fa-pen-nib me-1"></i>Manage Blog
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 card-hover" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <div class="card-status-top bg-orange"></div>
+                    <div class="card-body text-center">
+                        <div class="avatar avatar-xl bg-orange-lt mb-3">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h5 class="card-title">CTA Management</h5>
+                        <p class="card-text text-secondary">Create and manage call-to-action content for the platform</p>
+                        <a href="{{ url_for('ui_admin_cta_manager') }}" class="btn btn-primary" data-bs-toggle="tooltip" title="Manage call-to-action content and campaigns">
+                            <i class="fas fa-bullhorn me-1"></i>Manage CTAs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-shield-alt me-2"></i>Welcome to the Admin Dashboard
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <p class="text-secondary mb-3">
+                                    This is the main administrative interface for managing the AI Storytelling Assistant platform. 
+                                    From here you can access all administrative functions including user management, content moderation, 
+                                    system analytics, and platform configuration.
+                                </p>
+                                <div class="mb-3">
+                                    <strong>Quick Links:</strong>
+                                </div>
+                                <div class="list-group list-group-flush">
+                                    <a href="{{ url_for('ui_admin_users') }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-primary-lt me-3">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">User Management</div>
+                                                <div class="text-secondary small">Add, edit, or deactivate user accounts</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="{{ url_for('admin_news_list') }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-info-lt me-3">
+                                                <i class="fas fa-newspaper"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">News & Announcements</div>
+                                                <div class="text-secondary small">Publish platform updates and news</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="{{ url_for('ui_admin_billing_dashboard') }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-success-lt me-3">
+                                                <i class="fas fa-chart-bar"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">System Analytics</div>
+                                                <div class="text-secondary small">Monitor platform usage and performance</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="{{ url_for('blog_dashboard') }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-teal-lt me-3">
+                                                <i class="fas fa-pen-nib"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">Blog Management</div>
+                                                <div class="text-secondary small">Manage blog posts, categories, and authors</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="{{ url_for('ui_admin_cta_manager') }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm bg-orange-lt me-3">
+                                                <i class="fas fa-bullhorn"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">CTA Management</div>
+                                                <div class="text-secondary small">Create and manage call-to-action content</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card bg-azure-lt">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-azure mb-3">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                        <h4 class="card-title">Admin Access</h4>
+                                        <p class="text-secondary small">
+                                            You have full administrative privileges. Use these tools responsibly and follow security best practices.
+                                        </p>
+                                        <button class="btn btn-warning btn-sm" 
+                                                onclick="openHelpModal('admin')">
+                                            <i class="fas fa-question-circle me-1"></i>Admin Help
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block styles %}
+<style>
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--tblr-box-shadow-lg);
+    border-color: var(--tblr-primary);
+}
+
+.card-status-top {
+    height: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+}
+
+.admin-dashboard-page {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.row-cards .col-md-6:nth-child(1) .card { animation-delay: 0.1s; }
+.row-cards .col-md-6:nth-child(2) .card { animation-delay: 0.2s; }
+.row-cards .col-md-6:nth-child(3) .card { animation-delay: 0.3s; }
+.row-cards .col-md-6:nth-child(4) .card { animation-delay: 0.4s; }
+.row-cards .col-md-6:nth-child(5) .card { animation-delay: 0.5s; }
+.row-cards .col-md-6:nth-child(6) .card { animation-delay: 0.6s; }
+.row-cards .col-md-6:nth-child(7) .card { animation-delay: 0.7s; }
+.row-cards .col-md-6:nth-child(8) .card { animation-delay: 0.8s; }
+.row-cards .col-md-6:nth-child(9) .card { animation-delay: 0.9s; }
+.row-cards .col-md-6:nth-child(10) .card { animation-delay: 1.0s; }
+
+.list-group-item {
+    border: none;
+    padding: 1rem 0;
+}
+
+.list-group-item:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-radius: var(--tblr-border-radius);
+}
+</style>
+{% endblock %}
+
+{% endblock %}

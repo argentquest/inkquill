@@ -1,0 +1,363 @@
+<!-- Enhanced Tabler Premium Interview Modal -->
+<style>
+/* Tabler Premium Interview Styling */
+.option-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.button-cards {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.button-cards-large {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.option-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color) !important;
+    border-radius: var(--tblr-border-radius-lg);
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--tblr-box-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.option-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--tblr-box-shadow-lg);
+    border-color: var(--tblr-primary) !important;
+}
+
+.option-card:hover::before {
+    transform: translateX(0);
+}
+
+.option-card.selected {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    color: white;
+    box-shadow: var(--tblr-box-shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--tblr-primary) !important;
+}
+
+.option-card.selected .option-label {
+    color: white;
+    font-weight: 600;
+}
+
+.option-card.selected .option-description {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.option-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.option-description {
+    font-size: 0.875rem;
+    color: var(--tblr-text-muted);
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+}
+
+.option-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--tblr-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.large-card {
+    padding: 1.5rem;
+}
+
+.large-card .option-label {
+    font-size: 1.1rem;
+}
+
+/* Enhanced Tabler Form Controls */
+.text-input-container {
+    margin: 1rem 0;
+}
+
+.text-input-container .form-label {
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    margin-bottom: 0.5rem;
+}
+
+.text-input-container .form-control {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+    border-radius: var(--tblr-border-radius);
+    border: 1px solid var(--tblr-border-color);
+    background: var(--tblr-bg-surface);
+    transition: all 0.2s ease;
+}
+
+.text-input-container .form-control:focus {
+    border-color: var(--tblr-primary);
+    box-shadow: 0 0 0 0.125rem rgba(var(--tblr-primary-rgb), 0.25);
+    background: var(--tblr-bg-surface);
+}
+
+.text-input-container .form-control::placeholder {
+    color: var(--tblr-text-muted);
+    opacity: 0.7;
+}
+
+/* Tabler Form Floating Labels Support */
+.form-floating .form-control {
+    padding: 1rem 0.75rem;
+}
+
+.form-floating > label {
+    color: var(--tblr-text-muted);
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--tblr-primary);
+}
+
+/* Enhanced Modal Styling */
+.modal-content {
+    border-radius: var(--tblr-border-radius-lg) !important;
+    box-shadow: var(--tblr-box-shadow-lg) !important;
+    border: 1px solid var(--tblr-border-color-translucent);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%) !important;
+    color: white !important;
+    text-align: center !important;
+    border-bottom: none !important;
+    padding: 1.5rem 2rem !important;
+}
+
+.modal-header .modal-title {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: white !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+}
+
+.modal-header .modal-title .icon {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.8 !important;
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1 !important;
+}
+</style>
+
+<div class="modal modal-blur fade" id="interviewModal" tabindex="-1" aria-labelledby="interviewModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90vw; height: 85vh; padding: 10px;">
+        <div class="modal-content" style="height: 100%; border: none;">
+            <div class="modal-header" style="flex-shrink: 0;">
+                <h4 class="modal-title" id="interviewModalLabel">
+                    Welcome! Let's get to know you better
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0.75rem;">
+                <!-- Enhanced Loading State -->
+                <div id="interview-loading" class="text-center py-5">
+                    <div class="card">
+                        <div class="card-status-top bg-blue"></div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <div class="spinner-border text-primary me-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">
+                                        <i class="fas fa-magic me-2 text-blue"></i>
+                                        Loading interview questions...
+                                    </h4>
+                                    <p class="text-secondary mb-0">Please wait while we prepare your personalized welcome experience.</p>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-indeterminate bg-blue"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Error State -->
+                <div id="interview-error" class="d-none">
+                    <div class="card">
+                        <div class="card-status-top bg-red"></div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <span class="avatar bg-red-lt">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-fill">
+                                    <h3 class="card-title mb-1">
+                                        <i class="fas fa-times-circle me-2 text-red"></i>
+                                        Error Loading Interview
+                                    </h3>
+                                    <p class="text-secondary mb-3" id="interview-error-message">Unable to load interview questions. Please try again.</p>
+                                    <div class="btn-list">
+                                        <button type="button" class="btn btn-red" onclick="location.reload()">
+                                            <i class="fas fa-redo me-1"></i>
+                                            Try Again
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interview Content -->
+                <div id="interview-content" class="d-none" style="flex: 1; display: flex; flex-direction: column;">
+                    <!-- Question Container -->
+                    <div id="question-container" style="flex: 1; display: flex; flex-direction: column; padding: 2rem 3rem; background: transparent;">
+                        <!-- Questions will be dynamically rendered here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="flex-shrink: 0; background-color: var(--tblr-bg-surface-secondary); border-top: 1px solid var(--tblr-border-color);">
+                <!-- Enhanced Navigation with Tabler Premium Styling -->
+                <div class="d-flex align-items-center justify-content-between w-100">
+                    <!-- Left: Previous Button -->
+                    <button type="button" class="btn btn-outline-primary" id="prev-button" disabled>
+                        <i class="fas fa-chevron-left me-1"></i>
+                        Previous
+                    </button>
+                    
+                    <!-- Center: Enhanced Progress Bar -->
+                    <div class="d-flex align-items-center flex-grow-1 mx-3">
+                        <div class="progress flex-grow-1 me-3" style="height: 8px;">
+                            <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 16.7%" aria-valuenow="16.7" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span id="progress-text" class="badge bg-blue-lt text-blue">Question 1 of 6</span>
+                    </div>
+                    
+                    <!-- Right: Enhanced Action Buttons -->
+                    <div class="btn-list">
+                        <button type="button" class="btn btn-ghost-warning d-none" id="skip-button">
+                            <i class="fas fa-forward me-1"></i>
+                            Skip for now
+                        </button>
+                        <button type="button" class="btn btn-primary" id="next-button" disabled>
+                            Next
+                            <i class="fas fa-chevron-right ms-1"></i>
+                        </button>
+                        <button type="button" class="btn btn-success d-none" id="submit-button">
+                            <i class="fas fa-check me-1"></i>
+                            Complete Interview
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary d-none" id="close-button">
+                            <i class="fas fa-times me-1"></i>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Additional Styling */
+.progress-bar-indeterminate {
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 1rem 1rem;
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    0% {
+        background-position-x: 1rem;
+    }
+    100% {
+        background-position-x: 0;
+    }
+}
+
+/* Enhanced Question Content Styling */
+.question-header {
+    margin-bottom: 1rem;
+}
+
+.question-title {
+    color: var(--tblr-body-color);
+    margin-bottom: 0.5rem;
+}
+
+.question-subtitle {
+    color: var(--tblr-text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.question-purpose {
+    background: var(--tblr-bg-surface-secondary);
+    padding: 0.75rem;
+    border-radius: var(--tblr-border-radius);
+    border-left: 3px solid var(--tblr-primary);
+    margin-bottom: 1rem;
+}
+
+.question-purpose small {
+    color: var(--tblr-text-muted);
+    line-height: 1.4;
+}
+
+/* Character Count Styling */
+.char-count {
+    text-align: right;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--tblr-text-muted);
+}
+
+.char-count.text-danger {
+    color: var(--tblr-red) !important;
+}
+</style>

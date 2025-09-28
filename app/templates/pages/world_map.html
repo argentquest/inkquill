@@ -1,0 +1,336 @@
+{# /ai_rag_story_app/app/templates/pages/world_map.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set world_context = world %}
+
+{% block title %}World Map - {{ world_context.name | e }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+    .map-layout {
+        display: flex;
+        height: 80vh;
+        position: relative;
+    }
+    
+    .map-main {
+        flex: 1;
+        position: relative;
+        min-width: 300px;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem 0 0 0.375rem;
+    }
+    
+    .map-sidebar {
+        width: 350px;
+        min-width: 250px;
+        max-width: 600px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-left: none;
+        border-radius: 0 0.375rem 0.375rem 0;
+        overflow-y: auto;
+        position: relative;
+    }
+    
+    .resize-handle {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: #dee2e6;
+        cursor: col-resize;
+        z-index: 1000;
+        transition: background-color 0.2s;
+    }
+    
+    .resize-handle:hover {
+        background: #007bff;
+    }
+    
+    .resize-handle::before {
+        content: '';
+        position: absolute;
+        left: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 30px;
+        background: white;
+        border-radius: 1px;
+    }
+    
+    .sidebar-content {
+        padding: 20px;
+        height: 100%;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 25px;
+    }
+    
+    .sidebar-section h6 {
+        margin-bottom: 15px;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+    }
+    
+    .map-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 12px;
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+    }
+    
+    .map-legend {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 12px;
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        max-width: 250px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+    
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 1px solid #666;
+    }
+    
+    .map-info {
+        position: absolute;
+        top: 60px;
+        right: 10px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        display: none;
+        max-width: 300px;
+    }
+    
+    #network-map {
+        width: 100%;
+        height: 100%;
+        border-radius: 0.375rem 0 0 0.375rem;
+    }
+    
+    .connection-item {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 0.25rem;
+        padding: 12px;
+        margin-bottom: 8px;
+        position: relative;
+    }
+    
+    .connection-item:hover {
+        border-color: #007bff;
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+    }
+    
+    .connection-path {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+    
+    .connection-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+    }
+    
+    
+    .form-control-sm, .form-select-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="world-map-page">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2>World Map: {{ world_context.name | e }}</h2>
+                <p class="text-muted mb-0">Interactive map view of all locations and their connections</p>
+            </div>
+            <div>
+                <a href="{{ url_for('ui_world_detail', world_id=world_context.id) }}" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left me-1"></i> Back to World
+                </a>
+                <a href="{{ url_for('ui_list_locations_for_world', world_id=world_context.id) }}" class="btn btn-primary me-2">
+                    <i class="fas fa-list me-1"></i> List View
+                </a>
+                <button class="btn btn-outline-info" onclick="openHelpModal('world_map')" 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom"
+                        title="Get help with the interactive world map">
+                    <i class="fas fa-question-circle me-1"></i>Help
+                </button>
+            </div>
+        </div>
+
+        <div class="map-layout">
+            <!-- Main Map Area -->
+            <div class="map-main">
+                <div id="network-map"></div>
+                
+                <!-- Map Controls -->
+                <div class="map-controls">
+                    <div class="mb-2">
+                        <label for="layout-mode" class="form-label small mb-1">Layout Mode:</label>
+                        <select id="layout-mode" class="form-select form-select-sm">
+                            <option value="auto">Node Graph (Auto)</option>
+                            <option value="grid">Grid View (Fixed)</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <button id="zoom-fit" class="btn btn-sm btn-secondary w-100">
+                            <i class="fas fa-compress-arrows-alt me-1"></i> Fit All
+                        </button>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show-connections" checked>
+                        <label class="form-check-label small" for="show-connections">
+                            Show Connections
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Map Legend -->
+                <div class="map-legend">
+                    <h6 class="mb-2">Location Types</h6>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e74c3c;"></div>
+                        <small>Region</small>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #3498db;"></div>
+                        <small>City</small>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f39c12;"></div>
+                        <small>Building</small>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2ecc71;"></div>
+                        <small>Room</small>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #9b59b6;"></div>
+                        <small>Area</small>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #95a5a6;"></div>
+                        <small>Other/Object</small>
+                    </div>
+                </div>
+
+                <!-- Map Info Panel -->
+                <div class="map-info" id="map-info">
+                    <h6 id="info-title">Location Info</h6>
+                    <div id="info-content">Click on a location to see details</div>
+                </div>
+                
+            </div>
+
+            <!-- Right Sidebar for Connection Management -->
+            <div class="map-sidebar" id="map-sidebar">
+                <div class="resize-handle" id="resize-handle"></div>
+                <div class="sidebar-content">
+                    <!-- Create Connection Section -->
+                    <div class="sidebar-section">
+                        <h6><i class="fas fa-plus me-2"></i>Create Connection</h6>
+                        <button id="add-connection-btn" class="btn btn-primary btn-sm mb-3 w-100">
+                            <i class="fas fa-route me-1"></i> Add New Connection
+                        </button>
+                        <div id="connection-form" style="display: none;">
+                            <form id="connection-create-form">
+                                <div class="mb-3">
+                                    <label for="from-location" class="form-label small">From Location:</label>
+                                    <select id="from-location" class="form-select form-select-sm" required>
+                                        <option value="">-- Select Location --</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="to-location" class="form-label small">To Location:</label>
+                                    <select id="to-location" class="form-select form-select-sm" required>
+                                        <option value="">-- Select Location --</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="path-description" class="form-label small">Path Description:</label>
+                                    <input type="text" id="path-description" class="form-control form-control-sm" placeholder="e.g., A winding forest path">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reverse-description" class="form-label small">Return Path Description:</label>
+                                    <input type="text" id="reverse-description" class="form-control form-control-sm" placeholder="e.g., Back through the dense woods">
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="is-bidirectional" checked>
+                                        <label class="form-check-label small" for="is-bidirectional">
+                                            Bidirectional Connection
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check me-1"></i> Create Connection
+                                    </button>
+                                    <button type="button" id="cancel-connection" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-times me-1"></i> Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Existing Connections Section -->
+                    <div class="sidebar-section">
+                        <h6><i class="fas fa-list me-2"></i>Existing Connections</h6>
+                        <div id="connections-list">
+                            <!-- Connections will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', path='/js/world_map.js') }}"></script>
+{% endblock %}

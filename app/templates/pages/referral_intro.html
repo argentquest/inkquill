@@ -1,0 +1,452 @@
+{% extends "layouts/base.html" %}
+{% block title %}Referral Program - Earn Coins by Sharing{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Hero Header Section -->
+    <div class="page-header d-print-none mb-4" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); position: relative; overflow: hidden; margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.25);">
+        <!-- Background Pattern -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);"></div>
+        
+        <div class="page-header-content py-5 position-relative">
+            <div class="container-xl">
+                <div class="row align-items-center">
+                    <div class="col-12 text-center">
+                        <h1 class="page-title text-white mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 6l4 6l5 -4l-2 10l-8 -2l-8 2l-2 -10l5 4z"/>
+                            </svg>
+                            Referral Program
+                        </h1>
+                        <p class="text-white-75 fs-5 mb-3">Earn coins by sharing Ink and Quill with your friends!</p>
+                        <div class="badge bg-light text-dark fs-6 px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                                <path d="M12 7v5l3 3"/>
+                            </svg>
+                            Start earning today!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-status-top bg-primary"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg me-2 text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M9 12l2 2l4 -4"/>
+                            <path d="M21 12c-.552 0-1.005 -.449 -1.005 -1c0 -.551 .453 -1 1.005 -1c.552 0 1.005 .449 1.005 1c0 .551 -.453 1 -1.005 1z"/>
+                            <path d="M18 12c0 1.657 -2.686 3 -6 3s-6 -1.343 -6 -3s2.686 -3 6 -3s6 1.343 6 3z"/>
+                        </svg>
+                        How It Works
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="text-center">
+                                <div class="avatar avatar-xl bg-primary-lt mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"/>
+                                        <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-primary">1. Share Your Link</h4>
+                                <p class="text-muted">Copy your unique referral link and share it with friends on social media, email, or messaging apps.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="text-center">
+                                <div class="avatar avatar-xl bg-success-lt mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                                        <path d="M16 5l3 3"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-success">2. Friends Visit</h4>
+                                <p class="text-muted">When someone clicks your link and visits Ink and Quill, you earn <strong>5 coins</strong> immediately!</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="text-center">
+                                <div class="avatar avatar-xl bg-warning-lt mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
+                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-warning">3. They Sign Up</h4>
+                                <p class="text-muted">When your friend creates an account, you earn an additional <strong>50 coins</strong> bonus!</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="text-center">
+                                <div class="avatar avatar-xl bg-purple-lt mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                                        <path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1 -1.8 -1"/>
+                                        <path d="M12 6v2m0 8v2"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-purple">4. Earn More</h4>
+                                <p class="text-muted">Get <strong>25 coins</strong> when they create their first story and <strong>50 coins</strong> when they publish!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reward Structure -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-status-top bg-success"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                            <path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1 -1.8 -1"/>
+                            <path d="M12 6v2m0 8v2"/>
+                        </svg>
+                        Earn Coins For
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Friend visits your link</strong>
+                                <div class="text-muted">Instant reward when they click</div>
+                            </div>
+                            <span class="badge bg-success-lt text-success fs-6">+5 coins</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Friend creates account</strong>
+                                <div class="text-muted">When they sign up</div>
+                            </div>
+                            <span class="badge bg-warning-lt text-warning fs-6">+50 coins</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Friend creates first story</strong>
+                                <div class="text-muted">When they start writing</div>
+                            </div>
+                            <span class="badge bg-info-lt text-info fs-6">+25 coins</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Friend publishes first story</strong>
+                                <div class="text-muted">When they go public</div>
+                            </div>
+                            <span class="badge bg-purple-lt text-purple fs-6">+50 coins</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-status-top bg-warning"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                            <path d="M12 7v5l3 3"/>
+                        </svg>
+                        Daily Limits
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Maximum coins per day</strong>
+                                <div class="text-muted">Total daily earning limit</div>
+                            </div>
+                            <span class="badge bg-primary-lt text-primary fs-6">500 coins</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Visit rewards per day</strong>
+                                <div class="text-muted">Maximum click rewards</div>
+                            </div>
+                            <span class="badge bg-success-lt text-success fs-6">10 visits</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Sign-up rewards per day</strong>
+                                <div class="text-muted">Maximum registration rewards</div>
+                            </div>
+                            <span class="badge bg-warning-lt text-warning fs-6">5 sign-ups</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>Story rewards per day</strong>
+                                <div class="text-muted">Maximum story/publish rewards</div>
+                            </div>
+                            <span class="badge bg-info-lt text-info fs-6">3 each</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Referral Link Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-status-top bg-primary"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"/>
+                            <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"/>
+                        </svg>
+                        Your Referral Link
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Your unique referral link:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="referralLink" readonly 
+                                       value="{% if current_user %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref={{ current_user.id }}{% else %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref=YOUR_ID{% endif %}">
+                                <button class="btn btn-primary" type="button" id="copyLinkBtn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <rect x="8" y="8" width="12" height="12" rx="2"/>
+                                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                    </svg>
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ready-to-Share Messages -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-status-top bg-success"></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4"/>
+                            <path d="M8 9l8 0"/>
+                            <path d="M8 13l6 0"/>
+                        </svg>
+                        Ready-to-Share Messages
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h4 class="card-title">Social Media</h4>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control mb-2" rows="4" id="socialMessage" readonly>🌟 Discover amazing AI-powered storytelling at Ink and Quill! ✨
+
+Create captivating stories with AI assistance, build immersive worlds, and join a community of writers. 
+
+Try it now: {% if current_user %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref={{ current_user.id }}{% else %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref=YOUR_ID{% endif %}
+
+#WritingCommunity #AIStorytelling #CreativeWriting</textarea>
+                                    <button class="btn btn-success btn-sm" onclick="copyToClipboard('socialMessage')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <rect x="8" y="8" width="12" height="12" rx="2"/>
+                                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                        </svg>
+                                        Copy Message
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h4 class="card-title">Email</h4>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control mb-2" rows="4" id="emailMessage" readonly>Hey there!
+
+I've been using this amazing AI-powered storytelling platform called Ink and Quill, and I think you'd love it too! 
+
+You can create incredible stories with AI assistance, build detailed worlds, and connect with other writers. The AI helps with everything from plot development to character creation.
+
+Check it out: {% if current_user %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref={{ current_user.id }}{% else %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref=YOUR_ID{% endif %}
+
+Let me know what you think!
+
+Best,
+{% if current_user %}{{ current_user.display_name or current_user.username }}{% else %}[Your Name]{% endif %}</textarea>
+                                    <button class="btn btn-success btn-sm" onclick="copyToClipboard('emailMessage')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <rect x="8" y="8" width="12" height="12" rx="2"/>
+                                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                        </svg>
+                                        Copy Message
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h4 class="card-title">Quick Message</h4>
+                                </div>
+                                <div class="card-body">
+                                    <textarea class="form-control mb-2" rows="4" id="quickMessage" readonly>Check out Ink and Quill - an amazing AI storytelling platform! 🚀
+
+Perfect for writers who want AI assistance with their stories. Create worlds, develop characters, and write captivating narratives.
+
+Try it: {% if current_user %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref={{ current_user.id }}{% else %}{{ request.url._url.split('?')[0] | replace('/ui/referrals/intro', '') }}?ref=YOUR_ID{% endif %}</textarea>
+                                    <button class="btn btn-success btn-sm" onclick="copyToClipboard('quickMessage')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <rect x="8" y="8" width="12" height="12" rx="2"/>
+                                            <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>
+                                        </svg>
+                                        Copy Message
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <div class="card shadow-sm">
+                <div class="card-status-top bg-purple"></div>
+                <div class="card-body py-5">
+                    <h3 class="mb-3">Ready to Start Earning?</h3>
+                    <p class="text-muted mb-4">Share your referral link and start earning coins today!</p>
+                    <div class="btn-list flex-wrap justify-content-center">
+                        <a href="{{ url_for('ui_referrals') }}" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 7l6 6l4 -4l8 8"/>
+                                <path d="M21 10l-2 -2l-2 2"/>
+                                <path d="M21 10v4h-4"/>
+                            </svg>
+                            View My Stats
+                        </a>
+                        <button class="btn btn-success" onclick="shareViaNavigator()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                <path d="M8.7 10.7l6.6 -3.4"/>
+                                <path d="M8.7 13.3l6.6 3.4"/>
+                            </svg>
+                            Share Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Copy referral link
+    document.getElementById('copyLinkBtn').addEventListener('click', function() {
+        const linkInput = document.getElementById('referralLink');
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(linkInput.value).then(function() {
+            showToast('Referral link copied to clipboard!', 'success');
+        });
+    });
+});
+
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    element.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(element.value).then(function() {
+        showToast('Message copied to clipboard!', 'success');
+    });
+}
+
+function shareViaNavigator() {
+    const referralLink = document.getElementById('referralLink').value;
+    if (navigator.share && !referralLink.includes('YOUR_ID')) {
+        navigator.share({
+            title: 'Join me on Ink and Quill!',
+            text: 'Check out this amazing AI-powered storytelling platform!',
+            url: referralLink
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(referralLink).then(function() {
+            showToast('Referral link copied to clipboard!', 'success');
+        });
+    }
+}
+
+function showToast(message, type) {
+    // Create toast notification
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="me-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M5 12l5 5l10 -10"/>
+                </svg>
+            </div>
+            <div>${message}</div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

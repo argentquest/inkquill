@@ -1,0 +1,399 @@
+{# /ai_rag_story_app/app/templates/pages/world_list.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}My Worlds{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Force gradient background on page header */
+    .page-header {
+        background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%);
+    }
+    /* Tabler Premium World Cards */
+    .card-img-square-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+        border-bottom: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+        overflow: hidden;
+    }
+
+    .card-img-square-container .card-img-top,
+    .card-img-square-container .card-img-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-img-square-container .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tblr-text-muted);
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+    }
+
+    .card-img-square-container .card-img-placeholder .fas {
+        font-size: 3rem;
+        opacity: 0.6;
+    }
+
+    /* Tabler Premium World Card Styling */
+    .world-item {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .world-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1;
+    }
+    
+    .world-item:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tblr-box-shadow-lg);
+        border-color: var(--tblr-primary);
+    }
+    
+    .world-item:hover::before {
+        transform: translateX(0);
+    }
+
+    .world-item .card-title {
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        font-size: 1.1rem;
+    }
+
+    .world-item .actions .btn {
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+    
+    .world-item .btn-primary {
+        background: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+    }
+    
+    .world-item .btn-outline-secondary:hover {
+        background: var(--tblr-secondary);
+        border-color: var(--tblr-secondary);
+    }
+    
+    .world-item .btn-outline-danger:hover {
+        background: var(--tblr-red);
+        border-color: var(--tblr-red);
+    }
+
+    .world-item .card-metadata {
+        border-top: 1px solid var(--tblr-border-color);
+        padding-top: 0.75rem;
+        background: var(--tblr-bg-surface-secondary);
+        margin: 0 -1rem -1rem -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-bottom: 0.75rem;
+    }
+    
+    .world-item .card-metadata small {
+        color: var(--tblr-text-muted);
+        display: flex;
+        align-items: center;
+    }
+    
+    .world-item .card-metadata i {
+        color: var(--tblr-primary);
+        width: 12px;
+    }
+    
+    /* Enhanced Tabler Status Indicator */
+    .world-status-indicator {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+    }
+    
+    .status-badge {
+        background: linear-gradient(135deg, var(--tblr-green) 0%, var(--tblr-teal) 100%);
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--tblr-border-radius);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    /* Enhanced Action Button Grouping */
+    .actions .btn-list {
+        gap: 0.5rem;
+    }
+    
+    .actions .btn {
+        border-radius: var(--tblr-border-radius);
+        font-weight: 500;
+    }
+    
+    /* Add subtle animation to cards on load */
+    .world-item {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Stagger animation for multiple cards */
+    .world-item:nth-child(1) { animation-delay: 0.1s; }
+    .world-item:nth-child(2) { animation-delay: 0.2s; }
+    .world-item:nth-child(3) { animation-delay: 0.3s; }
+    .world-item:nth-child(4) { animation-delay: 0.4s; }
+    .world-item:nth-child(5) { animation-delay: 0.5s; }
+    .world-item:nth-child(6) { animation-delay: 0.6s; }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">My Worlds</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="fas fa-globe-americas me-3"></i>
+                    My Worlds
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Create and manage your story universes with powerful world-building tools
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-list me-1"></i>
+                        {{ worlds|length if worlds else 0 }} Worlds
+                    </span>
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-magic me-1"></i>
+                        AI Powered
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-globe me-1"></i>
+                        World Building
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <a href="{{ url_for('ui_world_builder_wizard') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom" 
+                       title="Launch the AI World Builder wizard to generate a complete fantasy world with characters, locations, and lore in minutes">
+                        <i class="fas fa-magic me-1"></i>
+                        AI World Builder
+                    </a>
+                    <a href="{{ url_for('ui_create_world_form') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom" 
+                       title="Start with an empty world canvas and build everything yourself from the ground up">
+                        <i class="fas fa-plus-circle me-1"></i>
+                        Create Custom World
+                    </a>
+                    <a href="{{ url_for('ui_import_world_from_book_form') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom" 
+                       title="Extract world elements from an existing book or story using AI analysis">
+                        <i class="fas fa-book-open me-1"></i>
+                        Import from Book
+                    </a>
+                    <a href="{{ url_for('ui_create_world_from_document_form') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom" 
+                       title="Upload a document (PDF, TXT, DOCX) and let AI extract world-building elements automatically">
+                        <i class="fas fa-file-upload me-1"></i>
+                        Import from File
+                    </a>
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('world_list')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="View comprehensive help documentation for world creation and management features">
+                        <i class="fas fa-life-ring me-1"></i>
+                        Help & Tutorials
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    {% if worlds %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <span class="avatar bg-blue-lt">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="card-title mb-1">Your Creative Universes</h4>
+                        <p class="text-secondary mb-0">Here are the worlds you have created. Click on a world to view its details, characters, locations, and lore.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="worlds-list-container" class="row row-cards">
+            {% for world in worlds %}
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="card h-100 world-item">
+                        <!-- Tabler Premium Status Indicator -->
+                        <div class="world-status-indicator">
+                            <span class="status-badge">
+                                <i class="fas fa-check me-1"></i>Active
+                            </span>
+                        </div>
+                        
+                        <!-- Square image container (consistent with other cards) -->
+                        <div class="card-img-square-container">
+                            {% if world.image_url %}
+                                <img src="{{ world.image_url }}" class="card-img-top" alt="{{ world.name | e }}">
+                            {% else %}
+                                <div class="card-img-placeholder">
+                                    <i class="fas fa-globe-americas"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ world.name | e }}</h5>
+                            {% if world.description %}
+                                <p class="card-text text-muted small flex-grow-1">{{ world.description | e | truncate(120, True) }}</p>
+                            {% else %}
+                                <p class="card-text text-muted small flex-grow-1"><em>No description provided for this world.</em></p>
+                            {% endif %}
+                            
+                            <!-- Metadata section -->
+                            <div class="card-metadata mb-3">
+                                <p class="card-text text-muted small mb-1">
+                                    <small><i class="fas fa-calendar-plus me-1"></i>Created: {{ world.created_at.strftime('%b %d, %Y') if world.created_at else 'N/A' }}</small>
+                                </p>
+                                <p class="card-text text-muted small mb-0">
+                                    <small><i class="fas fa-calendar-edit me-1"></i>Updated: {{ world.updated_at.strftime('%b %d, %Y') if world.updated_at else 'N/A' }}</small>
+                                </p>
+                            </div>
+                            
+                            <!-- Enhanced Tabler Premium Action Buttons -->
+                            <div class="actions mt-auto">
+                                <div class="btn-list w-100">
+                                    <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" 
+                                       class="btn btn-primary flex-fill"
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="View world details and manage elements">
+                                        <i class="fas fa-eye me-1"></i> Explore
+                                    </a>
+                                    <a href="{{ url_for('ui_edit_world_form', world_id=world.id) }}" 
+                                       class="btn btn-outline-secondary"
+                                       data-bs-toggle="tooltip" 
+                                       data-bs-placement="top" 
+                                       title="Edit world settings">
+                                        <i class="fas fa-cog me-1"></i> Edit
+                                    </a>
+                                    <button class="delete-world-btn btn btn-outline-danger" 
+                                            data-world-id="{{ world.id }}"
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="Delete this world permanently">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-status-top bg-blue"></div>
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <span class="avatar avatar-xl bg-blue-lt">
+                        <i class="fas fa-globe-americas fa-3x"></i>
+                    </span>
+                </div>
+                <h3 class="card-title mb-3">Create Your First World</h3>
+                <p class="text-secondary mb-4 mx-auto" style="max-width: 500px;">
+                    Worlds are the foundation of great storytelling. Build rich, detailed universes filled with characters, 
+                    locations, and lore that will inspire amazing stories.
+                </p>
+                <div class="btn-list justify-content-center">
+                    <a href="{{ url_for('ui_world_builder_wizard') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-magic me-2"></i>
+                        AI World Generator
+                    </a>
+                    <a href="{{ url_for('ui_create_world_form') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>
+                        Start From Scratch
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        Tip: Use the AI generator for quick inspiration, or start from scratch for complete control
+                    </small>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/world_crud.js') }}"></script>
+{% endblock %}

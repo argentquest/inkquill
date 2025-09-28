@@ -1,0 +1,90 @@
+{# /ai_rag_story_app/app/templates/pages/import_from_book.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Import World from Book Title - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+{# Custom styles moved to style.css #}
+{% endblock %}
+
+{% block content %}
+<div class="import-world-page"> {# Wrapper for CSS scoping #}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="card-title mb-0">Import World from Book Title</h2>
+                            {% set help_topic = 'import_book' %}
+                            {% set position = 'header' %}
+                            {% set size = 'default' %}
+                            {% set tooltip = 'Learn about importing worlds from literature' %}
+                            {% include 'partials/_help_button.html' %}
+                        </div>
+                        <p class="text-muted text-center mb-3">
+                            Enter the full title of a well-known classic book. The AI will attempt to generate a basic world definition, including key characters, locations, and lore items based on it.
+                        </p>
+                        <p class="alert alert-warning small d-flex align-items-center" role="alert"> {# Added d-flex for icon alignment #}
+                            
+                                <strong>Note:</strong> This feature relies on the AI's existing knowledge. Obscure books may not yield good results. The generation and import process can take 30-90 seconds or more. Please be patient.
+                            
+                        </p>
+
+                        <div class="mb-3">
+                            <a href="{{ url_for('ui_list_worlds') }}" class="text-decoration-none"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Return to your worlds list">
+                                <i class="fas fa-arrow-left me-1"></i> Back to My Worlds
+                            </a>
+                        </div>
+
+                        <form id="import-book-form"> 
+                            <div class="mb-3">
+                                <label for="book_title_input" class="form-label">Full Book Title:</label> 
+                                <input type="text" class="form-control form-control-lg" id="book_title_input" name="book_title"
+                                       required minlength="3"
+                                       placeholder="e.g., Alice's Adventures in Wonderland">
+                            </div>
+
+                            <div class="mb-3">
+                                {% with select_id='ai-model-config-select-import', tooltip_text='Choose from multiple AI models with different capabilities and costs. Premium models offer better quality but cost more per token.', show_label=true, label_text='AI Model', select_class='form-select-sm', default_model_type='generation' %}
+                                    {% include 'partials/_ai_model_selector.html' %}
+                                {% endwith %}
+                                <div class="form-text">Select the AI model to use for world generation. Leave blank to use the default JSON-enabled model.</div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" id="generate-import-button" class="btn btn-primary btn-lg"
+                                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                        title="Use AI to generate a world based on the book title with characters, locations, and lore"> 
+                                    <i class="fas fa-magic me-2"></i>
+                                    Generate & Import World
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="import-status-area" class="import-status-area">
+                            <p id="import-status-message-text" class="mb-0"></p> 
+                        </div>
+                         <div id="imported-world-link-area" class="mt-3 text-center" style="display: none;"> 
+                            <a href="#" id="view-imported-world-link" class="btn btn-success btn-lg"
+                               data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                               title="Navigate to the world that was just generated from the book">View Imported World</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/ai_model_selector.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/world_importer_form_handler.js') }}"></script>
+{% endblock %}

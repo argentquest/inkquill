@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if milestone_type == 'completion' %}
+Story Completed - {{ app_name }}
+{% elif milestone_type == 'published' %}
+Story Published - {{ app_name }}
+{% else %}
+Story Milestone - {{ app_name }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if milestone_type == 'completion' %}
+<h1>🎉 Congratulations, {{ user_name }}!</h1>
+<h2>You've completed "{{ story_title }}"!</h2>
+
+<p>What an incredible achievement! You've successfully completed your story, and we couldn't be more excited for you. Your dedication to storytelling is truly inspiring.</p>
+
+<div class="success-box">
+    <h2>✨ Your Story is Complete!</h2>
+    <p><strong>"{{ story_title }}"</strong> is now finished and ready to be shared with the world. Here's what you can do next:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Review and edit</strong> your completed story</li>
+        <li><strong>Publish it</strong> for others to read and enjoy</li>
+        <li><strong>Share it</strong> with friends and fellow writers</li>
+        <li><strong>Start your next masterpiece</strong></li>
+    </ul>
+</div>
+
+{% elif milestone_type == 'published' %}
+<h1>📚 Your Story is Now Published!</h1>
+<h2>"{{ story_title }}" is live!</h2>
+
+<p>Congratulations, {{ user_name }}! Your story "{{ story_title }}" has been successfully published and is now available for readers to discover and enjoy.</p>
+
+<div class="success-box">
+    <h2>🌟 Your Story is Live!</h2>
+    <p>Your published story is now part of our growing library of amazing stories. Here's what's happening:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Readers can discover</strong> your story in our gallery</li>
+        <li><strong>Share the link</strong> with friends and social media</li>
+        <li><strong>Track views and feedback</strong> from readers</li>
+        <li><strong>Build your author profile</strong> with more publications</li>
+    </ul>
+</div>
+
+{% else %}
+<h1>🎯 Story Milestone Reached!</h1>
+<h2>Great progress on "{{ story_title }}"!</h2>
+
+<p>Excellent work, {{ user_name }}! You've reached an important milestone in your story "{{ story_title }}". Every step forward is a victory worth celebrating!</p>
+
+<div class="info-box">
+    <h2>📈 Keep Up the Great Work!</h2>
+    <p>You're making fantastic progress on your story. Here are some ways to keep the momentum going:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Set writing goals</strong> for your next session</li>
+        <li><strong>Use AI assistance</strong> to overcome any creative blocks</li>
+        <li><strong>Develop your characters</strong> and world further</li>
+        <li><strong>Share your progress</strong> with the community</li>
+    </ul>
+</div>
+{% endif %}
+
+<div class="text-center">
+    <a href="{{ story_url }}" class="btn btn-primary">
+        📖 View Your Story
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<h2>🚀 What's Next?</h2>
+{% if milestone_type == 'completion' %}
+<p>Now that you've completed this story, why not:</p>
+<ul>
+    <li><strong>Polish and publish</strong> your completed work</li>
+    <li><strong>Start a new story</strong> in the same world or explore something completely different</li>
+    <li><strong>Create companion stories</strong> featuring your favorite characters</li>
+    <li><strong>Join our writer community</strong> to share your success</li>
+</ul>
+{% elif milestone_type == 'published' %}
+<p>Your story is published! Here are some next steps:</p>
+<ul>
+    <li><strong>Share your story</strong> on social media and with friends</li>
+    <li><strong>Engage with readers</strong> who comment on your work</li>
+    <li><strong>Start your next story</strong> to build your portfolio</li>
+    <li><strong>Join writing challenges</strong> and community events</li>
+</ul>
+{% else %}
+<p>Keep the creative energy flowing:</p>
+<ul>
+    <li><strong>Continue writing</strong> your current story</li>
+    <li><strong>Explore character development</strong> tools</li>
+    <li><strong>Use world-building features</strong> to enrich your story</li>
+    <li><strong>Get AI feedback</strong> on your progress</li>
+</ul>
+{% endif %}
+
+<div class="info-box">
+    <h2>💡 Writer's Tip</h2>
+    <p>Remember, every great author started with a single completed story. You're building valuable skills and creating something unique with each word you write. Keep exploring, keep creating, and most importantly, keep having fun with your storytelling!</p>
+</div>
+
+<div class="text-center">
+    <a href="{{ dashboard_url }}" class="btn btn-secondary">
+        🏠 Back to Dashboard
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<p>We're proud to be part of your writing journey!</p>
+<p><strong>The {{ app_name }} Team</strong></p>
+
+<div class="spacer"></div>
+
+<p class="text-muted">
+    <em>Story: "{{ story_title }}" | Story ID: #{{ story_id }} | {{ milestone_type.title() }}: {{ "now" | strftime('%B %d, %Y') }}</em>
+</p>
+{% endblock %}

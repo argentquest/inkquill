@@ -1,0 +1,1221 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Help Editor - Admin{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/matchesonscrollbar.min.css">
+
+<style>
+    .help-editor-container {
+        height: calc(100vh - 120px);
+        display: flex;
+        padding: 20px;
+        position: relative;
+    }
+    
+    .editor-panel {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-right: 10px;
+    }
+    
+    .preview-panel {
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-left: 10px;
+    }
+    
+    .resizer {
+        width: 20px;
+        background: var(--bg-surface-secondary);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--radius-sm);
+        cursor: col-resize;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+        margin: 0 -10px;
+        z-index: 10;
+    }
+    
+    .resizer:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+    }
+    
+    .resizer::before {
+        content: '';
+        width: 4px;
+        height: 40px;
+        background: var(--border-primary);
+        border-radius: 2px;
+        opacity: 0.6;
+        box-shadow: 0 0 4px rgba(0,0,0,0.1);
+    }
+    
+    .resizer:hover::before {
+        background: var(--primary);
+        opacity: 1;
+    }
+    
+    .resizer.resizing {
+        background: var(--primary-light);
+        border-color: var(--primary);
+    }
+    
+    .panel-header {
+        padding: 16px 20px;
+        background: var(--bg-surface-secondary);
+        border-bottom: 1px solid var(--border-primary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .panel-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .file-selector {
+        padding: 20px 20px 16px 20px;
+        border-bottom: 1px solid var(--border-primary);
+        background: var(--bg-surface);
+    }
+    
+    /* Editor toolbar */
+    .editor-toolbar {
+        background: var(--bg-surface-tertiary);
+        border-bottom: 1px solid var(--border-primary);
+        padding: 8px 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+    
+    .toolbar-group {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+    
+    .toolbar-separator {
+        width: 1px;
+        height: 20px;
+        background: var(--border-primary);
+        margin: 0 8px;
+    }
+    
+    .toolbar-btn {
+        padding: 4px 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+        font-size: 0.8rem;
+    }
+    
+    .toolbar-btn:hover {
+        background: var(--bg-surface);
+        border-color: var(--border-primary);
+        color: var(--text-primary);
+    }
+    
+    .toolbar-btn.active {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    .toolbar-select {
+        padding: 2px 6px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-primary);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        color: var(--text-primary);
+    }
+    
+    /* Dropdown styling for versions */
+    #file-select option[data-is-version="true"] {
+        font-style: italic;
+        padding-left: 20px;
+    }
+    
+    .editor-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .CodeMirror {
+        height: 100%;
+        font-size: 14px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+    
+    .preview-frame {
+        flex: 1;
+        border: none;
+        background: white;
+    }
+    
+    .editor-actions {
+        padding: 12px 20px;
+        background: var(--bg-surface-secondary);
+        border-top: 1px solid var(--border-primary);
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    .save-status {
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    .save-status.success {
+        color: var(--success);
+    }
+    
+    .save-status.error {
+        color: var(--danger);
+    }
+    
+    /* Dark mode adjustments */
+    [data-theme="dark"] .CodeMirror {
+        background: var(--bg-surface);
+        color: var(--text-primary);
+    }
+    
+    [data-theme="dark"] .preview-frame {
+        background: var(--bg-body);
+    }
+    
+    /* Loading states */
+    .panel-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        height: 100%;
+        color: var(--text-secondary);
+        padding: 2rem;
+    }
+    
+    .spinner-border {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 12px;
+    }
+    
+    @media (max-width: 1200px) {
+        .help-editor-container {
+            flex-direction: column;
+            height: auto;
+        }
+        
+        .editor-panel,
+        .preview-panel {
+            width: 100% !important;
+            min-height: 500px;
+            margin: 0 0 20px 0;
+        }
+        
+        .resizer {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Standardized Page Header #}
+{% set page_title = 'Help File Editor' %}
+{% set page_icon = 'fas fa-edit' %}
+{% set page_description = 'Edit and preview help documentation files' %}
+{% set page_stats = [
+    {'icon': 'fas fa-file-alt', 'text': 'HTML editing'},
+    {'icon': 'fas fa-eye', 'text': 'Live preview'},
+    {'icon': 'fas fa-code-branch', 'text': 'Version control'}
+] %}
+{% set back_url = url_for('ui_admin_dashboard') %}
+{% set back_text = 'Back to Admin' %}
+{% set help_topic = 'admin_help_editor' %}
+{% include 'partials/_page_header.html' %}
+
+<div class="container-fluid">
+    
+    <div class="help-editor-container">
+        <!-- Editor Panel -->
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Editor</h2>
+                <span id="current-file" class="text-muted">No file selected</span>
+            </div>
+            
+            <div class="file-selector">
+                <div class="d-flex gap-2 mb-3">
+                    <select class="form-select flex-grow-1" id="file-select">
+                        <option value="">Loading files...</option>
+                    </select>
+                    <button class="btn btn-success btn-sm" id="create-new-btn" onclick="showCreateNewModal()">
+                        <i class="fas fa-plus me-1"></i>New File
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Editor Toolbar -->
+            <div class="editor-toolbar" id="editor-toolbar" style="display: none;">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="format-btn" title="Format HTML (Ctrl+Shift+F)">
+                        <i class="fas fa-code"></i> Format
+                    </button>
+                    <button class="toolbar-btn" id="wrap-btn" title="Toggle Line Wrap">
+                        <i class="fas fa-text-width"></i> Wrap
+                    </button>
+                </div>
+                
+                <div class="toolbar-separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="find-btn" title="Find (Ctrl+F)">
+                        <i class="fas fa-search"></i> Find
+                    </button>
+                    <button class="toolbar-btn" id="replace-btn" title="Replace (Ctrl+H)">
+                        <i class="fas fa-exchange-alt"></i> Replace
+                    </button>
+                </div>
+                
+                <div class="toolbar-separator"></div>
+                
+                <div class="toolbar-group">
+                    <label for="font-size-select" style="font-size: 0.8rem; color: var(--text-secondary);">Size:</label>
+                    <select class="toolbar-select" id="font-size-select">
+                        <option value="12">12px</option>
+                        <option value="13">13px</option>
+                        <option value="14" selected>14px</option>
+                        <option value="15">15px</option>
+                        <option value="16">16px</option>
+                        <option value="18">18px</option>
+                    </select>
+                </div>
+                
+                <div class="toolbar-separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="fullscreen-btn" title="Toggle Fullscreen Editor">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                </div>
+            </div>
+            
+            <div class="editor-container" id="editor-container">
+                <div class="panel-loading text-center">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Ready to Edit</h5>
+                    <p class="text-muted mb-0">Select a file from the list above or create a new one</p>
+                    <small class="text-muted">Need help? Click the help button in the header</small>
+                </div>
+            </div>
+            
+            <div class="editor-actions">
+                <div class="save-status" id="save-status"></div>
+                <button class="btn btn-outline-secondary" id="reset-btn" disabled>
+                    <i class="fas fa-undo me-2"></i>Reset
+                </button>
+                <button class="btn btn-primary" id="save-btn" disabled>
+                    <i class="fas fa-save me-2"></i>Save as Version
+                </button>
+            </div>
+        </div>
+        
+        <!-- Resizer -->
+        <div class="resizer" id="resizer" title="Drag to resize panels (double-click to reset to 50/50)"></div>
+        
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Preview</h2>
+                <button class="btn btn-sm btn-outline-secondary" id="refresh-preview">
+                    <i class="fas fa-sync"></i>
+                </button>
+            </div>
+            
+            <iframe class="preview-frame" id="preview-frame"></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Create New File Modal -->
+<div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createFileModalLabel">Create New Help File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="new-file-name" class="form-label">File Name</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="new-file-name" placeholder="example_help" pattern="[a-z0-9_]+" required>
+                        <span class="input-group-text">.html</span>
+                    </div>
+                    <div class="form-text">Use lowercase letters, numbers, and underscores only</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="help-template" class="form-label">Template</label>
+                    <select class="form-select" id="help-template">
+                        <option value="blank">Blank File</option>
+                        <option value="standard">Standard Help Page</option>
+                        <option value="feature">Feature Documentation</option>
+                        <option value="tutorial">Tutorial/Guide</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="help-title" class="form-label">Page Title</label>
+                    <input type="text" class="form-control" id="help-title" placeholder="My Help Page">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="help-description" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="help-description" placeholder="Brief description of this help page">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="createNewFile()">
+                    <i class="fas fa-plus me-2"></i>Create File
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- CodeMirror JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closetag.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/search.min.js"></script>
+
+<script>
+    let editor = null;
+    let currentFile = null;
+    let originalContent = null;
+    let updateTimer = null;
+    let filesList = [];
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFilesList();
+        setupEventListeners();
+        initializePreview();
+        initializeResizer();
+    });
+    
+    function initializePreview() {
+        const previewFrame = document.getElementById('preview-frame');
+        const placeholderHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+                <style>
+                    body { 
+                        margin: 0; 
+                        padding: 20px; 
+                        background: #f8f9fa; 
+                        font-family: system-ui, -apple-system, sans-serif;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100vh;
+                        flex-direction: column;
+                        color: #6c757d;
+                        text-align: center;
+                    }
+                </style>
+            </head>
+            <body>
+                <i class="fas fa-eye fa-3x" style="margin-bottom: 1rem;"></i>
+                <h5>Live Preview</h5>
+                <p style="margin: 0;">Select a file to see the preview here</p>
+            </body>
+            </html>
+        `;
+        previewFrame.srcdoc = placeholderHtml;
+    }
+    
+    function initializeResizer() {
+        const resizer = document.getElementById('resizer');
+        const editorPanel = document.querySelector('.editor-panel');
+        const previewPanel = document.querySelector('.preview-panel');
+        const container = document.querySelector('.help-editor-container');
+        
+        let isResizing = false;
+        
+        // Load saved panel sizes from localStorage
+        const savedEditorWidth = localStorage.getItem('help-editor-panel-width');
+        if (savedEditorWidth && window.innerWidth > 1200) {
+            editorPanel.style.width = savedEditorWidth + '%';
+            previewPanel.style.width = (100 - parseFloat(savedEditorWidth)) + '%';
+        }
+        
+        resizer.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            resizer.classList.add('resizing');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+            
+            const containerRect = container.getBoundingClientRect();
+            const containerLeft = containerRect.left + 20; // Account for padding
+            const containerWidth = containerRect.width - 60; // Account for padding and resizer width
+            const mouseX = e.clientX - containerLeft;
+            
+            // Calculate the percentage position
+            const percentage = (mouseX / containerWidth) * 100;
+            
+            // Limit the percentage between 20% and 80%
+            const limitedPercentage = Math.max(20, Math.min(80, percentage));
+            
+            // Apply the new widths
+            editorPanel.style.width = limitedPercentage + '%';
+            previewPanel.style.width = (100 - limitedPercentage) + '%';
+            
+            // Refresh CodeMirror if it exists
+            if (editor) {
+                setTimeout(() => editor.refresh(), 10);
+            }
+        });
+        
+        document.addEventListener('mouseup', function() {
+            if (isResizing) {
+                isResizing = false;
+                resizer.classList.remove('resizing');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                
+                // Save the current panel width to localStorage
+                const editorWidth = parseFloat(editorPanel.style.width);
+                localStorage.setItem('help-editor-panel-width', editorWidth);
+            }
+        });
+        
+        // Double-click to reset to 50/50
+        resizer.addEventListener('dblclick', function() {
+            editorPanel.style.width = '50%';
+            previewPanel.style.width = '50%';
+            
+            // Save the reset preference
+            localStorage.setItem('help-editor-panel-width', '50');
+            
+            if (editor) {
+                setTimeout(() => editor.refresh(), 10);
+            }
+        });
+    }
+    
+    async function loadFilesList() {
+        try {
+            const response = await fetch('/admin/help-editor/files');
+            if (!response.ok) throw new Error('Failed to load files');
+            
+            filesList = await response.json();
+            renderFilesList(filesList);
+        } catch (error) {
+            console.error('Error loading files:', error);
+            showToast('error', 'Failed to load help files');
+        }
+    }
+    
+    function renderFilesList(files) {
+        const fileSelectEl = document.getElementById('file-select');
+        
+        if (files.length === 0) {
+            fileSelectEl.innerHTML = '<option value="">No help files found</option>';
+            return;
+        }
+        
+        // Populate dropdown with files and their versions
+        let optionsHtml = '<option value="">Select a file to edit...</option>';
+        
+        files.forEach(file => {
+            // Add the original file (if it exists)
+            if (file.path) {
+                const versionCount = file.versions.length > 0 ? ` (${file.versions.length} versions)` : '';
+                optionsHtml += `<option value="${file.path}" data-file-info='${JSON.stringify(file)}'>${file.name} - Original${versionCount}</option>`;
+            }
+            
+            // Add each version as a separate option
+            if (file.versions && file.versions.length > 0) {
+                file.versions.forEach(version => {
+                    optionsHtml += `<option value="${version.path}" data-file-info='${JSON.stringify(file)}' data-is-version="true">├─ ${file.name} - v2 by ${version.username} (${formatDate(version.date)})</option>`;
+                });
+            }
+            
+            // If no original exists, show disabled placeholder
+            if (!file.path && file.versions.length > 0) {
+                optionsHtml += `<option value="" disabled>${file.name} (no original)</option>`;
+                file.versions.forEach(version => {
+                    optionsHtml += `<option value="${version.path}" data-file-info='${JSON.stringify(file)}' data-is-version="true">├─ v2 by ${version.username} (${formatDate(version.date)})</option>`;
+                });
+            }
+        });
+        
+        fileSelectEl.innerHTML = optionsHtml;
+    }
+    
+    function setupEventListeners() {
+        // File dropdown selection
+        document.getElementById('file-select').addEventListener('change', function(e) {
+            const selectedOption = e.target.selectedOptions[0];
+            const filePath = e.target.value;
+            
+            if (filePath) {
+                // Load the selected file
+                loadFile(filePath);
+            }
+        });
+        
+        // Save button
+        document.getElementById('save-btn').addEventListener('click', saveFile);
+        
+        // Reset button
+        document.getElementById('reset-btn').addEventListener('click', resetEditor);
+        
+        // Refresh preview
+        document.getElementById('refresh-preview').addEventListener('click', function() {
+            console.log('Manual preview refresh triggered');
+            updatePreview();
+        });
+        
+        // Setup toolbar event listeners
+        setupToolbarListeners();
+    }
+    
+    function setupToolbarListeners() {
+        // Format button
+        document.getElementById('format-btn').addEventListener('click', function() {
+            if (editor) {
+                formatHTML();
+            }
+        });
+        
+        // Word wrap toggle
+        document.getElementById('wrap-btn').addEventListener('click', function() {
+            if (editor) {
+                toggleWordWrap();
+            }
+        });
+        
+        // Find button
+        document.getElementById('find-btn').addEventListener('click', function() {
+            if (editor) {
+                CodeMirror.commands.find(editor);
+            }
+        });
+        
+        // Replace button  
+        document.getElementById('replace-btn').addEventListener('click', function() {
+            if (editor) {
+                CodeMirror.commands.replace(editor);
+            }
+        });
+        
+        // Font size selector
+        document.getElementById('font-size-select').addEventListener('change', function() {
+            if (editor) {
+                changeFontSize(this.value);
+            }
+        });
+        
+        // Fullscreen toggle
+        document.getElementById('fullscreen-btn').addEventListener('click', function() {
+            if (editor) {
+                toggleFullscreen();
+            }
+        });
+        
+        // Keyboard shortcuts for toolbar functions
+        document.addEventListener('keydown', function(e) {
+            if (!editor) return;
+            
+            // Ctrl+Shift+F for format
+            if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+                e.preventDefault();
+                formatHTML();
+            }
+            
+            // Ctrl+H for replace
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                CodeMirror.commands.replace(editor);
+            }
+            
+            // F11 for fullscreen
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+    }
+    
+    function formatHTML() {
+        const content = editor.getValue();
+        const formatted = beautifyHTML(content);
+        editor.setValue(formatted);
+        showToast('success', 'HTML formatted successfully');
+    }
+    
+    function beautifyHTML(html) {
+        // Simple HTML beautifier - indent nested tags properly
+        let formatted = '';
+        let indent = 0;
+        const tab = '  '; // 2 spaces
+        
+        // Remove extra whitespace and split by tags
+        const tokens = html.replace(/>\s+</g, '><').split(/(<[^>]*>)/);
+        
+        for (let i = 0; i < tokens.length; i++) {
+            const token = tokens[i].trim();
+            if (!token) continue;
+            
+            if (token.startsWith('</')) {
+                // Closing tag - decrease indent
+                indent = Math.max(0, indent - 1);
+                formatted += tab.repeat(indent) + token + '\n';
+            } else if (token.startsWith('<') && token.endsWith('>')) {
+                // Opening tag
+                formatted += tab.repeat(indent) + token + '\n';
+                
+                // Increase indent for next line unless it's self-closing
+                if (!token.endsWith('/>') && !token.match(/<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)/i)) {
+                    indent++;
+                }
+            } else {
+                // Text content
+                if (token.length > 0) {
+                    formatted += tab.repeat(indent) + token + '\n';
+                }
+            }
+        }
+        
+        return formatted.trim();
+    }
+    
+    function toggleWordWrap() {
+        const currentWrap = editor.getOption('lineWrapping');
+        editor.setOption('lineWrapping', !currentWrap);
+        
+        const wrapBtn = document.getElementById('wrap-btn');
+        if (!currentWrap) {
+            wrapBtn.classList.add('active');
+            wrapBtn.title = 'Disable Line Wrap';
+        } else {
+            wrapBtn.classList.remove('active');
+            wrapBtn.title = 'Enable Line Wrap';
+        }
+        
+        // Save preference
+        localStorage.setItem('help-editor-line-wrap', !currentWrap);
+        showToast('info', `Line wrap ${!currentWrap ? 'enabled' : 'disabled'}`);
+    }
+    
+    function changeFontSize(size) {
+        const sizeInt = parseInt(size);
+        if (editor && sizeInt >= 10 && sizeInt <= 24) {
+            const wrapper = editor.getWrapperElement();
+            wrapper.style.fontSize = sizeInt + 'px';
+            editor.refresh();
+            
+            // Save preference
+            localStorage.setItem('help-editor-font-size', sizeInt);
+            showToast('info', `Font size changed to ${sizeInt}px`);
+        }
+    }
+    
+    let isFullscreen = false;
+    function toggleFullscreen() {
+        const editorPanel = document.querySelector('.editor-panel');
+        const previewPanel = document.querySelector('.preview-panel');
+        const resizer = document.querySelector('.resizer');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const container = document.querySelector('.help-editor-container');
+        
+        if (!isFullscreen) {
+            // Enter fullscreen mode
+            editorPanel.style.width = '100%';
+            previewPanel.style.display = 'none';
+            resizer.style.display = 'none';
+            container.style.position = 'fixed';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.right = '0';
+            container.style.bottom = '0';
+            container.style.zIndex = '9999';
+            container.style.background = 'var(--bg-body)';
+            container.style.padding = '20px';
+            
+            fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+            fullscreenBtn.title = 'Exit Fullscreen (F11)';
+            
+            isFullscreen = true;
+            showToast('info', 'Fullscreen editor enabled (F11 to exit)');
+        } else {
+            // Exit fullscreen mode
+            editorPanel.style.width = '50%';
+            previewPanel.style.display = 'flex';
+            resizer.style.display = 'flex';
+            container.style.position = 'relative';
+            container.style.top = 'auto';
+            container.style.left = 'auto';
+            container.style.right = 'auto';
+            container.style.bottom = 'auto';
+            container.style.zIndex = 'auto';
+            container.style.background = 'transparent';
+            container.style.padding = '0';
+            
+            fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
+            fullscreenBtn.title = 'Toggle Fullscreen Editor';
+            
+            isFullscreen = false;
+            showToast('info', 'Fullscreen editor disabled');
+        }
+        
+        // Refresh editor after layout change
+        if (editor) {
+            setTimeout(() => editor.refresh(), 100);
+        }
+    }
+    
+    async function loadFile(filepath) {
+        if (!filepath || filepath === 'null' || filepath === '') {
+            console.warn('Cannot load file with empty or null path:', filepath);
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/admin/help-editor/file/${filepath}`);
+            if (!response.ok) throw new Error('Failed to load file');
+            
+            const data = await response.json();
+            currentFile = data.filename;
+            originalContent = data.content;
+            
+            // Update UI - show if this is a version
+            const isVersion = filepath.includes('_v2_');
+            const fileDisplay = isVersion ? `${data.filename} (revision)` : data.filename;
+            document.getElementById('current-file').textContent = fileDisplay;
+            document.getElementById('save-btn').disabled = false;
+            document.getElementById('reset-btn').disabled = false;
+            
+            
+            // Initialize or update editor
+            if (!editor) {
+                initializeEditor(data.content);
+            } else {
+                editor.setValue(data.content);
+                // Update preview after setting content
+                setTimeout(updatePreview, 100);
+            }
+            
+        } catch (error) {
+            console.error('Error loading file:', error);
+            showToast('error', 'Failed to load file');
+        }
+    }
+    
+    function initializeEditor(content) {
+        const container = document.getElementById('editor-container');
+        container.innerHTML = '<textarea id="code-editor"></textarea>';
+        
+        editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+            mode: 'htmlmixed',
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'monokai' : 'default',
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            autoCloseTags: true,
+            indentUnit: 2,
+            indentWithTabs: false,
+            extraKeys: {
+                "Ctrl-S": saveFile,
+                "Cmd-S": saveFile,
+                "Ctrl-F": "find",
+                "Cmd-F": "find",
+                "Ctrl-H": "replace",
+                "Cmd-H": "replace"
+            }
+        });
+        
+        editor.setValue(content);
+        
+        // Show toolbar when editor is initialized
+        const toolbar = document.getElementById('editor-toolbar');
+        toolbar.style.display = 'flex';
+        
+        // Apply saved preferences
+        applyEditorPreferences();
+        
+        // Real-time preview update with debounce
+        editor.on('change', function() {
+            clearTimeout(updateTimer);
+            updateTimer = setTimeout(updatePreview, 500);
+        });
+        
+        // Initial preview update
+        setTimeout(updatePreview, 200);
+    }
+    
+    function applyEditorPreferences() {
+        if (!editor) return;
+        
+        // Apply saved font size
+        const savedFontSize = localStorage.getItem('help-editor-font-size');
+        if (savedFontSize) {
+            const fontSize = parseInt(savedFontSize);
+            if (fontSize >= 10 && fontSize <= 24) {
+                const wrapper = editor.getWrapperElement();
+                wrapper.style.fontSize = fontSize + 'px';
+                document.getElementById('font-size-select').value = fontSize;
+                editor.refresh();
+            }
+        }
+        
+        // Apply saved wrap setting (default is true)
+        const savedWrap = localStorage.getItem('help-editor-line-wrap');
+        if (savedWrap === 'false') {
+            editor.setOption('lineWrapping', false);
+            document.getElementById('wrap-btn').classList.remove('active');
+            document.getElementById('wrap-btn').title = 'Enable Line Wrap';
+        } else {
+            document.getElementById('wrap-btn').classList.add('active');
+            document.getElementById('wrap-btn').title = 'Disable Line Wrap';
+        }
+    }
+    
+    function updatePreview() {
+        if (!editor) {
+            console.warn('Editor not initialized, cannot update preview');
+            return;
+        }
+        
+        const previewFrame = document.getElementById('preview-frame');
+        if (!previewFrame) {
+            console.warn('Preview frame not found');
+            return;
+        }
+        
+        let content = editor.getValue();
+        console.log('Updating preview with content length:', content.length);
+        
+        // Clean up content for preview - remove problematic elements that might cause 404s
+        content = content
+            // Remove script tags that might reference non-existent files
+            .replace(/<script[^>]*src[^>]*><\/script>/gi, '')
+            // Remove link tags with relative paths that might be problematic
+            .replace(/<link[^>]*href="(?!https?:\/\/)[^"]*"[^>]*>/gi, '')
+            // Fix any relative image paths to be absolute
+            .replace(/src="\/static\//gi, `src="${window.location.origin}/static/`)
+            .replace(/href="\/static\//gi, `href="${window.location.origin}/static/`);
+        
+        // Create a complete HTML document with help styles
+        const previewHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${window.location.origin}/static/help/help-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: white; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            line-height: 1.6; 
+        }
+        .help-container { 
+            max-width: 100%; 
+            margin: 0; 
+            box-shadow: none;
+        }
+        h1, h2, h3, h4, h5, h6 { 
+            margin-top: 0; 
+            color: #333; 
+        }
+        p { 
+            margin-bottom: 1rem; 
+        }
+        .help-section { 
+            margin-bottom: 2rem; 
+        }
+        .help-tip { 
+            background: #f0f7ff; 
+            border-left: 4px solid #007bff; 
+            padding: 1rem; 
+            margin: 1rem 0; 
+        }
+        .help-alert { 
+            padding: 1rem; 
+            margin: 1rem 0; 
+            border-radius: 4px; 
+        }
+        .help-alert-info { 
+            background: #e7f3ff; 
+            border: 1px solid #b3d9ff; 
+        }
+        .help-alert-warning { 
+            background: #fff8e1; 
+            border: 1px solid #ffcc02; 
+        }
+        .help-steps { 
+            margin: 1rem 0; 
+        }
+        .help-step { 
+            margin-bottom: 1rem; 
+        }
+        .btn { 
+            padding: 0.5rem 1rem; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            text-decoration: none; 
+            display: inline-block; 
+        }
+        /* Remove any script references that might cause 404s */
+        script { display: none !important; }
+    </style>
+</head>
+<body>
+    ${content}
+</body>
+</html>`;
+        
+        // Update iframe content using srcdoc for better compatibility
+        previewFrame.srcdoc = previewHtml;
+        
+        // Fallback to blob method if srcdoc doesn't work
+        setTimeout(() => {
+            if (!previewFrame.contentDocument || !previewFrame.contentDocument.body || previewFrame.contentDocument.body.innerHTML.trim() === '') {
+                console.log('Falling back to blob method for preview');
+                const blob = new Blob([previewHtml], { type: 'text/html' });
+                previewFrame.src = URL.createObjectURL(blob);
+            }
+        }, 100);
+    }
+    
+    async function saveFile() {
+        if (!editor || !currentFile) return;
+        
+        const saveBtn = document.getElementById('save-btn');
+        const saveStatus = document.getElementById('save-status');
+        
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+        
+        try {
+            const response = await fetch('/admin/help-editor/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: currentFile,
+                    content: editor.getValue()
+                })
+            });
+            
+            if (!response.ok) throw new Error('Failed to save file');
+            
+            const result = await response.json();
+            
+            saveStatus.innerHTML = `<i class="fas fa-check-circle"></i> ${result.message}`;
+            saveStatus.className = 'save-status success';
+            
+            // Clear status after 5 seconds
+            setTimeout(() => {
+                saveStatus.innerHTML = '';
+                saveStatus.className = 'save-status';
+            }, 5000);
+            
+            // Reload files list to show new version
+            await loadFilesList();
+            
+        } catch (error) {
+            console.error('Error saving file:', error);
+            showToast('error', 'Failed to save file');
+            
+            saveStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> Save failed`;
+            saveStatus.className = 'save-status error';
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save as Version';
+        }
+    }
+    
+    function resetEditor() {
+        if (editor && originalContent !== null) {
+            editor.setValue(originalContent);
+            updatePreview();
+        }
+    }
+    
+    function formatDate(dateStr) {
+        if (dateStr.length === 8) {
+            const year = dateStr.substring(0, 4);
+            const month = dateStr.substring(4, 6);
+            const day = dateStr.substring(6, 8);
+            return `${year}-${month}-${day}`;
+        }
+        return dateStr;
+    }
+    
+    // Listen for theme changes
+    window.addEventListener('themeChanged', function(e) {
+        if (editor) {
+            editor.setOption('theme', e.detail.theme === 'dark' ? 'monokai' : 'default');
+        }
+    });
+    
+    // Create new file functions
+    function showCreateNewModal() {
+        const modal = new bootstrap.Modal(document.getElementById('createFileModal'));
+        modal.show();
+    }
+    
+    async function createNewFile() {
+        const fileName = document.getElementById('new-file-name').value.trim();
+        const template = document.getElementById('help-template').value;
+        const title = document.getElementById('help-title').value.trim();
+        const description = document.getElementById('help-description').value.trim();
+        
+        // Validate filename
+        if (!fileName) {
+            showToast('error', 'Please enter a file name');
+            return;
+        }
+        
+        if (!/^[a-z0-9_]+$/.test(fileName)) {
+            showToast('error', 'File name must contain only lowercase letters, numbers, and underscores');
+            return;
+        }
+        
+        // Check if file already exists
+        const fullFileName = fileName + '.html';
+        if (filesList.some(f => f.name === fullFileName)) {
+            showToast('error', 'A file with this name already exists');
+            return;
+        }
+        
+        // Generate content based on template
+        const content = generateHelpTemplate(template, title || fileName, description);
+        
+        try {
+            // Create the file
+            const response = await fetch('/admin/help-editor/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: fullFileName,
+                    content: content
+                })
+            });
+            
+            if (!response.ok) throw new Error('Failed to create file');
+            
+            const result = await response.json();
+            
+            showToast('success', 'File created successfully!');
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('createFileModal')).hide();
+            
+            // Clear form
+            document.getElementById('new-file-name').value = '';
+            document.getElementById('help-title').value = '';
+            document.getElementById('help-description').value = '';
+            document.getElementById('help-template').value = 'blank';
+            
+            // Reload files list and load the new file
+            await loadFilesList();
+            loadFile(fullFileName);
+            
+            // Set the dropdown to the new file
+            const fileSelect = document.getElementById('file-select');
+            fileSelect.value = fullFileName;
+            
+        } catch (error) {
+            console.error('Error creating file:', error);
+            showToast('error', 'Failed to create file');
+        }
+    }
+    
+    function generateHelpTemplate(template, title, description) {
+        // Simple template generation without template literals to avoid Jinja2 conflicts
+        function createTemplate(type, title, description) {
+            const baseHtml = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>' + title + ' - AI Storytelling Assistant</title>\n    <link rel="stylesheet" href="/static/help/help-styles.css">\n</head>\n<body>\n    <div class="help-container">\n        <div class="help-header centered">\n            <h1 class="help-title">' + title + '</h1>\n' + (description ? '            <p class="help-subtitle">' + description + '</p>\n' : '') + '        </div>\n        \n        <div class="help-content-wrapper">\n            <section class="help-section">\n                <p>Content goes here...</p>\n            </section>\n        </div>\n    </div>\n</body>\n</html>';
+            
+            return baseHtml;
+        }
+
+        const templates = {
+            blank: createTemplate('blank', title, description),
+            standard: createTemplate('standard', title, description),
+            feature: createTemplate('feature', title, description),
+            tutorial: createTemplate('tutorial', title, description)
+        };
+        
+        return templates[template] || templates.blank;
+    }
+</script>
+{% endblock %}

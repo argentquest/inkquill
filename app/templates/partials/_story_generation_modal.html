@@ -1,0 +1,401 @@
+{# /ai_rag_story_app/app/templates/partials/_story_generation_modal.html #}
+<div class="modal fade" id="storyGenerationModal" tabindex="-1" aria-labelledby="storyGenerationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <!-- Simplified Tabler-style Modal Header -->
+            <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title" id="storyGenerationModalLabel">
+                    <i class="fas fa-wand-magic-sparkles me-2"></i>
+                    Custom Story Generator
+                </h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Modal Subheader with Description -->
+            <div class="bg-light border-bottom px-4 py-3">
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    Customize your story by selecting specific elements from your world and defining the narrative style. The AI will weave these elements into a compelling story.
+                </p>
+            </div>
+            
+            <div class="modal-body">
+                <form id="story-generation-form">
+                    <!-- Story Parameters Section -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-sliders-h me-2"></i>Story Settings
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <!-- Genre Selection -->
+                                <div class="col-md-3">
+                                    <label for="story-genre-select" class="form-label">
+                                        Genre
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Choose the literary genre that defines your story's category and style. This influences plot structure, themes, and reader expectations."></i>
+                                    </label>
+                                    <select id="story-genre-select" class="form-select" required>
+                                        <option value="">Select Genre...</option>
+                                        <!-- Populated from prompts API -->
+                                    </select>
+                                    <div class="form-text small" id="genre-description" style="display: none;"></div>
+                                </div>
+                                
+                                <!-- Tone Selection -->
+                                <div class="col-md-3">
+                                    <label for="story-tone-select" class="form-label">
+                                        Tone
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Set the emotional atmosphere and writing style. The tone affects dialogue, descriptions, and the overall feeling readers experience."></i>
+                                    </label>
+                                    <select id="story-tone-select" class="form-select" required>
+                                        <option value="">Select Tone...</option>
+                                        <!-- Populated from prompts API -->
+                                    </select>
+                                    <div class="form-text small" id="tone-description" style="display: none;"></div>
+                                </div>
+                                
+                                <!-- Conflict Type -->
+                                <div class="col-md-3">
+                                    <label for="conflict-type-select" class="form-label">
+                                        Primary Conflict
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Define the central challenge or opposition in your story. This drives the plot forward and creates tension that keeps readers engaged."></i>
+                                    </label>
+                                    <select id="conflict-type-select" class="form-select" required>
+                                        <option value="">Select Conflict...</option>
+                                        <!-- Populated from prompts API -->
+                                    </select>
+                                    <div class="form-text small" id="conflict-description" style="display: none;"></div>
+                                </div>
+                                
+                                <!-- AI Model Selection -->
+                                <div class="col-md-3">
+                                    <label class="form-label">
+                                        AI Model
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Select the AI model for generation. Premium models offer better creativity and coherence but may cost more tokens."></i>
+                                    </label>
+                                    {% with select_id='ai-model-select', show_label=false, select_class='form-select', required=true, default_model_type='generation' %}
+                                        {% include 'partials/_ai_model_selector.html' %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            
+                            <!-- Author Concept -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label for="author-concept-input" class="form-label">
+                                        Story Concept
+                                        <span class="badge bg-secondary ms-1">Optional</span>
+                                        <i class="fas fa-question-circle ms-1 text-muted" 
+                                           data-bs-toggle="tooltip" 
+                                           data-bs-placement="top" 
+                                           title="Provide a brief idea, theme, or specific direction for your story. This helps guide the AI's creative process while respecting your vision."></i>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lightbulb"></i>
+                                        </span>
+                                        <textarea 
+                                            id="author-concept-input" 
+                                            class="form-control" 
+                                            rows="2"
+                                            maxlength="200"
+                                            placeholder="Example: A heist story where the characters must steal a magical artifact to save the kingdom..."></textarea>
+                                    </div>
+                                    <div class="form-text text-end">
+                                        <span id="concept-char-count">0</span>/200 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Element Selection Section -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-puzzle-piece me-2"></i>World Elements
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <!-- Characters Selection -->
+                                <div class="col-md-4">
+                                    <div class="border rounded p-3 h-100">
+                                        <h6 class="d-flex align-items-center justify-content-between mb-3">
+                                            <span>
+                                                <i class="fas fa-users me-2 text-primary"></i>Characters
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-question-circle text-muted" 
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="Select characters to feature in your story. These will be the main protagonists, antagonists, or supporting cast members."></i>
+                                            </span>
+                                        </h6>
+                                        <div class="element-grid" id="characters-grid" style="height: 200px; overflow-y: auto;">
+                                            <div class="text-center py-3">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                                <div class="text-muted small mt-2">Loading characters...</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 text-center">
+                                            <span class="badge bg-primary">
+                                                <span id="characters-count">0</span> selected
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Locations Selection -->
+                                <div class="col-md-4">
+                                    <div class="border rounded p-3 h-100">
+                                        <h6 class="d-flex align-items-center justify-content-between mb-3">
+                                            <span>
+                                                <i class="fas fa-map-marked-alt me-2 text-success"></i>Locations
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-question-circle text-muted" 
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="Choose locations where your story will take place. These settings will shape the atmosphere and events of your narrative."></i>
+                                            </span>
+                                        </h6>
+                                        <div class="element-grid" id="locations-grid" style="height: 200px; overflow-y: auto;">
+                                            <div class="text-center py-3">
+                                                <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                                                <div class="text-muted small mt-2">Loading locations...</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 text-center">
+                                            <span class="badge bg-success">
+                                                <span id="locations-count">0</span> selected
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Lore Items Selection -->
+                                <div class="col-md-4">
+                                    <div class="border rounded p-3 h-100">
+                                        <h6 class="d-flex align-items-center justify-content-between mb-3">
+                                            <span>
+                                                <i class="fas fa-scroll me-2 text-info"></i>Lore Items
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-question-circle text-muted" 
+                                                   data-bs-toggle="tooltip" 
+                                                   data-bs-placement="top" 
+                                                   title="Include lore items such as magical artifacts, historical events, or cultural elements that will enrich your story's world-building."></i>
+                                            </span>
+                                        </h6>
+                                        <div class="element-grid" id="lore-items-grid" style="height: 200px; overflow-y: auto;">
+                                            <div class="text-center py-3">
+                                                <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                                                <div class="text-muted small mt-2">Loading lore items...</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 text-center">
+                                            <span class="badge bg-info">
+                                                <span id="lore-items-count">0</span> selected
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden inputs for selected elements -->
+                    <input type="hidden" id="selected-characters" name="selected_characters">
+                    <input type="hidden" id="selected-locations" name="selected_locations">
+                    <input type="hidden" id="selected-lore-items" name="selected_lore_items">
+                </form>
+                
+                <!-- Generation Progress -->
+                <div id="generation-progress" class="alert alert-primary mt-3" style="display: none;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="spinner-border spinner-border-sm me-3" role="status"></div>
+                        <div>
+                            <h6 class="mb-1">Generating Your Story...</h6>
+                            <p class="mb-0 small" id="progress-message">Analyzing selected elements and crafting narrative...</p>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="generate-story-btn" disabled>
+                    <i class="fas fa-wand-magic-sparkles me-2"></i>Generate Story
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Tabler-style Modal Enhancements */
+#storyGenerationModal .modal-content {
+    border: none;
+    box-shadow: var(--tblr-box-shadow-lg);
+}
+
+#storyGenerationModal .modal-header {
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+#storyGenerationModal .card {
+    border: 1px solid var(--tblr-border-color);
+    box-shadow: none;
+}
+
+#storyGenerationModal .card-header {
+    background: var(--tblr-bg-surface-secondary);
+    border-bottom: 1px solid var(--tblr-border-color);
+    padding: 1rem;
+}
+
+#storyGenerationModal .element-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--tblr-bg-surface);
+    border-radius: var(--tblr-border-radius);
+}
+
+#storyGenerationModal .element-card {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background: white;
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#storyGenerationModal .element-card:hover {
+    background: var(--tblr-primary-lt);
+    border-color: var(--tblr-primary);
+    transform: translateX(2px);
+}
+
+#storyGenerationModal .element-card.selected {
+    background: var(--tblr-primary-lt);
+    border-color: var(--tblr-primary);
+    box-shadow: 0 0 0 2px rgba(var(--tblr-primary-rgb), 0.25);
+}
+
+#storyGenerationModal .element-card input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+#storyGenerationModal .element-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+#storyGenerationModal .element-card-title {
+    font-weight: 500;
+    color: var(--tblr-body-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+#storyGenerationModal .element-card-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--tblr-border-radius);
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+}
+
+#storyGenerationModal .element-card-icon.default-character { 
+    background: var(--tblr-primary-lt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tblr-primary);
+}
+
+#storyGenerationModal .element-card-icon.default-location { 
+    background: var(--tblr-success-lt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tblr-success);
+}
+
+#storyGenerationModal .element-card-icon.default-lore { 
+    background: var(--tblr-info-lt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tblr-info);
+}
+
+/* Tooltip styling for help icons */
+#storyGenerationModal .fa-question-circle {
+    cursor: help;
+    font-size: 0.875rem;
+}
+
+#storyGenerationModal .fa-question-circle:hover {
+    color: var(--tblr-primary) !important;
+}
+
+/* Form enhancements */
+#storyGenerationModal .form-label {
+    font-weight: 500;
+    color: var(--tblr-body-color);
+    margin-bottom: 0.5rem;
+}
+
+#storyGenerationModal .form-select,
+#storyGenerationModal .form-control {
+    border-color: var(--tblr-border-color);
+}
+
+#storyGenerationModal .form-select:focus,
+#storyGenerationModal .form-control:focus {
+    border-color: var(--tblr-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), 0.25);
+}
+
+/* Progress alert styling */
+#generation-progress {
+    border: 1px solid var(--tblr-primary);
+    background: var(--tblr-primary-lt);
+}
+
+#generation-progress .progress {
+    height: 0.75rem;
+    background: rgba(255,255,255,0.5);
+}
+</style>

@@ -1,0 +1,96 @@
+# Robots.txt for AI Storytelling Assistant
+# Control bot behavior and crawling
+
+User-agent: *
+# Allow access to public content
+Allow: /
+Allow: /public/
+Allow: /api/v1/public/
+
+# Disallow private and internal areas
+Disallow: /admin/
+Disallow: /api/v1/auth/
+Disallow: /api/v1/users/
+Disallow: /api/v1/worlds/
+Disallow: /api/v1/documents/
+Disallow: /api/v1/images/
+Disallow: /api/v1/chat/
+Disallow: /dashboard/
+Disallow: /worlds/
+Disallow: /stories/
+Disallow: /characters/
+Disallow: /locations/
+Disallow: /lore/
+Disallow: /settings/
+
+# Specific bot controls
+User-agent: facebookexternalhit
+# Allow Facebook to preview public content only
+Allow: /public/
+Allow: /api/v1/public/gallery
+Allow: /api/v1/public/worlds/*/metadata
+Disallow: /api/v1/public/chat/
+Crawl-delay: 5
+
+User-agent: Twitterbot
+# Allow Twitter card previews
+Allow: /public/
+Allow: /api/v1/public/gallery
+Allow: /api/v1/public/worlds/*/metadata
+Disallow: /api/v1/public/chat/
+Crawl-delay: 5
+
+User-agent: LinkedInBot
+# Allow LinkedIn previews
+Allow: /public/
+Allow: /api/v1/public/gallery
+Disallow: /api/v1/public/chat/
+Crawl-delay: 10
+
+User-agent: DiscordBot
+# Allow Discord embeds
+Allow: /public/
+Allow: /api/v1/public/gallery
+Disallow: /api/v1/public/chat/
+Crawl-delay: 5
+
+User-agent: WhatsApp
+# Allow WhatsApp previews but limit frequency
+Allow: /public/
+Disallow: /api/v1/public/chat/
+Crawl-delay: 30
+
+User-agent: SlackBot
+# Allow Slack unfurling
+Allow: /public/
+Disallow: /api/v1/public/chat/
+Crawl-delay: 10
+
+# Search engine bots
+User-agent: Googlebot
+Allow: /public/
+Disallow: /api/
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /public/
+Disallow: /api/
+Crawl-delay: 2
+
+User-agent: YandexBot
+Allow: /public/
+Disallow: /api/
+Crawl-delay: 5
+
+# Block aggressive crawlers
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Sitemap location (if you create one)
+# Sitemap: https://yourdomain.com/sitemap.xml

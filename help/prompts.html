@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompts & AI Instructions - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Prompts & AI Instructions</h1>
+            <p class="help-subtitle">Master the art of communicating with AI for better writing assistance</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"basics\"]').click()">
+                <div class="quick-action-icon">💬</div>
+                <div class="quick-action-text">Prompt Basics</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"system-prompts\"]').click()">
+                <div class="quick-action-icon">⚙️</div>
+                <div class="quick-action-text">System Prompts</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"advanced\"]').click()">
+                <div class="quick-action-icon">🎯</div>
+                <div class="quick-action-text">Advanced Techniques</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="basics">Prompt Basics</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="system-prompts">System Prompts</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="techniques">Writing Techniques</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="advanced">Advanced</button></li>
+            </ul>
+        </div>
+
+        <!-- Basics Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="basics">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Understanding AI Prompts
+                </h2>
+                <p>Prompts are instructions you give to AI to guide its responses. In the AI Storytelling Assistant, prompts determine how AI helps with writing, character development, world-building, and story analysis. Good prompts lead to relevant, useful AI assistance.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📝 User Prompts</h3>
+                        <p class="feature-card-description">Direct instructions you give to AI during writing sessions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🔧 System Prompts</h3>
+                        <p class="feature-card-description">Built-in instructions that define AI behavior and expertise.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎭 Role Prompts</h3>
+                        <p class="feature-card-description">Instructions that make AI act as specific types of writing assistants.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🔄 Context Prompts</h3>
+                        <p class="feature-card-description">Background information that helps AI understand your story world.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Writing Your First Effective Prompt</h3>
+                        <span class="recipe-card-time">5 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Start with a clear action verb (write, describe, suggest, analyze)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Specify what you want (dialogue, scene, character trait)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Provide relevant context (genre, character mood, plot situation)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Set constraints (length, style, tone)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Review and refine based on AI response quality</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Key Principle:</strong> Specific prompts get better results. "Write dialogue" is vague; "Write tense dialogue between two former friends arguing about a betrayal" is specific and actionable.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Anatomy of Effective Prompts</h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Essential Prompt Components</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Purpose</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Action</td>
+                                    <td>What you want AI to do</td>
+                                    <td>"Describe", "Write", "Suggest", "Analyze"</td>
+                                </tr>
+                                <tr>
+                                    <td>Subject</td>
+                                    <td>What to focus on</td>
+                                    <td>"the magic system", "character motivation", "scene atmosphere"</td>
+                                </tr>
+                                <tr>
+                                    <td>Context</td>
+                                    <td>Background information</td>
+                                    <td>"In a steampunk world", "After the battle", "For a young adult audience"</td>
+                                </tr>
+                                <tr>
+                                    <td>Constraints</td>
+                                    <td>Limitations and requirements</td>
+                                    <td>"In 200 words", "Without using magic", "In first person"</td>
+                                </tr>
+                                <tr>
+                                    <td>Style</td>
+                                    <td>Tone and approach</td>
+                                    <td>"Humorous", "Dark and gritty", "Poetic", "Conversational"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Good vs Poor Prompt Examples</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Prompt Improvement Examples:\n\n❌ Poor: \"Make my character better\"\n✅ Good: \"Develop three specific personality flaws that would create conflict for my protagonist, a confident warrior who struggles with self-doubt after failing to protect her village.\"\n\n❌ Poor: \"Write some dialogue\"\n✅ Good: \"Write a 150-word conversation between a cynical detective and an overly optimistic witness, where the detective is trying to extract crucial information without revealing the case details.\"\n\n❌ Poor: \"Describe the place\"\n✅ Good: \"Describe an abandoned steampunk laboratory from the perspective of a curious child, focusing on the strange mechanical contraptions and the eerie sounds they make in the darkness.\"')">Copy</button>
+                            <pre>Prompt Improvement Examples:
+
+❌ Poor: "Make my character better"
+✅ Good: "Develop three specific personality flaws that would create conflict for my protagonist, a confident warrior who struggles with self-doubt after failing to protect her village."
+
+❌ Poor: "Write some dialogue"
+✅ Good: "Write a 150-word conversation between a cynical detective and an overly optimistic witness, where the detective is trying to extract crucial information without revealing the case details."
+
+❌ Poor: "Describe the place"
+✅ Good: "Describe an abandoned steampunk laboratory from the perspective of a curious child, focusing on the strange mechanical contraptions and the eerie sounds they make in the darkness."</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Common Prompting Mistakes</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Avoid these common pitfalls:</p>
+                        <ul>
+                            <li><strong>Too Vague:</strong> "Help with my story" doesn't give AI direction</li>
+                            <li><strong>Too Constraining:</strong> Overly specific prompts limit AI creativity</li>
+                            <li><strong>No Context:</strong> AI needs background to provide relevant help</li>
+                            <li><strong>Mixed Instructions:</strong> Multiple unrelated requests in one prompt</li>
+                            <li><strong>Assuming Knowledge:</strong> AI doesn't know your story unless you tell it</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Iterative Prompt Refinement</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Improve prompts based on AI responses:</p>
+                        <ul>
+                            <li><strong>Start Broad:</strong> Begin with general requests, then add specifics</li>
+                            <li><strong>Add Examples:</strong> Show AI the style or content you want</li>
+                            <li><strong>Adjust Tone:</strong> Modify language to get different response styles</li>
+                            <li><strong>Include Constraints:</strong> Add length, style, or content limitations</li>
+                            <li><strong>Provide Feedback:</strong> Tell AI what worked and what didn't</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Prompts Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="system-prompts">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Understanding System Prompts
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Built-In AI Personalities</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>The platform includes specialized AI assistants:</p>
+                        <ul>
+                            <li><strong>Writing Coach:</strong> Focuses on craft, structure, and style improvement</li>
+                            <li><strong>World Builder:</strong> Specializes in creating consistent, detailed fictional worlds</li>
+                            <li><strong>Character Developer:</strong> Expert in psychology, motivation, and character arcs</li>
+                            <li><strong>Plot Analyst:</strong> Analyzes story structure, pacing, and narrative flow</li>
+                            <li><strong>Genre Specialist:</strong> Adapts advice for fantasy, sci-fi, romance, etc.</li>
+                        </ul>
+
+                        <div class="ai-feature-box">
+                            <h3 class="ai-feature-title">🎭 Adaptive AI Roles</h3>
+                            <p class="ai-feature-description">System prompts automatically adjust AI behavior based on your current activity - writing dialogue activates conversation expertise, world-building triggers cultural and geographical knowledge.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Context-Aware Prompting</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>How the system automatically enhances your prompts:</p>
+                        <ul>
+                            <li><strong>World Context:</strong> Adds relevant world-building information</li>
+                            <li><strong>Character Context:</strong> Includes character personalities and relationships</li>
+                            <li><strong>Story Context:</strong> References plot events and story structure</li>
+                            <li><strong>Style Context:</strong> Maintains consistency with your writing voice</li>
+                            <li><strong>Genre Context:</strong> Applies genre conventions and reader expectations</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Leveraging Auto-Context</h3>
+                                <span class="recipe-card-time">Per session</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Ensure your world elements are up-to-date</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Associate relevant characters and locations to scenes</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Write prompts knowing AI has background context</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Reference characters and places by name in prompts</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Trust AI to maintain consistency with established elements</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>System Prompt Categories</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Purpose</th>
+                                    <th>When Active</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Writing Assistant</td>
+                                    <td>General writing help and suggestions</td>
+                                    <td>During scene and act writing</td>
+                                </tr>
+                                <tr>
+                                    <td>World Building</td>
+                                    <td>Consistent world development</td>
+                                    <td>Creating locations, lore, and cultures</td>
+                                </tr>
+                                <tr>
+                                    <td>Character Development</td>
+                                    <td>Psychology and personality</td>
+                                    <td>Building character profiles and relationships</td>
+                                </tr>
+                                <tr>
+                                    <td>Story Analysis</td>
+                                    <td>Structure and pacing evaluation</td>
+                                    <td>Reviewing acts and story coherence</td>
+                                </tr>
+                                <tr>
+                                    <td>Dialogue Specialist</td>
+                                    <td>Conversation and voice</td>
+                                    <td>Writing character interactions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Prompt Enhancement Pipeline</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>How your prompts are processed behind the scenes:</p>
+                        <ul>
+                            <li><strong>Intent Recognition:</strong> System identifies what kind of help you need</li>
+                            <li><strong>Context Retrieval:</strong> Relevant world information is gathered</li>
+                            <li><strong>Prompt Enrichment:</strong> Background details are added to your prompt</li>
+                            <li><strong>Specialist Routing:</strong> Request goes to the most appropriate AI expert</li>
+                            <li><strong>Response Generation:</strong> AI creates contextually aware assistance</li>
+                            <li><strong>Consistency Check:</strong> Response is verified against your world rules</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">⚡</span>
+                            <div>
+                                <strong>Efficiency Tip:</strong> The more complete your world-building, the better the automatic context enhancement. Invest time in detailed character and world development for superior AI assistance.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Writing Techniques Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="techniques">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Prompting for Writing Tasks
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Dialogue Prompts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Crafting prompts for character conversations:</p>
+                        <ul>
+                            <li><strong>Character Voices:</strong> Specify how each character speaks</li>
+                            <li><strong>Emotional Context:</strong> Describe the mood and tension</li>
+                            <li><strong>Purpose:</strong> What the conversation should accomplish</li>
+                            <li><strong>Subtext:</strong> What characters aren't saying directly</li>
+                            <li><strong>Setting Influence:</strong> How location affects the conversation</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Dialogue Prompt Templates:\n\n📝 Basic: \"Write dialogue between [Character A] and [Character B] where [Character A] is trying to [goal] while [Character B] is [obstacle/reaction].\"\n\n🎭 Character-focused: \"Write a conversation that shows [Character] is [personality trait] through their speech patterns, word choice, and reactions.\"\n\n⚡ Tension-building: \"Create dialogue where the characters say one thing but mean another, with underlying tension about [conflict].\"\n\n🎯 Plot-advancing: \"Write dialogue that reveals [plot information] naturally while characters discuss [surface topic].\"')">Copy</button>
+                            <pre>Dialogue Prompt Templates:
+
+📝 Basic: "Write dialogue between [Character A] and [Character B] where [Character A] is trying to [goal] while [Character B] is [obstacle/reaction]."
+
+🎭 Character-focused: "Write a conversation that shows [Character] is [personality trait] through their speech patterns, word choice, and reactions."
+
+⚡ Tension-building: "Create dialogue where the characters say one thing but mean another, with underlying tension about [conflict]."
+
+🎯 Plot-advancing: "Write dialogue that reveals [plot information] naturally while characters discuss [surface topic]."</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Descriptive Writing Prompts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Getting vivid, engaging descriptions:</p>
+                        <ul>
+                            <li><strong>Sensory Focus:</strong> Specify which senses to emphasize</li>
+                            <li><strong>Perspective:</strong> Choose the viewing character's emotional state</li>
+                            <li><strong>Mood:</strong> Set the atmosphere you want to create</li>
+                            <li><strong>Purpose:</strong> What the description should achieve for the story</li>
+                            <li><strong>Style:</strong> Match the tone of your overall narrative</li>
+                        </ul>
+
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Description Type</th>
+                                    <th>Key Elements</th>
+                                    <th>Example Prompt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Setting/Location</td>
+                                    <td>Atmosphere, history, function</td>
+                                    <td>"Describe an ancient library through the eyes of a young scholar, emphasizing the weight of knowledge and mystery"</td>
+                                </tr>
+                                <tr>
+                                    <td>Character Appearance</td>
+                                    <td>Personality hints, memorable features</td>
+                                    <td>"Describe a warrior's appearance that hints at their gentle nature despite their intimidating profession"</td>
+                                </tr>
+                                <tr>
+                                    <td>Action Scenes</td>
+                                    <td>Pacing, tension, clarity</td>
+                                    <td>"Write a tense sword fight that shows the protagonist's desperation and growing exhaustion"</td>
+                                </tr>
+                                <tr>
+                                    <td>Emotional Moments</td>
+                                    <td>Internal state, physical manifestation</td>
+                                    <td>"Describe a character's grief in a way that shows rather than tells their emotional state"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Plot Development Prompts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Advancing your story with purposeful prompts:</p>
+                        <ul>
+                            <li><strong>Conflict Escalation:</strong> How to increase tension naturally</li>
+                            <li><strong>Character Growth:</strong> Moments that change characters</li>
+                            <li><strong>Plot Twists:</strong> Surprising but logical developments</li>
+                            <li><strong>Resolution Building:</strong> Leading toward satisfying conclusions</li>
+                            <li><strong>Pacing Control:</strong> Speeding up or slowing down action</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Development Prompts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Creating deep, consistent characters:</p>
+                        <ul>
+                            <li><strong>Personality Exploration:</strong> Uncovering character depths</li>
+                            <li><strong>Motivation Analysis:</strong> Understanding character drives</li>
+                            <li><strong>Relationship Dynamics:</strong> How characters interact</li>
+                            <li><strong>Growth Arcs:</strong> Character change over time</li>
+                            <li><strong>Backstory Integration:</strong> Using history to inform present actions</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Character Development Prompts:\n\n🧠 Psychology: \"Analyze why [Character] would choose [action] given their [background/motivation/fears].\"\n\n💭 Internal Conflict: \"Explore the internal struggle between [Character\\'s] desire for [X] and their belief that [Y].\"\n\n🔄 Growth: \"Show how [Character] has changed since [event] through their reaction to [new situation].\"\n\n👥 Relationships: \"Develop the complex dynamic between [Character A] and [Character B], considering their [shared history/conflict/goal].\"')">Copy</button>
+                            <pre>Character Development Prompts:
+
+🧠 Psychology: "Analyze why [Character] would choose [action] given their [background/motivation/fears]."
+
+💭 Internal Conflict: "Explore the internal struggle between [Character's] desire for [X] and their belief that [Y]."
+
+🔄 Growth: "Show how [Character] has changed since [event] through their reaction to [new situation]."
+
+👥 Relationships: "Develop the complex dynamic between [Character A] and [Character B], considering their [shared history/conflict/goal]."</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="advanced">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Advanced Prompting Techniques
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Chain-of-Thought Prompting</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Guide AI through complex reasoning processes:</p>
+                        <ul>
+                            <li><strong>Step-by-Step Analysis:</strong> Break complex problems into stages</li>
+                            <li><strong>Reasoning Chains:</strong> Ask AI to show its thinking process</li>
+                            <li><strong>Multi-Perspective Analysis:</strong> Consider multiple viewpoints</li>
+                            <li><strong>Problem Decomposition:</strong> Split large creative challenges</li>
+                            <li><strong>Progressive Refinement:</strong> Build complexity gradually</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Chain-of-Thought Example</h3>
+                                <span class="recipe-card-time">Analysis workflow</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content"><strong>Initial Query:</strong> "I need to resolve this plot conflict..."</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content"><strong>Context Building:</strong> "First, analyze the motivations of each character involved..."</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content"><strong>Option Generation:</strong> "Consider three possible approaches..."</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content"><strong>Consequence Analysis:</strong> "For each approach, what are the story implications?"</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content"><strong>Recommendation:</strong> "Based on this analysis, recommend the best path forward"</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Meta-Prompting Strategies</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Prompts about prompting - optimizing AI interactions:</p>
+                        <ul>
+                            <li><strong>Prompt Optimization:</strong> Ask AI to improve your prompts</li>
+                            <li><strong>Alternative Approaches:</strong> Request different ways to tackle problems</li>
+                            <li><strong>Quality Assessment:</strong> Have AI evaluate its own responses</li>
+                            <li><strong>Style Matching:</strong> Ask AI to adapt to your preferred communication style</li>
+                            <li><strong>Iterative Improvement:</strong> Build on previous responses systematically</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Meta-Prompt Examples:\n\n🔧 Optimization: \"How could I improve this prompt to get more specific, actionable advice about character development?\"\n\n📊 Evaluation: \"Rate the effectiveness of your previous response and suggest how to improve it.\"\n\n🎯 Targeting: \"What additional context would help you provide better writing assistance for this scene?\"\n\n🔄 Iteration: \"Based on my feedback about your last suggestion, revise your approach to better match my writing style.\"')">Copy</button>
+                            <pre>Meta-Prompt Examples:
+
+🔧 Optimization: "How could I improve this prompt to get more specific, actionable advice about character development?"
+
+📊 Evaluation: "Rate the effectiveness of your previous response and suggest how to improve it."
+
+🎯 Targeting: "What additional context would help you provide better writing assistance for this scene?"
+
+🔄 Iteration: "Based on my feedback about your last suggestion, revise your approach to better match my writing style."</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Constraint-Based Creativity</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Use limitations to spark creativity:</p>
+                        <ul>
+                            <li><strong>Format Constraints:</strong> Specific structures like sonnets, haikus, or dramatic forms</li>
+                            <li><strong>Content Restrictions:</strong> Forbidden words, required elements, or thematic limits</li>
+                            <li><strong>Style Constraints:</strong> Writing in the style of specific authors or genres</li>
+                            <li><strong>Perspective Limits:</strong> Unusual viewpoints or narrative restrictions</li>
+                            <li><strong>Logical Constraints:</strong> Working within established world rules</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Multi-Agent Prompting</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Simulate different perspectives and expertise:</p>
+                        <ul>
+                            <li><strong>Devil's Advocate:</strong> Have AI argue against your ideas</li>
+                            <li><strong>Expert Panels:</strong> Get advice from different specialized perspectives</li>
+                            <li><strong>Character Voices:</strong> Let AI respond as your characters would</li>
+                            <li><strong>Genre Specialists:</strong> Get advice specific to your story's genre</li>
+                            <li><strong>Critique Teams:</strong> Multiple analytical approaches to story problems</li>
+                        </ul>
+
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent Type</th>
+                                    <th>Perspective</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Story Editor</td>
+                                    <td>Structure and pacing</td>
+                                    <td>Plot development and flow</td>
+                                </tr>
+                                <tr>
+                                    <td>Character Psychologist</td>
+                                    <td>Human behavior and motivation</td>
+                                    <td>Character development and relationships</td>
+                                </tr>
+                                <tr>
+                                    <td>World Historian</td>
+                                    <td>Cultural and historical accuracy</td>
+                                    <td>World-building consistency</td>
+                                </tr>
+                                <tr>
+                                    <td>Genre Expert</td>
+                                    <td>Reader expectations and tropes</td>
+                                    <td>Genre-appropriate content</td>
+                                </tr>
+                                <tr>
+                                    <td>Beta Reader</td>
+                                    <td>Reader experience and engagement</td>
+                                    <td>Accessibility and appeal</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Prompt Templates and Frameworks</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Reusable structures for consistent results:</p>
+                        <ul>
+                            <li><strong>Scene Development Template:</strong> Systematic approach to writing scenes</li>
+                            <li><strong>Character Analysis Framework:</strong> Deep dive into character psychology</li>
+                            <li><strong>Plot Problem Solver:</strong> Structured approach to story issues</li>
+                            <li><strong>World Building Methodology:</strong> Comprehensive world development</li>
+                            <li><strong>Revision Checklist:</strong> Systematic improvement process</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Efficiency Tip:</strong> Create and save your most effective prompts as templates. This saves time and ensures consistent quality in AI interactions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Prompt Engineering Best Practices</h2>
+                <ul>
+                    <li><strong>Experiment Iteratively:</strong> Test variations to find what works best</li>
+                    <li><strong>Document Successful Patterns:</strong> Keep a library of effective prompts</li>
+                    <li><strong>Understand AI Limitations:</strong> Know what AI can and cannot do well</li>
+                    <li><strong>Maintain Creative Control:</strong> Use AI as a tool, not a replacement for your vision</li>
+                    <li><strong>Context is King:</strong> The more relevant context you provide, the better the results</li>
+                </ul>
+
+                <div class="alert alert-success">
+                    <span class="alert-icon">🎯</span>
+                    <div>
+                        <strong>Mastery Tip:</strong> The best AI writers develop an intuitive understanding of how to communicate their creative vision clearly to AI. This skill improves with practice and experimentation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

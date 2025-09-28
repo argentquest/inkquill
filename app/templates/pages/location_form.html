@@ -1,0 +1,679 @@
+{# /ai_rag_story_app/app/templates/pages/location_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set page_action = "Create New" if location is none else "Edit" %}
+{% set button_action_text = "Create Location" if location is none else "Save Changes" %}
+{% set button_icon_class = "fas fa-map-marker-alt" if location is none else "fas fa-save" %}
+{% set world_context = world if world else (location.world if location and location.world else None) %}
+
+{% block title %}{{ page_action }} Location {% if world_context %}in {{ world_context.name | e }}{% endif %}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- TABLER PREMIUM FORM STYLES - Following UI Design Standards -->
+<style>
+    /* Enhanced location form layout with Tabler CSS variables */
+    .location-form-layout {
+        display: flex;
+        min-height: 70vh;
+        gap: 0;
+        border-radius: var(--tblr-border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .location-form-main {
+        flex: 1;
+        min-width: 400px;
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg) 0 0 var(--tblr-border-radius-lg);
+        padding: 2rem;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .location-form-sidebar {
+        width: 400px;
+        min-width: 300px;
+        max-width: 600px;
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-left: none;
+        border-radius: 0 var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0;
+        overflow-y: auto;
+        position: relative;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: var(--tblr-border-color);
+        cursor: col-resize;
+        z-index: 1000;
+        transition: background-color 0.15s ease-in-out;
+    }
+    
+    .form-resize-handle:hover {
+        background: var(--tblr-primary);
+    }
+    
+    .form-resize-handle::before {
+        content: '';
+        position: absolute;
+        left: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 30px;
+        background: var(--tblr-bg-surface);
+        border-radius: var(--tblr-border-radius-sm);
+    }
+    
+    .form-sidebar-content {
+        padding: 2rem;
+        height: 100%;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 2rem;
+    }
+    
+    .sidebar-section h3 {
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: var(--tblr-muted);
+        border-bottom: 1px solid var(--tblr-border-color);
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Enhanced image container */
+    #generated-image-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        background-color: var(--tblr-bg-surface-tertiary);
+        border-radius: var(--tblr-border-radius);
+        overflow: hidden;
+        border: 1px solid var(--tblr-border-color);
+        transition: all 0.15s ease-in-out;
+    }
+
+    #generated-image-display {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    #image-generation-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 3rem;
+        height: 3rem;
+    }
+    
+    /* Enhanced gallery */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .gallery-thumbnail {
+        position: relative;
+        border: 2px solid transparent;
+        border-radius: var(--tblr-border-radius);
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .gallery-thumbnail img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
+    
+    .gallery-thumbnail:hover {
+        border-color: var(--tblr-info);
+        transform: translateY(-2px);
+    }
+    
+    .gallery-thumbnail.active {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 2px var(--tblr-primary);
+    }
+    
+    .gallery-thumbnail .set-current-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        line-height: 1;
+    }
+    
+    .gallery-thumbnail:hover .set-current-btn {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    /* Enhanced form controls */
+    .form-control:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+
+    .form-select:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+    
+    @media (max-width: 768px) {
+        .location-form-layout {
+            flex-direction: column;
+        }
+        
+        .location-form-sidebar {
+            width: 100%;
+            border-left: 1px solid var(--tblr-border-color);
+            border-radius: 0 0 var(--tblr-border-radius-lg) var(--tblr-border-radius-lg);
+        }
+        
+        .location-form-main {
+            border-radius: var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0 0;
+        }
+        
+        .form-resize-handle {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay for Visual Depth -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="{{ button_icon_class }}"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_worlds') }}" class="text-white-50">Worlds</a></li>
+                            {% if world_context %}
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=world_context.id) }}" class="text-white-50">{{ world_context.name }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_locations_for_world', world_id=world_context.id) }}" class="text-white-50">Locations</a></li>
+                            {% endif %}
+                            <li class="breadcrumb-item active text-white" aria-current="page">{{ page_action }} Location</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3">
+                    <i class="{{ button_icon_class }} me-3"></i>
+                    {{ page_action }} Location
+                </h1>
+                <div class="page-subtitle text-white mb-4">
+                    {% if world_context %}
+                        Create and manage location details for {{ world_context.name }}
+                    {% else %}
+                        Create and manage location details
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if world_context %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-globe me-1"></i>{{ world_context.name }}
+                    </span>
+                    {% endif %}
+                    {% if location %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-edit me-1"></i>Editing Location
+                    </span>
+                    {% else %}
+                    <span class="badge bg-light text-dark px-3 py-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-plus me-1"></i>New Location
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('location_detail')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            title="Get help with location creation and editing">
+                        <i class="fas fa-question-circle me-1"></i>Help
+                    </button>
+                    {% if world_context %}
+                    <a href="{{ url_for('ui_list_locations_for_world', world_id=world_context.id) }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Return to location list">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Locations
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('ui_list_worlds') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Return to worlds list">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Worlds
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="location-form-page"> {# Wrapper for CSS scoping #}
+    
+    <div class="container-fluid">
+        {# TABLER PREMIUM ALERT - Enhanced error display #}
+        <div id="location-form-error-message" class="alert alert-danger alert-dismissible" style="display: none;" role="alert">
+            <div class="d-flex">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="m0 0h24v24H0z" fill="none"></path>
+                        <path d="m12 9v4"></path>
+                        <path d="m10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"></path>
+                        <path d="m12 16h.01"></path>
+                    </svg>
+                </div>
+                <div class="alert-message"></div>
+            </div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+
+        <!-- Split Layout -->
+        <div class="location-form-layout" id="form-layout">
+            <!-- Main Form Area -->
+            <div class="location-form-main">
+                <form id="location-form" action="{{ form_action_url }}" method="post" data-page-action="{{ page_action }}" {% if world_context %}data-world-id="{{ world_context.id }}"{% endif %} {% if location and location.id %}data-location-id="{{ location.id }}"{% endif %}>
+                    
+                    <h4 class="mb-4">Basic Information</h4>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-bold">
+                            Location Name
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="The name of your location. This is how it will be identified throughout your world and stories. Choose something memorable and fitting for your setting. Examples: 'The Whispering Woods', 'Dragon's Rest Tavern', 'The Crystal Caves'."></i>
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="name" name="name"
+                               value="{{ location.name | e if location and location.name else '' }}"
+                               required minlength="1" maxlength="255"
+                               placeholder="Enter the name of the location (e.g., The Whispering Woods)"
+                               style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-bold">
+                            Description (Optional)
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="A detailed description of your location including its appearance, history, key features, and significance. This will be used by the AI to maintain consistency when referencing this location in stories and to enhance the narrative experience."></i>
+                        </label>
+                        <textarea class="form-control form-control-lg" id="description" name="description"
+                                  rows="4"
+                                  placeholder="Describe the location (appearance, history, key features, etc.)."
+                                  style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ location.description | e if location and location.description else '' }}</textarea>
+                    </div>
+
+                    {% if location and location.id %}
+                    <div class="mb-3">
+                        <label class="form-label">AI-Generated RAG Context / Description:</label>
+                        <div id="generated-rag-content-display-loc"
+                             class="form-control-plaintext p-3 border bg-light rounded">
+                            Loading AI-generated context...
+                        </div>
+                        <div class="form-text">This is the descriptive text automatically generated by the AI for RAG purposes, based on the fields you save. It is re-generated when significant fields are updated.</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="atmosphere" class="form-label fw-bold">
+                            Atmosphere (Optional)
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="The mood or feeling that pervades this location. This helps set the tone when the AI describes scenes here. Examples: Eerie, Serene, Bustling, Desolate, Mysterious, Welcoming, Dangerous, Peaceful."></i>
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="atmosphere" name="atmosphere"
+                               value="{{ location.atmosphere | e if location and location.atmosphere else '' }}"
+                               maxlength="255"
+                               placeholder="e.g., Eerie, Serene, Bustling, Desolate"
+                               style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="significance" class="form-label fw-bold">
+                            General Significance (Optional)
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="What role does this location play in your world? Why is it important to the story or setting? Examples: 'The last safe haven for refugees', 'Ancient seat of magical power', 'Trading hub between kingdoms', 'Site of a historic battle'."></i>
+                        </label>
+                        <textarea class="form-control form-control-lg" id="significance" name="significance"
+                                  rows="3"
+                                  placeholder="What is this location's general importance or role in the world?"
+                                  style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ location.significance | e if location and location.significance else '' }}</textarea>
+                    </div>
+
+                    <!-- AI Import Fields -->
+                    <h4 class="mt-4 mb-4">AI Import Data <small class="text-muted">(Optional)</small></h4>
+                    
+                    <div class="mb-3">
+                        <label for="geography" class="form-label fw-bold">
+                            Geography (Optional)
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="Physical and geographical features of this location. Include terrain, natural characteristics, climate, and environmental details. Examples: 'Rocky mountains with pine forests', 'Coastal city with natural harbor', 'Underground cavern system'. This field is often populated during AI imports but can be edited manually."></i>
+                        </label>
+                        <textarea class="form-control form-control-lg" id="geography" name="geography"
+                                  rows="3"
+                                  placeholder="Geographical features, terrain, or natural characteristics."
+                                  style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ location.geography | e if location and location.geography else '' }}</textarea>
+                        <div class="form-text">Description of the physical geography (automatically set during AI imports)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cultural_context" class="form-label fw-bold">
+                            Cultural Context (Optional)
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="Cultural, social, and political aspects of this location. Who lives here? What customs do they follow? What is the governance structure? Examples: 'Democratic trading city', 'Tribal sacred grounds', 'Military outpost'. This helps the AI understand the social dynamics when characters visit."></i>
+                        </label>
+                        <textarea class="form-control form-control-lg" id="cultural_context" name="cultural_context"
+                                  rows="3"
+                                  placeholder="Cultural, social, or political aspects of this location."
+                                  style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ location.cultural_context | e if location and location.cultural_context else '' }}</textarea>
+                        <div class="form-text">Description of cultural and social aspects (automatically set during AI imports)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="importance_rating" class="form-label fw-bold">
+                            Importance Rating
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="How significant is this location to your overall world and stories? This helps the AI prioritize how much detail to include when referencing this location. Higher ratings indicate more central roles in narratives and world events."></i>
+                        </label>
+                        <select class="form-select form-select-lg" id="importance_rating" name="importance_rating"
+                                style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                            <option value="">-- Not specified --</option>
+                            <option value="1" {% if location and location.importance_rating == 1 %}selected{% endif %}>1 - Minor location</option>
+                            <option value="2" {% if location and location.importance_rating == 2 %}selected{% endif %}>2 - Background location</option>
+                            <option value="3" {% if location and location.importance_rating == 3 %}selected{% endif %}>3 - Important setting</option>
+                            <option value="4" {% if location and location.importance_rating == 4 %}selected{% endif %}>4 - Major location</option>
+                            <option value="5" {% if location and location.importance_rating == 5 %}selected{% endif %}>5 - Central location</option>
+                        </select>
+                        <div class="form-text">Location's significance to the story (automatically set during AI imports)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="connected_elements" class="form-label fw-bold">
+                            Connected Elements (Optional)
+                            <i class="fas fa-question-circle text-muted ms-1" 
+                               data-bs-toggle="tooltip" 
+                               data-bs-placement="top"
+                               title="Characters, other locations, or lore items that are associated with this location. This helps maintain story consistency and creates narrative connections. Examples: 'Home to the Wizard Aldric', 'Connected to the Ancient Library by secret tunnel', 'Contains the Crystal of Eternal Flame'."></i>
+                        </label>
+                        <textarea class="form-control form-control-lg" id="connected_elements" name="connected_elements"
+                                  rows="3"
+                                  placeholder="Characters, locations, or lore items associated with this location."
+                                  style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ location.connected_elements | e if location and location.connected_elements else '' }}</textarea>
+                        <div class="form-text">Description of connections to other story elements (automatically set during AI imports)</div>
+                    </div>
+
+                    {# TABLER PREMIUM FORM ACTIONS - Following UI Design Standards #}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        {% if world_context %}
+                        <a href="{{ url_for('ui_list_locations_for_world', world_id=world_context.id) }}" class="btn btn-ghost-secondary me-md-2"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Discard changes and return to location list">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('ui_list_worlds') }}" class="btn btn-ghost-secondary me-md-2"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Discard changes and return to worlds list">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        {% endif %}
+                        <button type="submit" id="save-location-button" class="btn btn-lg"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if location %}Save all changes to this location{% else %}Create a new location with the provided information{% endif %}"
+                                style="background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%); border: none; color: white; font-weight: 600; padding: 0.75rem 2rem; border-radius: var(--tblr-border-radius-lg); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                            <i class="{{ button_icon_class }} me-1"></i>{{ button_action_text }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Advanced Features Sidebar -->
+            <div class="location-form-sidebar" id="form-sidebar">
+                <div class="form-resize-handle" id="form-resize-handle"></div>
+                <div class="form-sidebar-content">
+                    
+                    <!-- FIX: ADD IMAGE GENERATION SECTION -->
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-image me-2"></i>Appearance & Image Generation</h3>
+                        <div class="mb-3">
+                            <label for="image_style_select" class="form-label fw-bold">
+                                Image Style
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Choose a predefined art style for your location images. Different styles work better for different types of locations and genres. If no style is selected, the AI will use its default artistic interpretation based on your description."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="image_style_select" name="image_style_select"
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- Default Style --</option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image_prompt_definition" class="form-label fw-bold">
+                                AI Image Prompt
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="Detailed description for DALL-E 3 image generation. Be specific about the location's appearance, architectural style, lighting, atmosphere, and setting. Examples: 'ancient stone bridge over a misty chasm, fantasy art', 'bustling medieval marketplace, overhead view', 'dark forest clearing with glowing mushrooms'."></i>
+                            </label>
+                            <textarea class="form-control form-control-lg" id="image_prompt_definition" name="image_prompt_definition" form="location-form"
+                                      rows="4"
+                                      placeholder="Describe location for image generation, e.g., 'ancient stone bridge over a misty chasm, fantasy art'"
+                                      style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ location.image_prompt_definition | e if location and location.image_prompt_definition else '' }}</textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" id="generate-image-btn" data-element-type="location" data-element-id="{{ location.id if location else '' }}" 
+                                {% if not location %}disabled{% endif %}
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="{% if location %}Use AI to generate a location image based on the description{% else %}Save the location first to enable image generation{% endif %}"
+                                style="transition: all 0.15s ease-in-out;">
+                            <i class="fas fa-magic me-1"></i>Generate Location Image
+                        </button>
+                        <div id="image-generation-status" class="small text-muted mt-2" style="display: none;"></div>
+                        <div id="generated-image-container" class="mt-3">
+                            <div id="image-generation-spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <img id="generated-image-display" src="{{ image_url if image_url else '' }}" alt="Generated location image" style="display: {{ 'block' if image_url else 'none' }};">
+                        </div>
+                        <a href="{{ image_url if image_url else '#' }}" id="generated-image-link" target="_blank" class="small text-truncate d-block mt-1">{{ image_url if image_url else '' }}</a>
+                        
+                        <div class="mt-4" id="image-gallery-section" {% if not location %}style="display: none;"{% endif %}>
+                            <h3 class="h3">Version History</h3>
+                            <div id="image-gallery-container" class="image-gallery">
+                                <p class="text-muted small">Loading image versions...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END FIX -->
+                    
+                    <div class="sidebar-section">
+                        <h3>Scale & Hierarchy</h3>
+                        <div class="mb-3">
+                            <label for="scale" class="form-label fw-bold">
+                                Scale/Type
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The scale or type of this location, which helps organize your world hierarchy. Region = large areas like kingdoms or continents; City = settlements; Building = structures; Room = spaces within buildings; Area = open spaces or zones; Object = specific items or features."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="scale" name="scale" form="location-form"
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- Select Scale --</option>
+                                <option value="REGION" {% if location and location.scale and location.scale.value == 'REGION' %}selected{% endif %}>Region</option>
+                                <option value="CITY" {% if location and location.scale and location.scale.value == 'CITY' %}selected{% endif %}>City</option>
+                                <option value="BUILDING" {% if location and location.scale and location.scale.value == 'BUILDING' %}selected{% endif %}>Building</option>
+                                <option value="ROOM" {% if location and location.scale and location.scale.value == 'ROOM' %}selected{% endif %}>Room</option>
+                                <option value="AREA" {% if location and location.scale and location.scale.value == 'AREA' %}selected{% endif %}>Area</option>
+                                <option value="OBJECT" {% if location and location.scale and location.scale.value == 'OBJECT' %}selected{% endif %}>Object</option>
+                                <option value="OTHER" {% if location and location.scale and location.scale.value == 'OTHER' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="parent_location_id" class="form-label fw-bold">
+                                Parent Location
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The larger location that contains this one, creating a hierarchy. For example, a 'Tavern Room' might be inside the 'Dragon's Rest Tavern', which is inside the 'Town of Millbrook'. This helps organize your world and allows for nested location relationships."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="parent_location_id" name="parent_location_id" form="location-form" {% if location and location.parent_location_id %}data-current-value="{{ location.parent_location_id }}"{% endif %}
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- No Parent (Root Location) --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>Map Coordinates</h3>
+                        <div class="mb-3">
+                            <label for="map_x" class="form-label fw-bold">
+                                X Coordinate
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The horizontal position of this location on your world map. This can be used for distance calculations and positioning locations relative to each other. Use any coordinate system that makes sense for your world."></i>
+                            </label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="map_x" name="map_x" form="location-form" value="{{ location.map_x if location and location.map_x is not none else '' }}"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="map_y" class="form-label fw-bold">
+                                Y Coordinate
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The vertical position of this location on your world map. Combined with the X coordinate, this helps place the location precisely on your world map and enables distance calculations between locations."></i>
+                            </label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="map_y" name="map_y" form="location-form" value="{{ location.map_y if location and location.map_y is not none else '' }}"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="map_z" class="form-label fw-bold">
+                                Z Coordinate (Elevation)
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The elevation or height of this location. This could represent altitude above sea level, floor level in a building, or depth underground. Useful for 3D positioning and understanding the vertical relationship between locations."></i>
+                            </label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="map_z" name="map_z" form="location-form" value="{{ location.map_z if location and location.map_z is not none else '' }}"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>Physical Dimensions</h3>
+                        <div class="mb-3">
+                            <label for="dimension_x" class="form-label fw-bold">
+                                Width/Length
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The width or length of this location in the specified units. This helps provide scale and can be useful for tactical planning, travel time calculations, and describing the scope of the location to players or readers."></i>
+                            </label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="dimension_x" name="dimension_x" form="location-form" value="{{ location.dimension_x if location and location.dimension_x is not none else '' }}"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dimension_y" class="form-label fw-bold">
+                                Height/Breadth
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The height or breadth of this location. For outdoor areas, this might be the north-south distance. For buildings, it could be the height. Choose the interpretation that makes most sense for your location type."></i>
+                            </label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="dimension_y" name="dimension_y" form="location-form" value="{{ location.dimension_y if location and location.dimension_y is not none else '' }}"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dimension_z" class="form-label fw-bold">
+                                Depth/Height
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The depth or height dimension of this location. This could be vertical height for tall structures, depth for underground areas, or the third horizontal dimension for large regions. Use consistently with your other dimensions."></i>
+                            </label>
+                            <input type="number" step="0.01" class="form-control form-control-lg" id="dimension_z" name="dimension_z" form="location-form" value="{{ location.dimension_z if location and location.dimension_z is not none else '' }}"
+                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dimension_unit" class="form-label fw-bold">
+                                Unit
+                                <i class="fas fa-question-circle text-muted ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top"
+                                   title="The unit of measurement for all the dimension fields above. Choose the unit that best fits the scale of your location. Feet for buildings and rooms, miles or kilometers for large regions, or grid squares for tactical maps."></i>
+                            </label>
+                            <select class="form-select form-select-lg" id="dimension_unit" name="dimension_unit" form="location-form"
+                                    style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">
+                                <option value="">-- Select Unit --</option>
+                                <option value="feet" {% if location and location.dimension_unit == 'feet' %}selected{% endif %}>Feet</option>
+                                <option value="meters" {% if location and location.dimension_unit == 'meters' %}selected{% endif %}>Meters</option>
+                                <option value="miles" {% if location and location.dimension_unit == 'miles' %}selected{% endif %}>Miles</option>
+                                <option value="kilometers" {% if location and location.dimension_unit == 'kilometers' %}selected{% endif %}>Kilometers</option>
+                                <option value="squares" {% if location and location.dimension_unit == 'squares' %}selected{% endif %}>Grid Squares</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', path='/js/location_form_handler.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/location_form_resize.js') }}"></script>
+    <!-- FIX: Add the generic image generator script -->
+    <script src="{{ url_for('static', path='/js/image_generator.js') }}"></script>
+    <!-- END FIX -->
+{% endblock %}

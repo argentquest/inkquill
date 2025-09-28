@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Builder Wizard - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">World Builder Wizard</h1>
+            <p class="help-subtitle">Create rich, detailed worlds through guided questions</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"overview\"]').click()">
+                <div class="quick-action-icon">🌟</div>
+                <div class="quick-action-text">How It Works</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"questions\"]').click()">
+                <div class="quick-action-icon">❓</div>
+                <div class="quick-action-text">Question Guide</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"tips\"]').click()">
+                <div class="quick-action-icon">💡</div>
+                <div class="quick-action-text">Best Practices</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="overview">Overview</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="questions">Questions</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="workflow">Workflow</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="tips">Tips & Examples</button></li>
+            </ul>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="overview">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    What is the World Builder Wizard?
+                </h2>
+                <p>The World Builder Wizard is an AI-powered questionnaire that creates rich, detailed fantasy and sci-fi worlds based on your answers to 20 carefully crafted questions. Instead of starting with a blank page, you answer multiple-choice questions about your world's genre, technology, magic, politics, and culture, then AI generates comprehensive descriptions for you.</p>
+                
+                <div class="alert alert-success">
+                    <span class="alert-icon">✨</span>
+                    <div><strong>Perfect for:</strong> Writers who want detailed worlds without extensive world-building experience, or experienced builders looking for fresh inspiration.</div>
+                </div>
+
+                <div class="help-section">
+                    <h2 class="help-section-title">What You Get</h2>
+                    <p>After completing the wizard, AI generates three types of content for your world:</p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h3 class="feature-card-title">📝 Short Description</h3>
+                            <p class="feature-card-description">A concise 1-2 sentence summary (50 words max) that captures the essence of your world. Perfect for quick reference and sharing.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h3 class="feature-card-title">📖 Detailed Description</h3>
+                            <p class="feature-card-description">A comprehensive 3-5 paragraph description covering geography, culture, politics, technology, magic systems, and daily life in your world.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h3 class="feature-card-title">🎨 Visual Prompt</h3>
+                            <p class="feature-card-description">An optimized description for AI image generation, helping you create visual representations of your world's atmosphere and key features.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Quick Start: Create Your First World</h3>
+                        <span class="recipe-card-time">10-15 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">From the World List, click <strong>"Generate New World"</strong></div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Answer questions by clicking the green option chips (minimum: none required!)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Watch answered questions turn green with checkmarks</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Click <strong>"Generate World"</strong> to create AI descriptions</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Review the generated content and make edits if needed</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">6</div>
+                            <div class="recipe-step-content">Enter a world name and click <strong>"Create World"</strong></div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">🆓</span>
+                    <div>
+                        <strong>No Minimum Required:</strong> You can generate a world by answering just a few questions, or answer all 20 for maximum detail. The AI works with whatever information you provide.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">User Interface Layout</h2>
+                <p>The World Builder Wizard uses a split-screen design for efficient workflow:</p>
+                
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Area</th>
+                            <th>Purpose</th>
+                            <th>Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Left Panel (70%)</strong></td>
+                            <td>Question answering interface</td>
+                            <td>Question cards, answer options, navigation buttons</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Right Sidebar (30%)</strong></td>
+                            <td>Help and progress tracking</td>
+                            <td>Help content, answered questions summary, generation controls</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Question Cards</strong></td>
+                            <td>Individual question interface</td>
+                            <td>Hover tooltips, colored selection chips, checkmark indicators</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Answer Summary</strong></td>
+                            <td>Track your progress</td>
+                            <td>Real-time updates, question count, selected answers preview</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Questions Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="questions">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Complete Question Reference
+                </h2>
+                <p>The World Builder Wizard covers 20 comprehensive aspects of world-building. Here's what each question helps define:</p>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>🎭 Genre & Setting Questions (1-3)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Options Available</th>
+                                    <th>Impact on World</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1. World Genre</strong></td>
+                                    <td>High Fantasy, Dark Fantasy, Space Opera, Cyberpunk, Steampunk, Post-Apocalyptic, Contemporary with Twist</td>
+                                    <td>Sets overall tone, available technology, and supernatural elements</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2. Technology Level</strong></td>
+                                    <td>Stone Age → Futuristic Advanced Tech (7 levels)</td>
+                                    <td>Determines available tools, transportation, communication, and daily life complexity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3. Magic Power Level</strong></td>
+                                    <td>None → Omnipresent/God-like (6 levels)</td>
+                                    <td>Affects conflict resolution, social structure, and world physics</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>🏛️ Politics & Society Questions (4-7)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Options Available</th>
+                                    <th>Impact on World</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>4. Government Type</strong></td>
+                                    <td>Monarchy, Democracy, Feudalism, Theocracy, Tribal, Dictatorship, Anarchy</td>
+                                    <td>Shapes power structure, laws, social hierarchy, and character motivations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>5. Main Conflict Source</strong></td>
+                                    <td>Resource Scarcity, Ideological Clash, Power Struggle, Ancient Evil, Social Inequality, External Invasion</td>
+                                    <td>Creates central tension and story opportunities</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>6. Inhabitant Types</strong></td>
+                                    <td>Humans Only, Mixed Fantasy Races, Unique Species, Non-Human Dominated, Artificial Beings</td>
+                                    <td>Determines available characters, cultures, and inter-species dynamics</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>7. Societal Values</strong></td>
+                                    <td>Honor, Innovation, Harmony, Strength, Knowledge, Freedom</td>
+                                    <td>Influences character behavior, laws, traditions, and moral conflicts</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>🌍 Environment & Culture Questions (8-12)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Options Available</th>
+                                    <th>Impact on World</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>8. World Climate</strong></td>
+                                    <td>Temperate, Arid Desert, Cold/Frozen, Tropical, Urban Sprawl, Alien Environment</td>
+                                    <td>Affects architecture, clothing, food, survival challenges, and scenery</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>9. World Mood</strong></td>
+                                    <td>Hopeful/Optimistic, Grim/Dark, Whimsical, Mysterious, Chaotic, Mundane</td>
+                                    <td>Sets emotional tone for stories and character interactions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>10. History's Role</strong></td>
+                                    <td>Forgotten, Influential, Prophetic, Buried/Dangerous, Irrelevant, Cyclical</td>
+                                    <td>Determines how past events affect current world and available plot hooks</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>11. Economic System</strong></td>
+                                    <td>Barter, Agrarian, Trade-based, Industrial, Command Economy, Post-scarcity</td>
+                                    <td>Shapes daily life, social classes, and adventure opportunities</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>12. Cultural Hubs</strong></td>
+                                    <td>Capital Cities, Sacred Sites, Marketplaces, Academies, Wilderness, Laboratories</td>
+                                    <td>Defines where important events happen and characters gather</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>⚙️ Systems & Infrastructure Questions (13-16)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Options Available</th>
+                                    <th>Impact on World</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>13. Transportation</strong></td>
+                                    <td>Foot/Animal, Maritime, Mechanized, Magical, Space Travel, Interdimensional</td>
+                                    <td>Affects travel time, trade routes, and story pacing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>14. Knowledge Access</strong></td>
+                                    <td>Oral Tradition, Limited Scribes, Guilds/Academies, Widespread Literacy, AI/Digital</td>
+                                    <td>Determines education level, information spread, and character knowledge</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>15. Energy Sources</strong></td>
+                                    <td>Natural/Sunlight, Magic, Fossil Fuels, Electricity, Renewable, Exotic</td>
+                                    <td>Influences technology availability and environmental concerns</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>16. Art Forms</strong></td>
+                                    <td>Storytelling, Architecture, Painting, Dance/Music, Craftsmanship, Magical Arts</td>
+                                    <td>Shapes cultural expression and entertainment options</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>🗡️ Conflicts & Daily Life Questions (17-20)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Options Available</th>
+                                    <th>Impact on World</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>17. Unique Features</strong></td>
+                                    <td>Multiple Suns/Moons, Sentient Environment, Extreme Weather, Energy Anomalies, Floating Islands</td>
+                                    <td>Creates distinctive visual elements and environmental challenges</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>18. Life/Death Perception</strong></td>
+                                    <td>Rebirth Cycles, Finality, Afterlife-focused, Soul Harvesting, Undead Common, Transcendence</td>
+                                    <td>Affects religions, funeral customs, and character motivations</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>19. Common Threats</strong></td>
+                                    <td>Banditry, Environmental, Political Intrigue, Magical Aberrations, Disease, Warfare</td>
+                                    <td>Provides immediate dangers and adventure hooks</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>20. Daily Life Feel</strong></td>
+                                    <td>Survival Struggle, Orderly/Peaceful, Busy/Ambitious, Oppressed/Fearful, Mystical, Free/Adventurous</td>
+                                    <td>Sets baseline for character experiences and story tone</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <span class="alert-icon">💡</span>
+                <div>
+                    <strong>Pro Tip:</strong> You don't need to answer every question! The AI can create compelling worlds with as few as 5-6 thoughtful answers. Focus on the aspects most important to your story.
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="workflow">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Step-by-Step Workflow
+                </h2>
+                
+                <div class="help-section">
+                    <h3 class="help-section-title">Phase 1: Question Selection & Answering</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">🔍 Browse Questions</h4>
+                            <p class="feature-card-description">Questions appear as clickable cards. Hover over each card to see the full question text in a tooltip. No specific order required!</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">✅ Select Answers</h4>
+                            <p class="feature-card-description">Click on green answer chips to select your choice. Questions turn green with checkmarks when answered. Change answers anytime by clicking different options.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">📊 Track Progress</h4>
+                            <p class="feature-card-description">The right sidebar shows your progress: answered questions count, selected answers summary, and quick access to generation controls.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">🔄 Flexible Navigation</h4>
+                            <p class="feature-card-description">Use "Previous/Next" buttons for linear flow, or click any question card to jump around. Answer in whatever order feels natural!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3 class="help-section-title">Phase 2: AI Generation</h3>
+                    <div class="recipe-card">
+                        <div class="recipe-card-header">
+                            <h4 class="recipe-card-title">Generate World Descriptions</h4>
+                            <span class="recipe-card-time">30-60 seconds</span>
+                        </div>
+                        <ol class="recipe-steps">
+                            <li class="recipe-step">
+                                <div class="recipe-step-number">1</div>
+                                <div class="recipe-step-content"><strong>Validation:</strong> System checks your answers for consistency (automatic)</div>
+                            </li>
+                            <li class="recipe-step">
+                                <div class="recipe-step-number">2</div>
+                                <div class="recipe-step-content"><strong>Prompt Assembly:</strong> Your answers are formatted into a structured AI prompt</div>
+                            </li>
+                            <li class="recipe-step">
+                                <div class="recipe-step-number">3</div>
+                                <div class="recipe-step-content"><strong>AI Processing:</strong> Azure OpenAI generates three types of descriptions</div>
+                            </li>
+                            <li class="recipe-step">
+                                <div class="recipe-step-number">4</div>
+                                <div class="recipe-step-content"><strong>Content Review:</strong> Preview generated content before creating the world</div>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⏱️</span>
+                        <div>
+                            <strong>Processing Time:</strong> AI generation typically takes 30-60 seconds. The more questions you answer, the more detailed and personalized your world becomes.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3 class="help-section-title">Phase 3: World Creation</h3>
+                    <p>After reviewing your generated content:</p>
+                    <ol>
+                        <li><strong>Edit if Needed:</strong> Modify any generated descriptions to match your vision</li>
+                        <li><strong>Name Your World:</strong> Choose a memorable name that captures the world's essence</li>
+                        <li><strong>Create World:</strong> Save your world to your collection</li>
+                        <li><strong>Continue Building:</strong> Add characters, locations, and lore items to expand your world</li>
+                    </ol>
+
+                    <div class="alert alert-success">
+                        <span class="alert-icon">🎉</span>
+                        <div>
+                            <strong>What Happens Next:</strong> Your new world becomes available in your World List, complete with generated descriptions and ready for story development!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Behind the Scenes: AI Technology</h2>
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>How the AI Creates Your World</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>The World Builder Wizard uses advanced AI technology to transform your answers into rich narratives:</p>
+                        <ul>
+                            <li><strong>Azure OpenAI Integration:</strong> Powered by GPT models fine-tuned for creative writing</li>
+                            <li><strong>Semantic Kernel Framework:</strong> Ensures consistent, high-quality output</li>
+                            <li><strong>Template-Based Prompting:</strong> Your answers fill a structured template optimized for world-building</li>
+                            <li><strong>Multi-Output Generation:</strong> Creates short summary, detailed description, and visual prompt in one pass</li>
+                            <li><strong>Cost Tracking:</strong> All AI usage is monitored and logged for transparency</li>
+                        </ul>
+                        
+                        <div class="code-block">
+                            <pre>Example AI Prompt Structure:
+Based on the following world-building choices, create compelling descriptions:
+• Genre: High Fantasy
+• Technology: Medieval
+• Magic: Common/Widespread
+• Government: Feudalism
+...
+
+Generate:
+1. SHORT DESCRIPTION (1-2 sentences, max 50 words)
+2. LONGER DESCRIPTION (3-5 paragraphs)
+3. VISUAL PROMPT (image generation optimized)</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips & Examples Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="tips">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Best Practices & Pro Tips
+                </h2>
+                
+                <div class="help-section">
+                    <h3 class="help-section-title">Strategic Question Answering</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">🎯 Focus on Core Elements</h4>
+                            <p class="feature-card-description">Answer Genre, Technology Level, Magic Power, and Government Type first. These have the biggest impact on your world's foundation.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">⚖️ Create Interesting Contrasts</h4>
+                            <p class="feature-card-description">Mix opposing elements for complexity: High magic + Low technology, or Advanced tech + Tribal government create unique dynamics.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">📖 Think Story-First</h4>
+                            <p class="feature-card-description">Choose answers that create conflict and story opportunities. Peaceful, perfect worlds are harder to write compelling adventures in.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4 class="feature-card-title">🔄 Iterate and Refine</h4>
+                            <p class="feature-card-description">Generate multiple versions with different answer combinations. You can always create variations of successful worlds.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3 class="help-section-title">Example World Combinations</h3>
+                    
+                    <div class="collapsible">
+                        <div class="collapsible-header">
+                            <span>🏰 Classic High Fantasy</span>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <table class="help-table">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Recommended Answer</th>
+                                        <th>Why This Works</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Genre</td>
+                                        <td>High Fantasy</td>
+                                        <td>Sets expectation for magic, races, and medieval elements</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Technology</td>
+                                        <td>Medieval</td>
+                                        <td>Swords and castles create familiar adventure framework</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Magic</td>
+                                        <td>Common/Widespread</td>
+                                        <td>Enables diverse character abilities and plot solutions</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Government</td>
+                                        <td>Feudalism</td>
+                                        <td>Clear hierarchy creates political intrigue opportunities</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Inhabitants</td>
+                                        <td>Mixed Fantasy Races</td>
+                                        <td>Elves, dwarves, orcs provide diverse characters and cultures</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="alert alert-success">
+                                <span class="alert-icon">✨</span>
+                                <div><strong>Result:</strong> A rich fantasy realm perfect for epic quests, political intrigue, and magical adventures.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="collapsible">
+                        <div class="collapsible-header">
+                            <span>🚀 Space Opera Adventure</span>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <table class="help-table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Genre:</strong> Space Opera</td>
+                                        <td><strong>Technology:</strong> Futuristic Advanced</td>
+                                        <td><strong>Magic:</strong> None</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Government:</strong> Democracy</td>
+                                        <td><strong>Transportation:</strong> Space Travel</td>
+                                        <td><strong>Conflict:</strong> External Invasion</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Inhabitants:</strong> Mixed Species</td>
+                                        <td><strong>Energy:</strong> Exotic</td>
+                                        <td><strong>Mood:</strong> Hopeful</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="alert alert-success">
+                                <span class="alert-icon">🌌</span>
+                                <div><strong>Result:</strong> A optimistic galactic civilization facing external threats, perfect for Star Trek-style exploration and diplomacy.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="collapsible">
+                        <div class="collapsible-header">
+                            <span>🌆 Cyberpunk Dystopia</span>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <table class="help-table">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Genre:</strong> Cyberpunk</td>
+                                        <td><strong>Technology:</strong> Futuristic Advanced</td>
+                                        <td><strong>Magic:</strong> None</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Government:</strong> Dictatorship</td>
+                                        <td><strong>Climate:</strong> Urban Sprawl</td>
+                                        <td><strong>Mood:</strong> Grim/Dark</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Economy:</strong> Command</td>
+                                        <td><strong>Threats:</strong> Political Intrigue</td>
+                                        <td><strong>Daily Life:</strong> Oppressed/Fearful</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="alert alert-success">
+                                <span class="alert-icon">🕶️</span>
+                                <div><strong>Result:</strong> A dark urban future perfect for hacker protagonists fighting against corporate oppression.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3 class="help-section-title">Common Mistakes to Avoid</h3>
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div>
+                            <strong>Too Perfect Worlds:</strong> Avoid selecting only positive, peaceful options. Conflict drives stories - your world needs problems to solve and tensions to explore.
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div>
+                            <strong>Inconsistent Combinations:</strong> While contrasts are good, some combinations don't work well together. Stone Age + Space Travel creates logical problems unless explained by magic or aliens.
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <div>
+                            <strong>Overthinking Initial Choices:</strong> Remember, this is just the foundation! You can always add complexity, modify details, and expand on the generated content after creation.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3 class="help-section-title">After World Creation</h3>
+                    <p>Your World Builder-generated world is just the beginning! Here's how to expand it:</p>
+                    <ol>
+                        <li><strong>Add Characters:</strong> Create protagonists, antagonists, and supporting characters using the character builder</li>
+                        <li><strong>Design Locations:</strong> Build specific places mentioned in your world description</li>
+                        <li><strong>Develop Lore:</strong> Expand on magic systems, history, and cultural details</li>
+                        <li><strong>Write Stories:</strong> Use your world as the setting for adventures and narratives</li>
+                        <li><strong>Generate Images:</strong> Use the visual prompt to create artwork representing your world</li>
+                    </ol>
+                    
+                    <div class="alert alert-info">
+                        <span class="alert-icon">💡</span>
+                        <div>
+                            <strong>Integration Benefits:</strong> Worlds created through the wizard automatically integrate with the RAG (Retrieval Augmented Generation) system, making all your world details searchable and available for AI-assisted writing!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Tip -->
+        <div class="final-tip">
+            <h4>🌠 Final Tip</h4>
+            <p>The World Builder Wizard creates foundations, not finished worlds. Don't worry about answering every question perfectly - you can always expand and refine the generated content. Focus on the core elements that excite you most about your world concept.</p>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

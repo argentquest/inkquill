@@ -1,0 +1,693 @@
+%% Complete Entity Relationship Diagram
+%% Title: Storytelling Platform - Complete Database Schema
+%% Description: Full entity relationship diagram showing all tables and relationships
+%% Last Updated: 2025-07-14
+%% Version: 1.0.0
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#1976d2',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#1565c0',
+    'lineColor': '#424242',
+    'secondaryColor': '#388e3c',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+erDiagram
+    %% Core User and Authentication
+    User {
+        int id PK
+        string username UK
+        string email UK
+        string hashed_password
+        string display_name
+        string auth_provider
+        string provider_id UK
+        json provider_data
+        string profile_picture_url
+        boolean is_active
+        boolean is_admin
+        json interview_data
+        boolean bonus1
+        boolean bonus2
+        boolean bonus3
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    UserAccount {
+        int id PK
+        int user_id FK
+        decimal balance_coins
+        decimal total_earned_coins
+        decimal total_spent_coins
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    UserTransaction {
+        int id PK
+        int user_id FK
+        string transaction_type
+        decimal amount_coins
+        string description
+        json metadata
+        timestamp created_at
+    }
+    
+    UserActivity {
+        uuid id PK
+        int user_id FK
+        string activity_type
+        string endpoint
+        string method
+        json request_data
+        json response_data
+        int status_code
+        int duration_ms
+        timestamp created_at
+    }
+    
+    %% World Building Domain
+    World {
+        int id PK
+        string name
+        text description
+        text short_description
+        json world_builder_data
+        int user_id FK
+        text image_prompt_definition
+        string image_blob_path
+        int current_image_id FK
+        boolean is_free_chat_enabled
+        boolean is_shadow
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    Character {
+        int id PK
+        string name
+        string gender
+        string species
+        text description
+        text personality_traits
+        text backstory
+        text image_prompt_definition
+        string image_blob_path
+        int world_id FK
+        int current_location_id FK
+        text placement_note
+        int current_image_id FK
+        int importance_rating
+        text relationships
+        json core_motivations
+        json physical_attributes
+        json key_relationships
+        string genre
+        json genre_specific_answers
+        text generated_narrative
+        boolean is_ai_generated
+        text next_quest_scenario
+        text first_meeting_message
+        string age_category
+        string profession
+        text short_backstory
+        text visual_prompt
+        json narrative_filter_results
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    Location {
+        int id PK
+        string name
+        text description
+        string location_type
+        text image_prompt_definition
+        string image_blob_path
+        int world_id FK
+        int current_image_id FK
+        int importance_rating
+        json physical_attributes
+        text generated_narrative
+        boolean is_ai_generated
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    LoreItem {
+        int id PK
+        string title
+        text content
+        string lore_type
+        text image_prompt_definition
+        string image_blob_path
+        int world_id FK
+        int current_image_id FK
+        int importance_rating
+        text generated_narrative
+        boolean is_ai_generated
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    LocationConnection {
+        int from_location_id PK,FK
+        int to_location_id PK,FK
+        string connection_type
+        text description
+        boolean is_bidirectional
+        int travel_time_minutes
+        string difficulty_level
+    }
+    
+    WorldRole {
+        int id PK
+        int world_id FK
+        string role_name
+        text description
+        json permissions
+        timestamp created_at
+    }
+    
+    %% Story Structure Domain
+    Story {
+        int id PK
+        string title
+        text short_description
+        text ai_summary
+        int user_id FK
+        int world_id FK
+        string story_type
+        string story_genre
+        string story_tone
+        string primary_conflict_type
+        text image_prompt_definition
+        string image_blob_path
+        int current_image_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    Act {
+        int id PK
+        string title
+        text description
+        int story_id FK
+        int act_number
+        text narrative_text
+        text act_summary
+        text ai_summary
+        text image_prompt_definition
+        string image_blob_path
+        int current_image_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    Scene {
+        int id PK
+        string title
+        text description
+        int act_id FK
+        int scene_number
+        text content
+        text summary
+        text ai_summary
+        text image_prompt_definition
+        string image_blob_path
+        int current_image_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    StoryClass {
+        int id PK
+        string name
+        text description
+        int world_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Association Tables
+    StoryCharacterAssociation {
+        int id PK
+        int story_id FK
+        int character_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    StoryLocationAssociation {
+        int id PK
+        int story_id FK
+        int location_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    StoryLoreItemAssociation {
+        int id PK
+        int story_id FK
+        int lore_item_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    ActCharacterAssociation {
+        int id PK
+        int act_id FK
+        int character_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    ActLocationAssociation {
+        int id PK
+        int act_id FK
+        int location_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    ActLoreItemAssociation {
+        int id PK
+        int act_id FK
+        int lore_item_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    SceneCharacterAssociation {
+        int id PK
+        int scene_id FK
+        int character_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    SceneLocationAssociation {
+        int id PK
+        int scene_id FK
+        int location_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    SceneLoreItemAssociation {
+        int id PK
+        int scene_id FK
+        int lore_item_id FK
+        string[] roles
+        timestamp created_at
+    }
+    
+    %% AI and Generated Content
+    AIModelConfiguration {
+        int id PK
+        string model_name
+        string display_name
+        string provider
+        string model_type
+        decimal user_price_input_usd_pm
+        decimal user_price_output_usd_pm
+        boolean is_active
+        json configuration
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    AICallLog {
+        int id PK
+        string job_id
+        int user_id FK
+        int model_config_id FK
+        text input_prompt
+        string model_name
+        string call_type
+        int object_id
+        int prompt_tokens
+        int completion_tokens
+        int total_tokens
+        decimal calculated_cost_usd
+        int duration_ms
+        timestamp created_at
+    }
+    
+    GeneratedImage {
+        int id PK
+        string element_type
+        int associated_element_id
+        int user_id FK
+        string prompt_used
+        string image_size
+        string provider
+        string model_used
+        string blob_path
+        string status
+        string error_message
+        int ai_cost_log_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Document Management
+    UploadedDocument {
+        int id PK
+        string filename
+        string original_filename
+        string content_type
+        int file_size_bytes
+        string source_element_type
+        int source_element_id
+        int world_id FK
+        int user_id FK
+        string processing_status
+        json metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Community Features
+    ForumCategory {
+        int id PK
+        string name
+        text description
+        string slug
+        int sort_order
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ForumThread {
+        int id PK
+        string title
+        text description
+        int category_id FK
+        int user_id FK
+        int world_id FK
+        int story_id FK
+        boolean is_pinned
+        boolean is_locked
+        int view_count
+        int post_count
+        timestamp last_activity_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ForumPost {
+        int id PK
+        text content
+        int thread_id FK
+        int user_id FK
+        int parent_post_id FK
+        boolean is_deleted
+        int vote_score
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ForumVote {
+        int id PK
+        int post_id FK
+        int user_id FK
+        int vote_value
+        timestamp created_at
+    }
+    
+    ForumSubscription {
+        int id PK
+        int thread_id FK
+        int user_id FK
+        boolean email_notifications
+        timestamp created_at
+    }
+    
+    %% Publishing and Social
+    PublishedStory {
+        int id PK
+        int story_id FK
+        int user_id FK
+        string published_url
+        string filename
+        string title
+        text description
+        int word_count
+        boolean is_public
+        int view_count
+        decimal average_rating
+        int rating_count
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    StoryComment {
+        int id PK
+        int published_story_id FK
+        int user_id FK
+        text content
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    StoryRating {
+        int id PK
+        int published_story_id FK
+        int user_id FK
+        int rating_value
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    SocialShare {
+        uuid id PK
+        int user_id FK
+        string platform
+        string content_type
+        int content_id
+        string share_url
+        int coins_earned
+        timestamp created_at
+    }
+    
+    %% Chat and Interaction
+    ChatSession {
+        int id PK
+        int user_id FK
+        int world_id FK
+        string session_name
+        boolean is_active
+        timestamp last_activity_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ChatMessage {
+        int id PK
+        int session_id FK
+        int user_id FK
+        text content
+        string message_type
+        json metadata
+        int ai_cost_log_id FK
+        timestamp created_at
+    }
+    
+    StoryChatSession {
+        int id PK
+        int user_id FK
+        int story_id FK
+        string session_name
+        boolean is_active
+        timestamp last_activity_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    StoryChatMessage {
+        int id PK
+        int session_id FK
+        int user_id FK
+        text content
+        string message_type
+        json metadata
+        int ai_cost_log_id FK
+        timestamp created_at
+    }
+    
+    %% Background Processing
+    JobStatus {
+        int id PK
+        string job_id UK
+        int user_id FK
+        string job_type
+        string status
+        text status_message
+        json result_data
+        timestamp started_at
+        timestamp completed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Brainstorming and Ideation
+    BrainstormSession {
+        int id PK
+        int user_id FK
+        string session_name
+        json responses
+        json analysis
+        boolean is_completed
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    BrainstormFavorite {
+        int id PK
+        int user_id FK
+        int session_id FK
+        string favorite_type
+        json favorite_data
+        timestamp created_at
+    }
+    
+    BrainstormStory {
+        int id PK
+        int user_id FK
+        int session_id FK
+        string title
+        text premise
+        json story_data
+        boolean is_converted
+        timestamp created_at
+    }
+    
+    %% Credit and Billing
+    CreditPackage {
+        int id PK
+        string name
+        text description
+        int coins_amount
+        decimal price_usd
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Anonymous Sessions
+    AnonymousUserSession {
+        int id PK
+        string session_id UK
+        int user_id FK
+        json session_data
+        timestamp expires_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% User Interview
+    UserInterviewResponse {
+        int id PK
+        int user_id FK
+        json responses
+        json analysis
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Relationships
+    User ||--o{ UserAccount : has
+    User ||--o{ UserTransaction : performs
+    User ||--o{ UserActivity : generates
+    User ||--o{ World : owns
+    User ||--o{ Story : creates
+    User ||--o{ Character : creates
+    User ||--o{ Location : creates
+    User ||--o{ LoreItem : creates
+    User ||--o{ AICallLog : triggers
+    User ||--o{ GeneratedImage : requests
+    User ||--o{ UploadedDocument : uploads
+    User ||--o{ ForumThread : creates
+    User ||--o{ ForumPost : authors
+    User ||--o{ ForumVote : casts
+    User ||--o{ ForumSubscription : subscribes
+    User ||--o{ PublishedStory : publishes
+    User ||--o{ StoryComment : writes
+    User ||--o{ StoryRating : rates
+    User ||--o{ SocialShare : shares
+    User ||--o{ ChatSession : initiates
+    User ||--o{ ChatMessage : sends
+    User ||--o{ StoryChatSession : initiates
+    User ||--o{ StoryChatMessage : sends
+    User ||--o{ JobStatus : triggers
+    User ||--o{ BrainstormSession : creates
+    User ||--o{ BrainstormFavorite : saves
+    User ||--o{ BrainstormStory : generates
+    User ||--o{ AnonymousUserSession : links
+    User ||--o{ UserInterviewResponse : provides
+    
+    World ||--o{ Character : contains
+    World ||--o{ Location : contains
+    World ||--o{ LoreItem : contains
+    World ||--o{ Story : hosts
+    World ||--o{ StoryClass : defines
+    World ||--o{ ChatSession : enables
+    World ||--o{ WorldRole : customizes
+    World ||--o{ UploadedDocument : organizes
+    World ||--o{ ForumThread : discusses
+    
+    Story ||--o{ Act : structured_as
+    Act ||--o{ Scene : contains
+    
+    Story ||--o{ StoryCharacterAssociation : features
+    Story ||--o{ StoryLocationAssociation : uses
+    Story ||--o{ StoryLoreItemAssociation : references
+    
+    Act ||--o{ ActCharacterAssociation : features
+    Act ||--o{ ActLocationAssociation : uses
+    Act ||--o{ ActLoreItemAssociation : references
+    
+    Scene ||--o{ SceneCharacterAssociation : features
+    Scene ||--o{ SceneLocationAssociation : uses
+    Scene ||--o{ SceneLoreItemAssociation : references
+    
+    StoryCharacterAssociation }o--|| Character : targets
+    StoryLocationAssociation }o--|| Location : targets
+    StoryLoreItemAssociation }o--|| LoreItem : targets
+    
+    ActCharacterAssociation }o--|| Character : targets
+    ActLocationAssociation }o--|| Location : targets
+    ActLoreItemAssociation }o--|| LoreItem : targets
+    
+    SceneCharacterAssociation }o--|| Character : targets
+    SceneLocationAssociation }o--|| Location : targets
+    SceneLoreItemAssociation }o--|| LoreItem : targets
+    
+    Location ||--o{ LocationConnection : connects_from
+    Location ||--o{ LocationConnection : connects_to
+    Location ||--o{ Character : houses
+    
+    AIModelConfiguration ||--o{ AICallLog : configures
+    AICallLog ||--o{ GeneratedImage : tracks
+    
+    ForumCategory ||--o{ ForumThread : organizes
+    ForumThread ||--o{ ForumPost : contains
+    ForumPost ||--o{ ForumVote : receives
+    ForumThread ||--o{ ForumSubscription : tracked_by
+    
+    Story ||--o{ PublishedStory : published_as
+    PublishedStory ||--o{ StoryComment : receives
+    PublishedStory ||--o{ StoryRating : receives
+    
+    ChatSession ||--o{ ChatMessage : contains
+    StoryChatSession ||--o{ StoryChatMessage : contains
+    
+    BrainstormSession ||--o{ BrainstormFavorite : generates
+    BrainstormSession ||--o{ BrainstormStory : creates

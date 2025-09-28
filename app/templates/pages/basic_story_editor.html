@@ -1,0 +1,1143 @@
+{# /ai_rag_story_app/app/templates/pages/basic_story_editor.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ story.title | e }} - Basic Story Editor{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/pages/basic-story-editor.css') }}">
+<link href="{{ url_for('static', path='/css/modules/ai_quill_toolbar.css') }}" rel="stylesheet">
+
+<!-- CodeMirror CSS for HTML editing -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/pages/basic-story-editor-extracted.css') }}">
+<style>
+/* Preview theme styles */
+.preview-content .theme-light {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.preview-content .theme-dark {
+    background-color: #2d3748;
+    color: #f7fafc;
+}
+
+.preview-content .theme-sepia {
+    background-color: #f4f1e8;
+    color: #5a4a37;
+}
+
+.preview-content .font-size-small {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.preview-content .font-size-medium {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.preview-content .font-size-large {
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.preview-content {
+    transition: all 0.3s ease;
+    padding: 2rem;
+    border-radius: 8px;
+    min-height: 300px;
+}
+
+/* Preview Story Header Styles */
+.story-header .story-title-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--tblr-text-primary, #333);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.story-header .story-meta {
+    font-size: 1rem;
+    color: var(--tblr-text-secondary, #666);
+    margin-bottom: 1rem;
+}
+
+.story-image-preview img {
+    border: 1px solid var(--tblr-border-color, #dee2e6);
+    transition: transform 0.2s ease;
+}
+
+.story-image-preview img:hover {
+    transform: scale(1.02);
+}
+
+#preview-no-image {
+    color: var(--tblr-text-muted, #999);
+    font-size: 0.9rem;
+}
+
+/* Preview Footer Styles */
+.story-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    text-align: center;
+}
+
+.story-footer hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #dee2e6, transparent);
+    margin-bottom: 1.5rem;
+}
+
+.story-footer a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.story-footer a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Theme-specific footer adjustments */
+.preview-content.theme-dark .story-footer {
+    color: #f7fafc;
+}
+
+.preview-content.theme-dark .story-footer hr {
+    background: linear-gradient(to right, transparent, #4a5568, transparent);
+}
+
+.preview-content.theme-sepia .story-footer {
+    color: #5a4a37;
+}
+
+.preview-content.theme-sepia .story-footer hr {
+    background: linear-gradient(to right, transparent, #d4c4a8, transparent);
+}
+
+/* Responsive adjustments for preview */
+@media (max-width: 768px) {
+    .story-header .story-title-large {
+        font-size: 2rem;
+    }
+    
+    .story-header .row {
+        flex-direction: column-reverse;
+    }
+    
+    .story-header .col-md-4 {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="basic-story-editor" data-story-id="{{ story.id }}">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-auto">
+                    <a href="{{ url_for('ui_list_stories') }}" class="btn"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Back to Stories">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="page-pretitle">
+                        <i class="fas fa-pen-fancy me-2"></i>Basic Story Editor
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="title-container">
+                        <h1 class="page-title">{{ story.title | e }}</h1>
+                    </div>
+                    <div class="story-meta">
+                        <span class="badge me-2">
+                            <i class="fas fa-book me-1"></i>Basic Story
+                        </span>
+                        <span class="badge me-2" id="publish-status-badge">
+                            <i class="fas fa-draft2digital me-1"></i>Draft
+                        </span>
+                        <span class="me-3">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Created {{ story.created_at.strftime("%B %d, %Y") }}
+                        </span>
+                        <span>
+                            <i class="fas fa-user me-1"></i>
+                            {{ current_user.display_name or current_user.username }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="story-image-container d-flex flex-column align-items-center">
+                        <div class="position-relative">
+                            <!-- Always present image element -->
+                            <img id="story-image" src="{{ story.image_url if story.image_url else '' }}" alt="Story Image" 
+                                 class="rounded {{ 'd-none' if not story.image_url else '' }}" 
+                                 style="width: 128px; height: 128px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2);">
+                            
+                            <!-- Always present placeholder element -->
+                            <div id="story-image-placeholder" 
+                                 class="d-flex align-items-center justify-content-center rounded {{ 'd-none' if story.image_url else '' }}" 
+                                 style="width: 128px; height: 128px; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3);">
+                                <div class="text-center">
+                                    <i class="fas fa-image text-white-50" style="font-size: 2rem;"></i>
+                                    <div class="text-white-75 small mt-1">No Image</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Image overlay button -->
+                            <div class="image-overlay-buttons position-absolute" style="top: 5px; right: 5px;">
+                                <button type="button" class="btn btn-sm btn-light opacity-75" id="change-image-btn"
+                                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                        title="Change story image"
+                                        onclick="showStoryImageModal({{ story.id }}, 'A cover image for: {{ story.title | e }}', handleImageUpdate)">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Change image button for mobile -->
+                        <button type="button" class="btn btn-sm btn-outline-light mt-2 d-md-none" 
+                                onclick="showStoryImageModal({{ story.id }}, 'A cover image for: {{ story.title | e }}', handleImageUpdate)">
+                            <i class="fas fa-camera me-1"></i>{% if story.image_url %}Change{% else %}Add{% endif %} Image
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex gap-2 justify-content-end align-items-center flex-wrap">
+                        
+                        <!-- Action Buttons -->
+                        <button type="button" class="btn btn-success" id="save-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Save your story">
+                            <i class="fas fa-save me-1"></i>Save
+                        </button>
+                        
+                        <button type="button" class="btn" id="change-image-hero-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Change story cover image"
+                                onclick="showStoryImageModal({{ story.id }}, 'A cover image for: {{ story.title | e }}', handleImageUpdate)">
+                            <i class="fas fa-camera me-1"></i>{% if story.image_url %}Change{% else %}Add{% endif %} Image
+                        </button>
+                        
+                        <button type="button" class="btn" id="preview-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Preview your story">
+                            <i class="fas fa-eye me-1"></i>Preview
+                        </button>
+                        
+                        <button type="button" class="btn" id="ai-assist-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Open AI Writing Assistant">
+                            <i class="fas fa-magic me-1"></i>AI Assist
+                        </button>
+                        
+                        <button type="button" class="btn" id="publish-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Publish your story">
+                            <i class="fas fa-globe me-1"></i>Publish
+                        </button>
+                        
+                        <button type="button" class="btn btn-info" id="export-pdf-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Export your story as a professional PDF document">
+                            <i class="fas fa-file-pdf me-1"></i>Export PDF
+                        </button>
+                        
+                        <button type="button" class="btn btn-warning" id="help-btn"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                title="Get help with using the Basic Story Editor">
+                            <i class="fas fa-question-circle me-1"></i>Help
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Title Editor -->
+    <div class="container-fluid mb-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <label for="story-title-input" class="form-label">
+                                    <i class="fas fa-heading me-2"></i>Story Title
+                                </label>
+                                <input type="text" 
+                                       id="story-title-input" 
+                                       class="form-control form-control-lg" 
+                                       value="{{ story.title | e }}" 
+                                       placeholder="Enter your story title...">
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <div class="title-status" id="title-status">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Changes will be saved when you click Save
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor Container -->
+    <div class="editor-container">
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar">
+            <div class="toolbar-left">
+                <div class="editor-tip">
+                    <i class="fas fa-lightbulb me-2 text-warning"></i>
+                    <span class="text-muted">Tip: Select some of the Text and click right mouse click to have quick access to AI Support</span>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="save-status" id="save-status">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Saved</span>
+                </div>
+                <div class="word-count" id="word-count">0 words</div>
+            </div>
+        </div>
+
+        <!-- Basic Story Editor -->
+        <div class="quill-container">
+            {% set entity_type = "story" %}
+            {% set entity_id = story.id %}
+            {% set initial_content = act.description if act else (story.content or '') %}
+            {% include "partials/content_editor.html" %}
+        </div>
+
+    </div>
+</div>
+
+<!-- Publish Modal -->
+<div class="modal fade" id="story-publish-modal" tabindex="-1" aria-labelledby="storyPublishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Enhanced Tabler Premium Header -->
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); color: white; border-bottom: none;">
+                <h4 class="modal-title text-white" id="storyPublishModalLabel">
+                    <i class="fas fa-globe me-2"></i>Publish Story
+                </h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Button Row with Tabler Styling -->
+            <div class="card-status-top bg-primary"></div>
+            <div class="p-3 bg-light border-bottom">
+                <div class="btn-list justify-content-end">
+                    <button type="button" class="btn btn-ghost-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirm-publish">
+                        <i class="fas fa-globe me-1"></i>Publish Story
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Story Info Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar avatar-sm bg-primary text-white me-3">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <h5 class="card-title mb-1" id="publish-story-title">Story Title</h5>
+                                <div class="text-muted">
+                                    <span class="badge badge-outline text-primary me-2">
+                                        <i class="fas fa-file-text me-1"></i><span id="publish-word-count">0</span> words
+                                    </span>
+                                    <span class="badge badge-outline text-secondary">
+                                        <i class="fas fa-clock me-1"></i><span id="publish-read-time">0</span> min read
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Publish Options Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-cog me-2"></i>Publishing Options
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-eye me-1"></i>Visibility
+                                    </label>
+                                    <select class="form-select" id="publish-visibility">
+                                        <option value="public">
+                                            <i class="fas fa-globe me-1"></i>Public - Anyone can discover and read
+                                        </option>
+                                        <option value="private">
+                                            <i class="fas fa-lock me-1"></i>Private - Only you can read
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>Publication Status
+                                    </label>
+                                    <div class="form-control-plaintext">
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Ready to Publish
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Story Description (Optional)
+                            </label>
+                            <textarea class="form-control" id="publish-description" rows="3" 
+                                      placeholder="A brief description that will appear in story listings..."></textarea>
+                            <div class="form-hint">This helps readers understand what your story is about.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preview Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-eye me-2"></i>Preview
+                        </h4>
+                        <div class="card-subtitle">How your story will appear to readers</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card card-sm bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title" id="preview-card-title">Story Title</h6>
+                                <p class="card-text text-muted" id="preview-card-description">Story description will appear here...</p>
+                                <div class="card-meta">
+                                    <small class="text-muted">
+                                        <span id="preview-card-stats">0 words • 0 min read</span>
+                                        <span class="ms-2" id="preview-card-date">Just now</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Unpublish Modal -->
+<div class="modal fade" id="story-unpublish-modal" tabindex="-1" aria-labelledby="storyUnpublishModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="storyUnpublishModalLabel">
+                    <i class="fas fa-eye-slash me-2"></i>Unpublish Story
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to unpublish this story?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>This will:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Remove the story from public listings</li>
+                        <li>Make the public link inaccessible</li>
+                        <li>Change the status back to "Draft"</li>
+                    </ul>
+                </div>
+                <p class="mb-0">You can always republish it later.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="confirm-unpublish">
+                    <i class="fas fa-eye-slash me-1"></i>Unpublish
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="story-preview-modal" tabindex="-1" aria-labelledby="storyPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header preview-header">
+                <div class="preview-title-section">
+                    <h4 class="modal-title" id="storyPreviewModalLabel">Story Preview</h4>
+                    <h5 class="preview-story-title" id="preview-story-title"></h5>
+                </div>
+                <div class="preview-controls">
+                    <div class="btn-group me-3" role="group" aria-label="Font size">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="font-size-small"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Small font size for compact reading">
+                            <i class="fas fa-font font-size-sm"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary active" id="font-size-medium"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Medium font size (default)">
+                            <i class="fas fa-font font-size-md"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="font-size-large"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Large font size for easier reading">
+                            <i class="fas fa-font font-size-lg"></i>
+                        </button>
+                    </div>
+                    <div class="btn-group me-3" role="group" aria-label="Theme">
+                        <button type="button" class="btn btn-sm btn-outline-secondary active" id="theme-light"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Light theme - white background, dark text">
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="theme-dark"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dark theme - dark background, light text">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="theme-sepia"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Sepia theme - warm beige background for comfortable reading">
+                            <i class="fas fa-book"></i>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="print-story"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Print your story with professional formatting">
+                        <i class="fas fa-print me-1"></i>Print
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Close preview and return to editing"></button>
+                </div>
+            </div>
+            <div class="modal-body preview-content" id="preview-content">
+                <!-- Story Header with Image -->
+                <div class="story-header mb-4" id="preview-story-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="story-title-large mb-2" id="preview-story-title-large"></h1>
+                            <div class="story-meta text-muted">
+                                <span id="preview-word-count">0 words</span> • 
+                                <span id="preview-read-time">0 min read</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="story-image-preview text-center" id="preview-story-image-container">
+                                <img id="preview-story-image" class="img-fluid rounded shadow-sm" 
+                                     style="max-height: 200px; max-width: 100%; object-fit: cover; display: none;" 
+                                     alt="Story Cover Image">
+                                <div id="preview-no-image" class="text-muted d-none">
+                                    <i class="fas fa-image fa-2x mb-2"></i>
+                                    <div>No Cover Image</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                </div>
+                
+                <!-- Story Content -->
+                <div class="story-content" id="preview-story-content">
+                    <!-- Story content will be inserted here -->
+                </div>
+                
+                <!-- Story Footer (matching published version) -->
+                <footer class="story-footer mt-5">
+                    <hr style="border: none; height: 1px; background: linear-gradient(to right, transparent, #dee2e6, transparent); margin: 2rem 0;">
+                    <p class="text-center text-muted" style="font-size: 0.9rem;">
+                        This story was created using <a href="https://inkandquill.ai" target="_blank" rel="noopener" style="color: #007bff; text-decoration: none; font-weight: 500;">Ink And Quill</a> - AI-powered storytelling tools for writers.
+                    </p>
+                </footer>
+                
+                <!-- Bottom Stats (kept for compatibility) -->
+                <div class="preview-stats mt-4 d-none">
+                    <small class="text-muted">
+                        <span id="preview-word-count-bottom">0 words</span> • 
+                        <span id="preview-read-time-bottom">0 min read</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Download Modal -->
+<div class="modal fade" id="pdf-download-modal" tabindex="-1" aria-labelledby="pdfDownloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Enhanced Tabler Premium Header -->
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); color: white; border-bottom: none;">
+                <h5 class="modal-title text-white" id="pdfDownloadModalLabel">
+                    <i class="fas fa-file-pdf me-2"></i>PDF Export Ready
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body text-center p-4">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                </div>
+                
+                <h6 class="mb-3">Your story has been exported successfully!</h6>
+                <p class="text-muted mb-4">Click the button below to download your professionally formatted PDF.</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-primary btn-lg" id="pdf-download-link" download>
+                        <i class="fas fa-download me-2"></i>Download PDF
+                    </a>
+                </div>
+                
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        The PDF includes your story content, images, and professional formatting.
+                    </small>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Assistant Panel -->
+<div class="ai-assistant-panel" id="ai-assistant-panel">
+    <div class="panel-header" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); color: white; padding: 1rem; border-bottom: 2px solid var(--tblr-primary);">
+        <h5 style="margin: 0; font-weight: 700; color: #ffffff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); font-size: 1.1rem;"><i class="fas fa-magic me-2"></i>AI Writing Assistant</h5>
+    </div>
+    
+    <!-- AI Model Selector -->
+    <div class="panel-model-selector px-3 py-2 border-bottom">
+        {% with select_id='basic-story-ai-model-select', tooltip_text='Select the AI model for writing assistance', show_label=true, label_text='Select LLM Model', select_class='btn-sm', default_model_type='writing_assistant' %}
+            {% include 'partials/_ai_model_button_selector.html' %}
+        {% endwith %}
+    </div>
+    
+    
+    <div class="panel-body" style="display: flex; flex-direction: column; flex-grow: 1; height: 100%;">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" id="aiAssistantTabs" role="tablist" style="background: #ffffff; border-bottom: 2px solid var(--tblr-primary); border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="query-tab" data-bs-toggle="tab" data-bs-target="#query-panel" type="button" role="tab" aria-controls="query-panel" aria-selected="true" style="font-weight: 600; padding: 0.75rem 1.25rem; border: 2px solid transparent; transition: all 0.2s ease;">
+                    <i class="fas fa-question-circle me-1"></i>AI Query
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="result-tab" data-bs-toggle="tab" data-bs-target="#result-panel" type="button" role="tab" aria-controls="result-panel" aria-selected="false" style="font-weight: 600; padding: 0.75rem 1.25rem; border: 2px solid transparent; transition: all 0.2s ease;">
+                    <i class="fas fa-robot me-1"></i>AI Result
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="aiAssistantTabContent" style="display: flex; flex-direction: column; flex-grow: 1; height: 100%; margin-top: 0; margin-bottom: 1rem;">
+            <!-- Query Tab -->
+            <div class="tab-pane fade show active" id="query-panel" role="tabpanel" aria-labelledby="query-tab" style="border: 1px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius); padding: var(--tblr-spacer-3); margin-top: 0; background: var(--tblr-bg-surface);">
+                <!-- Instructions -->
+                <div class="alert alert-info mb-4" role="alert">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="alert-heading mb-1">How to use AI Writing Assistant</h6>
+                            <p class="mb-2">
+                                Choose an assistance type below, optionally add a custom request, then click Generate to get AI-powered help with your story.
+                            </p>
+                            <p class="mb-0">
+                                <strong>Custom Request:</strong> Add specific instructions like "make this dialogue more dramatic" or "add more tension here" to personalize AI responses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Panel Footer (moved after alert) -->
+                <div class="panel-footer mt-3">
+                    <div class="ai-status" id="ai-status">
+                        <i class="fas fa-circle"></i>
+                        <span>Ready</span>
+                    </div>
+                    <div class="panel-actions">
+                        <button type="button" class="btn btn-sm btn-warning d-none" id="stop-generation">
+                            <i class="fas fa-stop me-1"></i>Stop
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary" id="generate-assistance"
+                                style="background: var(--tblr-primary); border-color: var(--tblr-primary); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
+                            <i class="fas fa-magic me-1"></i>Generate
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Assistance Types -->
+                <div class="assistance-types" style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; justify-items: center;">
+            <div class="assistance-type-btn btn" data-type="continue" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Suggests 2-3 different directions to continue your story, analyzing plot dynamics and considering pacing while staying true to your established tone and style"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-arrow-right text-primary"></i>
+                <span class="btn-text">Continue Story</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="what_happens_next" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Get exactly 3 quick, specific suggestions for the immediate next event in your story (action, dialogue, or internal conflict)"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-lightbulb text-warning"></i>
+                <span class="btn-text">What Happens Next</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="dialogue" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Make dialogue more natural and engaging, distinguish character voices through speech patterns, fix exposition-heavy conversations, and advance plot through dialogue"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-comments text-info"></i>
+                <span class="btn-text">Dialogue Help</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="improve" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Receive balanced feedback highlighting what's working well and areas to improve in narrative structure, character development, pacing, and prose quality"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-edit text-success"></i>
+                <span class="btn-text">Improve Text</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="plot_twist" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Build on existing plot elements to suggest complications, twists, and developments for both immediate and long-term story arcs"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-surprise text-danger"></i>
+                <span class="btn-text">Plot Twist</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="character_dev" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Analyze speech patterns to make character voices more distinct and memorable, ensuring age-appropriate and consistent dialogue that reveals personality"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-users text-purple"></i>
+                <span class="btn-text">Character Dev</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="creative" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Think outside conventional patterns to generate unexpected twists, revelations, and creative developments that build on your existing story elements in surprising ways"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-palette text-pink"></i>
+                <span class="btn-text">Creative Ideas</span>
+            </div>
+            <div class="assistance-type-btn btn" data-type="problem" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Describe your specific problem in Custom Request (plot holes, pacing issues, character motivation, etc.) to get multiple practical solutions and alternatives"
+                 style="border: 1px solid var(--tblr-border-color); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; min-height: 60px; justify-content: center; padding: 0.5rem;">
+                <i class="fas fa-question-circle text-orange"></i>
+                <span class="btn-text">Solve Problem</span>
+            </div>
+        </div>
+        
+        <!-- Custom Request -->
+        <div class="custom-request">
+            <label for="custom-request-text" class="form-label">
+                <i class="fas fa-pen me-1"></i>Custom Request (Optional)
+            </label>
+            <textarea 
+                id="custom-request-text" 
+                class="form-control" 
+                placeholder="Describe what you need help with... (e.g., 'Make this dialogue more dramatic' or 'Add more tension to this scene')">
+            </textarea>
+        </div>
+            </div>
+            
+            <!-- Result Tab -->
+            <div class="tab-pane fade" id="result-panel" role="tabpanel" aria-labelledby="result-tab" style="border: 1px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius); padding: var(--tblr-spacer-3); margin-top: 0; background: var(--tblr-bg-surface); display: flex; flex-direction: column; flex-grow: 1; height: 100%;">
+                
+                <!-- Coin Count Display -->
+                <div class="coin-count-display mb-3" id="coin-count-display" style="display: none;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-coins text-warning me-2"></i>
+                            <span class="fw-bold">Operation Cost:</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span id="coin-amount" class="badge bg-warning text-dark fw-bold">0 coins</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Response -->
+                <div class="ai-response show" id="ai-response" style="display: flex; flex-direction: column; flex-grow: 1;">
+            <!-- Response Header with All Actions -->
+            <div class="response-header d-none" id="response-header">
+                <div class="response-header-row">
+                    <div class="response-insert-actions">
+                        <button type="button" class="btn btn-sm btn-primary" id="insert-response">
+                            <i class="fas fa-plus me-1"></i>Insert into Story
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary d-none" id="insert-selected">
+                            <i class="fas fa-check me-1"></i>Insert Selected
+                        </button>
+                    </div>
+                </div>
+                <div class="response-header-row">
+                    <div class="response-utility-actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copy-response">
+                            <i class="fas fa-copy me-1"></i>Copy to Clipboard
+                        </button>
+                        <button type="button" class="btn btn-sm btn-warning" id="clear-response">
+                            <i class="fas fa-trash me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <textarea class="form-control d-none" id="response-content" readonly 
+                      style="resize: none; width: 100%; flex-grow: 1; min-height: 300px; font-family: var(--tblr-font-sans-serif); font-size: 0.9rem; line-height: 1.5; background: var(--tblr-bg-surface); border: 1px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius); overflow-y: auto;"
+                      placeholder="AI response will appear here..."></textarea>
+                    <div class="no-response-message" id="no-response-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No AI response yet. Go to the Query tab and click Generate to get AI assistance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Image Generation Modal -->
+{% include "partials/image_generation_modal.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script src="{{ url_for('static', path='/js/modules/ai_quill_toolbar.js') }}"></script>
+<script src="{{ url_for('static', path='/js/basic_story_editor_ai_assistant.js') }}"></script>
+
+<!-- CodeMirror JS for HTML editing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closetag.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/xml-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/html-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/selection/active-line.min.js"></script>
+
+<!-- JS Beautify for HTML formatting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
+
+<!-- Include Image Generation Modal -->
+{% include "partials/image_generation_modal.html" %}
+
+<!-- Include Image Properties Modal -->
+{% include "partials/image_properties_modal.html" %}
+
+<!-- Publish Story Modal -->
+<div class="modal fade" id="story-publish-modal" tabindex="-1" aria-labelledby="storyPublishModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Enhanced Tabler Premium Header -->
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); color: white; border-bottom: none;">
+                <h4 class="modal-title text-white" id="storyPublishModalLabel">
+                    <i class="fas fa-globe me-2"></i>Publish Story
+                </h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <!-- Story Info Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar avatar-sm bg-primary text-white me-3">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <h5 class="card-title mb-1" id="publish-story-title">Story Title</h5>
+                                <div class="text-muted">
+                                    <span class="badge badge-outline text-primary me-2">
+                                        <i class="fas fa-file-text me-1"></i><span id="publish-word-count">0</span> words
+                                    </span>
+                                    <span class="badge badge-outline text-secondary">
+                                        <i class="fas fa-clock me-1"></i><span id="publish-read-time">0</span> min read
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Publish Options Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-cog me-2"></i>Publishing Options
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-eye me-1"></i>Visibility
+                                    </label>
+                                    <select class="form-select" id="publish-visibility">
+                                        <option value="public">
+                                            Public - Anyone can discover and read
+                                        </option>
+                                        <option value="private">
+                                            Private - Only you can read
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>Publication Status
+                                    </label>
+                                    <div class="form-control-plaintext">
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Ready to Publish
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Story Description (Optional)
+                            </label>
+                            <textarea class="form-control" id="publish-description" rows="3" 
+                                      placeholder="A brief description that will appear in story listings..."></textarea>
+                            <div class="form-hint">This helps readers understand what your story is about.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preview Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-eye me-2"></i>Preview
+                        </h4>
+                        <div class="card-subtitle text-secondary">
+                            How your story will appear in listings
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card preview-card">
+                            <div class="card-body">
+                                <h3 class="card-title" id="preview-card-title">Story Title</h3>
+                                <p class="text-secondary" id="preview-card-description">No description provided.</p>
+                                <div class="d-flex align-items-center text-secondary">
+                                    <small id="preview-card-stats">0 words • 0 min read</small>
+                                    <small class="ms-auto" id="preview-card-date">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirm-publish">
+                    <i class="fas fa-globe me-1"></i>Publish Story
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Image Generation Modal -->
+{% include "partials/image_generation_modal.html" %}
+
+<!-- AI Assistant Panel -->
+<div class="ai-assistant-panel" id="ai-assistant-panel">
+    <div class="panel-header">
+        <h5><i class="fas fa-magic me-2"></i>AI Writing Assistant</h5>
+    </div>
+    
+    <div class="panel-footer">
+        <div class="ai-status" id="ai-status">
+            <i class="fas fa-circle"></i>
+            <span>Ready</span>
+        </div>
+        <div class="panel-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="stop-generation">
+                <i class="fas fa-stop me-1"></i>Stop
+            </button>
+            <button type="button" class="btn btn-sm btn-primary" id="generate-assistance">
+                <i class="fas fa-magic me-1"></i>Generate
+            </button>
+        </div>
+    </div>
+    
+    <div class="panel-body">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" id="aiAssistantTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="query-tab" data-bs-toggle="tab" data-bs-target="#query-panel" type="button" role="tab" aria-controls="query-panel" aria-selected="true">
+                    <i class="fas fa-question-circle me-1"></i>Query
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="result-tab" data-bs-toggle="tab" data-bs-target="#result-panel" type="button" role="tab" aria-controls="result-panel" aria-selected="false">
+                    <i class="fas fa-robot me-1"></i>Result
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="aiAssistantTabContent">
+            <!-- Query Tab -->
+            <div class="tab-pane fade show active" id="query-panel" role="tabpanel" aria-labelledby="query-tab">
+                <!-- Instructions -->
+                <div class="assistance-instructions">
+                    <p class="mb-3 text-muted">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Select the option you want to use, then press Generate
+                    </p>
+                </div>
+                
+                <!-- Assistance Types -->
+                <div class="assistance-types">
+            <div class="assistance-type-btn" data-type="continue" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Suggests 2-3 different directions to continue your story, analyzing plot dynamics and considering pacing while staying true to your established tone and style">
+                <i class="fas fa-arrow-right"></i>
+                <span class="btn-text">Continue Story</span>
+            </div>
+            <div class="assistance-type-btn" data-type="what_happens_next" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Get exactly 3 quick, specific suggestions for the immediate next event in your story (action, dialogue, or internal conflict)">
+                <i class="fas fa-lightbulb"></i>
+                <span class="btn-text">What Happens Next</span>
+            </div>
+            <div class="assistance-type-btn" data-type="dialogue" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Make dialogue more natural and engaging, distinguish character voices through speech patterns, fix exposition-heavy conversations, and advance plot through dialogue">
+                <i class="fas fa-comments"></i>
+                <span class="btn-text">Dialogue Help</span>
+            </div>
+            <div class="assistance-type-btn" data-type="improve" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Receive balanced feedback highlighting what's working well and areas to improve in narrative structure, character development, pacing, and prose quality">
+                <i class="fas fa-edit"></i>
+                <span class="btn-text">Improve Text</span>
+            </div>
+            <div class="assistance-type-btn" data-type="plot_twist" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Build on existing plot elements to suggest complications, twists, and developments for both immediate and long-term story arcs">
+                <i class="fas fa-surprise"></i>
+                <span class="btn-text">Plot Twist</span>
+            </div>
+            <div class="assistance-type-btn" data-type="character_dev" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Analyze speech patterns to make character voices more distinct and memorable, ensuring age-appropriate and consistent dialogue that reveals personality">
+                <i class="fas fa-users"></i>
+                <span class="btn-text">Character Dev</span>
+            </div>
+            <div class="assistance-type-btn" data-type="creative" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Think outside conventional patterns to generate unexpected twists, revelations, and creative developments that build on your existing story elements in surprising ways">
+                <i class="fas fa-palette"></i>
+                <span class="btn-text">Creative Ideas</span>
+            </div>
+            <div class="assistance-type-btn" data-type="problem" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom"
+                 title="Describe your specific problem in Custom Request (plot holes, pacing issues, character motivation, etc.) to get multiple practical solutions and alternatives">
+                <i class="fas fa-question-circle"></i>
+                <span class="btn-text">Solve Problem</span>
+            </div>
+        </div>
+        
+        <!-- Custom Request -->
+        <div class="custom-request">
+            <label for="custom-request-text" class="form-label">
+                <i class="fas fa-pen me-1"></i>Custom Request (Optional)
+            </label>
+            <textarea 
+                id="custom-request-text" 
+                class="form-control" 
+                placeholder="Describe what you need help with... (e.g., 'Make this dialogue more dramatic' or 'Add more tension to this scene')">
+            </textarea>
+        </div>
+            </div>
+            
+            <!-- Result Tab -->
+            <div class="tab-pane fade" id="result-panel" role="tabpanel" aria-labelledby="result-tab">
+                <!-- AI Response -->
+                <div class="ai-response show" id="ai-response">
+            <!-- Response Header with All Actions -->
+            <div class="response-header d-none" id="response-header">
+                <div class="response-header-row">
+                    <div class="response-insert-actions">
+                        <button type="button" class="btn btn-sm btn-success" id="insert-response">
+                            <i class="fas fa-plus me-1"></i>Insert into Story
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success d-none" id="insert-selected">
+                            <i class="fas fa-check me-1"></i>Insert Selected
+                        </button>
+                    </div>
+                </div>
+                <div class="response-header-row">
+                    <div class="response-utility-actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copy-response">
+                            <i class="fas fa-copy me-1"></i>Copy to Clipboard
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="clear-response">
+                            <i class="fas fa-trash me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="response-content d-none" id="response-content"></div>
+                    <div class="no-response-message" id="no-response-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No AI response yet. Go to the Query tab and click Generate to get AI assistance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Image Generation Modal -->
+{% include "partials/image_generation_modal.html" %}
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+  "appCommandLine": "startup.sh",
+  "numberOfWorkers": 4,
+  "alwaysOn": true,
+  "httpLoggingEnabled": true,
+  "detailedErrorLoggingEnabled": true,
+  "pythonVersion": "3.11",
+  "linuxFxVersion": "PYTHON|3.11",
+  "preZipRunStatus": "ENABLE_ORYX_BUILD"
+}

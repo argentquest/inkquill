@@ -1,0 +1,183 @@
+{# AI Model Selector Partial - Admin Only #}
+{# Parameters:
+   - select_id: Unique ID for the select element
+   - select_name: Name attribute for form submission (optional)
+   - select_class: Additional CSS classes (optional)
+   - tooltip_text: Tooltip text (optional)
+   - required: Whether the field is required (default: true)
+   - show_label: Whether to show the label (default: true)
+   - label_text: Custom label text (default: "AI Model")
+   - default_model_type: Context for default selection ("public_chat", "generation", "writing_assistant")
+#}
+
+{% if current_user and current_user.is_admin %}
+<div class="ai-model-selector-wrapper">
+<script>console.log('AI Model Selector: User is admin, showing selector for {{ select_id }}');</script>
+    {% if show_label != false %}
+    <label for="{{ select_id }}" class="form-label fw-bold" style="color: var(--tblr-body-color);">
+        <i class="fas fa-robot me-1 text-primary"></i>{{ label_text | default('AI Model') }}
+        {% if tooltip_text %}
+        <i class="fas fa-info-circle text-muted ms-1" 
+           data-bs-toggle="tooltip" 
+           data-bs-placement="top" 
+           title="{{ tooltip_text }}"></i>
+        {% endif %}
+    </label>
+    {% endif %}
+    
+    <select id="{{ select_id }}" 
+            name="{{ select_name | default(select_id) }}" 
+            class="form-select {{ select_class | default('') }}"
+            style="border-radius: var(--tblr-border-radius); border-color: var(--tblr-border-color); background: var(--tblr-bg-surface); transition: all 0.2s ease;"
+            {% if required != false %}required{% endif %}>
+        <option value="">Select AI Model...</option>
+    </select>
+    
+    {% if show_label == false and tooltip_text %}
+    <small class="form-text text-muted">{{ tooltip_text }}</small>
+    {% endif %}
+</div>
+
+<script>
+// Initialize model selector when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const selectElement = document.getElementById('{{ select_id }}');
+    if (!selectElement) {
+        console.error('AI Model Selector: Element {{ select_id }} not found');
+        return;
+    }
+
+    // Check if AIModelSelector is available and use it
+    if (typeof AIModelSelector !== 'undefined') {
+        AIModelSelector.initialize('{{ select_id }}');
+    } else {
+        // Fallback: Load models directly using the same logic as AIModelSelector
+        selectElement.innerHTML = '<option value="">Loading AI Models...</option>';
+        selectElement.disabled = true;
+
+        fetch('/api/v1/ai-models/', { credentials: 'include' })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch AI models');
+                return response.json();
+            })
+            .then(models => {
+                // Preserve current selection if any
+                const currentValue = selectElement.value;
+                
+                selectElement.innerHTML = '';
+                
+                if (models.length === 0) {
+                    selectElement.innerHTML = '<option value="">No AI models found</option>';
+                    selectElement.disabled = true;
+                    return;
+                }
+
+                // Add empty option if not required
+                {% if required == false %}
+                selectElement.innerHTML = '<option value="">Select AI Model...</option>';
+                {% endif %}
+
+                let defaultModelId = null;
+                
+                // Use current value if it exists and is valid
+                if (currentValue && models.find(m => m.id == currentValue)) {
+                    defaultModelId = currentValue;
+                } else {
+                    // Determine default model based on context
+                    {% if default_model_type %}
+                    const modelType = '{{ default_model_type }}';
+                    if (modelType === 'public_chat') {
+                        // For public chat, prefer models marked as public chat default
+                        const publicChatDefault = models.find(m => m.is_public_chat_default);
+                        if (publicChatDefault) {
+                            defaultModelId = publicChatDefault.id;
+                        }
+                    } else if (modelType === 'generation' || modelType === 'writing_assistant') {
+                        // For generation/writing, prefer gpt-4o-mini for cost efficiency
+                        const costEfficientModel = models.find(m => m.model_name && m.model_name.includes('gpt-4o-mini'));
+                        if (costEfficientModel) {
+                            defaultModelId = costEfficientModel.id;
+                        }
+                    }
+                    
+                    // Fallback to first active generation model
+                    if (!defaultModelId) {
+                        const firstGenerationModel = models.find(m => m.model_type === 'GENERATION' && m.is_active);
+                        if (firstGenerationModel) {
+                            defaultModelId = firstGenerationModel.id;
+                        }
+                    }
+                    {% endif %}
+                    
+                    // If no specific default found, use first model for required selects
+                    {% if required != false %}
+                    if (!defaultModelId && models.length > 0) {
+                        defaultModelId = models[0].id;
+                    }
+                    {% endif %}
+                }
+
+                models.forEach((model) => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = model.display_name || model.name;
+                    option.title = model.description || `Uses the ${model.model_name} engine.`;
+                    
+                    selectElement.appendChild(option);
+                });
+                
+                selectElement.disabled = false;
+                
+                // Set the selected value after all options are added
+                if (defaultModelId) {
+                    // Multiple approaches to ensure the selection is visible
+                    
+                    // 1. Clear all selections first
+                    Array.from(selectElement.options).forEach(opt => opt.selected = false);
+                    
+                    // 2. Find and select the correct option
+                    const selectedOption = selectElement.querySelector(`option[value="${defaultModelId}"]`);
+                    if (selectedOption) {
+                        selectedOption.selected = true;
+                        selectElement.selectedIndex = Array.from(selectElement.options).indexOf(selectedOption);
+                    }
+                    
+                    // 3. Set the value property
+                    selectElement.value = defaultModelId;
+                    
+                    // 4. Force a visual refresh using multiple methods
+                    setTimeout(() => {
+                        // Force re-render by temporarily hiding and showing
+                        const originalDisplay = selectElement.style.display;
+                        selectElement.style.display = 'none';
+                        selectElement.offsetHeight; // Trigger reflow
+                        selectElement.style.display = originalDisplay;
+                        
+                        // Trigger focus and blur to refresh Bootstrap styling
+                        selectElement.focus();
+                        selectElement.blur();
+                        
+                        // Trigger change event
+                        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                        
+                        console.log(`AI Model Selector: Final state - value: ${selectElement.value}, selectedIndex: ${selectElement.selectedIndex}`);
+                    }, 100);
+                }
+                
+                console.log(`AI Model Selector: Populated {{ select_id }} with ${models.length} models, selected: ${selectElement.value}`);
+                console.log(`AI Model Selector: Options in dropdown:`, Array.from(selectElement.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})));
+            })
+            .catch(error => {
+                console.error('Error loading AI models for {{ select_id }}:', error);
+                selectElement.innerHTML = '<option value="">Error loading models</option>';
+                selectElement.disabled = true;
+                if (typeof showToast === 'function') {
+                    showToast('error', 'Could not load AI models');
+                }
+            });
+    }
+});
+</script>
+{% else %}
+<script>console.log('AI Model Selector: User is not admin or not logged in, hiding selector for {{ select_id }}');</script>
+{% endif %}

@@ -1,0 +1,187 @@
+{# /ai_rag_story_app/app/templates/partials/_breadcrumbs.html #}
+
+<style>
+    .breadcrumb-container {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 0.75rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .breadcrumb {
+        background: none;
+        margin-bottom: 0;
+        padding: 0;
+    }
+    
+    .breadcrumb-item {
+        font-size: 0.875rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "\f054";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #6c757d;
+        margin: 0 0.5rem;
+    }
+    
+    .breadcrumb-item a {
+        color: var(--tblr-primary);
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+</style>
+
+<!-- Breadcrumb Navigation -->
+<div class="breadcrumb-container">
+    <div class="container-fluid">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <!-- Home breadcrumb -->
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('ui_home') }}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                
+                <!-- Dynamic breadcrumbs based on current path -->
+                {% set path_parts = request.url.path.strip('/').split('/') %}
+                {% if path_parts and path_parts[0] %}
+                    
+                    <!-- Main section breadcrumb -->
+                    {% if path_parts[0] == 'ui' and path_parts|length > 1 %}
+                        {% set section = path_parts[1] %}
+                        
+                        {% if section == 'worlds' %}
+                            <li class="breadcrumb-item{% if path_parts|length == 2 %} active{% endif %}">
+                                {% if path_parts|length == 2 %}
+                                    <i class="fas fa-globe me-1"></i>My Worlds
+                                {% else %}
+                                    <a href="{{ url_for('ui_list_worlds') }}">
+                                        <i class="fas fa-globe me-1"></i>My Worlds
+                                    </a>
+                                {% endif %}
+                            </li>
+                            
+                            {% if path_parts|length > 2 %}
+                                {% if path_parts[2] == 'create' %}
+                                    <li class="breadcrumb-item active">
+                                        <i class="fas fa-plus me-1"></i>Create World
+                                    </li>
+                                {% elif path_parts[2].isdigit() %}
+                                    <li class="breadcrumb-item active">
+                                        <i class="fas fa-eye me-1"></i>World Details
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            
+                        {% elif section == 'stories' %}
+                            <li class="breadcrumb-item{% if path_parts|length == 2 %} active{% endif %}">
+                                {% if path_parts|length == 2 %}
+                                    <i class="fas fa-book me-1"></i>My Stories
+                                {% else %}
+                                    <a href="{{ url_for('ui_list_stories') }}">
+                                        <i class="fas fa-book me-1"></i>My Stories
+                                    </a>
+                                {% endif %}
+                            </li>
+                            
+                        {% elif section == 'brainstorm' %}
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-lightbulb me-1"></i>My Brainstorms
+                            </li>
+                            
+                        {% elif section == 'account' %}
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-user-cog me-1"></i>My Account
+                            </li>
+                            
+                        {% elif section == 'admin' %}
+                            <li class="breadcrumb-item{% if path_parts|length == 2 %} active{% endif %}">
+                                {% if path_parts|length == 2 %}
+                                    <i class="fas fa-shield-alt me-1"></i>Admin Dashboard
+                                {% else %}
+                                    <a href="{{ url_for('ui_admin_dashboard') }}">
+                                        <i class="fas fa-shield-alt me-1"></i>Admin Dashboard
+                                    </a>
+                                {% endif %}
+                            </li>
+                            
+                        {% elif section == 'llm-models' %}
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-robot me-1"></i>AI Models
+                            </li>
+                        {% endif %}
+                        
+                    {% elif path_parts[0] == 'blog' %}
+                        {% if path_parts|length == 1 or (path_parts|length == 2 and path_parts[1] == '') %}
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-edit me-1"></i>Blog
+                            </li>
+                        {% elif path_parts[1] == 'dashboard' %}
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('blog_home') }}">
+                                    <i class="fas fa-edit me-1"></i>Blog
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-pen-nib me-1"></i>My Blog Dashboard
+                            </li>
+                        {% elif path_parts[1] == 'editor' %}
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('blog_home') }}">
+                                    <i class="fas fa-edit me-1"></i>Blog
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-pen me-1"></i>Blog Editor
+                            </li>
+                        {% elif path_parts[1] == 'post' %}
+                            <li class="breadcrumb-item">
+                                <a href="{{ url_for('blog_home') }}">
+                                    <i class="fas fa-edit me-1"></i>Blog
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                <i class="fas fa-file-alt me-1"></i>Blog Post
+                            </li>
+                        {% endif %}
+                        
+                    {% elif path_parts[0] == 'news' %}
+                        <li class="breadcrumb-item active">
+                            <i class="fas fa-newspaper me-1"></i>News & Updates
+                        </li>
+                        
+                    {% elif path_parts[0] == 'forum' %}
+                        <li class="breadcrumb-item active">
+                            <i class="fas fa-comments me-1"></i>Community Forum
+                        </li>
+                        
+                    {% elif path_parts[0] == 'public' %}
+                        <li class="breadcrumb-item active">
+                            <i class="fas fa-robot me-1"></i>AI Chat Gallery
+                        </li>
+                        
+                    {% elif path_parts[0] == 'published' %}
+                        <li class="breadcrumb-item active">
+                            <i class="fas fa-book-open me-1"></i>Published Stories
+                        </li>
+                        
+                    {% elif path_parts[0] == 'billing' %}
+                        <li class="breadcrumb-item active">
+                            <i class="fas fa-credit-card me-1"></i>Billing & Credits
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ol>
+        </nav>
+    </div>
+</div>

@@ -1,0 +1,613 @@
+{# /ai_rag_story_app/app/templates/pages/act_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% set page_action = "Create New" if act is none else "Edit" %}
+{% set button_action_text = "Create Act" if act is none else "Save Changes" %}
+{% set button_icon_class = "fas fa-plus-circle" if act is none else "fas fa-save" %}
+
+{% block title %}{{ page_action }} Act{% endblock %}
+
+{% block styles %}
+{{ super() }} 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    /* Edit Act Form High Priority Fixes */
+    .edit-act-form-page {
+        background: #FAFBFC;
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+    
+    /* 1. Main Container */
+    .form-container {
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+    
+    /* 2. Form Header */
+    .form-header {
+        background: #F8FAFC;
+        padding: 24px 32px;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    
+    .form-header h2 {
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        color: #0F172A !important;
+        margin: 0 !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .form-header .back-link {
+        color: #6366F1 !important;
+        font-size: 15px !important;
+        text-decoration: none !important;
+        transition: color 0.2s ease;
+    }
+    
+    .form-header .back-link:hover {
+        color: #4F46E5 !important;
+    }
+    
+    .form-header .back-link i {
+        margin-right: 6px;
+    }
+    
+    /* 3. Form Body */
+    .form-body {
+        padding: 32px;
+        max-height: calc(90vh - 180px);
+        overflow-y: auto;
+    }
+    
+    /* 4. Form Field Styling */
+    .form-section {
+        margin-bottom: 32px;
+    }
+    
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+        margin-bottom: 8px !important;
+        display: block;
+    }
+    
+    .form-control {
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        border: 2px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        background: #FFFFFF !important;
+        transition: all 0.2s ease !important;
+        min-height: 48px !important;
+    }
+    
+    .form-control:focus {
+        border-color: #6366F1 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    }
+    
+    .form-control-sm {
+        padding: 10px 14px !important;
+        font-size: 15px !important;
+        min-height: 42px !important;
+    }
+    
+    .form-text {
+        font-size: 13px !important;
+        color: #94A3B8 !important;
+        margin-top: 6px !important;
+    }
+    
+    /* 5. Content Editor Styling */
+    .editor-section {
+        margin-top: 24px;
+    }
+    
+    #description-editor-container {
+        background: #FFFFFF;
+        border: 2px solid #E2E8F0;
+        border-radius: 12px;
+        min-height: 400px;
+        transition: border-color 0.2s ease;
+        overflow: hidden;
+    }
+    
+    #description-editor-container:focus-within {
+        border-color: #6366F1;
+    }
+    
+    /* Quill Toolbar Styling */
+    .ql-toolbar {
+        background: #F8FAFC !important;
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #E2E8F0 !important;
+        border-radius: 12px 12px 0 0 !important;
+        border: none !important;
+    }
+    
+    .ql-toolbar .ql-formats {
+        margin-right: 12px;
+    }
+    
+    .ql-toolbar button,
+    .ql-toolbar .ql-picker {
+        margin-right: 4px !important;
+    }
+    
+    .ql-toolbar button {
+        min-width: 36px !important;
+        height: 36px !important;
+        border-radius: 6px !important;
+        background: transparent !important;
+        transition: all 0.2s ease !important;
+        border: none !important;
+    }
+    
+    .ql-toolbar button:hover {
+        background: #E2E8F0 !important;
+    }
+    
+    .ql-toolbar button.ql-active {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+    }
+    
+    .ql-toolbar .ql-picker {
+        background: transparent !important;
+        border-radius: 6px !important;
+    }
+    
+    /* Quill Editor Text Area */
+    .ql-editor {
+        padding: 24px !important;
+        font-size: 17px !important;
+        line-height: 1.8 !important;
+        color: #1E293B !important;
+        font-family: Georgia, 'Times New Roman', serif !important;
+        min-height: 350px !important;
+        border: none !important;
+    }
+    
+    .ql-editor.ql-blank::before {
+        color: #94A3B8 !important;
+        font-style: normal !important;
+        font-size: 17px !important;
+    }
+    
+    /* 6. Visual Section Dividers */
+    .section-divider {
+        border-top: 1px solid #F1F5F9;
+        margin: 32px 0;
+        padding-top: 32px;
+    }
+    
+    /* 7. Form Footer */
+    .form-footer {
+        background: #F8FAFC;
+        padding: 24px 32px;
+        border-top: 1px solid #E2E8F0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+    }
+    
+    /* 8. Action Buttons */
+    .btn-cancel {
+        background: #FFFFFF !important;
+        color: #64748B !important;
+        border: 1px solid #E2E8F0 !important;
+        padding: 12px 24px !important;
+        border-radius: 8px !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+    
+    .btn-cancel:hover {
+        background: #F8FAFC !important;
+        color: #64748B !important;
+        border-color: #CBD5E1 !important;
+    }
+    
+    .btn-save {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        padding: 12px 32px !important;
+        border-radius: 8px !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px;
+    }
+    
+    .btn-save:hover {
+        background: #4F46E5 !important;
+        color: #FFFFFF !important;
+        transform: translateY(-1px);
+    }
+    
+    /* 9. Quality of Life Features */
+    .character-count {
+        position: absolute;
+        bottom: 12px;
+        right: 16px;
+        font-size: 13px;
+        color: #94A3B8;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    
+    .auto-save-indicator {
+        position: absolute;
+        top: 24px;
+        right: 32px;
+        font-size: 13px;
+        color: #10B981;
+        display: none;
+    }
+    
+    /* 10. Error Handling */
+    .alert-danger {
+        background: #FEE2E2 !important;
+        border: 1px solid #FECACA !important;
+        color: #DC2626 !important;
+        border-radius: 8px !important;
+        padding: 16px !important;
+        margin-bottom: 24px !important;
+    }
+    
+    /* 11. Responsive Design */
+    @media (max-width: 768px) {
+        .edit-act-form-page {
+            padding: 20px 16px;
+        }
+        
+        .form-container {
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
+        }
+        
+        .form-header,
+        .form-body,
+        .form-footer {
+            padding: 20px;
+        }
+        
+        .form-footer {
+            flex-direction: column;
+        }
+        
+        .btn-cancel,
+        .btn-save {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .ql-toolbar {
+            padding: 8px 12px !important;
+        }
+        
+        .ql-toolbar button {
+            min-width: 32px !important;
+            height: 32px !important;
+        }
+        
+        .ql-editor {
+            padding: 16px !important;
+            font-size: 16px !important;
+        }
+    }
+    
+    /* 12. Micro-interactions */
+    .form-control,
+    .btn-cancel,
+    .btn-save,
+    .back-link {
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+    }
+    
+    /* Loading state */
+    .btn-save.loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+    
+    .btn-save.loading::after {
+        content: "";
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Fade-in animation */
+    .form-container {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-act-form-page">
+    <div class="form-container">
+        <!-- Form Header -->
+        <div class="form-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>{{ page_action }} Act {% if story_id %}for Story ID {{ story_id }}{% endif %}</h2>
+                    {% if story_id %}
+                    <a href="{{ url_for('ui_story_detail', story_id=story_id) }}" class="back-link">
+                        <i class="fas fa-arrow-left"></i> Back to Story Details
+                    </a>
+                    {% elif act and act.story_id %} 
+                    <a href="{{ url_for('ui_story_detail', story_id=act.story_id) }}" class="back-link">
+                        <i class="fas fa-arrow-left"></i> Back to Story Details
+                    </a>
+                    {% endif %}
+                </div>
+                {% set help_topic = 'act_detail' %}
+                {% set position = 'header' %}
+                {% set size = 'default' %}
+                {% set tooltip = 'Get help with act creation and management' %}
+                {% include 'partials/_help_button.html' %}
+            </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="form-body">
+            <div class="auto-save-indicator" id="auto-save-indicator">
+                <i class="fas fa-check-circle"></i> Saved
+            </div>
+            
+            <div id="act-form-error-message" class="alert alert-danger" style="display: none;" role="alert">
+            </div>
+
+            <form id="act-form" action="{{ form_action_url }}" method="post" data-page-action="{{ page_action }}" {% if story_id and act is none %}data-story-id="{{ story_id }}"{% endif %} {% if act and act.story_class_id %}data-act-story-class-id="{{ act.story_class_id }}"{% endif %}>
+
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Act Title</label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               value="{{ act.title | e if act and act.title else '' }}"
+                               required minlength="1" maxlength="255"
+                               placeholder="Enter the title for this act">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="act_number" class="form-label">Act Number</label>
+                        <input type="number" class="form-control" id="act_number" name="act_number"
+                               value="{{ act.act_number if act and act.act_number else '' }}"
+                               required min="1" step="1"
+                               placeholder="e.g., 1, 2, 3...">
+                        <div class="form-text">The sequential order of this act within the story (must be unique per story).</div>
+                    </div>
+                </div>
+
+                <!-- Content Editor Section -->
+                <div class="form-section section-divider">
+                    <label for="description-editor" class="form-label">Content (Optional)</label>
+                    <div id="description-editor-container" style="position: relative;">
+                        <div id="description-editor"></div>
+                        <div class="character-count" id="character-count">0 characters</div>
+                    </div>
+                    <textarea id="description" name="description" style="display:none;">{{ act.description | e if act and act.description else '' }}</textarea>
+                </div>
+
+                <!-- Summary and Notes Section -->
+                <div class="form-section section-divider">
+                    <div class="mb-3">
+                        <label for="act_summary" class="form-label">Writer's Summary (Optional)</label>
+                        <textarea class="form-control form-control-sm" id="act_summary" name="act_summary"
+                                  rows="3"
+                                  placeholder="Your intent and summary for this act...">{{ act.act_summary | e if act and act.act_summary else '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ai_summary" class="form-label">AI Summary (Optional)</label>
+                        <textarea class="form-control form-control-sm" id="ai_summary" name="ai_summary"
+                                  rows="3"
+                                  placeholder="AI-generated summary..."
+                                  readonly
+                                  style="background-color: #f8f9fa; cursor: not-allowed;">{{ act.ai_summary | e if act and act.ai_summary else '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="writer_notes" class="form-label">Writer's Notes (Optional)</label>
+                        <textarea class="form-control form-control-sm" id="writer_notes" name="writer_notes"
+                                  rows="4"
+                                  placeholder="Private notes for yourself regarding this act.">{{ act.writer_notes | e if act and act.writer_notes else '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Configuration Section -->
+                <div class="form-section section-divider">
+                    <div class="mb-3">
+                        <label for="system_prompt_id" class="form-label">Associated System Prompt (Optional)</label>
+                        <select class="form-select form-select-sm" id="system_prompt_id" name="system_prompt_id">
+                            <option value="">-- None --</option>
+                            {% if available_system_prompts %}
+                                {% for p in available_system_prompts %}
+                                    <option value="{{ p.id }}" {% if act and act.system_prompt_id == p.id %}selected{% endif %}>
+                                        {{ p.title | e }} (Type: {{ p.prompt_type.value | title if p.prompt_type else 'N/A' }})
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <div class="form-text">Select a pre-defined system prompt to guide AI generation for this act.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="story_class_id" class="form-label">Story Class (Optional)</label>
+                        <select class="form-select form-select-sm" id="story_class_id" name="story_class_id">
+                            <option value="">-- No Class --</option>
+                            <!-- Story classes will be loaded dynamically -->
+                        </select>
+                        <div class="form-text">
+                            Choose a class to color-code this act. 
+                            <a href="{{ url_for('story_classes_list_ui') }}" target="_blank" class="text-decoration-none">
+                                <i class="fas fa-external-link-alt fa-sm"></i> Manage Classes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        
+        <!-- Form Footer -->
+        <div class="form-footer">
+            {% if story_id %}
+            <a href="{{ url_for('ui_story_detail', story_id=story_id) }}" class="btn-cancel">Cancel</a>
+            {% elif act and act.story_id %}
+            <a href="{{ url_for('ui_story_detail', story_id=act.story_id) }}" class="btn-cancel">Cancel</a>
+            {% else %}
+            <a href="{{ url_for('ui_list_stories') }}" class="btn-cancel">Cancel</a>
+            {% endif %}
+            <button type="submit" form="act-form" id="save-act-button" class="btn-save">
+                <i class="{{ button_icon_class }}"></i>{{ button_action_text }}
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var descriptionEditorDiv = document.getElementById('description-editor');
+            var descriptionHiddenTextarea = document.getElementById('description'); 
+            var characterCountElement = document.getElementById('character-count');
+            var autoSaveIndicator = document.getElementById('auto-save-indicator');
+
+            if (descriptionEditorDiv && descriptionHiddenTextarea) {
+                var quillDescriptionEditor = new Quill('#description-editor', {
+                    theme: 'snow', 
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],        
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'indent': '-1'}, { 'indent': '+1' }],          
+                            [{ 'align': [] }],
+                            ['link'], 
+                            ['clean'] 
+                        ]
+                    },
+                    placeholder: 'Enter the narrative content for this act...'
+                });
+
+                if (descriptionHiddenTextarea.value.trim() !== '') {
+                    quillDescriptionEditor.root.innerHTML = descriptionHiddenTextarea.value;
+                }
+
+                // Character count functionality
+                function updateCharacterCount() {
+                    var text = quillDescriptionEditor.getText();
+                    var charCount = text.trim().length;
+                    if (characterCountElement) {
+                        characterCountElement.textContent = charCount + ' characters';
+                    }
+                }
+
+                // Update character count on text change
+                quillDescriptionEditor.on('text-change', function() {
+                    updateCharacterCount();
+                    showAutoSaveIndicator();
+                });
+
+                // Auto-save indicator functionality
+                function showAutoSaveIndicator() {
+                    if (autoSaveIndicator) {
+                        autoSaveIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                        autoSaveIndicator.style.display = 'block';
+                        autoSaveIndicator.style.color = '#94A3B8';
+                        
+                        // Simulate auto-save after 2 seconds
+                        setTimeout(function() {
+                            autoSaveIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Saved';
+                            autoSaveIndicator.style.color = '#10B981';
+                            
+                            // Hide after 3 seconds
+                            setTimeout(function() {
+                                autoSaveIndicator.style.display = 'none';
+                            }, 3000);
+                        }, 2000);
+                    }
+                }
+
+                // Initialize character count
+                updateCharacterCount();
+
+                descriptionEditorDiv.__quill = quillDescriptionEditor;
+                
+                console.log('Quill editor initialized for #description-editor on act_form.html');
+            } else {
+                console.warn("Div with ID 'description-editor' or hidden textarea 'description' not found for Quill initialization on act_form.html.");
+            }
+
+            // Form submission handling with loading state
+            var saveButton = document.getElementById('save-act-button');
+            var actForm = document.getElementById('act-form');
+            
+            if (actForm && saveButton) {
+                actForm.addEventListener('submit', function() {
+                    saveButton.classList.add('loading');
+                    saveButton.disabled = true;
+                });
+            }
+        });
+    </script>
+    <script src="{{ url_for('static', path='/js/act_form_handler.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,903 @@
+{# /ai_rag_story_app/app/templates/layouts/base.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Story Assistant{% endblock %} - {{ project_name | default('AI App') }}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍔</text></svg>">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- New CSS Architecture with Day/Night Theme Support -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/main.css') }}">
+    
+    <!-- Tabler Premium UI Kit -->
+    <link href="{{ url_for('static', path='/tabler/css/tabler.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='/tabler/css/tabler-flags.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='/tabler/css/tabler-payments.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='/tabler/css/tabler-socials.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='/tabler/css/tabler-vendors.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', path='/tabler/css/tabler-themes.min.css') }}" rel="stylesheet"/>
+    
+    <!-- Theme Toggle Script (load early to prevent FOUC) -->
+    <script>
+        // Prevent flash of wrong theme
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    
+    <!-- Override Tabler sidebar layout for horizontal navigation -->
+    <style>
+        /* Remove sidebar space and make content full width */
+        .page {
+            padding-left: 0 !important;
+        }
+        
+        .page-wrapper {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .navbar-vertical {
+            display: none !important;
+        }
+        
+        /* Ensure content containers expand properly */
+        .container-fluid {
+            max-width: none !important;
+            width: 100% !important;
+        }
+        
+        /* Adjust page body spacing */
+        .page-body {
+            padding-top: 0 !important;
+        }
+        
+        /* Ensure cards and content expand to full width */
+        .card {
+            width: 100% !important;
+        }
+        
+        /* Fix any fixed-width elements */
+        @media (min-width: 768px) {
+            .container-xl {
+                max-width: none !important;
+            }
+        }
+    </style>
+
+    <!-- Open Graph Meta Tags for Social Media Sharing -->
+    <meta property="og:site_name" content="{{ project_name | default('AI Storytelling Assistant') }}" />
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+    <meta property="og:title" content="{% block og_title %}{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}Create immersive stories with AI assistance. Build worlds, develop characters, and write engaging narratives with our advanced AI storytelling platform.{% endblock %}" />
+    <meta property="og:url" content="{% block og_url %}{{ request.url if request else '' }}{% endblock %}" />
+    <meta property="og:image" content="{% block og_image %}{{ request.url_for('static', path='/images/logo.jpeg') if request else '/static/images/logo.jpeg' }}{% endblock %}" />
+    <meta property="og:image:width" content="{% block og_image_width %}1200{% endblock %}" />
+    <meta property="og:image:height" content="{% block og_image_height %}630{% endblock %}" />
+    <meta property="og:image:alt" content="{% block og_image_alt %}AI Storytelling Assistant{% endblock %}" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
+    <meta name="twitter:title" content="{% block twitter_title %}{% endblock %}" />
+    <meta name="twitter:description" content="{% block twitter_description %}Create immersive stories with AI assistance. Build worlds, develop characters, and write engaging narratives with our advanced AI storytelling platform.{% endblock %}" />
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.url_for('static', path='/images/logo.jpeg') if request else '/static/images/logo.jpeg' }}{% endblock %}" />
+    <meta name="twitter:image:alt" content="{% block twitter_image_alt %}AI Storytelling Assistant{% endblock %}" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Create immersive stories with AI assistance. Build worlds, develop characters, and write engaging narratives with our advanced AI storytelling platform.{% endblock %}" />
+    <meta name="keywords" content="{% block meta_keywords %}AI storytelling, creative writing, story generator, world building, character development, narrative AI{% endblock %}" />
+
+    {% block head_extra %}{% endblock %}
+    {% block styles %}{% endblock %}
+    
+    <!-- Cookie Consent Banner Styles -->
+    {% if cookie_consent_required and google_analytics_id %}
+    <style>
+        .cookie-consent-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            z-index: 1050;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .cookie-consent-content {
+            padding: 1.5rem 0;
+        }
+        
+        .cookie-consent-text h6 {
+            color: white;
+            font-weight: 600;
+        }
+        
+        .cookie-consent-text p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0;
+        }
+        
+        .cookie-consent-text a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: underline !important;
+        }
+        
+        .cookie-consent-text a:hover {
+            color: white;
+        }
+        
+        .cookie-consent-actions .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .cookie-consent-actions .btn-outline-light:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        .cookie-consent-actions .btn-light:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+        }
+        
+        .cookie-category {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .cookie-consent-content {
+                padding: 1rem 0;
+            }
+            
+            .cookie-consent-actions {
+                margin-top: 1rem;
+            }
+            
+            .cookie-consent-actions .d-flex {
+                justify-content: center !important;
+            }
+        }
+    </style>
+    {% endif %}
+    
+    <!-- Google Analytics with Consent Mode -->
+    {% if google_analytics_id %}
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      {% if google_analytics_consent_mode %}
+      // Initialize Google Consent Mode
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'functionality_storage': 'granted',
+        'security_storage': 'granted'
+      });
+      {% endif %}
+      
+      gtag('js', new Date());
+      
+      // Configure Google Analytics
+      gtag('config', '{{ google_analytics_id }}', {
+        page_title: document.title,
+        page_location: window.location.href,
+        {% if current_user and current_user.is_authenticated %}
+        user_id: '{{ current_user.id }}',
+        user_properties: {
+          user_type: '{{ "admin" if current_user.is_admin else "regular" }}',
+          account_created: '{{ current_user.created_at.strftime("%Y-%m-%d") if current_user.created_at else "unknown" }}',
+          is_active: {{ "true" if current_user.is_active else "false" }}
+        },
+        {% endif %}
+        {% if google_analytics_consent_mode %}
+        anonymize_ip: true,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
+        {% endif %}
+      });
+      
+      // Consent management functions
+      window.grantAnalyticsConsent = function() {
+        {% if google_analytics_consent_mode %}
+        gtag('consent', 'update', {
+          'analytics_storage': 'granted'
+        });
+        {% endif %}
+        localStorage.setItem('analytics_consent', 'granted');
+        console.log('Analytics consent granted');
+      };
+      
+      window.denyAnalyticsConsent = function() {
+        {% if google_analytics_consent_mode %}
+        gtag('consent', 'update', {
+          'analytics_storage': 'denied'
+        });
+        {% endif %}
+        localStorage.setItem('analytics_consent', 'denied');
+        console.log('Analytics consent denied');
+      };
+      
+      window.getAnalyticsConsent = function() {
+        return localStorage.getItem('analytics_consent');
+      };
+      
+      // Check for existing consent on page load
+      const existingConsent = localStorage.getItem('analytics_consent');
+      if (existingConsent === 'granted') {
+        window.grantAnalyticsConsent();
+      } else if (existingConsent === 'denied') {
+        window.denyAnalyticsConsent();
+      }
+      
+      // Custom event tracking functions (consent-aware)
+      window.trackAuthEvent = function(action, method) {
+        console.log('🔍 trackAuthEvent called with:', action, method);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackAuthEvent:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackAuthEvent blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const eventData = {
+          event_category: 'authentication',
+          event_label: method || 'unknown',
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          {% endif %}
+          value: 1
+        };
+        console.log('📤 trackAuthEvent sending gtag event:', action, eventData);
+        gtag('event', action, eventData);
+        console.log('✅ trackAuthEvent gtag event sent');
+      };
+      
+      window.trackFeatureUse = function(feature, action, additionalData) {
+        {% if google_analytics_consent_mode %}
+        if (window.getAnalyticsConsent() !== 'granted') {
+          console.log('Analytics consent required for event tracking');
+          return;
+        }
+        {% endif %}
+        const eventData = {
+          event_category: 'user_engagement',
+          event_label: feature,
+          action_type: action || 'use',
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          user_type: '{{ "admin" if current_user.is_admin else "regular" }}',
+          {% endif %}
+          page_url: window.location.pathname,
+          timestamp: new Date().toISOString(),
+          value: 1
+        };
+        
+        // Merge additional custom data
+        if (additionalData && typeof additionalData === 'object') {
+          Object.assign(eventData, additionalData);
+        }
+        
+        gtag('event', 'feature_use', eventData);
+      };
+      
+      window.trackAIInteraction = function(type, model, tokens, cost) {
+        console.log('🔍 trackAIInteraction called with:', type, model, tokens, cost);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackAIInteraction:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackAIInteraction blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const eventData = {
+          event_category: 'ai_usage',
+          event_label: type,
+          ai_model: model || 'unknown',
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          {% endif %}
+          token_count: tokens || 0,
+          estimated_cost: cost || 0,
+          page_context: window.location.pathname,
+          value: tokens || 1
+        };
+        console.log('📤 trackAIInteraction sending gtag event with data:', eventData);
+        gtag('event', 'ai_interaction', eventData);
+        console.log('✅ trackAIInteraction gtag event sent');
+      };
+      
+      // Enhanced tracking functions for specific user actions
+      window.trackStoryAction = function(action, storyId, storyTitle) {
+        console.log('🔍 trackStoryAction called with:', action, storyId, storyTitle);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackStoryAction:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackStoryAction blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const eventData = {
+          event_category: 'story_management',
+          event_label: storyTitle || 'untitled',
+          story_id: storyId,
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          {% endif %}
+          value: 1
+        };
+        console.log('📤 trackStoryAction sending gtag event:', 'story_' + action, eventData);
+        gtag('event', 'story_' + action, eventData);
+        console.log('✅ trackStoryAction gtag event sent');
+      };
+      
+      window.trackWorldAction = function(action, worldId, worldName) {
+        console.log('🔍 trackWorldAction called with:', action, worldId, worldName);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackWorldAction:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackWorldAction blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const eventData = {
+          event_category: 'world_building',
+          event_label: worldName || 'untitled',
+          world_id: worldId,
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          {% endif %}
+          value: 1
+        };
+        console.log('📤 trackWorldAction sending gtag event:', 'world_' + action, eventData);
+        gtag('event', 'world_' + action, eventData);
+        console.log('✅ trackWorldAction gtag event sent');
+      };
+      
+      window.trackImageGeneration = function(elementType, elementId, prompt) {
+        console.log('🔍 trackImageGeneration called with:', elementType, elementId, prompt);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackImageGeneration:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackImageGeneration blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const eventData = {
+          event_category: 'content_creation',
+          event_label: elementType,
+          element_id: elementId,
+          prompt_length: prompt ? prompt.length : 0,
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          {% endif %}
+          value: 1
+        };
+        console.log('📤 trackImageGeneration sending gtag event with data:', eventData);
+        gtag('event', 'image_generation', eventData);
+        console.log('✅ trackImageGeneration gtag event sent');
+      };
+      
+      window.trackPageView = function(pageName, customParams) {
+        console.log('🔍 trackPageView called with:', pageName, customParams);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackPageView:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackPageView blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const pageData = {
+          page_title: pageName || document.title,
+          page_location: window.location.href,
+          page_path: window.location.pathname,
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          user_type: '{{ "admin" if current_user.is_admin else "regular" }}',
+          {% endif %}
+        };
+        
+        if (customParams && typeof customParams === 'object') {
+          Object.assign(pageData, customParams);
+        }
+        
+        console.log('📤 trackPageView sending gtag event with data:', pageData);
+        gtag('event', 'page_view', pageData);
+        console.log('✅ trackPageView gtag event sent');
+      };
+      
+      window.trackError = function(errorMessage, errorSource) {
+        console.log('🔍 trackError called with:', errorMessage, errorSource);
+        {% if google_analytics_consent_mode %}
+        const consentStatus = window.getAnalyticsConsent();
+        console.log('Consent check in trackError:', consentStatus);
+        if (consentStatus !== 'granted') {
+          console.log('❌ trackError blocked - consent not granted:', consentStatus);
+          return;
+        }
+        {% endif %}
+        const errorData = {
+          description: errorMessage,
+          error_source: errorSource || 'unknown',
+          {% if current_user and current_user.is_authenticated %}
+          user_id: '{{ current_user.id }}',
+          {% endif %}
+          fatal: false
+        };
+        console.log('📤 trackError sending gtag event with data:', errorData);
+        gtag('event', 'exception', errorData);
+        console.log('✅ trackError gtag event sent');
+      };
+    </script>
+    <!-- Google tag (gtag.js) - Load after consent setup -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    {% endif %}
+    
+    <!-- Sidebar navigation styles -->
+    <style>
+        /* Navigation button hover effect */
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<!-- Tabler App Layout -->
+<body>
+    <div class="page">
+        <!-- Horizontal Navigation -->
+        {% include 'partials/_horizontal_navbar.html' %}
+        
+        <!-- Page wrapper (full width) -->
+        <div class="page-wrapper" style="margin-left: 0 !important;">
+            <!-- Page header (controlled by individual pages) -->
+            {% block page_header %}{% endblock %}
+            
+            <!-- Page body -->
+            <div class="page-body">
+                {% include 'partials/_alerts.html' %}
+                {% block content %}
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h1>Welcome to the AI Storytelling Assistant!</h1>
+                                    <p>Your creative companion for storytelling and world-building.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endblock %}
+            </div>
+            
+            <!-- Page footer -->
+            {% include 'partials/_footer.html' %}
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="help-modal" style="display: none;">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h2 id="helpModalTitle">Help</h2>
+                <button class="help-modal-close" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div class="help-modal-body">
+                <iframe id="helpFrame" src="" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Warning Modal -->
+    <div class="modal fade" id="cookieWarningModal" tabindex="-1" aria-labelledby="cookieWarningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="cookieWarningModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Cookie Session Lost
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning d-flex align-items-center mb-3">
+                        <i class="fas fa-cookie-bite me-2 fa-lg"></i>
+                        <div>
+                            <strong>Your anonymous session has been lost!</strong>
+                        </div>
+                    </div>
+                    <p>It looks like your browser cookies have been cleared or expired. As an anonymous user, this means:</p>
+                    <ul class="mb-3">
+                        <li><strong>Your coin balance has been reset to 0</strong></li>
+                        <li>You've lost access to any previous chat sessions</li>
+                        <li>Your usage history has been cleared</li>
+                    </ul>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>To avoid this in the future:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Don't clear cookies for this site</li>
+                            <li>Consider creating a free account to preserve your progress</li>
+                            <li>Bookmark this page instead of typing the URL</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Continue Anonymous
+                    </button>
+                    <a href="/ui/register" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-1"></i>Create Free Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Required Modal -->
+    <div class="modal fade" id="authRequiredModal" tabindex="-1" aria-labelledby="authRequiredModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="authRequiredModalLabel">
+                        <i class="fas fa-lock me-2"></i>Login Required
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-user-lock text-primary fa-3x mb-3"></i>
+                        <h4>Feature Not Available</h4>
+                        <p class="mb-3">This feature requires you to be logged in to your account.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Why register?</strong> Get unlimited access to all features and never lose your progress!
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sign-in-alt text-success fa-2x mb-2"></i>
+                                    <h6>Already Have Account?</h6>
+                                    <p class="small text-muted mb-2">Sign in to access all your content</p>
+                                    <a href="/ui/login" class="btn btn-success btn-sm" onclick="if(window.trackAuthEvent) trackAuthEvent('login_modal_click', 'auth_required_modal');">
+                                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-plus text-primary fa-2x mb-2"></i>
+                                    <h6>New User?</h6>
+                                    <p class="small text-muted mb-2">Create a free account in under 1 minute</p>
+                                    <a href="/ui/register" class="btn btn-primary btn-sm" onclick="if(window.trackAuthEvent) trackAuthEvent('register_modal_click', 'auth_required_modal');">
+                                        <i class="fas fa-user-plus me-1"></i>Register Free
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Consent Banner -->
+    {% if cookie_consent_required and google_analytics_id %}
+    <div id="cookieConsentBanner" class="cookie-consent-banner" style="display: none;">
+        <div class="cookie-consent-content">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 col-md-7">
+                        <div class="cookie-consent-text">
+                            <h6 class="mb-2">
+                                <i class="fas fa-cookie-bite me-2"></i>
+                                We use cookies to improve your experience
+                            </h6>
+                            <p class="mb-0 small">
+                                We use analytics cookies to understand how you use our AI storytelling platform and improve your experience. 
+                                You can choose which cookies to accept.
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#cookieDetailsModal" class="text-decoration-none">
+                                    Learn more
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-5">
+                        <div class="cookie-consent-actions">
+                            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="handleCookieChoice('necessary')" id="acceptNecessaryBtn">
+                                    <i class="fas fa-shield-alt me-1"></i>Necessary Only
+                                </button>
+                                <button type="button" class="btn btn-light btn-sm" onclick="handleCookieChoice('all')" id="acceptAllBtn">
+                                    <i class="fas fa-check me-1"></i>Accept All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Details Modal -->
+    <div class="modal fade" id="cookieDetailsModal" tabindex="-1" aria-labelledby="cookieDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cookieDetailsModalLabel">
+                        <i class="fas fa-cookie-bite me-2"></i>Cookie & Privacy Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <p>We use cookies and similar technologies to provide, protect and improve our services. Here's what each category does:</p>
+                    </div>
+                    
+                    <div class="cookie-category mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-shield-alt text-success me-2"></i>Necessary Cookies
+                                </h6>
+                                <small class="text-muted">Required for basic website functionality</small>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="necessaryCookies" checked disabled>
+                                <label class="form-check-label" for="necessaryCookies">Always On</label>
+                            </div>
+                        </div>
+                        <p class="small">
+                            These cookies are essential for you to browse the website and use its features, such as user authentication, 
+                            form submissions, and security features. They cannot be disabled.
+                        </p>
+                    </div>
+                    
+                    <div class="cookie-category mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-chart-line text-info me-2"></i>Analytics Cookies
+                                </h6>
+                                <small class="text-muted">Help us understand how you use our platform</small>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="analyticsCookies">
+                                <label class="form-check-label" for="analyticsCookies">Optional</label>
+                            </div>
+                        </div>
+                        <p class="small">
+                            These cookies collect information about how you use our website, such as which pages you visit and 
+                            which features you use. This helps us improve our AI storytelling tools and user experience. 
+                            <strong>Powered by Google Analytics.</strong>
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Your Privacy Matters:</strong> We respect your privacy choices. You can change these settings at any time 
+                        by clicking the cookie preferences link in our footer.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" onclick="handleCookieChoice('necessary')" data-bs-dismiss="modal">
+                        <i class="fas fa-shield-alt me-1"></i>Necessary Only
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="handleCookieChoice('custom')" data-bs-dismiss="modal">
+                        <i class="fas fa-save me-1"></i>Save Preferences
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="handleCookieChoice('all')" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-1"></i>Accept All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Bootstrap JS (required for modal functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Tabler Premium Core -->
+    <script src="{{ url_for('static', path='/tabler/js/tabler.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/tabler/js/tabler-theme.min.js') }}"></script>
+    
+    <script src="{{ url_for('static', path='/js/notifications.js') }}"></script>
+    <!-- <<< MODIFICATION: Added utils.js >>> -->
+    <script src="{{ url_for('static', path='/js/utils.js') }}"></script>
+    <!-- <<< END MODIFICATION >>> -->
+    <!-- Reusable Coin Animation System -->
+    <script src="{{ url_for('static', path='/js/coin-animation.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/sidebar.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/maintenance.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/image_job_monitor.js') }}"></script>
+    
+    <!-- Clear any old navigation layout cookies -->
+    <script>
+        // Clear the nav_layout cookie to ensure sidebar is always used
+        document.cookie = 'nav_layout=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    </script>
+    
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', path='/js/theme-toggle.js') }}"></script>
+    
+    <!-- Help Modal Script -->
+    <script src="{{ url_for('static', path='/js/help-modal.js') }}"></script>
+    
+    <!-- Help Panel Script -->
+    <script src="{{ url_for('static', path='/js/help-panel.js') }}"></script>
+    
+    <!-- Referral Tracking Script -->
+    <script src="{{ url_for('static', path='/js/referral-tracking.js') }}"></script>
+    
+    
+    {% block scripts %}{% endblock %}
+
+    <!-- Navigation conditional display script -->
+    <script>
+    // Check if user has non-shadow worlds and conditionally show "My Worlds" navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if current_user %}
+        // Only check for authenticated users
+        setTimeout(() => {
+            const myWorldsNavItem = document.getElementById('my-worlds-nav-item');
+            console.log('My Worlds Nav Item found:', myWorldsNavItem);
+            
+            if (myWorldsNavItem) {
+                // User is already authenticated (checked by server-side template)
+                console.log('User is authenticated, checking for non-shadow worlds...');
+                fetch('/api/v1/worlds/has-non-shadow-worlds', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        console.error('Response not ok:', response.status, response.statusText);
+                        // Try to get the error details
+                        return response.text().then(text => {
+                            console.error('Error response body:', text);
+                            return null;
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API response data:', data);
+                    if (data && data.has_non_shadow_worlds) {
+                        console.log('User has non-shadow worlds, showing nav item');
+                        myWorldsNavItem.style.display = 'block';
+                    } else {
+                        console.log('User has no non-shadow worlds');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking for non-shadow worlds:', error);
+                });
+            }
+        }, 100); // Small delay to ensure page is fully loaded
+        {% endif %}
+        
+        // Quick Actions visibility logic
+        {% if current_user %}
+        setTimeout(() => {
+            checkQuickActionsVisibility();
+        }, 100); // Small delay to ensure page is fully loaded
+        {% endif %}
+    });
+
+    {% if current_user %}
+    async function checkQuickActionsVisibility() {
+        try {
+            // Check if we have a valid authentication token by looking at cookies
+            const accessToken = document.cookie.split(';').find(row => row.trim().startsWith('access_token='));
+            if (!accessToken) {
+                return; // Skip API calls if no access token
+            }
+            
+            // Get user data for Quick Actions visibility
+            const [worldsResponse, storiesResponse] = await Promise.all([
+                fetch('/api/v1/worlds/has-non-shadow-worlds', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'include'
+                }),
+                fetch('/api/v1/stories/', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'include'
+                })
+            ]);
+
+            if (!worldsResponse.ok || !storiesResponse.ok) {
+                // Exit early on auth errors (including 422) - no console logging
+                return;
+            }
+            
+            const worldsData = await worldsResponse.json();
+            const storiesData = await storiesResponse.json();
+            
+            const hasNonShadowWorlds = worldsData.has_non_shadow_worlds;
+            const hasStories = storiesData.length > 0;
+            const hasOnlyBasicStories = hasStories && storiesData.every(story => story.story_type === 'basic');
+
+            // Apply visibility rules
+            
+            // 1. Introduction: Hidden if you only have Basic Stories
+            const introBtn = document.getElementById('introduction-btn');
+            if (introBtn && !hasOnlyBasicStories) {
+                introBtn.style.display = 'block';
+            }
+            
+            // 2. Build My First World: Hidden if you only have Basic Stories
+            const buildWorldBtn = document.getElementById('build-world-btn');
+            if (buildWorldBtn && !hasOnlyBasicStories) {
+                buildWorldBtn.style.display = 'block';
+            }
+            
+            // 3. View Your Stories: Visible if you have stories
+            const viewStoriesBtn = document.getElementById('view-stories-btn');
+            if (viewStoriesBtn && hasStories) {
+                viewStoriesBtn.style.display = 'block';
+            }
+            
+            // 7. Manage My Worlds: Visible if you have non-shadow worlds
+            const manageWorldsBtn = document.getElementById('manage-worlds-btn');
+            if (manageWorldsBtn && hasNonShadowWorlds) {
+                manageWorldsBtn.style.display = 'block';
+            }
+            
+            // 8. Manage RAG Documents: Visible if you have non-shadow worlds
+            const manageDocsBtn = document.getElementById('manage-documents-btn');
+            if (manageDocsBtn && hasNonShadowWorlds) {
+                manageDocsBtn.style.display = 'block';
+            }
+            
+        } catch (error) {
+            // Silently fail - suppress all errors including 422
+        }
+    }
+    {% endif %}
+    </script>
+
+</body>
+</html>

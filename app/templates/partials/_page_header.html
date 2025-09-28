@@ -1,0 +1,95 @@
+{# 
+   TABLER PREMIUM PAGE HEADER COMPONENT
+   Following UI Design Standards from CLAUDE.md
+   
+   Usage:
+   {% set page_title = 'My Page Title' %}
+   {% set page_icon = 'fas fa-globe' %}
+   {% set page_description = 'Manage your world settings and content' %}
+   {% set page_stats = [
+       {'icon': 'fas fa-file-alt', 'text': '5 documents'},
+       {'icon': 'fas fa-user', 'text': '12 characters'}
+   ] %}
+   {% set header_actions %}
+       <a href="#" class="btn btn-light">New Item</a>
+   {% endset %}
+   {% include 'partials/_page_header.html' %}
+   
+   Parameters:
+   - page_title: Main page title (required)
+   - page_icon: FontAwesome icon class for title (required)
+   - page_description: Descriptive text below title (optional)
+   - page_stats: Array of stat objects with icon and text (optional)
+   - header_actions: HTML block for action buttons (optional)
+   - back_url: URL for back button (optional)
+   - back_text: Text for back button (default: 'Back')
+   - help_topic: Help topic for help button (optional)
+   
+   TABLER PREMIUM FEATURES:
+   - Enhanced gradient hero header with pattern overlay
+   - Follows UI Design Standards spacing rules
+   - Uses Tabler CSS variables throughout
+   - Proper button styling for header context
+   - Enhanced visual hierarchy with badges
+#}
+
+{# Set default values #}
+{% set page_title = page_title or 'Page Title' %}
+{% set page_icon = page_icon or 'fas fa-file' %}
+{% set page_description = page_description or '' %}
+{% set page_stats = page_stats or [] %}
+{% set back_text = back_text or 'Back' %}
+{% set help_topic = help_topic or 'dashboard' %}
+
+<!-- Enhanced Tabler Premium Hero Header -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; padding: 2rem; border-radius: var(--tblr-border-radius-lg); position: relative; overflow: hidden;">
+    <!-- Background Pattern -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <!-- Header Content -->
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="page-title text-white mb-2">
+                    <i class="{{ page_icon }} me-2"></i>
+                    {{ page_title }}
+                </h2>
+                {% if page_description %}
+                <div class="page-subtitle text-white mb-3">
+                    {{ page_description }}
+                </div>
+                {% endif %}
+                {% if page_stats %}
+                <div class="d-flex align-items-center text-white flex-wrap">
+                    {% for stat in page_stats %}
+                        <span class="badge bg-light text-dark me-2{% if not loop.last %} mb-1{% endif %}">
+                            <i class="{{ stat.icon }} me-1"></i>
+                            {{ stat.text }}
+                        </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="btn-list flex-wrap">
+                    {% if back_url %}
+                        <a href="{{ back_url }}" class="btn btn-light"
+                           data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                           title="Return to previous page">
+                            <i class="fas fa-arrow-left me-1"></i> {{ back_text }}
+                        </a>
+                    {% endif %}
+                    
+                    {# Help Button - Following UI Design Standards #}
+                    {% set help_topic = help_topic %}
+                    {% include 'partials/_help_button.html' %}
+                    
+                    {# Custom action buttons #}
+                    {% if header_actions %}
+                        {{ header_actions | safe }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

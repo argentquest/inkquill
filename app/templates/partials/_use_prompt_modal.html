@@ -1,0 +1,44 @@
+{# /ai_rag_story_app/app/templates/partials/_use_prompt_modal.html #}
+
+<!-- Modal for the "Use Prompt" feature -->
+<div class="modal fade" id="usePromptModal" tabindex="-1" aria-labelledby="usePromptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="usePromptModalLabel">
+                    <i class="fas fa-play-circle me-2"></i>Use Prompt in an Editor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted">Select a story and an act to apply this prompt to. You will be redirected to the editor with the prompt content pre-filled.</p>
+                
+                <!-- Hidden textarea to temporarily store the prompt content when the modal is opened -->
+                <textarea id="use-prompt-modal-content-storage" style="display:none;"></textarea>
+
+                <div id="use-prompt-modal-error" class="alert alert-danger" style="display: none;" role="alert"></div>
+
+                <div class="mb-3">
+                    <label for="use-prompt-story-select" class="form-label">1. Select a Story:</label>
+                    <select class="form-select" id="use-prompt-story-select" name="story_id">
+                        <option value="">-- Select a story --</option>
+                        <!-- Options will be populated by prompt_crud.js -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="use-prompt-act-select" class="form-label">2. Select an Act:</label>
+                    <select class="form-select" id="use-prompt-act-select" name="act_id" disabled>
+                        <option value="">-- Select a story first --</option>
+                        <!-- Options will be populated by prompt_crud.js after a story is selected -->
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="use-prompt-go-to-editor-btn" disabled>
+                    <i class="fas fa-arrow-right me-2"></i>Go to Editor
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

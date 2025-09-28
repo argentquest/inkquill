@@ -1,0 +1,353 @@
+/* Tabler Premium Enhancements for Basic Story Editor */
+.basic-story-editor {
+    background: var(--tblr-bg-surface-secondary);
+    min-height: 100vh;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hero Header Styles */
+.hero-header {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    color: var(--tblr-white);
+    position: relative;
+    overflow: hidden;
+    margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    margin-bottom: 2rem;
+    padding: 2rem 0;
+}
+
+.hero-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.hero-header .container-fluid {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-header .page-title {
+    font-size: var(--tblr-font-size-h1);
+    font-weight: var(--tblr-font-weight-bold);
+    color: var(--tblr-white) !important;
+    margin-bottom: var(--tblr-spacer-2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hero-header .page-pretitle {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: var(--tblr-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: var(--tblr-spacer-1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: var(--tblr-font-weight-medium);
+}
+
+.hero-header .story-meta {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-header .badge {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: var(--tblr-white) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-header .btn,
+.hero-header a.btn {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--tblr-white);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.hero-header .btn:hover,
+.hero-header a.btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--tblr-white);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.hero-header .btn:focus,
+.hero-header a.btn:focus {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--tblr-white);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+    text-decoration: none;
+}
+
+/* Help button specific styling */
+.hero-header .btn-warning {
+    background: rgba(255, 193, 7, 0.2);
+    border-color: rgba(255, 193, 7, 0.3);
+    color: var(--tblr-white);
+}
+
+.hero-header .btn-warning:hover {
+    background: rgba(255, 193, 7, 0.3);
+    border-color: rgba(255, 193, 7, 0.4);
+    color: var(--tblr-white);
+    transform: translateY(-1px);
+}
+
+.editor-container {
+    background: var(--tblr-bg-surface);
+    border-radius: var(--tblr-border-radius-lg);
+    box-shadow: var(--tblr-shadow-card);
+    border: 1px solid var(--tblr-border-color-light);
+    margin: var(--tblr-spacer-4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.editor-container:hover {
+    box-shadow: var(--tblr-shadow-card-hover);
+    border-color: var(--tblr-border-color);
+}
+
+.ai-assistant-panel,
+div.ai-assistant-panel,
+#ai-assistant-panel {
+    background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    border: 1px solid var(--tblr-border-color-light) !important;
+    border-radius: var(--tblr-border-radius-lg) !important;
+    box-shadow: var(--tblr-shadow-card) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: -400px !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: 400px !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    z-index: 1050 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* When panel is shown, slide it in from the right */
+.ai-assistant-panel.show,
+div.ai-assistant-panel.show,
+#ai-assistant-panel.show {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Add scrollbar to panel body */
+.ai-assistant-panel > .panel-body {
+    overflow-y: auto !important;
+    flex: 1 !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Add scrollbar to query panel to prevent truncation */
+#query-panel,
+#result-panel {
+    overflow-y: auto !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    padding-right: 10px !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Make tab content use full height */
+.ai-assistant-panel .tab-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+/* Make tab panes use full height */
+.ai-assistant-panel .tab-pane {
+    flex: 1 !important;
+    height: 100% !important;
+}
+
+/* Make active assistance type button darker */
+#query-panel > div.assistance-types > div.assistance-type-btn.btn.active {
+    background: #1a365d !important;
+    color: white !important;
+    border-color: #2a4a6b !important;
+}
+
+/* Add scrollbar to Publish Story modal */
+#story-publish-modal .modal-body {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    padding-right: 15px !important;
+}
+
+/* Fix dropdown visibility in publish modal */
+#story-publish-modal .dropdown-menu {
+    max-height: none !important;
+    overflow: visible !important;
+    z-index: 1060 !important;
+}
+
+/* Ensure publish modal allows dropdown overflow */
+#story-publish-modal .modal-content {
+    overflow: visible !important;
+}
+
+#story-publish-modal .card {
+    overflow: visible !important;
+}
+
+/* Remove padding from form-select elements */
+.form-select {
+    padding: 0 !important;
+}
+
+.ai-assistant-panel:hover {
+    box-shadow: var(--tblr-shadow-card-hover);
+    border-color: var(--tblr-border-color);
+}
+
+.assistance-type-btn:hover {
+    background: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--tblr-shadow-card);
+}
+
+.assistance-type-btn.active:hover {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--primary-color) !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(var(--tblr-primary-rgb), 0.15);
+    transform: translateY(-1px);
+}
+
+.assistance-type-btn.active,
+.ai-assistant-panel .assistance-type-btn.active {
+    /* background: var(--tblr-primary); */
+    background: transparent;
+    border-color: var(--primary-color);
+    color: var(--text-secondary);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(var(--tblr-primary-rgb), 0.1);
+    position: relative;
+}
+
+
+.assistance-type-btn.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--tblr-primary), var(--tblr-purple));
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+.assistance-type-btn.active .btn-text,
+.ai-assistant-panel .assistance-type-btn.active .btn-text {
+    font-weight: 600;
+}
+
+.assistance-type-btn.active i,
+.ai-assistant-panel .assistance-type-btn.active i {
+    color: var(--text-secondary);
+    opacity: 1;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .assistance-type-btn.active {
+        background: var(--tblr-white);
+        color: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+    }
+    
+    .assistance-type-btn.active .btn-text,
+    .assistance-type-btn.active i {
+        color: var(--tblr-primary);
+    }
+    
+    .assistance-type-btn.active:hover {
+        background: var(--tblr-white) !important;
+        color: var(--tblr-primary) !important;
+        border-color: var(--tblr-primary) !important;
+    }
+}
+
+/* Preview Modal Theme Styles */
+.preview-content.theme-dark {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+.preview-content.theme-dark .story-content {
+    background-color: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+.preview-content.theme-dark h1,
+.preview-content.theme-dark h2,
+.preview-content.theme-dark h3,
+.preview-content.theme-dark h4,
+.preview-content.theme-dark h5,
+.preview-content.theme-dark h6 {
+    color: #ffffff !important;
+}
+
+.preview-content.theme-sepia {
+    background-color: #f4f1ea !important;
+    color: #5c4b37 !important;
+}
+
+.preview-content.theme-sepia .story-content {
+    background-color: #f4f1ea !important;
+    color: #5c4b37 !important;
+}
+
+.preview-content.theme-sepia h1,
+.preview-content.theme-sepia h2,
+.preview-content.theme-sepia h3,
+.preview-content.theme-sepia h4,
+.preview-content.theme-sepia h5,
+.preview-content.theme-sepia h6 {
+    color: #3d2e1f !important;
+}
+
+/* Font Size Styles */
+.story-content.font-small {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.story-content.font-medium {
+    font-size: 16px !important;
+    line-height: 1.7 !important;
+}
+
+.story-content.font-large {
+    font-size: 18px !important;
+    line-height: 1.8 !important;
+}

@@ -1,0 +1,297 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ profile_user.display_name or profile_user.username }}'s Published Stories{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* User Profile Page */
+    .user-profile-page {
+        background: #FAFBFC;
+        min-height: 100vh;
+    }
+    
+    /* Profile Header */
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0 40px;
+        margin-bottom: 40px;
+    }
+    
+    .profile-info {
+        text-align: center;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 48px;
+        color: #667eea;
+    }
+    
+    .profile-name {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .profile-username {
+        font-size: 20px;
+        opacity: 0.9;
+        margin-bottom: 20px;
+    }
+    
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 30px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+    
+    /* Stories Section */
+    .stories-section {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #111827;
+    }
+    
+    /* Story Cards */
+    .story-card {
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s;
+    }
+    
+    .story-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .story-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: #6b7280;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-profile-page">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="container">
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <h1 class="profile-name">
+                    {{ profile_user.display_name or profile_user.username }}
+                </h1>
+                
+                <div class="profile-username">
+                    @{{ profile_user.username }}
+                </div>
+                
+                {% if profile_user.created_at %}
+                <div class="text-white-50">
+                    <i class="fas fa-calendar me-2"></i>
+                    Member since {{ profile_user.created_at.strftime('%B %Y') }}
+                </div>
+                {% endif %}
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ total_stories }}</span>
+                        <span class="stat-label">Published Stories</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stories | sum(attribute='view_count') }}</span>
+                        <span class="stat-label">Total Views</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ stories | sum(attribute='comment_count') }}</span>
+                        <span class="stat-label">Total Comments</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stories Section -->
+    <div class="container">
+        <div class="stories-section">
+            <h2 class="section-title">
+                <i class="fas fa-book me-2"></i>
+                Published Stories
+            </h2>
+            
+            {% if stories %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for story in stories %}
+                <div class="col">
+                    <div class="card story-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ story.published_url }}" 
+                                   target="_blank"
+                                   class="text-decoration-none text-dark">
+                                    {{ story.title }}
+                                </a>
+                            </h5>
+                            
+                            {% if story.story and story.story.world %}
+                            <div class="text-muted small mb-2">
+                                <i class="fas fa-globe-americas me-1"></i>
+                                {{ story.story.world.name }}
+                            </div>
+                            {% endif %}
+                            
+                            <p class="card-text">
+                                {% if story.description %}
+                                    {{ story.description | truncate(150) }}
+                                {% else %}
+                                    <em>No description available</em>
+                                {% endif %}
+                            </p>
+                            
+                            <div class="story-stats">
+                                <span><i class="fas fa-eye"></i> {{ story.view_count }}</span>
+                                <span><i class="fas fa-comment"></i> {{ story.comment_count }}</span>
+                                {% if story.average_rating %}
+                                <span class="text-warning">
+                                    <i class="fas fa-star"></i> {{ "%.1f"|format(story.average_rating) }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex gap-2">
+                                <a href="{{ story.published_url }}" 
+                                   target="_blank"
+                                   class="btn btn-sm btn-primary flex-fill">
+                                    <i class="fas fa-book-open"></i> Read
+                                </a>
+                                <a href="{{ url_for('view_published_story', story_id=story.id) }}" 
+                                   class="btn btn-sm btn-outline-secondary flex-fill">
+                                    <i class="fas fa-comments"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <nav aria-label="Story pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous -->
+                    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" 
+                           href="{{ url_for('user_published_stories', username=profile_user.username, page=page-1) }}"
+                           {% if page <= 1 %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    </li>
+                    
+                    <!-- Page numbers -->
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ p }}</span>
+                            </li>
+                        {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   href="{{ url_for('user_published_stories', username=profile_user.username, page=p) }}">
+                                    {{ p }}
+                                </a>
+                            </li>
+                        {% elif p == page - 3 or p == page + 3 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Next -->
+                    <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                        <a class="page-link" 
+                           href="{{ url_for('user_published_stories', username=profile_user.username, page=page+1) }}"
+                           {% if page >= total_pages %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+            
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <i class="fas fa-book"></i>
+                <h3>No Published Stories Yet</h3>
+                <p>
+                    {% if current_user and current_user.id == profile_user.id %}
+                        You haven't published any stories yet.
+                        <br>
+                        <a href="{{ url_for('ui_list_stories') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus me-2"></i>Publish Your First Story
+                        </a>
+                    {% else %}
+                        {{ profile_user.display_name or profile_user.username }} hasn't published any stories yet.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

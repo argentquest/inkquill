@@ -1,0 +1,264 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "short_label": "World Genre",
+      "full_question": "What's the overall 'flavor' or dominant genre feel of your world?",
+      "answers": [
+        {"id": 1, "text": "High Fantasy: Magic is common, epic quests, clear good vs. evil."},
+        {"id": 2, "text": "Dark Fantasy: Grittier, morally ambiguous, magic has a cost."},
+        {"id": 3, "text": "Sci-Fi (Soft): Focus on social impact of tech, less on scientific accuracy."},
+        {"id": 4, "text": "Sci-Fi (Hard): Rooted in plausible science, detailed tech."},
+        {"id": 5, "text": "Post-Apocalyptic: Society rebuilding after a major catastrophe."},
+        {"id": 6, "text": "Steampunk/Dieselpunk: Victorian/Industrial era with advanced, steam/diesel-powered tech."},
+        {"id": 7, "text": "Contemporary Twist: Our world, but with one major fantastical/sci-fi element."}
+      ]
+    },
+    {
+      "id": 2,
+      "short_label": "Tech Level",
+      "full_question": "What's the primary level of technological advancement?",
+      "answers": [
+        {"id": 1, "text": "Stone Age/Tribal: Basic tools, hunter-gatherer societies."},
+        {"id": 2, "text": "Medieval/Feudal: Swords, castles, agrarian society."},
+        {"id": 3, "text": "Renaissance/Early Industrial: Gunpowder, printing press, early machines."},
+        {"id": 4, "text": "Victorian/Industrial: Steam engines, factories, early electricity."},
+        {"id": 5, "text": "Modern/Information Age: Computers, global communication, advanced medicine."},
+        {"id": 6, "text": "Futuristic/Advanced: Space travel, AI, energy manipulation."}
+      ]
+    },
+    {
+      "id": 3,
+      "short_label": "Magic Power",
+      "full_question": "How prevalent and powerful is magic (or an equivalent supernatural force)?",
+      "answers": [
+        {"id": 1, "text": "None: No magic exists."},
+        {"id": 2, "text": "Subtle/Rare: Magic is hinted at, rare, or very limited in power."},
+        {"id": 3, "text": "Common but Weak: Many can use minor spells/abilities; major feats are rare."},
+        {"id": 4, "text": "Common and Powerful: Magic is a major force, capable of grand effects, wielded by many."},
+        {"id": 5, "text": "Omnipresent/God-like: Magic shapes the very fabric of reality, gods/deities intervene directly."}
+      ]
+    },
+    {
+      "id": 4,
+      "short_label": "Gov Type",
+      "full_question": "What is the dominant form of government or social structure?",
+      "answers": [
+        {"id": 1, "text": "Monarchy/Empire: Ruled by a king/emperor, often hereditary."},
+        {"id": 2, "text": "Republic/Democracy: Citizens have a say through elected representatives."},
+        {"id": 3, "text": "Feudalism: Land and loyalty based; lords and vassals."},
+        {"id": 4, "text": "Theocracy: Ruled by religious leaders."},
+        {"id": 5, "text": "Tribal/Clan-based: Governed by elders or chiefs, strong kinship ties."},
+        {"id": 6, "text": "Dictatorship/Tyranny: Absolute rule by one individual or a small group."},
+        {"id": 7, "text": "Anarchy/Lawless: No central authority, every group for themselves."}
+      ]
+    },
+    {
+      "id": 5,
+      "short_label": "Main Conflict",
+      "full_question": "What is the primary driver of conflict or tension in this world?",
+      "answers": [
+        {"id": 1, "text": "Resource Scarcity: Fighting over essential resources like water, food, or rare materials."},
+        {"id": 2, "text": "Ideological/Religious: Clashes between differing belief systems."},
+        {"id": 3, "text": "Power Struggles: Factions vying for control, political intrigue."},
+        {"id": 4, "text": "Ancient Evil: A persistent, overarching danger to all."},
+        {"id": 5, "text": "Social Inequality: Oppression and rebellion."},
+        {"id": 6, "text": "Technological Disruption: Unforeseen consequences or ethical dilemmas from new tech."},
+        {"id": 7, "text": "Nature vs. Civilization: Humanity's impact on the environment, or vice-versa."}
+      ]
+    },
+    {
+      "id": 6,
+      "short_label": "Inhabitant Type",
+      "full_question": "What kind of intelligent inhabitants populate this world?",
+      "answers": [
+        {"id": 1, "text": "Humans Only: A world populated solely by different human cultures."},
+        {"id": 2, "text": "Humans + Standard Fantasy Races: Humans, elves, dwarves, orcs, etc."},
+        {"id": 3, "text": "Humans + Unique Races/Species: Humans alongside your own created intelligent species."},
+        {"id": 4, "text": "Non-Human Only: A world where humans don't exist, only other intelligent beings."},
+        {"id": 5, "text": "Mixed/Diverse: A wide variety of all the above."}
+      ]
+    },
+    {
+      "id": 7,
+      "short_label": "World Climate",
+      "full_question": "What's the overall climate or dominant geographical feature?",
+      "answers": [
+        {"id": 1, "text": "Temperate/Varied: Four seasons, diverse biomes (forests, plains, coastlines)."},
+        {"id": 2, "text": "Arid/Desert: Vast deserts, oases, extreme heat."},
+        {"id": 3, "text": "Cold/Icy: Tundras, glaciers, snow-covered landscapes."},
+        {"id": 4, "text": "Tropical/Jungle: Dense rainforests, high humidity, abundant life."},
+        {"id": 5, "text": "Urban/Polluted: Dominated by sprawling, often gritty cities."},
+        {"id": 6, "text": "Alien/Otherworldly: Non-earthlike environments (e.g., floating islands, crystal forests)."}
+      ]
+    },
+    {
+      "id": 8,
+      "short_label": "World Mood",
+      "full_question": "How would you describe the general mood or atmosphere?",
+      "answers": [
+        {"id": 1, "text": "Hopeful/Optimistic: A world facing challenges but striving for a better future."},
+        {"id": 2, "text": "Grim/Dystopian: Oppressive, bleak, often totalitarian."},
+        {"id": 3, "text": "Whimsical/Fantastical: Lighthearted, magical, often fairytale-like."},
+        {"id": 4, "text": "Mysterious/Intriguing: Filled with ancient secrets, unknown dangers, and hidden truths."},
+        {"id": 5, "text": "Chaotic/Lawless: Dangerous, unpredictable, where survival is key."},
+        {"id": 6, "text": "Mundane/Everyday: Similar to our world, with relatable challenges."}
+      ]
+    },
+    {
+      "id": 9,
+      "short_label": "History's Role",
+      "full_question": "What is the role of history or ancient lore in the present day?",
+      "answers": [
+        {"id": 1, "text": "Forgotten/Lost: Most history is unknown or misinterpreted."},
+        {"id": 2, "text": "Influential/Revered: Past events and figures heavily shape present society."},
+        {"id": 3, "text": "Prophetic/Guiding: Ancient prophecies or legends dictate current events."},
+        {"id": 4, "text": "Buried/Dangerous: Secrets from the past threaten the present."},
+        {"id": 5, "text": "Irrelevant: History has little bearing on day-to-day life."}
+      ]
+    },
+    {
+      "id": 10,
+      "short_label": "Economic System",
+      "full_question": "What is the primary economic system or method of resource exchange?",
+      "answers": [
+        {"id": 1, "text": "Barter/Subsistence: Direct exchange of goods/services; focus on local survival."},
+        {"id": 2, "text": "Agrarian/Rural: Based on farming and land ownership."},
+        {"id": 3, "text": "Trade/Merchant-based: Extensive trade networks, merchants are powerful."},
+        {"id": 4, "text": "Industrial/Capitalist: Driven by production, factories, and accumulating wealth."},
+        {"id": 5, "text": "Command/Controlled: Resources are centrally managed and distributed by the government."},
+        {"id": 6, "text": "Post-Scarcity: Resources are abundant; needs are met without traditional currency."}
+      ]
+    },
+    {
+      "id": 11,
+      "short_label": "Main Travel",
+      "full_question": "What is the dominant form of travel and transportation?",
+      "answers": [
+        {"id": 1, "text": "Foot/Animal: Walking, horses, simple carts."},
+        {"id": 2, "text": "Maritime/Water-based: Ships, boats, canals are primary routes."},
+        {"id": 3, "text": "Early Mechanized: Simple vehicles, steam trains, basic airships."},
+        {"id": 4, "text": "Advanced Mechanized: Cars, trains, planes, advanced airships."},
+        {"id": 5, "text": "Magical/Supernatural: Teleportation, magical mounts, portals."},
+        {"id": 6, "text": "Space/Interdimensional: Starships, warp drives, jumps between dimensions."}
+      ]
+    },
+    {
+      "id": 12,
+      "short_label": "Unique Feature",
+      "full_question": "What is the world's most unique or defining natural phenomenon/feature?",
+      "answers": [
+        {"id": 1, "text": "Unusual Celestial Bodies: Multiple moons/suns, unique planetary alignments."},
+        {"id": 2, "text": "Sentient Environment: Talking trees, living mountains, rivers with consciousness."},
+        {"id": 3, "text": "Extreme Weather: Perpetual storms, localized climate anomalies."},
+        {"id": 4, "text": "Energy Anomalies: Zones where magic is amplified/suppressed, ley lines."},
+        {"id": 5, "text": "Unique Flora/Fauna: Plants that glow, animals with extraordinary abilities."},
+        {"id": 6, "text": "Shifting Terrain: Moving islands, landmasses that rearrange."}
+      ]
+    },
+    {
+      "id": 13,
+      "short_label": "Life/Death View",
+      "full_question": "What is the common perception of life and death?",
+      "answers": [
+        {"id": 1, "text": "Cycle of Rebirth: Souls return, death is a transition."},
+        {"id": 2, "text": "Finality: Death is the absolute end."},
+        {"id": 3, "text": "Afterlife-focused: Strong belief in heaven/hell, specific spiritual realms."},
+        {"id": 4, "text": "Soul Harvesting: Death provides a resource for others."},
+        {"id": 5, "text": "Undead/Resurrection: Death is often temporary or manipulated."},
+        {"id": 6, "text": "Scientific/Biological: Death is a purely biological process, perhaps with cryo-preservation."}
+      ]
+    },
+    {
+      "id": 14,
+      "short_label": "Knowledge Access",
+      "full_question": "How are knowledge and education typically acquired and valued?",
+      "answers": [
+        {"id": 1, "text": "Oral Tradition: Knowledge passed down verbally or through direct training."},
+        {"id": 2, "text": "Scribes/Limited: Knowledge is rare, held by few, often religious or noble."},
+        {"id": 3, "text": "Guilds/Academies: Specialized schools for specific professions or magical arts."},
+        {"id": 4, "text": "Widespread Literacy: Education is common and accessible."},
+        {"id": 5, "text": "Digital/AI Learning: Information is instantly accessible via advanced tech/AI."},
+        {"id": 6, "text": "Experiential/Survival: Learning primarily through direct experience and harsh lessons."}
+      ]
+    },
+    {
+      "id": 15,
+      "short_label": "Primary Energy",
+      "full_question": "What is the primary source of light or energy in the world?",
+      "answers": [
+        {"id": 1, "text": "Natural Sunlight: Traditional celestial bodies."},
+        {"id": 2, "text": "Magic/Arcane: Spells, enchanted artifacts, raw magical power."},
+        {"id": 3, "text": "Steam/Fossil Fuels: Coal, oil, gas, powering industrial machines."},
+        {"id": 4, "text": "Electricity/Grid: Generators, power plants, often a central grid."},
+        {"id": 5, "text": "Renewable/Sustainable: Solar, wind, hydro, geothermal."},
+        {"id": 6, "text": "Exotic/Unusual: Bioluminescence, crystal energy, sentient light sources."}
+      ]
+    },
+    {
+      "id": 16,
+      "short_label": "Dominant Art",
+      "full_question": "What is the most dominant or culturally significant art form?",
+      "answers": [
+        {"id": 1, "text": "Oral Storytelling/Songs: Passed down traditions, epic poems."},
+        {"id": 2, "text": "Architecture/Sculpture: Grand buildings, monuments, statues."},
+        {"id": 3, "text": "Painting/Visual Arts: Murals, portraits, abstract works."},
+        {"id": 4, "text": "Dance/Performance: Ritualistic, theatrical, or social performances."},
+        {"id": 5, "text": "Craftsmanship/Utility: Art integrated into everyday objects (pottery, textiles, tools)."},
+        {"id": 6, "text": "Magical Arts: Spells as art forms, enchanted creations."}
+      ]
+    },
+    {
+      "id": 17,
+      "short_label": "Societal Value",
+      "full_question": "What is the single most highly valued trait or concept in society?",
+      "answers": [
+        {"id": 1, "text": "Honor/Duty: Loyalty, integrity, fulfilling obligations."},
+        {"id": 2, "text": "Innovation/Progress: New ideas, technological advancement, pushing boundaries."},
+        {"id": 3, "text": "Harmony/Community: Cooperation, collective well-being, peace."},
+        {"id": 4, "text": "Strength/Power: Physical prowess, military might, political influence."},
+        {"id": 5, "text": "Knowledge/Wisdom: Learning, understanding, sagacity."},
+        {"id": 6, "text": "Freedom/Autonomy: Individual liberty, self-determination."}
+      ]
+    },
+    {
+      "id": 18,
+      "short_label": "Threat Type",
+      "full_question": "What is the most common or pervasive type of threat to daily life?",
+      "answers": [
+        {"id": 1, "text": "Banditry/Marauders: Localized crime, raiders, lawlessness."},
+        {"id": 2, "text": "Environmental Hazards: Natural disasters, harsh weather, dangerous wildlife."},
+        {"id": 3, "text": "Political Intrigue: Betrayal, espionage, systemic corruption."},
+        {"id": 4, "text": "Magical Aberrations: Wild magic, uncontrolled spells, cursed artifacts."},
+        {"id": 5, "text": "Disease/Plague: Widespread sickness, epidemics."},
+        {"id": 6, "text": "Warfare/Invasion: Large-scale conflicts between nations or factions."}
+      ]
+    },
+    {
+      "id": 19,
+      "short_label": "Cultural Hub",
+      "full_question": "What kind of place serves as the most important cultural or social hub?",
+      "answers": [
+        {"id": 1, "text": "Capital City/Palace: Seat of power, grand urban center."},
+        {"id": 2, "text": "Sacred Site/Temple: Religious center, place of pilgrimage."},
+        {"id": 3, "text": "Marketplace/Bazaar: Center of trade, social gathering."},
+        {"id": 4, "text": "Academy/Library: Hub of knowledge, research, and learning."},
+        {"id": 5, "text": "Wilderness Enclave: Hidden villages, nomadic camps, natural sanctuaries."},
+        {"id": 6, "text": "Scientific Lab/Factory: Industrial or research complex."}
+      ]
+    },
+    {
+      "id": 20,
+      "short_label": "Daily Life",
+      "full_question": "What is the dominant feeling of average daily life for common people?",
+      "answers": [
+        {"id": 1, "text": "Struggle for Survival: Constant effort to meet basic needs."},
+        {"id": 2, "text": "Orderly & Predictable: Routine, stable, relatively safe."},
+        {"id": 3, "text": "Busy & Ambitious: Driven by work, progress, self-improvement."},
+        {"id": 4, "text": "Oppressed & Fearful: Under strict control, living in apprehension."},
+        {"id": 5, "text": "Mystical & Ritualistic: Guided by traditions, magic, spiritual practices."},
+        {"id": 6, "text": "Free & Adventurous: Opportunities for exploration, less structure."}
+      ]
+    }
+  ]
+}

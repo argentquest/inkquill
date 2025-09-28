@@ -1,0 +1,115 @@
+{# Tabler Premium Footer - Enhanced with Gradient Design #}
+
+<style>
+    /* Enhanced Footer with Gradient - Tabler Premium */
+    .footer-enhanced {
+        background: linear-gradient(135deg, 
+            rgba(32, 107, 196, 0.02) 0%, 
+            rgba(168, 85, 247, 0.02) 100%),
+            linear-gradient(to top, #f8f9fa 0%, #ffffff 100%) !important;
+        border-top: 2px solid transparent !important;
+        border-image: linear-gradient(90deg, 
+            var(--tblr-purple) 0%, 
+            var(--tblr-primary) 50%, 
+            var(--tblr-purple) 100%) !important;
+        border-image-slice: 1 !important;
+        position: relative !important;
+        overflow: hidden !important;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Animated gradient accent line */
+    .footer-enhanced::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: -100% !important;
+        width: 200% !important;
+        height: 2px !important;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--tblr-primary), 
+            var(--tblr-purple),
+            var(--tblr-primary),
+            transparent) !important;
+        animation: footerShimmer 8s linear infinite !important;
+    }
+    
+    @keyframes footerShimmer {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(50%); }
+    }
+    
+    /* Enhanced footer link styles */
+    .footer-enhanced .link-secondary {
+        color: var(--tblr-secondary) !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+    }
+    
+    .footer-enhanced .link-secondary:hover {
+        color: var(--tblr-primary) !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    /* Add subtle hover effect to badges */
+    .footer-enhanced .badge {
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    
+    .footer-enhanced .badge:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Enhance the copyright text */
+    .footer-enhanced .link-primary {
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700 !important;
+    }
+</style>
+
+<footer class="footer footer-transparent footer-enhanced border-top" style="padding: 1.5rem 0;">
+    <div class="container-fluid">
+        <div class="row text-center align-items-center flex-row-reverse">
+            <div class="col-lg-auto ms-lg-auto">
+                <ul class="list-inline list-inline-dots mb-0">
+                    <li class="list-inline-item">
+                        <a href="{{ url_for('ui_terms_of_service') }}" class="link-secondary text-decoration-none">
+                            <i class="fas fa-file-contract me-1"></i>
+                            Terms of Service
+                        </a>
+                    </li>
+                    {% if cookie_consent_required and google_analytics_id %}
+                    <li class="list-inline-item">
+                        <a href="#" onclick="showCookiePreferences(); return false;" class="link-secondary text-decoration-none">
+                            <i class="fas fa-cookie-bite me-1"></i>
+                            Cookie Preferences
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                <ul class="list-inline list-inline-dots mb-0">
+                    <li class="list-inline-item">
+                        &copy; 2025 
+                        <span class="link-primary fw-bold">{{ project_name | default('AI Story Assistant') }}</span>
+                        All rights reserved.
+                    </li>
+                    <li class="list-inline-item">
+                        <span class="badge bg-blue-lt text-blue">
+                            <i class="fas fa-magic me-1"></i>
+                            Powered by AI
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>

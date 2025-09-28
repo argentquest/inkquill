@@ -1,0 +1,116 @@
+{# /ai_rag_story_app/app/templates/pages/user_guide_redirect.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Help & User Guide - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .redirect-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .redirect-message {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        margin-bottom: 2rem;
+        max-width: 500px;
+    }
+    
+    .redirect-message h1 {
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .redirect-message p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .fallback-link {
+        margin-top: 2rem;
+    }
+    
+    .fallback-link a {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .fallback-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="redirect-page">
+    <div class="redirect-message">
+        <h1>📚 Opening Help & User Guide</h1>
+        <p>We're opening the interactive help system for you with the complete user guide...</p>
+    </div>
+    
+    <div class="loading-spinner"></div>
+    
+    <p>The help panel should open automatically. If it doesn't:</p>
+    
+    <div class="fallback-link">
+        <button onclick="openHelpPanel('introduction')" class="btn btn-primary">
+            <i class="fas fa-question-circle me-2"></i>
+            Open Help & User Guide
+        </button>
+    </div>
+    
+    <div class="fallback-link">
+        <a href="{{ url_for('ui_home') }}">← Return to Home</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a moment for the help system to load, then open the help panel
+    setTimeout(function() {
+        if (window.openHelpPanel) {
+            // Open the help panel with the introduction topic
+            window.openHelpPanel('introduction');
+            
+            // Optional: Redirect to home page after opening help
+            setTimeout(function() {
+                window.location.href = "{{ url_for('ui_home') }}";
+            }, 500);
+        } else {
+            console.warn('Help panel system not available');
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}

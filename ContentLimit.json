@@ -1,0 +1,145 @@
+{
+  "dropdown_prompts": [
+    {
+      "name": "Flash Idea (1-2 Sentences)",
+      "description": "Best for: Quick brainstorming, a single impactful line, or a very brief character thought.",
+      "prompt_template": "Generate a flash idea or a very brief thought in 1-2 concise sentences about: [USER_INPUT_STORY_IDEA]. Make it impactful and to the point.",
+      "max_tokens_guidance": "50-100",
+      "post_processing_note": "Prioritize sentence count. If over 2 sentences, trim to the closest natural sentence break at 2 sentences."
+    },
+    {
+      "name": "Vignette (3-5 Sentences)",
+      "description": "Best for: A concise description, a short observation, or a quick reaction to an event.",
+      "prompt_template": "Write a short vignette, exactly 3-5 sentences long, focusing on: [USER_INPUT_STORY_IDEA]. Ensure it conveys a clear mood or observation.",
+      "max_tokens_guidance": "100-150",
+      "post_processing_note": "Trim to fit 3-5 sentences. If less than 3 sentences, consider a small expansion prompt or accept as is."
+    },
+    {
+      "name": "Short Scene (1-2 Paragraphs)",
+      "description": "Best for: A single, focused moment, a brief interaction, or setting a quick mood.",
+      "prompt_template": "Create a short scene in 1-2 distinct paragraphs about: [USER_INPUT_STORY_IDEA]. Focus on a single moment or brief interaction. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "150-300",
+      "post_processing_note": "Identify paragraph breaks. If more than 2 paragraphs, trim to 2. If less than 1, regenerate or flag."
+    },
+    {
+      "name": "Developing Scene (3-4 Paragraphs)",
+      "description": "Best for: Expanding on a specific event, showing a mini-conflict, or introducing a new element.",
+      "prompt_template": "Generate a developing scene, structured into 3-4 distinct paragraphs, exploring: [USER_INPUT_STORY_IDEA]. Include elements that expand on a specific event or introduce a mini-conflict. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "300-600",
+      "post_processing_note": "Identify paragraph breaks. If outside 3-4 paragraphs, trim or attempt slight expansion if significantly under."
+    },
+    {
+      "name": "Standard Passage (5-7 Paragraphs)",
+      "description": "Best for: A more complete scene, developing a minor plot point, or a significant character interaction.",
+      "prompt_template": "Write a standard passage for a story, structured into 5-7 well-developed paragraphs, detailing: [USER_INPUT_STORY_IDEA]. Focus on creating a more complete scene or developing a minor plot point. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "600-1000",
+      "post_processing_note": "Identify paragraph breaks. If outside 5-7 paragraphs, trim or attempt slight expansion."
+    },
+    {
+      "name": "Chapter Segment (8-12+ Paragraphs)",
+      "description": "Best for: A substantial section of a story, exploring multiple facets of a scene or event, or concluding a mini-arc.",
+      "prompt_template": "Generate a substantial chapter segment, structured into 8-12 distinct paragraphs, covering: [USER_INPUT_STORY_IDEA]. Explore multiple facets of the scene or event, potentially concluding a mini-arc. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "1000-2000",
+      "post_processing_note": "Identify paragraph breaks. If significantly over 12, trim. If significantly under 8, consider iterative generation."
+    },
+    {
+      "name": "Outline / Synopsis (Variable Length)",
+      "description": "Best for: A structured summary of the story, key plot points, character arcs, and thematic ideas.",
+      "prompt_template": "Provide a detailed outline or synopsis for a story about: [USER_INPUT_STORY_IDEA]. Include key plot points (beginning, rising action, climax, falling action, resolution), main characters and their arcs, and potential thematic ideas. Organize into clear sections.",
+      "max_tokens_guidance": "300-800",
+      "post_processing_note": "Review for logical flow and completeness of outline elements. Trimming based on section completeness rather than strict paragraph count."
+    },
+    {
+      "name": "Custom Length...",
+      "description": "Allows user to specify custom length (paragraphs, sentences, or words).",
+      "prompt_template_placeholder": "This prompt will be dynamically generated based on user input. Examples below.",
+      "dynamic_prompt_examples": [
+        "Generate exactly [X] paragraphs about: [USER_INPUT_STORY_IDEA].",
+        "Generate exactly [X] sentences about: [USER_INPUT_STORY_IDEA].",
+        "Generate approximately [X] words about: [USER_INPUT_STORY_IDEA]. Ensure it is coherent and flows well."
+      ],
+      "max_tokens_calculation": "Approximately [X * 15] to [X * 25] for paragraphs; [X * 10] to [X * 15] for sentences; [X * 1.5] for words.",
+      "post_processing_note": "Crucial for precise control. Extensive trimming/expansion logic required to meet exact user specifications."
+    },
+    {
+      "name": "AI Decides (No Specific Limit)",
+      "description": "Best for: Allowing the AI to generate content until it naturally concludes a coherent idea or narrative, without a hard stop.",
+      "prompt_template": "Generate a complete and coherent story or narrative about: [USER_INPUT_STORY_IDEA]. Continue until the story reaches a natural conclusion or a logical stopping point.",
+      "max_tokens_guidance": "No specific `max_tokens` applied, or a very high default like 4000 (depending on model limits) to allow full generation.",
+      "post_processing_note": "Minimal post-processing, primarily for formatting and ensuring narrative completeness without abrupt cuts."
+    }
+  ]
+}
+
+
+
+
+
+
+Remove custom length
+
+
+I've removed the "Custom Length" option from the previous JSON structure. Here's the updated version:
+
+JSON
+
+{
+  "dropdown_prompts": [
+    {
+      "name": "Flash Idea (1-2 Sentences)",
+      "description": "Best for: Quick brainstorming, a single impactful line, or a very brief character thought.",
+      "prompt_template": "Generate a flash idea or a very brief thought in 1-2 concise sentences about: [USER_INPUT_STORY_IDEA]. Make it impactful and to the point.",
+      "max_tokens_guidance": "50-100",
+      "post_processing_note": "Prioritize sentence count. If over 2 sentences, trim to the closest natural sentence break at 2 sentences."
+    },
+    {
+      "name": "Vignette (3-5 Sentences)",
+      "description": "Best for: A concise description, a short observation, or a quick reaction to an event.",
+      "prompt_template": "Write a short vignette, exactly 3-5 sentences long, focusing on: [USER_INPUT_STORY_IDEA]. Ensure it conveys a clear mood or observation.",
+      "max_tokens_guidance": "100-150",
+      "post_processing_note": "Trim to fit 3-5 sentences. If less than 3 sentences, consider a small expansion prompt or accept as is."
+    },
+    {
+      "name": "Short Scene (1-2 Paragraphs)",
+      "description": "Best for: A single, focused moment, a brief interaction, or setting a quick mood.",
+      "prompt_template": "Create a short scene in 1-2 distinct paragraphs about: [USER_INPUT_STORY_IDEA]. Focus on a single moment or brief interaction. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "150-300",
+      "post_processing_note": "Identify paragraph breaks. If more than 2 paragraphs, trim to 2. If less than 1, regenerate or flag."
+    },
+    {
+      "name": "Developing Scene (3-4 Paragraphs)",
+      "description": "Best for: Expanding on a specific event, showing a mini-conflict, or introducing a new element.",
+      "prompt_template": "Generate a developing scene, structured into 3-4 distinct paragraphs, exploring: [USER_INPUT_STORY_IDEA]. Include elements that expand on a specific event or introduce a mini-conflict. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "300-600",
+      "post_processing_note": "Identify paragraph breaks. If outside 3-4 paragraphs, trim or attempt slight expansion if significantly under."
+    },
+    {
+      "name": "Standard Passage (5-7 Paragraphs)",
+      "description": "Best for: A more complete scene, developing a minor plot point, or a significant character interaction.",
+      "prompt_template": "Write a standard passage for a story, structured into 5-7 well-developed paragraphs, detailing: [USER_INPUT_STORY_IDEA]. Focus on creating a more complete scene or developing a minor plot point. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "600-1000",
+      "post_processing_note": "Identify paragraph breaks. If outside 5-7 paragraphs, trim or attempt slight expansion."
+    },
+    {
+      "name": "Chapter Segment (8-12+ Paragraphs)",
+      "description": "Best for: A substantial section of a story, exploring multiple facets of a scene or event, or concluding a mini-arc.",
+      "prompt_template": "Generate a substantial chapter segment, structured into 8-12 distinct paragraphs, covering: [USER_INPUT_STORY_IDEA]. Explore multiple facets of the scene or event, potentially concluding a mini-arc. Ensure clear paragraph separation.",
+      "max_tokens_guidance": "1000-2000",
+      "post_processing_note": "Identify paragraph breaks. If significantly over 12, trim. If significantly under 8, consider iterative generation."
+    },
+    {
+      "name": "Outline / Synopsis (Variable Length)",
+      "description": "Best for: A structured summary of the story, key plot points, character arcs, and thematic ideas.",
+      "prompt_template": "Provide a detailed outline or synopsis for a story about: [USER_INPUT_STORY_IDEA]. Include key plot points (beginning, rising action, climax, falling action, resolution), main characters and their arcs, and potential thematic ideas. Organize into clear sections.",
+      "max_tokens_guidance": "300-800",
+      "post_processing_note": "Review for logical flow and completeness of outline elements. Trimming based on section completeness rather than strict paragraph count."
+    },
+    {
+      "name": "AI Decides (No Specific Limit)",
+      "description": "Best for: Allowing the AI to generate content until it naturally concludes a coherent idea or narrative, without a hard stop.",
+      "prompt_template": "Generate a complete and coherent story or narrative about: [USER_INPUT_STORY_IDEA]. Continue until the story reaches a natural conclusion or a logical stopping point.",
+      "max_tokens_guidance": "No specific `max_tokens` applied, or a very high default like 4000 (depending on model limits) to allow full generation.",
+      "post_processing_note": "Minimal post-processing, primarily for formatting and ensuring narrative completeness without abrupt cuts."
+    }
+  ]
+}

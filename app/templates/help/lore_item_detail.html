@@ -1,0 +1,820 @@
+<div class="container-fluid">
+    <!-- Enhanced Tabler Premium Hero Header with Gradient -->
+    <div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.25); margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <!-- Background Pattern Overlay -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+        
+        <div class="page-body" style="position: relative; z-index: 1;">
+            <div class="container-fluid">
+                <div class="row align-items-center py-4">
+                    <div class="col">
+                        <h1 class="page-title text-white mb-2">
+                            <i class="fas fa-scroll me-2"></i>
+                            Lore Item Detail Help
+                        </h1>
+                        <div class="page-subtitle text-white opacity-75 mb-3">
+                            Create and manage detailed lore items that bring depth and authenticity to your fictional world
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-plus me-1"></i>
+                                Rich Creation
+                            </span>
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-project-diagram me-1"></i>
+                                Relationships
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-brain me-1"></i>
+                                AI Enhanced
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn btn-light">
+                                <i class="fas fa-plus me-1"></i>
+                                New Lore Item
+                            </button>
+                            <button class="btn btn-outline-light">
+                                <i class="fas fa-brain me-1"></i>
+                                Ask AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabler Navigation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card position-sticky" style="top: 1rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Navigation</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#overview" class="list-group-item list-group-item-action">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Lore Overview
+                    </a>
+                    <a href="#creation" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2 text-success"></i>
+                        Creating Lore Items
+                    </a>
+                    <a href="#categories" class="list-group-item list-group-item-action">
+                        <i class="fas fa-folder-open me-2 text-blue"></i>
+                        Lore Categories
+                    </a>
+                    <a href="#details" class="list-group-item list-group-item-action">
+                        <i class="fas fa-edit me-2 text-purple"></i>
+                        Adding Details
+                    </a>
+                    <a href="#relationships" class="list-group-item list-group-item-action">
+                        <i class="fas fa-link me-2 text-orange"></i>
+                        Relationships
+                    </a>
+                    <a href="#media" class="list-group-item list-group-item-action">
+                        <i class="fas fa-images me-2 text-pink"></i>
+                        Media & Assets
+                    </a>
+                    <a href="#ai-integration" class="list-group-item list-group-item-action">
+                        <i class="fas fa-brain me-2 text-indigo"></i>
+                        AI Integration
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabler Main Content -->
+        <div class="col-lg-9">
+            <div class="space-y-4">
+                <!-- Lore Overview Card -->
+                <div class="card" id="overview">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Lore Overview
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">Lore items are the building blocks of your fictional world's history, culture, and unique elements. They can represent anything from magical artifacts and ancient prophecies to cultural customs and historical events. Each lore item becomes part of your world's searchable knowledge base, accessible to both you and your AI assistant.</p>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="text-primary mb-3">Key Features</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-primary-lt me-3">
+                                                <i class="fas fa-expand-arrows-alt"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Flexible Structure</strong>
+                                                <div class="text-secondary">Adapt to any type of lore or world element</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-success-lt me-3">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Rich Descriptions</strong>
+                                                <div class="text-secondary">Detailed text fields with formatting support</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-blue-lt me-3">
+                                                <i class="fas fa-tags"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Categorization</strong>
+                                                <div class="text-secondary">Organize by type, importance, or custom categories</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-purple-lt me-3">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Cross-References</strong>
+                                                <div class="text-secondary">Link to related characters, locations, and other lore</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-orange-lt me-3">
+                                                <i class="fas fa-robot"></i>
+                                            </div>
+                                            <div>
+                                                <strong>AI Enhancement</strong>
+                                                <div class="text-secondary">AI can help develop and expand your lore items</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creating Lore Items Card -->
+                <div class="card" id="creation">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-plus-circle me-2 text-success"></i>
+                            Creating Lore Items
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Start building your world's lore with these essential steps:</p>
+                        
+                        <div class="steps steps-counter steps-green">
+                            <div class="step-item">
+                                <div class="h4 m-0">Choose a Name</div>
+                                <div class="text-secondary">Give your lore item a memorable, descriptive name that fits your world's naming conventions.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Select Category</div>
+                                <div class="text-secondary">Choose the appropriate category to help organize and classify your lore item.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Add Description</div>
+                                <div class="text-secondary">Write a detailed description that captures the essence and significance of this lore item.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Build Connections</div>
+                                <div class="text-secondary">Link your lore item to related characters, locations, and other lore items.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lore Categories Card -->
+                <div class="card" id="categories">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-folder-open me-2 text-blue"></i>
+                            Lore Categories
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Organize your lore items into meaningful categories for better navigation and understanding:</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-blue-lt me-3">
+                                                <i class="fas fa-landmark"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Historical Events</h4>
+                                                <div class="text-secondary">Major world-shaping moments</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Wars and battles</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Founding of kingdoms</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Natural disasters</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Political changes</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-purple-lt me-3">
+                                                <i class="fas fa-theater-masks"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Cultural Elements</h4>
+                                                <div class="text-secondary">Traditions and social structures</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Traditions and customs</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Festivals and celebrations</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Social structures</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Languages and dialects</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-orange-lt me-3">
+                                                <i class="fas fa-sword"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Artifacts & Items</h4>
+                                                <div class="text-secondary">Objects of power and significance</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Magical artifacts</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Historical objects</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Weapons and tools</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Sacred relics</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-indigo-lt me-3">
+                                                <i class="fas fa-book-open"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Knowledge & Beliefs</h4>
+                                                <div class="text-secondary">Wisdom and understanding</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Prophecies and legends</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Religious beliefs</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Magical systems</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Scientific principles</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-success-lt me-3">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Organizations</h4>
+                                                <div class="text-secondary">Groups and institutions</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Guilds and orders</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Political groups</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Religious institutions</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Secret societies</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-teal-lt me-3">
+                                                <i class="fas fa-leaf"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Natural Elements</h4>
+                                                <div class="text-secondary">Flora, fauna, and natural forces</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Unique flora and fauna</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Magical creatures</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Geological features</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Elemental forces</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adding Details Card -->
+                <div class="card" id="details">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit me-2 text-purple"></i>
+                            Adding Details
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Enrich your lore items with comprehensive details that bring your world to life:</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-info me-2 text-primary"></i>
+                                            Core Information
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Name:</strong> The primary identifier for your lore item
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Category:</strong> Classification for organization
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Description:</strong> Detailed explanation of the item's nature and significance
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Importance:</strong> Scale from minor detail to world-defining element
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-plus me-2 text-success"></i>
+                                            Extended Details
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Origin:</strong> How, when, and where the lore item came to be
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>History:</strong> Evolution and changes over time
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Current Status:</strong> Present-day relevance and condition
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Significance:</strong> Impact on your world and story
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-globe me-2 text-blue"></i>
+                                            Contextual Information
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Timeline:</strong> When the lore item existed or was relevant
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Geographic Scope:</strong> Where it has influence or presence
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Cultural Impact:</strong> How it affects different societies
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Secrets:</strong> Hidden aspects or mysteries
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relationships Card -->
+                <div class="card" id="relationships">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-link me-2 text-orange"></i>
+                            Relationships
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Connect your lore items to create a rich, interconnected world:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-orange mb-3">Character Connections</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Creators:</strong> Who made or established the lore item
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Guardians:</strong> Who protects or maintains it
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Users:</strong> Who interacts with or is affected by it
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Seekers:</strong> Who desires or pursues it
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-orange mb-3">Location Links</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Origin Points:</strong> Where the lore item was created
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Current Location:</strong> Where it exists now
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Areas of Influence:</strong> Geographic regions it affects
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Sacred Sites:</strong> Places of special significance
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-orange mb-3">Lore Connections</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Prerequisites:</strong> Other lore items that led to this one
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Consequences:</strong> What resulted from this lore item
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Related Items:</strong> Similar or connected lore elements
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Conflicts:</strong> Opposing or contradictory lore
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media & Assets Card -->
+                <div class="card" id="media">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-images me-2 text-pink"></i>
+                            Media & Assets
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Enhance your lore items with visual and audio elements:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-pink mb-3">Visual Elements</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Concept Art:</strong> Visual representations of the lore item
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Symbols:</strong> Icons or emblems associated with it
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Maps:</strong> Geographic or conceptual diagrams
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Diagrams:</strong> Technical or explanatory illustrations
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-pink mb-3">Documents</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>In-World Texts:</strong> Books, scrolls, or documents about the lore
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Research Notes:</strong> Your development and brainstorming materials
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Reference Materials:</strong> Real-world inspirations and sources
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Story Excerpts:</strong> Scenes or passages featuring the lore
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-pink mb-3">Audio Elements</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Pronunciation Guides:</strong> How to say unique names or terms
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Ambient Sounds:</strong> Audio that captures the lore's atmosphere
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Music:</strong> Themes or melodies associated with the lore
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Voice Notes:</strong> Your recorded thoughts and ideas
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Integration Card -->
+                <div class="card" id="ai-integration">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-brain me-2 text-indigo"></i>
+                            AI Integration
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Leverage AI assistance to develop and expand your lore items:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-indigo mb-3">AI-Assisted Development</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Expansion Ideas:</strong> Generate additional details and aspects
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Consistency Checking:</strong> Verify lore fits with your world
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Impact Analysis:</strong> Explore how lore affects your story
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Question Generation:</strong> Discover unexplored aspects
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-indigo mb-3">Content Generation</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Detailed Descriptions:</strong> Expand brief notes into full descriptions
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Historical Context:</strong> Generate background and timeline details
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Cultural Integration:</strong> Show how lore fits into society
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Variant Versions:</strong> Create different interpretations or versions
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-indigo mb-3">Writing Support</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Scene Integration:</strong> Suggestions for using lore in scenes
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Character Reactions:</strong> How characters might respond to the lore
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Plot Hooks:</strong> Story opportunities based on the lore
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Dialogue Suggestions:</strong> How characters might discuss the lore
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-rocket me-2 text-success"></i>
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-primary-lt mb-3 mx-auto">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <h4>Create Lore Item</h4>
+                                        <p class="text-secondary">Start building a new lore element</p>
+                                        <button class="btn btn-primary">New Lore Item</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-folder-open"></i>
+                                        </div>
+                                        <h4>Browse Categories</h4>
+                                        <p class="text-secondary">Explore different types of lore</p>
+                                        <button class="btn btn-success">View Categories</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-brain"></i>
+                                        </div>
+                                        <h4>AI Assistance</h4>
+                                        <p class="text-secondary">Get help developing your lore</p>
+                                        <button class="btn btn-blue">Ask AI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recipe Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-magic me-2 text-purple"></i>
+                            Recipe for Compelling Lore
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-target"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Clear Purpose</strong>
+                                        <div class="text-secondary">Understand why this lore matters to your world</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-palette"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Rich Detail</strong>
+                                        <div class="text-secondary">Provide enough information to feel real</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-link"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Connections</strong>
+                                        <div class="text-secondary">Link to other elements in your world</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Conflict Potential</strong>
+                                        <div class="text-secondary">Consider how it might create tension</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Evolution</strong>
+                                        <div class="text-secondary">Show how it changes over time</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-purple">
+                            <div class="d-flex">
+                                <div class="avatar avatar-sm bg-purple-lt me-3">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div>
+                                    <strong>Result:</strong> A living piece of lore that adds depth, authenticity, and story potential to your fictional world.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Tip Alert -->
+                <div class="alert alert-success">
+                    <div class="d-flex">
+                        <div class="avatar avatar-sm bg-success-lt me-3">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">💡 Pro Tip</h4>
+                            <div class="text-secondary">Great lore serves multiple purposes: it enriches your world, provides story hooks, and creates opportunities for character development. When creating lore, always ask "How can this impact my story or characters?" to ensure it serves your narrative goals.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('.list-group-item-action').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Highlight active navigation item
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('[id]');
+        const navLinks = document.querySelectorAll('.list-group-item-action');
+        
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentSection) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>

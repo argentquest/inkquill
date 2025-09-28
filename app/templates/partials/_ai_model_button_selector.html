@@ -1,0 +1,300 @@
+{# AI Model Button Selector Partial - Admin Only #}
+{# Parameters:
+   - select_id: Unique ID for the button element
+   - select_name: Name attribute for form submission (optional)
+   - select_class: Additional CSS classes (optional)
+   - tooltip_text: Tooltip text (optional)
+   - show_label: Whether to show the label (default: true)
+   - label_text: Custom label text (default: "AI Model")
+   - default_model_type: Context for default selection ("public_chat", "generation", "writing_assistant")
+#}
+
+{% if current_user and current_user.is_admin %}
+<div class="ai-model-button-selector-wrapper">
+    {% if show_label != false %}
+    <label class="form-label">
+        <i class="fas fa-robot me-1"></i>{{ label_text | default('AI Model') }}
+        {% if tooltip_text %}
+        <i class="fas fa-info-circle text-muted ms-1" 
+           data-bs-toggle="tooltip" 
+           data-bs-placement="top" 
+           title="{{ tooltip_text }}"></i>
+        {% endif %}
+    </label>
+    {% endif %}
+    
+    <!-- Button Dropdown -->
+    <div class="dropdown w-100">
+        <button class="btn btn-outline-secondary dropdown-toggle w-100 {{ select_class | default('') }}" 
+                type="button" 
+                id="{{ select_id }}-button" 
+                data-bs-toggle="dropdown" 
+                data-bs-auto-close="true"
+                aria-expanded="false">
+            <span class="selected-model-text">Loading AI Models...</span>
+        </button>
+        <ul class="dropdown-menu w-100" aria-labelledby="{{ select_id }}-button">
+            <!-- Options will be populated by JavaScript -->
+        </ul>
+    </div>
+    
+    <!-- Hidden input to store the selected value -->
+    <input type="hidden" id="{{ select_id }}-value" name="{{ select_name | default(select_id) }}" value="">
+    
+    <!-- Hidden select element for compatibility with existing code -->
+    <select id="{{ select_id }}" style="display: none;">
+        <!-- Options will be populated by JavaScript -->
+    </select>
+</div>
+
+<style>
+.ai-model-button-selector-wrapper .dropdown {
+    width: 100%;
+}
+
+.ai-model-button-selector-wrapper .dropdown-toggle {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-model-button-selector-wrapper .dropdown-toggle::after {
+    margin-left: auto;
+}
+
+.ai-model-button-selector-wrapper .dropdown-menu {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ai-model-button-selector-wrapper .dropdown-item {
+    white-space: normal;
+    padding: 0.5rem 1rem;
+}
+
+.ai-model-button-selector-wrapper .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.ai-model-button-selector-wrapper .dropdown-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.ai-model-button-selector-wrapper .dropdown-item.active .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.ai-model-button-selector-wrapper .dropdown-item.active .badge {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+</style>
+
+<script>
+// Initialize button model selector when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Use setTimeout to ensure Bootstrap is fully loaded
+    setTimeout(function() {
+    const button = document.getElementById('{{ select_id }}-button');
+    const hiddenInput = document.getElementById('{{ select_id }}-value');
+    const hiddenSelect = document.getElementById('{{ select_id }}');
+    const dropdown = button ? button.nextElementSibling : null;
+    const selectedText = button ? button.querySelector('.selected-model-text') : null;
+    
+    console.log('AI Model Button Selector: Initializing {{ select_id }}');
+    console.log('Button found:', button);
+    console.log('Dropdown found:', dropdown);
+    
+    if (!button || !hiddenInput || !dropdown || !hiddenSelect) {
+        console.error('AI Model Button Selector: Required elements not found for {{ select_id }}');
+        console.error('Button:', button, 'HiddenInput:', hiddenInput, 'Dropdown:', dropdown, 'HiddenSelect:', hiddenSelect);
+        return;
+    }
+    
+    // Add click debugging
+    button.addEventListener('click', function(e) {
+        console.log('Button clicked for {{ select_id }}', e);
+        console.log('Click target:', e.target);
+        console.log('Current target:', e.currentTarget);
+        console.log('Is dropdown showing?', dropdown.classList.contains('show'));
+    });
+    
+    // Add event listeners to detect Bootstrap dropdown events
+    button.addEventListener('show.bs.dropdown', function () {
+        console.log('Bootstrap dropdown show event for {{ select_id }}');
+    });
+    
+    button.addEventListener('shown.bs.dropdown', function () {
+        console.log('Bootstrap dropdown shown event for {{ select_id }}');
+    });
+    
+    button.addEventListener('hide.bs.dropdown', function () {
+        console.log('Bootstrap dropdown hide event for {{ select_id }}');
+    });
+    
+    // Check if Bootstrap is available
+    console.log('Bootstrap available?', typeof bootstrap !== 'undefined');
+    console.log('Bootstrap.Dropdown available?', typeof bootstrap !== 'undefined' && bootstrap.Dropdown);
+    
+    // Check if Bootstrap dropdown is already initialized by data-bs-toggle
+    let bsDropdown = null;
+    if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+        bsDropdown = bootstrap.Dropdown.getInstance(button);
+        console.log('Existing Bootstrap dropdown instance:', bsDropdown);
+    }
+    
+    // Add global click listener for debugging
+    document.addEventListener('click', function(e) {
+        if (e.target.id === '{{ select_id }}-button' || button.contains(e.target)) {
+            console.log('Document captured click on {{ select_id }} button');
+        }
+    }, true); // Use capture phase
+    
+    // Try manual dropdown toggle as fallback
+    button.addEventListener('mousedown', function(e) {
+        console.log('Mousedown on {{ select_id }} button');
+        e.preventDefault();
+        
+        // Manual toggle
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+            button.setAttribute('aria-expanded', 'false');
+        } else {
+            dropdown.classList.add('show');
+            button.setAttribute('aria-expanded', 'true');
+            dropdown.style.position = 'absolute';
+            dropdown.style.inset = '0px auto auto 0px';
+            dropdown.style.margin = '0px';
+            dropdown.style.transform = 'translate(0px, 40px)';
+        }
+    });
+
+    // Load models and populate dropdown
+    fetch('/api/v1/ai-models/', { credentials: 'include' })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch AI models');
+            return response.json();
+        })
+        .then(models => {
+            if (models.length === 0) {
+                selectedText.textContent = 'No AI models found';
+                button.disabled = true;
+                return;
+            }
+
+            // Clear loading items
+            dropdown.innerHTML = '';
+            hiddenSelect.innerHTML = '';
+            
+            let defaultModelId = null;
+            
+            // Determine default model based on context
+            {% if default_model_type %}
+            const modelType = '{{ default_model_type }}';
+            if (modelType === 'public_chat') {
+                const publicChatDefault = models.find(m => m.is_public_chat_default);
+                if (publicChatDefault) defaultModelId = publicChatDefault.id;
+            } else if (modelType === 'generation' || modelType === 'writing_assistant') {
+                const costEfficientModel = models.find(m => m.model_name && m.model_name.includes('gpt-4o-mini'));
+                if (costEfficientModel) defaultModelId = costEfficientModel.id;
+            }
+            
+            if (!defaultModelId) {
+                const firstGenerationModel = models.find(m => m.model_type === 'GENERATION' && m.is_active);
+                if (firstGenerationModel) defaultModelId = firstGenerationModel.id;
+            }
+            {% endif %}
+            
+            if (!defaultModelId && models.length > 0) {
+                defaultModelId = models[0].id;
+            }
+
+            // Populate dropdown items and hidden select
+            models.forEach(model => {
+                // Create dropdown item
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.className = 'dropdown-item';
+                a.href = '#';
+                a.dataset.modelId = model.id;
+                a.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-medium">${model.display_name || model.name}</div>
+                            <small class="text-muted d-block">${model.description || 'AI Model'}</small>
+                        </div>
+                        ${model.provider ? `<small class="badge bg-secondary ms-2">${model.provider}</small>` : ''}
+                    </div>
+                `;
+                
+                // Add click handler
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    selectModel(model.id, model.display_name);
+                });
+                
+                li.appendChild(a);
+                dropdown.appendChild(li);
+                
+                // Create option for hidden select
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.display_name;
+                hiddenSelect.appendChild(option);
+            });
+            
+            // Set default selection
+            if (defaultModelId) {
+                const defaultModel = models.find(m => m.id == defaultModelId);
+                if (defaultModel) {
+                    selectModel(defaultModel.id, defaultModel.display_name);
+                }
+            }
+            
+            console.log(`AI Model Button Selector: Populated {{ select_id }} with ${models.length} models`);
+        })
+        .catch(error => {
+            console.error('Error loading AI models for {{ select_id }}:', error);
+            selectedText.textContent = 'Error loading models';
+            button.disabled = true;
+        });
+    
+    function selectModel(modelId, modelName) {
+        // Update hidden input
+        hiddenInput.value = modelId;
+        
+        // Update hidden select
+        hiddenSelect.value = modelId;
+        
+        // Update button text
+        selectedText.textContent = modelName;
+        
+        // Add selected styling to the clicked item
+        dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const selectedItem = dropdown.querySelector(`[data-model-id="${modelId}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('active');
+        }
+        
+        // Trigger change events on both elements
+        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+        hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        console.log(`AI Model Button Selector: Selected model ${modelId} (${modelName})`);
+    }
+    
+    // Expose getValue function for external access
+    window['get' + '{{ select_id }}' + 'Value'] = function() {
+        return hiddenInput.value;
+    };
+    }, 100); // End setTimeout
+});
+</script>
+{% else %}
+<script>console.log('AI Model Button Selector: User is not admin, hiding selector for {{ select_id }}');</script>
+{% endif %}

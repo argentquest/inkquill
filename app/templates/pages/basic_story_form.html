@@ -1,0 +1,79 @@
+{# /ai_rag_story_app/app/templates/pages/basic_story_form.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Create Basic Story - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+{# Recommendation: Move inline styles to a dedicated CSS file, e.g., /static/css/basic_story_form.css #}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/basic_story_form.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="basic-story-form-page">
+    <div class="form-header">
+        <h1><i class="fas fa-rocket"></i> Create Basic Story</h1>
+        <p>Start writing immediately - no complex setup required!</p>
+    </div>
+    
+    <div class="basic-story-card">
+        <div class="feature-list">
+            <h5><i class="fas fa-sparkles"></i> What you get with Basic Story:</h5>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Instant story creation - just add a title</li>
+                <li><i class="fas fa-check-circle"></i> Automatic first act creation</li>
+                <li><i class="fas fa-check-circle"></i> AI writing assistance focused on craft</li>
+                <li><i class="fas fa-check-circle"></i> Story chat for creative discussions</li>
+                <li><i class="fas fa-check-circle"></i> Full publishing capabilities</li>
+                <li><i class="fas fa-check-circle"></i> Upgrade to Advanced anytime</li>
+            </ul>
+        </div>
+        
+        <form id="basic-story-form">
+            <div class="form-group mb-4">
+                <label for="title" class="form-label">Story Title <span class="text-danger">*</span></label>
+                <input type="text" 
+                       class="form-control form-control-lg" 
+                       id="title" 
+                       name="title" 
+                       placeholder="Enter your story title" 
+                       required 
+                       autofocus>
+                <div class="form-text">Choose a compelling title for your story</div>
+            </div>
+            
+            <div class="form-group mb-4">
+                <label for="short_description" class="form-label">Short Description (Optional)</label>
+                <textarea class="form-control" 
+                          id="short_description" 
+                          name="short_description" 
+                          rows="3" 
+                          placeholder="Brief description of your story (optional)"></textarea>
+                <div class="form-text">A short summary to help you remember what this story is about</div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success btn-create">
+                    <i class="fas fa-rocket me-2"></i>Start Writing
+                </button>
+                <a href="{{ url_for('ui_list_stories') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="text-center mt-4">
+        <p class="text-muted">
+            Need world-building features? 
+            <a href="{{ url_for('ui_create_story_form_generic') }}">Create an Advanced Story instead</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', path='/js/basic_story_form.js') }}"></script>
+{% endblock %}

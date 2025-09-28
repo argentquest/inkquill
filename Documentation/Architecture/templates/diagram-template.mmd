@@ -1,0 +1,89 @@
+%% Mermaid Diagram Template
+%% Title: [Diagram Title]
+%% Description: [Brief description of what this diagram shows]
+%% Last Updated: [Date]
+%% Version: [Version]
+
+%% Styling and Theme Configuration
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#ff6b6b',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#ff4757',
+    'lineColor': '#5f27cd',
+    'secondaryColor': '#00d2d3',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+%% Example System Architecture Diagram
+graph TB
+    %% Define subgraphs for logical grouping
+    subgraph "Client Layer"
+        A[Web Browser]
+        B[Mobile App]
+        C[API Client]
+    end
+    
+    subgraph "Application Layer"
+        D[Load Balancer]
+        E[FastAPI Application]
+        F[Authentication Service]
+    end
+    
+    subgraph "Business Logic Layer"
+        G[Story Service]
+        H[World Service]
+        I[AI Service]
+    end
+    
+    subgraph "Data Layer"
+        J[(Database)]
+        K[Cache]
+        L[File Storage]
+    end
+    
+    subgraph "External Services"
+        M[Azure OpenAI]
+        N[Azure Search]
+        O[OAuth Provider]
+    end
+    
+    %% Define connections
+    A --> D
+    B --> D
+    C --> D
+    
+    D --> E
+    E --> F
+    
+    E --> G
+    E --> H
+    E --> I
+    
+    G --> J
+    H --> J
+    I --> J
+    
+    G --> K
+    H --> K
+    
+    I --> L
+    
+    I --> M
+    I --> N
+    F --> O
+    
+    %% Styling for specific nodes
+    classDef clientLayer fill:#e1f5fe
+    classDef appLayer fill:#f3e5f5
+    classDef businessLayer fill:#e8f5e8
+    classDef dataLayer fill:#fff3e0
+    classDef externalLayer fill:#ffebee
+    
+    class A,B,C clientLayer
+    class D,E,F appLayer
+    class G,H,I businessLayer
+    class J,K,L dataLayer
+    class M,N,O externalLayer

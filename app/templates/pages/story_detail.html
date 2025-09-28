@@ -1,0 +1,1416 @@
+{# /ai_rag_story_app/app/templates/pages/story_detail.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ story.title | e if story else "Story Details" }} - Details{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ story.title | e if story else "Story Details" }}{% endblock %}
+{% block og_description %}{{ story.summary | e if story and story.summary else (story.description | e if story and story.description else "Discover an engaging story created with AI assistance on our storytelling platform.") }}{% endblock %}
+{% block og_image %}{% if story and story.image_url %}{{ story.image_url }}{% elif story %}{{ request.url_for('generate_social_preview', content_type='story', content_id=story.id) if request else '/api/v1/social/preview/story/' + story.id|string + '.jpg' }}{% else %}{{ request.url_for('static', path='/images/logo.jpeg') if request else '/static/images/logo.jpeg' }}{% endif %}{% endblock %}
+{% block og_url %}{{ request.url if request else '' }}{% endblock %}
+
+{% block twitter_card %}summary_large_image{% endblock %}
+{% block meta_keywords %}story, {{ story.title | e if story else "AI story" }}, creative writing, AI storytelling{% if story and story.world_name %}, {{ story.world_name | e }}{% endif %}{% endblock %}
+
+{% block styles %}
+{{ super() }} 
+<link rel="stylesheet" href="{{ url_for('static', path='/css/story_chat.css') }}">
+<style>
+    /* Story Detail Page - Tabler Premium UI Standards */
+    .page {
+        background: var(--tblr-bg-surface-secondary);
+        min-height: 100vh;
+    }
+    
+    /* Hero Header with Enhanced Gradient (per UI Standards) */
+    .story-hero-header {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        background-attachment: fixed;
+        position: relative;
+        overflow: hidden;
+        margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+        margin-bottom: calc(var(--tblr-gutter-x, 1.5rem) * 0.7);
+    }
+    
+    .story-hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .story-hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 3rem 0;
+        color: white;
+    }
+    
+    /* Thumbnail styling with enhanced design */
+    .story-thumbnail {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: var(--tblr-border-radius-lg);
+        border: 3px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        box-shadow: var(--tblr-box-shadow-lg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .story-thumbnail:hover {
+        transform: scale(1.05);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    .story-thumbnail-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: var(--tblr-border-radius-lg);
+        border: 3px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.8);
+        font-size: 14px;
+        text-align: center;
+        flex-shrink: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .story-thumbnail-placeholder:hover {
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    /* Story Title with enhanced typography */
+    .story-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .story-subtitle {
+        font-size: 1.125rem;
+        color: rgba(255,255,255,0.9);
+        font-style: italic;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Story Type Badge */
+    .story-type-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(10px);
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--tblr-border-radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    /* Context info styling */
+    .story-context {
+        color: rgba(255,255,255,0.8);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .story-context a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+        transition: all 0.2s;
+    }
+    
+    .story-context a:hover {
+        color: white;
+        border-bottom-color: rgba(255,255,255,0.6);
+    }
+    
+    /* Breadcrumb styling for hero */
+    .story-breadcrumb {
+        margin-top: 1rem;
+    }
+    
+    .story-breadcrumb .breadcrumb {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: var(--tblr-border-radius);
+        padding: 0.5rem 1rem;
+    }
+    
+    .story-breadcrumb .breadcrumb-item {
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .story-breadcrumb .breadcrumb-item a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+    }
+    
+    .story-breadcrumb .breadcrumb-item.active {
+        color: white;
+        font-weight: 500;
+    }
+    
+    /* Header Action Buttons */
+    .story-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    /* Enhanced button styling for hero header */
+    .story-actions .btn {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        border-radius: var(--tblr-border-radius);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .story-actions .btn:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.5);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .story-actions .btn-primary {
+        background: rgba(255,255,255,0.9);
+        color: var(--tblr-primary);
+        border-color: rgba(255,255,255,0.9);
+    }
+    
+    .story-actions .btn-primary:hover {
+        background: white;
+        color: var(--tblr-primary);
+        border-color: white;
+    }
+    
+    .story-actions .btn-warning {
+        background: var(--tblr-warning);
+        color: white;
+        border-color: var(--tblr-warning);
+    }
+    
+    .story-actions .btn-warning:hover {
+        background: var(--tblr-yellow);
+        color: white;
+        border-color: var(--tblr-yellow);
+    }
+    
+    /* Act Cards with Tabler Premium styling */
+    .act-card {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        margin-bottom: 2rem;
+        box-shadow: var(--tblr-box-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .act-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .act-card:hover {
+        box-shadow: var(--tblr-box-shadow-lg);
+        transform: translateY(-4px);
+        border-color: var(--tblr-primary);
+    }
+    
+    .act-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .act-card .card-header {
+        background: var(--tblr-bg-surface-secondary);
+        border-bottom: 1px solid var(--tblr-border-color);
+        padding: 1.25rem;
+        border-radius: var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0 0;
+    }
+    
+    .act-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Act titles with enhanced typography */
+    .act-card .card-title {
+        font-size: 1.375rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+    
+    .act-card .card-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    .act-card .card-title a:hover {
+        color: var(--tblr-primary);
+    }
+    
+    /* Act metadata with status indicators */
+    .act-number-badge {
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--tblr-border-radius);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .story-class-badge {
+        background: var(--tblr-bg-surface-tertiary);
+        color: var(--tblr-body-color);
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--tblr-border-radius);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    /* Act content with enhanced styling */
+    .act-description-preview {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--tblr-text-secondary);
+        margin-bottom: 1.25rem;
+    }
+    
+    /* Thumbnail styling for acts */
+    .act-thumbnail {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface-secondary);
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+    }
+    
+    .act-thumbnail-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: var(--tblr-border-radius-lg);
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-bg-surface-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tblr-text-secondary);
+        font-size: 0.875rem;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    /* Act Element Associations with enhanced design */
+    .act-elements {
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1rem;
+    }
+    
+    .element-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .element-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .element-tags .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--tblr-border-radius);
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+        cursor: default;
+    }
+    
+    .element-tags .badge:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--tblr-box-shadow);
+    }
+
+    /* Scene Cards with Premium styling */
+    .scene-card {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--tblr-box-shadow-input);
+        position: relative;
+    }
+    
+    .scene-card:hover {
+        border-color: var(--tblr-primary);
+        box-shadow: var(--tblr-box-shadow);
+        transform: translateY(-2px);
+        background: var(--tblr-bg-surface-secondary);
+    }
+    
+    /* Scene card structure */
+    .scene-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .scene-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+    
+    .scene-number {
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--tblr-border-radius);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Scene content */
+    .scene-summary {
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: var(--tblr-text-secondary);
+        margin-bottom: 1rem;
+    }
+    
+    .scene-content {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: var(--tblr-text-muted);
+        margin-bottom: 1rem;
+        font-style: italic;
+    }
+    
+    /* Scene actions */
+    .scene-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        margin-top: auto;
+    }
+    
+    /* Enhanced button groups with Tabler styling */
+    .btn-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .btn-list .btn {
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--tblr-border-radius);
+        padding: 0.5rem 1rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+    
+    .btn-list .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    /* Primary action buttons */
+    .btn-list .btn-primary {
+        background: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+        color: white;
+    }
+    
+    .btn-list .btn-primary:hover {
+        background: var(--tblr-primary-darken-10);
+        border-color: var(--tblr-primary-darken-10);
+        color: white;
+    }
+    
+    /* Warning buttons (Help) */
+    .btn-list .btn-warning {
+        background: var(--tblr-warning);
+        border-color: var(--tblr-warning);
+        color: white;
+    }
+    
+    .btn-list .btn-warning:hover {
+        background: var(--tblr-yellow);
+        border-color: var(--tblr-yellow);
+        color: white;
+    }
+    
+    /* Secondary buttons */
+    .btn-list .btn-outline-secondary {
+        background: var(--tblr-bg-surface);
+        border-color: var(--tblr-border-color);
+        color: var(--tblr-text-secondary);
+    }
+    
+    .btn-list .btn-outline-secondary:hover {
+        background: var(--tblr-bg-surface-secondary);
+        border-color: var(--tblr-primary);
+        color: var(--tblr-primary);
+    }
+    
+    /* Danger buttons */
+    .btn-list .btn-outline-danger {
+        background: var(--tblr-bg-surface);
+        border-color: var(--tblr-danger);
+        color: var(--tblr-danger);
+    }
+    
+    .btn-list .btn-outline-danger:hover {
+        background: var(--tblr-danger);
+        border-color: var(--tblr-danger);
+        color: white;
+    }
+    
+    /* Section headers with enhanced styling */
+    .section-header {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin-top: 2.5rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-header::before {
+        content: '';
+        width: 4px;
+        height: 1.5rem;
+        background: linear-gradient(135deg, var(--tblr-primary), var(--tblr-purple));
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    /* Enhanced cards for associations */
+    .association-card {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        box-shadow: var(--tblr-box-shadow-input);
+        margin-bottom: 1.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .association-card:hover {
+        box-shadow: var(--tblr-box-shadow);
+        transform: translateY(-1px);
+    }
+    
+    .association-card .card-header {
+        background: var(--tblr-bg-surface-secondary);
+        border-bottom: 1px solid var(--tblr-border-color);
+        padding: 1rem 1.25rem;
+        border-radius: var(--tblr-border-radius-lg) var(--tblr-border-radius-lg) 0 0;
+    }
+    
+    .association-card .card-body {
+        padding: 1.25rem;
+    }
+    
+    .association-card .card-header h5 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--tblr-body-color);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Enhanced element lists */
+    .element-list { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0; 
+    }
+    
+    .element-list-item { 
+        padding: 0.75rem 0; 
+        border-bottom: 1px solid var(--tblr-border-color-translucent); 
+        display: flex; 
+        align-items: center; 
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+    }
+    
+    .element-list-item:last-child { 
+        border-bottom: none; 
+    }
+    
+    .element-list-item:hover {
+        background: var(--tblr-bg-surface-secondary);
+        margin: 0 -0.75rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        border-radius: var(--tblr-border-radius);
+    }
+    
+    .element-list-img { 
+        width: 2.5rem; 
+        height: 2.5rem; 
+        object-fit: cover; 
+        border-radius: 50%; 
+        background: var(--tblr-bg-surface-secondary); 
+        flex-shrink: 0;
+        border: 1px solid var(--tblr-border-color);
+    }
+    
+    .element-list-icon { 
+        width: 2.5rem; 
+        height: 2.5rem; 
+        border-radius: 50%; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        background: var(--tblr-bg-surface-secondary); 
+        flex-shrink: 0;
+        border: 1px solid var(--tblr-border-color);
+    }
+    
+    .element-list-icon .fas { 
+        color: var(--tblr-text-secondary); 
+    }
+    
+    /* Enhanced alerts with avatars */
+    .enhanced-alert {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        box-shadow: var(--tblr-box-shadow-input);
+    }
+    
+    .enhanced-alert.alert-info {
+        border-left: 4px solid var(--tblr-blue);
+    }
+    
+    .enhanced-alert.alert-warning {
+        border-left: 4px solid var(--tblr-warning);
+    }
+    
+    .enhanced-alert.alert-success {
+        border-left: 4px solid var(--tblr-green);
+        background: var(--tblr-green-lt);
+    }
+    
+    .enhanced-alert .avatar {
+        flex-shrink: 0;
+    }
+    
+    .enhanced-alert .alert-content {
+        flex: 1;
+    }
+    
+    .enhanced-alert .alert-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--tblr-body-color);
+    }
+    
+    .enhanced-alert .alert-text {
+        color: var(--tblr-text-secondary);
+        margin: 0;
+    }
+    
+    /* Responsive design with Tabler mobile-first approach */
+    @media (max-width: 768px) {
+        .story-hero-content {
+            padding: 2rem 0;
+        }
+        
+        .story-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .story-subtitle {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .story-thumbnail,
+        .story-thumbnail-placeholder {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .story-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        
+        .story-actions .btn {
+            justify-content: center;
+        }
+        
+        /* Mobile act cards */
+        .act-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .act-card .card-header,
+        .act-card .card-body {
+            padding: 1rem;
+        }
+        
+        .act-card .card-title {
+            font-size: 1.25rem;
+        }
+        
+        .act-thumbnail,
+        .act-thumbnail-placeholder {
+            width: 80px;
+            height: 80px;
+        }
+        
+        /* Mobile button groups */
+        .btn-list {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        
+        .btn-list .btn {
+            justify-content: center;
+            width: 100%;
+        }
+        
+        /* Mobile scene cards */
+        .scene-card {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .scene-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .scene-title {
+            font-size: 1rem;
+        }
+        
+        .scene-actions {
+            justify-content: stretch;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .scene-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Mobile associations */
+        .association-card .card-header,
+        .association-card .card-body {
+            padding: 1rem;
+        }
+        
+        .section-header {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+        }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 480px) {
+        .story-hero-content {
+            padding: 1.5rem 0;
+        }
+        
+        .story-title {
+            font-size: 1.75rem;
+        }
+        
+        .story-thumbnail,
+        .story-thumbnail-placeholder {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .act-card .card-header,
+        .act-card .card-body {
+            padding: 0.75rem;
+        }
+        
+        .scene-card {
+            padding: 0.75rem;
+        }
+        
+        .element-list-img,
+        .element-list-icon {
+            width: 2rem;
+            height: 2rem;
+        }
+    }
+    
+    /* Published story success alert */
+    #published-story-link-area {
+        margin: 1.5rem 0;
+        border-radius: var(--tblr-border-radius-lg);
+        padding: 1.25rem;
+        background: var(--tblr-green-lt);
+        border: 1px solid var(--tblr-green);
+        border-left: 4px solid var(--tblr-green);
+    }
+    
+    /* Remove default margins and spacing conflicts */
+    .story-detail-page .me-2 {
+        margin-right: 0 !important;
+    }
+    
+    .story-detail-page .mb-2 {
+        margin-bottom: 12px !important;
+    }
+    
+    .story-detail-page .mt-3 {
+        margin-top: 24px !important;
+    }
+    
+    .story-detail-page .mt-5 {
+        margin-top: 40px !important;
+    }
+    
+    .story-detail-page .mb-4 {
+        margin-bottom: 24px !important;
+    }
+    
+    /* Scene Card Styling (Dynamically Loaded) */
+    .story-detail-page .scene-card,
+    .story-detail-page .scenes-container .card {
+        background: #FFFFFF !important;
+        padding: 24px !important;
+        border-radius: 12px !important;
+        border: 1px solid #E2E8F0 !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        transition: all 0.2s ease;
+    }
+    
+    .story-detail-page .scene-card:hover,
+    .story-detail-page .scenes-container .card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        transform: translateY(-1px);
+    }
+    
+    /* Scene titles */
+    .story-detail-page .scene-card .card-title,
+    .story-detail-page .scenes-container .card-title {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .story-detail-page .scene-card .card-title a,
+    .story-detail-page .scenes-container .card-title a {
+        color: #1E293B !important;
+        text-decoration: none;
+    }
+    
+    .story-detail-page .scene-card .card-title a:hover,
+    .story-detail-page .scenes-container .card-title a:hover {
+        color: #6366F1 !important;
+    }
+    
+    /* Scene summary text */
+    .story-detail-page .scene-card .card-text,
+    .story-detail-page .scenes-container .card-text {
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+        color: #64748B !important;
+        margin-bottom: 16px !important;
+    }
+    
+    /* Scene metadata */
+    .story-detail-page .scene-card .text-muted,
+    .story-detail-page .scenes-container .text-muted {
+        font-size: 13px !important;
+        color: #94A3B8 !important;
+    }
+    
+    /* Scene action buttons */
+    .story-detail-page .scene-card .btn,
+    .story-detail-page .scenes-container .btn {
+        min-height: 36px !important;
+        padding: 8px 16px !important;
+        font-size: 14px !important;
+        border-radius: 6px !important;
+        margin-right: 8px !important;
+        margin-bottom: 4px;
+    }
+    
+    .story-detail-page .scene-card .btn:last-child,
+    .story-detail-page .scenes-container .btn:last-child {
+        margin-right: 0 !important;
+    }
+    
+    /* Scene Edit button */
+    .story-detail-page .scene-card .btn-primary:not(.delete-scene-btn),
+    .story-detail-page .scenes-container .btn-primary:not(.delete-scene-btn) {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+        border-color: #6366F1 !important;
+    }
+    
+    .story-detail-page .scene-card .btn-primary:not(.delete-scene-btn):hover,
+    .story-detail-page .scenes-container .btn-primary:not(.delete-scene-btn):hover {
+        background: #4F46E5 !important;
+        border-color: #4F46E5 !important;
+    }
+    
+    /* Scene Delete button */
+    .story-detail-page .delete-scene-btn {
+        background: #FEE2E2 !important;
+        color: #DC2626 !important;
+        border-color: #DC2626 !important;
+    }
+    
+    .story-detail-page .delete-scene-btn:hover {
+        background: #FECACA !important;
+        color: #DC2626 !important;
+        border-color: #DC2626 !important;
+    }
+    
+    /* Scene button group spacing */
+    .story-detail-page .scene-card .btn-group,
+    .story-detail-page .scenes-container .btn-group {
+        gap: 8px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .story-detail-page .scene-card .btn-group .btn,
+    .story-detail-page .scenes-container .btn-group .btn {
+        margin: 0 !important;
+    }
+    
+    /* No scenes message */
+    .story-detail-page .no-scenes-message {
+        font-size: 14px;
+        color: #94A3B8;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    /* Scenes section within acts */
+    .story-detail-page .scenes-section {
+        border-top: 1px solid #F1F5F9;
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+    
+    .story-detail-page .scenes-container {
+        margin-top: 16px;
+    }
+    
+    /* Fade-in Animations per UI Standards */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .act-card {
+        animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        opacity: 0;
+    }
+    
+    .act-card:nth-child(1) { animation-delay: 0.1s; }
+    .act-card:nth-child(2) { animation-delay: 0.2s; }
+    .act-card:nth-child(3) { animation-delay: 0.3s; }
+    .act-card:nth-child(4) { animation-delay: 0.4s; }
+    .act-card:nth-child(5) { animation-delay: 0.5s; }
+    .act-card:nth-child(6) { animation-delay: 0.6s; }
+    .act-card:nth-child(7) { animation-delay: 0.7s; }
+    .act-card:nth-child(8) { animation-delay: 0.8s; }
+    .act-card:nth-child(9) { animation-delay: 0.9s; }
+    .act-card:nth-child(n+10) { animation-delay: 1s; }
+</style>
+{% endblock %}
+
+{% block page_header %}
+{% if story %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient (MANDATORY STANDARD) -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.7); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 250px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <a href="{{ url_for('ui_list_stories') }}" class="btn btn-sm btn-light me-2"
+                       data-bs-toggle="tooltip" title="Back to My Stories">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_list_stories') }}" class="text-white-50">My Stories</a></li>
+                            {% if story.world %}<li class="breadcrumb-item"><a href="{{ url_for('ui_world_detail', world_id=story.world.id) }}" class="text-white-50">{{ story.world.name }}</a></li>{% endif %}
+                            <li class="breadcrumb-item active text-white" aria-current="page">{{ story.title | e }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <div class="d-flex align-items-start gap-4 mb-4">
+                    <!-- Story Thumbnail -->
+                    <div>
+                        {% if story.current_image and story.current_image.blob_url %}
+                            <img src="{{ story.current_image.blob_url }}" alt="{{ story.title }} thumbnail" style="width: 100px; height: 100px; border-radius: var(--tblr-border-radius-lg); object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">
+                        {% else %}
+                            <div style="width: 100px; height: 100px; border-radius: var(--tblr-border-radius-lg); border: 3px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.8); text-align: center;">
+                                <div>
+                                    <i class="fas fa-book-open mb-1" style="font-size: 1.5rem;"></i><br>
+                                    <small>No Image</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Story Info -->
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <h1 class="page-title text-white mb-0" style="font-size: 2.5rem; font-weight: 700;">
+                                <i class="fas fa-book-open me-3"></i>{{ story.title | e }}
+                            </h1>
+                            <!-- Story Type Badge -->
+                            {% if story.story_type == 'basic' %}
+                            <span class="badge bg-light text-dark px-3 py-2" title="Basic Story - Focus on writing">
+                                <i class="fas fa-rocket me-1"></i>Basic
+                            </span>
+                            {% else %}
+                            <span class="badge bg-light text-dark px-3 py-2" title="Advanced Story - Full world-building features">
+                                <i class="fas fa-globe me-1"></i>Advanced
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Story Description -->
+                        {% if story.short_description %}
+                        <div class="page-subtitle text-white mb-3">
+                            <i class="fas fa-quote-left me-2"></i>
+                            {{ story.short_description | e | truncate(200, True) }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            {% if story.world %}
+                            <span class="badge bg-light text-dark me-2 px-3 py-2">
+                                <i class="fas fa-globe-americas me-1"></i>
+                                {{ story.world.name }}
+                            </span>
+                            {% endif %}
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <i class="fas fa-calendar me-1"></i>
+                                Created {{ story.created_at.strftime('%B %d, %Y') if story.created_at else 'Unknown' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list flex-wrap">
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('story_detail')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with this page">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                    <a href="{{ url_for('ui_create_act_form', story_id=story.id) }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Create a new act (chapter) for your story">
+                        <i class="fas fa-plus-circle me-1"></i>Add New Act
+                    </a>
+                    <a href="{{ url_for('ui_edit_story_form', story_id=story.id) }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Edit story title, description, world assignment, and other details">
+                        <i class="fas fa-edit me-1"></i>Edit Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    {% if story %}
+        
+        <div class="container-fluid">
+            <input type="hidden" id="story-id-for-associations" value="{{ story.id if story and story.id else '' }}">
+            <input type="hidden" id="world-id-for-associations" value="{{ story.world_id if story and story.world_id else '' }}">
+
+            <!-- Enhanced Published Story Alert -->
+            <div id="published-story-link-area" class="enhanced-alert alert-success" style="display: none;">
+                <div class="avatar avatar-sm bg-green text-white">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Story Published Successfully!</div>
+                    <p id="publish-status-message" class="alert-text mb-2"></p> 
+                    <div class="d-flex flex-wrap gap-2">
+                        <a id="published-story-url" href="#" target="_blank" class="btn btn-sm btn-primary">
+                            <i class="fas fa-external-link-alt me-1"></i>View Published Story
+                        </a>
+                        {% if story and story.published_version %}
+                        <a href="{{ url_for('view_published_story', story_id=story.published_version.id) }}" 
+                           class="btn btn-sm btn-success">
+                            <i class="fas fa-comments me-1"></i>View Comments & Ratings
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if acts %}
+            <!-- Acts Section -->
+            <div class="section-header">
+                <i class="fas fa-theater-masks"></i>
+                Story Acts
+            </div>
+            
+            <div class="row row-cards" id="acts-list-container"> 
+                {% for act in acts %}
+                    <div class="col-12">
+                        <div class="card act-card" data-act-id="{{ act.id }}">
+                            <!-- Enhanced Act Header -->
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="act-header-left">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="act-number-badge">Act {{ act.act_number }}</span>
+                                        {% if act.story_class %}
+                                            <span class="story-class-badge" 
+                                                  {% if act.story_class.color %}
+                                                  style="background-color: {{ act.story_class.color }}; color: {% if (act.story_class.color[1:3]|int(base=16) * 299 + act.story_class.color[3:5]|int(base=16) * 587 + act.story_class.color[5:7]|int(base=16) * 114) / 1000 > 128 %}#000000{% else %}#ffffff{% endif %};"
+                                                  {% endif %}>
+                                                {{ act.story_class.name | e }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <h4 class="card-title mb-1">
+                                        <a href="{{ url_for('ui_act_editor', story_id=story.id, act_id=act.id) }}" 
+                                           class="text-decoration-none">
+                                            {{ act.title | e }}
+                                        </a>
+                                    </h4>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>Updated: {{ act.updated_at.strftime('%Y-%m-%d %H:%M') if act.updated_at else 'N/A' }}
+                                    </small>
+                                </div>
+                                <div class="btn-list">
+                                    <a href="{{ url_for('ui_act_editor', story_id=story.id, act_id=act.id) }}" 
+                                       class="btn btn-primary"
+                                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                       title="Open the act editor to write and develop content with AI assistance">
+                                        <i class="fas fa-edit me-2"></i>Edit Act
+                                    </a>
+                                    <a href="{{ url_for('ui_create_scene_form', story_id=story.id, act_id=act.id) }}" 
+                                       class="btn btn-outline-secondary"
+                                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                       title="Create a new scene within this act">
+                                        <i class="fas fa-plus me-2"></i>Add Scene
+                                    </a>
+                                    <button class="generate-scenes-btn btn btn-outline-secondary" 
+                                            data-act-id="{{ act.id }}" data-story-id="{{ story.id }}"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                            title="Use AI to automatically generate multiple scenes for this act">
+                                        <i class="fas fa-cogs me-2"></i>Generate Scenes
+                                    </button>
+                                    <button class="compile-scenes-to-act-btn btn btn-outline-secondary" 
+                                            data-act-id="{{ act.id }}" data-story-id="{{ story.id }}"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                            title="Combine all scenes in this act into the main act content">
+                                        <i class="fas fa-layer-group me-2"></i>Compile Scenes
+                                    </button>
+                                    <button class="delete-act-btn btn btn-outline-danger" 
+                                            data-act-id="{{ act.id }}" data-story-id="{{ story.id }}"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                            title="Permanently delete this act and all its scenes">
+                                        <i class="fas fa-trash-alt me-2"></i>Delete
+                                    </button>
+                                </div>
+                                <div id="generate-scenes-status-{{ act.id }}" class="form-text mt-1" style="display: none;"></div>
+                            </div>
+                            
+                            <!-- Enhanced Act Body -->
+                            <div class="card-body">
+                                <div class="d-flex gap-3 mb-3">
+                                    <!-- Act Thumbnail -->
+                                    <div>
+                                        {% if act.current_image and act.current_image.blob_url %}
+                                            <img src="{{ act.current_image.blob_url }}" alt="{{ act.title }} thumbnail" class="act-thumbnail">
+                                        {% else %}
+                                            <div class="act-thumbnail-placeholder">
+                                                <div>
+                                                    <i class="fas fa-image mb-1"></i><br>
+                                                    <small>No Image</small>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Act Description -->
+                                    <div class="act-content flex-grow-1">
+                                        {% if act.description %}
+                                            <div class="act-description-preview">{{ act.description | safe | truncate(150, True) }}</div>
+                                        {% else %}
+                                            <p class="text-muted mb-0"><em>No content yet.</em></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Act Element Associations -->
+                                {% if act_associations and act_associations.get(act.id) %}
+                                    {% set act_assoc = act_associations[act.id] %}
+                                    {% if act_assoc.characters or act_assoc.locations or act_assoc.lore_items %}
+                                        <div class="act-elements mb-3">
+                                            <h6 class="mb-2 text-muted">
+                                                <i class="fas fa-link me-1"></i>Elements in this Act
+                                            </h6>
+                                            <div class="row g-2">
+                                                <!-- Characters -->
+                                                {% if act_assoc.characters %}
+                                                    <div class="col-md-4">
+                                                        <div class="element-group">
+                                                            <small class="text-muted d-block mb-1">
+                                                                <i class="fas fa-users me-1"></i>Characters
+                                                            </small>
+                                                            <div class="element-tags">
+                                                                {% for char_data in act_assoc.characters %}
+                                                                    <span class="badge bg-primary me-1 mb-1" 
+                                                                          title="{% if char_data.roles %}{{ char_data.roles | join(', ') }}{% endif %}">
+                                                                        {{ char_data.character.name }}
+                                                                    </span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Locations -->
+                                                {% if act_assoc.locations %}
+                                                    <div class="col-md-4">
+                                                        <div class="element-group">
+                                                            <small class="text-muted d-block mb-1">
+                                                                <i class="fas fa-map-marked-alt me-1"></i>Locations
+                                                            </small>
+                                                            <div class="element-tags">
+                                                                {% for loc_data in act_assoc.locations %}
+                                                                    <span class="badge bg-danger me-1 mb-1"
+                                                                          title="{% if loc_data.roles %}{{ loc_data.roles | join(', ') }}{% endif %}">
+                                                                        {{ loc_data.location.name }}
+                                                                    </span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Lore Items -->
+                                                {% if act_assoc.lore_items %}
+                                                    <div class="col-md-4">
+                                                        <div class="element-group">
+                                                            <small class="text-muted d-block mb-1">
+                                                                <i class="fas fa-scroll me-1"></i>Lore Items
+                                                            </small>
+                                                            <div class="element-tags">
+                                                                {% for lore_data in act_assoc.lore_items %}
+                                                                    <span class="badge bg-warning text-dark me-1 mb-1"
+                                                                          title="{% if lore_data.roles %}{{ lore_data.roles | join(', ') }}{% endif %}">
+                                                                        {{ lore_data.lore_item.title }}
+                                                                    </span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                                
+                                <!-- Scenes Container -->
+                                <div class="scenes-section mt-auto">
+                                    <div class="scenes-container" id="scenes-for-act-{{ act.id }}">
+                                        <p class="text-muted no-scenes-message" style="display: none;"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- No Acts State -->
+            <div class="enhanced-alert alert-info">
+                <div class="avatar avatar-sm bg-blue text-white">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">No Acts Created Yet</div>
+                    <p class="alert-text">This story doesn't have any acts yet. Click "Add New Act" above to get started writing your story!</p>
+                </div>
+            </div>
+            {% endif %}
+
+
+    {% else %}
+        <div class="alert alert-danger mt-3">Story details could not be loaded.</div>
+    {% endif %}
+
+            <!-- Story Chat Section -->
+            {% if story %}
+            <div class="section-header">
+                <i class="fas fa-comments"></i>
+                Story Discussion
+                <button class="btn btn-sm btn-outline-primary ms-auto" onclick="toggleStoryChatSection()">
+                    <i class="fas fa-chevron-down" id="chat-toggle-icon"></i>
+                    <span id="chat-toggle-text">Show Chat</span>
+                </button>
+            </div>
+            
+            <div id="story-chat-section" style="display: none;">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div id="story-chat-container">
+                            <!-- Story chat interface will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    {% if story and story.world_id %}
+        {% include 'partials/_link_character_modal.html' %}
+        {% include 'partials/_link_location_modal.html' %}
+        {% include 'partials/_link_lore_item_modal.html' %}
+        {% include 'partials/_story_generation_modal.html' %}
+    {% endif %}
+
+    <!-- FIX: Moved script includes inside the content block -->
+    {% block page_scripts %}
+        <script src="{{ url_for('static', path='/js/story_crud.js') }}"></script>
+        <script src="{{ url_for('static', path='/js/act_crud.js') }}"></script>
+        <script src="{{ url_for('static', path='/js/scene_crud.js') }}"></script> 
+        <script src="{{ url_for('static', path='/js/story_chat.js') }}"></script>
+        {% if story and story.world_id %}
+            <script src="{{ url_for('static', path='/js/story_associations_handler.js') }}"></script>
+            <script src="{{ url_for('static', path='/js/story_generation_modal.js') }}"></script>
+        {% endif %}
+        
+        <!-- Story Chat Initialization -->
+        {% if story %}
+        <script>
+            function toggleStoryChatSection() {
+                const section = document.getElementById('story-chat-section');
+                const icon = document.getElementById('chat-toggle-icon');
+                const text = document.getElementById('chat-toggle-text');
+                
+                if (section.style.display === 'none') {
+                    section.style.display = 'block';
+                    icon.className = 'fas fa-chevron-up';
+                    text.textContent = 'Hide Chat';
+                    
+                    // Initialize story chat if not already done
+                    if (!storyChatInterface) {
+                        storyChatInterface = new StoryChatInterface({{ story.id }}, 'story-chat-container');
+                    }
+                } else {
+                    section.style.display = 'none';
+                    icon.className = 'fas fa-chevron-down';
+                    text.textContent = 'Show Chat';
+                }
+            }
+        </script>
+        {% endif %}
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    {# This block is now for scripts that are truly global, if any. 
+       Page-specific scripts are now in the `page_scripts` block above. #}
+{% endblock %}

@@ -1,0 +1,370 @@
+<!-- /ai_rag_story_app/app/templates/pages/admin_image_jobs.html -->
+{% extends "layouts/base.html" %}
+
+{% block head %}
+<title>Admin: Image Generation Jobs</title>
+<style>
+.job-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: #fafafa;
+}
+
+.job-card.running {
+    border-left: 4px solid #007bff;
+    background: #f0f8ff;
+}
+
+.job-card.completed {
+    border-left: 4px solid #28a745;
+    background: #f0fff0;
+}
+
+.job-card.failed {
+    border-left: 4px solid #dc3545;
+    background: #fff0f0;
+}
+
+.job-meta {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.active-tasks-counter {
+    background: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.btn-outline-primary {
+    font-size: 0.875rem;
+}
+
+.text-primary {
+    font-weight: 600;
+}
+
+.image-preview-link {
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.image-preview-link img {
+    width: 128px;
+    height: 128px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.image-preview-link img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-images me-2"></i>Image Generation Jobs</h2>
+                <button id="refresh-btn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                </button>
+            </div>
+
+            <div class="active-tasks-counter" id="active-tasks-counter">
+                <i class="fas fa-cog fa-spin me-1"></i>
+                Loading active tasks...
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Jobs (All Users)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="jobs-container">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Loading jobs...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Active Tasks:</strong>
+                                <span id="status-active-tasks" class="badge bg-primary ms-1">-</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Auto-refresh:</strong>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="auto-refresh-toggle" checked>
+                                    <label class="form-check-label" for="auto-refresh-toggle">
+                                        Every 10 seconds
+                                    </label>
+                                </div>
+                            </div>
+                            <button id="clear-completed-btn" class="btn btn-outline-danger btn-sm w-100">
+                                <i class="fas fa-trash me-1"></i>Clear Completed Jobs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImagePreview" src="" alt="Image preview" class="img-fluid">
+                <div id="imageDetails" class="mt-3 text-start">
+                    <!-- Image details will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="modalImageLink" href="" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-1"></i>Open Full Size
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let autoRefreshInterval = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const refreshBtn = document.getElementById('refresh-btn');
+    const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+    const jobsContainer = document.getElementById('jobs-container');
+    const activeTasksCounter = document.getElementById('active-tasks-counter');
+    const statusActiveTasks = document.getElementById('status-active-tasks');
+
+    function formatDate(isoString) {
+        return new Date(isoString).toLocaleString();
+    }
+
+    function getJobStateClass(state) {
+        switch(state.toLowerCase()) {
+            case 'running': return 'running';
+            case 'completed': return 'completed';
+            case 'failed': return 'failed';
+            default: return '';
+        }
+    }
+
+    function getJobStateIcon(state) {
+        switch(state.toLowerCase()) {
+            case 'pending': return '<i class="fas fa-clock text-warning"></i>';
+            case 'running': return '<i class="fas fa-cog fa-spin text-primary"></i>';
+            case 'completed': return '<i class="fas fa-check-circle text-success"></i>';
+            case 'failed': return '<i class="fas fa-times-circle text-danger"></i>';
+            default: return '<i class="fas fa-question-circle text-muted"></i>';
+        }
+    }
+
+    async function fetchJobs() {
+        try {
+            // Get ALL jobs (admin endpoint)
+            const response = await fetch('/api/v1/generate-image/jobs/all?limit=100', {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            const jobs = data.jobs || [];
+            const activeTaskCount = data.active_task_count || 0;
+
+            // Update active tasks counter
+            activeTasksCounter.innerHTML = `
+                <i class="fas fa-cog ${activeTaskCount > 0 ? 'fa-spin' : ''} me-1"></i>
+                ${activeTaskCount} Active Task${activeTaskCount !== 1 ? 's' : ''}
+            `;
+            statusActiveTasks.textContent = activeTaskCount;
+
+            // Render jobs
+            if (jobs.length === 0) {
+                jobsContainer.innerHTML = '<p class="text-muted text-center py-4">No recent image generation jobs found.</p>';
+                return;
+            }
+
+            jobsContainer.innerHTML = jobs.map(job => `
+                <div class="job-card ${getJobStateClass(job.state)}">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center">
+                            ${getJobStateIcon(job.state)}
+                            <strong class="ms-2">${job.job_id.substring(0, 8)}...</strong>
+                            <span class="badge bg-secondary ms-2">${job.state}</span>
+                        </div>
+                        <small class="text-muted">${formatDate(job.created_at)}</small>
+                    </div>
+                    
+                    <div class="job-meta">
+                        <div>
+                            <strong>User:</strong> 
+                            <span class="text-primary">${job.user_display_name || job.username}</span>
+                            <span class="text-muted">(ID: ${job.user_id})</span>
+                        </div>
+                        ${job.element_type ? `
+                            <div>
+                                <strong>Element:</strong> ${job.element_type} #${job.element_id}
+                                ${job.world_id ? `
+                                    <a href="/ui/worlds/${job.world_id}/${job.element_type}s/${job.element_id}" 
+                                       class="btn btn-sm btn-outline-secondary ms-2" target="_blank">
+                                        <i class="fas fa-arrow-right me-1"></i>View Element
+                                    </a>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                        ${job.prompt ? `<div><strong>Prompt:</strong> ${job.prompt}</div>` : ''}
+                        <div><strong>Status:</strong> ${job.status_message || 'No status message'}</div>
+                        ${job.result ? `
+                            <div>
+                                <strong>Result:</strong> Image ${job.result.image_id} created
+                                ${job.image_url ? `
+                                    <div>
+                                        <a href="${job.image_url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-external-link-alt me-1"></i>View Full Size
+                                        </a>
+                                        <div class="image-preview-link" 
+                                             onclick="showImageModal('${job.image_url}', ${JSON.stringify(job).replace(/"/g, '&quot;')})">
+                                            <img src="${job.image_url}" alt="Generated image preview" 
+                                                 style="width: 128px; height: 128px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; cursor: pointer; transition: all 0.2s;"
+                                                 onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'text-muted\\'>Preview unavailable</span>';">
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Failed to fetch jobs:', error);
+            jobsContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Failed to load jobs: ${error.message}
+                </div>
+            `;
+            activeTasksCounter.innerHTML = '<i class="fas fa-times me-1"></i>Error loading';
+            statusActiveTasks.textContent = 'Error';
+        }
+    }
+
+    function startAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+        autoRefreshInterval = setInterval(fetchJobs, 10000); // Every 10 seconds
+    }
+
+    function stopAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
+    }
+
+    // Event listeners
+    refreshBtn.addEventListener('click', fetchJobs);
+
+    autoRefreshToggle.addEventListener('change', function() {
+        if (this.checked) {
+            startAutoRefresh();
+        } else {
+            stopAutoRefresh();
+        }
+    });
+
+    // Initial load
+    fetchJobs();
+    
+    // Start auto-refresh if toggle is checked
+    if (autoRefreshToggle.checked) {
+        startAutoRefresh();
+    }
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', stopAutoRefresh);
+});
+
+// Store jobs data globally for modal access
+let jobsData = [];
+
+// Show image modal with details
+function showImageModal(imageUrl, jobData) {
+    const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+    const modalImage = document.getElementById('modalImagePreview');
+    const modalLink = document.getElementById('modalImageLink');
+    const imageDetails = document.getElementById('imageDetails');
+    
+    // Set image
+    modalImage.src = imageUrl;
+    modalLink.href = imageUrl;
+    
+    // Parse job data if it's a string
+    if (typeof jobData === 'string') {
+        try {
+            jobData = JSON.parse(jobData);
+        } catch (e) {
+            console.error('Failed to parse job data:', e);
+        }
+    }
+    
+    // Build details HTML
+    let detailsHtml = '<div class="small">';
+    detailsHtml += `<p><strong>Job ID:</strong> ${jobData.job_id || 'N/A'}</p>`;
+    detailsHtml += `<p><strong>User:</strong> ${jobData.user_display_name || jobData.username || 'Unknown'}</p>`;
+    detailsHtml += `<p><strong>Element:</strong> ${jobData.element_type || 'N/A'} #${jobData.element_id || 'N/A'}</p>`;
+    detailsHtml += `<p><strong>Created:</strong> ${formatDate(jobData.created_at) || 'N/A'}</p>`;
+    if (jobData.prompt) {
+        detailsHtml += `<p><strong>Prompt:</strong> ${jobData.prompt}</p>`;
+    }
+    if (jobData.result && jobData.result.revised_prompt) {
+        detailsHtml += `<p><strong>Revised Prompt:</strong> ${jobData.result.revised_prompt}</p>`;
+    }
+    detailsHtml += '</div>';
+    
+    imageDetails.innerHTML = detailsHtml;
+    
+    // Show modal
+    modal.show();
+}
+</script>
+{% endblock %}

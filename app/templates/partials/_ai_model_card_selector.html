@@ -1,0 +1,218 @@
+{# AI Model Card Selector Partial - Admin Only #}
+{# Parameters:
+   - select_id: Unique ID for the selector
+   - select_name: Name attribute for form submission (optional)
+   - tooltip_text: Tooltip text (optional)
+   - show_label: Whether to show the label (default: true)
+   - label_text: Custom label text (default: "AI Model")
+   - default_model_type: Context for default selection
+   - max_columns: Maximum columns to display (default: 3)
+#}
+
+{% if current_user and current_user.is_admin %}
+<div class="ai-model-card-selector-wrapper">
+    {% if show_label != false %}
+    <label class="form-label">
+        <i class="fas fa-robot me-1"></i>{{ label_text | default('AI Model') }}
+        {% if tooltip_text %}
+        <i class="fas fa-info-circle text-muted ms-1" 
+           data-bs-toggle="tooltip" 
+           data-bs-placement="top" 
+           title="{{ tooltip_text }}"></i>
+        {% endif %}
+    </label>
+    {% endif %}
+    
+    <!-- Card Grid -->
+    <div class="model-cards-container" id="{{ select_id }}-container">
+        <div class="text-center py-3">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            Loading AI models...
+        </div>
+    </div>
+    
+    <!-- Hidden input to store the selected value -->
+    <input type="hidden" id="{{ select_id }}-value" name="{{ select_name | default(select_id) }}" value="">
+</div>
+
+<style>
+.model-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+}
+
+.model-card {
+    border: 2px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+    position: relative;
+}
+
+.model-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+.model-card.selected {
+    border-color: #0d6efd;
+    background: #e7f3ff;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+}
+
+.model-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 0.25rem;
+    right: 0.5rem;
+    color: #0d6efd;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.model-card-name {
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.model-card-provider {
+    font-size: 0.75em;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.model-card-description {
+    font-size: 0.7em;
+    color: #6c757d;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+
+<script>
+// Initialize card model selector when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('{{ select_id }}-container');
+    const hiddenInput = document.getElementById('{{ select_id }}-value');
+    
+    if (!container || !hiddenInput) {
+        console.error('AI Model Card Selector: Required elements not found for {{ select_id }}');
+        return;
+    }
+
+    // Load models and populate cards
+    fetch('/api/v1/ai-models/', { credentials: 'include' })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch AI models');
+            return response.json();
+        })
+        .then(models => {
+            if (models.length === 0) {
+                container.innerHTML = '<div class="text-center py-3 text-muted">No AI models found</div>';
+                return;
+            }
+
+            // Clear loading
+            container.innerHTML = '';
+            
+            let defaultModelId = null;
+            
+            // Determine default model based on context
+            {% if default_model_type %}
+            const modelType = '{{ default_model_type }}';
+            if (modelType === 'public_chat') {
+                const publicChatDefault = models.find(m => m.is_public_chat_default);
+                if (publicChatDefault) defaultModelId = publicChatDefault.id;
+            } else if (modelType === 'generation' || modelType === 'writing_assistant') {
+                const costEfficientModel = models.find(m => m.model_name && m.model_name.includes('gpt-4o-mini'));
+                if (costEfficientModel) defaultModelId = costEfficientModel.id;
+            }
+            
+            if (!defaultModelId) {
+                const firstGenerationModel = models.find(m => m.model_type === 'GENERATION' && m.is_active);
+                if (firstGenerationModel) defaultModelId = firstGenerationModel.id;
+            }
+            {% endif %}
+            
+            if (!defaultModelId && models.length > 0) {
+                defaultModelId = models[0].id;
+            }
+
+            // Create cards
+            models.forEach(model => {
+                const card = document.createElement('div');
+                card.className = 'model-card';
+                card.dataset.modelId = model.id;
+                card.innerHTML = `
+                    <div class="model-card-name">${model.display_name}</div>
+                    <div class="model-card-provider">${model.provider}</div>
+                    <div class="model-card-description">${model.description || 'AI Language Model'}</div>
+                `;
+                
+                // Add click handler
+                card.addEventListener('click', function() {
+                    selectModel(model.id, model.display_name);
+                });
+                
+                container.appendChild(card);
+            });
+            
+            // Set default selection
+            if (defaultModelId) {
+                const defaultModel = models.find(m => m.id == defaultModelId);
+                if (defaultModel) {
+                    selectModel(defaultModel.id, defaultModel.display_name);
+                }
+            }
+            
+            console.log(`AI Model Card Selector: Populated {{ select_id }} with ${models.length} models`);
+        })
+        .catch(error => {
+            console.error('Error loading AI models for {{ select_id }}:', error);
+            container.innerHTML = '<div class="text-center py-3 text-danger">Error loading models</div>';
+        });
+    
+    function selectModel(modelId, modelName) {
+        // Clear previous selection
+        container.querySelectorAll('.model-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Select new card
+        const selectedCard = container.querySelector(`[data-model-id="${modelId}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+        
+        // Update hidden input
+        hiddenInput.value = modelId;
+        
+        // Trigger change event
+        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        console.log(`AI Model Card Selector: Selected model ${modelId} (${modelName})`);
+    }
+    
+    // Expose getValue function for external access
+    window['get' + '{{ select_id }}' + 'Value'] = function() {
+        return hiddenInput.value;
+    };
+});
+</script>
+{% else %}
+<script>console.log('AI Model Card Selector: User is not admin, hiding selector for {{ select_id }}');</script>
+{% endif %}

@@ -1,0 +1,144 @@
+{  
+  "world": {  
+    "name": "The Little Prince's Universe",  
+    "description": "The world of The Little Prince is a poetic and surreal cosmos comprised of tiny asteroids, vast deserts, and distant stars. It blends childlike wonder with profound philosophical reflections, where innocence and wisdom coexist in a delicate balance. The atmosphere is whimsical yet melancholic, inviting contemplation about love, loss, friendship, and the nature of human relationships. Each location, from small planets to the barren Earth, serves as a metaphorical backdrop for the Little Prince's encounters and the lessons he learns. This universe is unique in its simplicity and depth, evoking a timeless sense of curiosity and introspection.",  
+    "characters": [  
+      {  
+        "name": "The Little Prince",  
+        "description": "A small, blond-haired boy from a tiny asteroid known as B-612. He is curious, innocent, and thoughtful, traveling through space to understand life and human nature. His simple yet profound observations form the heart of the story.",  
+        "personality_traits": "Innocent, Curious, Philosophical, Kind, Reflective, Imaginative, Lonely",  
+        "backstory": "The Little Prince leaves his small planet, where he cares for a single rose and three small volcanoes, to explore other worlds and learn about life. His journey brings him into contact with various characters who embody adult follies.",  
+        "importance_rating": 5,  
+        "relationships": "Caretaker of the Rose, friend to the Aviator, encounters with various planetary inhabitants.",  
+        "image_prompt_definition": "Small blond-haired boy in simple clothes, gentle expression, standing on a tiny asteroid with a single rose."  
+      },  
+      {  
+        "name": "The Rose",  
+        "description": "A delicate and vain flower with four thorns living on the Little Prince's asteroid. She is proud and demanding but also vulnerable, representing love's complexities.",  
+        "personality_traits": "Proud, Sensitive, Vain, Fragile, Loving, Complex",  
+        "backstory": "The Rose grows on the Little Prince’s tiny planet and becomes the object of his affection and care. Her vanity and fragility cause tension, prompting the Prince to leave his home in search of understanding.",  
+        "importance_rating": 4,  
+        "relationships": "Loved by the Little Prince, symbolizes his attachment and emotional growth.",  
+        "image_prompt_definition": "Elegant red rose with four thorns, delicate petals, standing alone on a small rocky surface."  
+      },  
+      {  
+        "name": "The Aviator",  
+        "description": "The narrator and pilot who crashes in the Sahara Desert. He befriends the Little Prince and serves as a grounded perspective contrasting the Prince’s innocence.",  
+        "personality_traits": "Pragmatic, Reflective, Lonely, Compassionate, Imaginative",  
+        "backstory": "An adult pilot stranded in the desert, he meets the Little Prince and learns to see the world through a child's eyes again, rekindling his sense of wonder.",  
+        "importance_rating": 5,  
+        "relationships": "Friend and confidant of the Little Prince, narrator of the story.",  
+        "image_prompt_definition": "Middle-aged male pilot with goggles and scarf, contemplative expression, desert backdrop."  
+      },  
+      {  
+        "name": "The Fox",  
+        "description": "A wild fox who teaches the Little Prince the meaning of taming and relationships. He is wise, patient, and represents the theme of friendship.",  
+        "personality_traits": "Wise, Patient, Playful, Loyal, Insightful",  
+        "backstory": "The Fox requests to be tamed by the Little Prince, explaining that to form bonds is to create responsibility and love. His lessons deeply affect the Prince’s understanding of his rose.",  
+        "importance_rating": 4,  
+        "relationships": "Friend and teacher to the Little Prince, symbolizes friendship and trust.",  
+        "image_prompt_definition": "Small wild fox with bright eyes, sitting attentively in a grassy field, gentle demeanor."  
+      },  
+      {  
+        "name": "The King",  
+        "description": "A monarch who rules over a tiny asteroid and issues absurd commands. He embodies the folly of authority and power without purpose.",  
+        "personality_traits": "Authoritative, Lonely, Delusional, Proud, Comical",  
+        "backstory": "The King believes he rules over everything but has no subjects. His interactions with the Little Prince highlight the absurdity of arbitrary power.",  
+        "importance_rating": 3,  
+        "relationships": "One of the planetary inhabitants visited by the Little Prince.",  
+        "image_prompt_definition": "Small king in regal robes and crown, seated on a tiny throne on a small asteroid."  
+      },  
+      {  
+        "name": "The Businessman",  
+        "description": "A man obsessed with counting and owning stars, representing materialism and the absurdity of wealth.",  
+        "personality_traits": "Obsessive, Materialistic, Distracted, Serious, Narrow-minded",  
+        "backstory": "The Businessman spends his time counting stars to claim ownership, missing the true value of life and beauty around him.",  
+        "importance_rating": 3,  
+        "relationships": "Encountered by the Little Prince during his travels.",  
+        "image_prompt_definition": "Man in formal suit, holding a ledger and glasses, standing amidst stars in the night sky."  
+      },  
+      {  
+        "name": "The Lamplighter",  
+        "description": "A man who obediently lights and extinguishes a street lamp every minute due to his planet’s rapid rotation. He represents duty and the absurdity of blind obedience.",  
+        "personality_traits": "Dutiful, Tired, Obedient, Lonely, Methodical",  
+        "backstory": "The Lamplighter follows his orders without question, embodying the conflict between duty and personal freedom.",  
+        "importance_rating": 3,  
+        "relationships": "One of the characters visited by the Little Prince.",  
+        "image_prompt_definition": "Man in simple uniform with a lamp, lighting a street lamp on a small rotating asteroid."  
+      },  
+      {  
+        "name": "The Geographer",  
+        "description": "A scholar who records the locations of mountains, rivers, and cities but never explores himself. He symbolizes intellectual detachment.",  
+        "personality_traits": "Scholarly, Detached, Serious, Methodical, Unadventurous",  
+        "backstory": "The Geographer advises the Little Prince to visit Earth but cannot provide firsthand knowledge, highlighting the limits of book learning.",  
+        "importance_rating": 3,  
+        "relationships": "Encountered by the Little Prince during his interplanetary journey.",  
+        "image_prompt_definition": "Older man with spectacles and maps, seated at a desk cluttered with charts and books."  
+      }  
+    ],  
+    "locations": [  
+      {  
+        "name": "Asteroid B-612",  
+        "description": "The Little Prince’s tiny home planet, no larger than a house, with three small volcanoes and a single rose. It is a place of solitude and care, symbolizing innocence and responsibility.",  
+        "atmosphere": "Quiet, Intimate, Reflective",  
+        "scale": "PLANET",  
+        "geography": "Small rocky asteroid with volcanic features and a single cultivated rose.",  
+        "cultural_context": "Represents the personal and emotional world of the Little Prince, emphasizing care and love.",  
+        "significance": "Central setting representing the Little Prince’s origins and emotional center.",  
+        "importance_rating": 5,  
+        "connected_elements": "Home of the Little Prince and the Rose.",  
+        "image_prompt_definition": "Small asteroid with three volcanoes and a single red rose growing on it, starry background."  
+      },  
+      {  
+        "name": "The Sahara Desert",  
+        "description": "A vast, arid desert on Earth where the Aviator crashes and meets the Little Prince. It is a place of isolation but also profound encounter and revelation.",  
+        "atmosphere": "Barren, Silent, Mysterious",  
+        "scale": "REGION",  
+        "geography": "Expansive desert with sand dunes and scorching sun.",  
+        "cultural_context": "Earthly setting contrasting with cosmic worlds, grounding the story in reality.",  
+        "significance": "Where the narrative is framed and where the essential relationship between the Aviator and the Little Prince develops.",  
+        "importance_rating": 5,  
+        "connected_elements": "Meeting place of the Aviator and the Little Prince.",  
+        "image_prompt_definition": "Wide sandy desert under a bright blue sky, crashed airplane visible, small boy standing nearby."  
+      },  
+      {  
+        "name": "The Little Prince’s Journey Planets",  
+        "description": "A series of tiny planets each inhabited by a single adult character embodying various human follies, such as the King, Businessman, and Lamplighter. Each planet is a microcosm of philosophical ideas.",  
+        "atmosphere": "Surreal, Allegorical, Isolated",  
+        "scale": "PLANET",  
+        "geography": "Various small asteroids, each with its unique feature reflecting the inhabitant's nature.",  
+        "cultural_context": "Allegorical representations of adult behaviors and societal critiques.",  
+        "significance": "Settings for the Little Prince’s lessons about human nature.",  
+        "importance_rating": 4,  
+        "connected_elements": "Home to key characters like the King, Businessman, Lamplighter, and Geographer.",  
+        "image_prompt_definition": "Multiple tiny asteroids floating in space, each with a single figure and symbolic objects."  
+      }  
+    ],  
+    "lore_items": [  
+      {  
+        "title": "The Rose",  
+        "description": "A unique flower cared for by the Little Prince on his asteroid. It symbolizes love, beauty, vanity, and vulnerability, central to the Prince’s emotional journey.",  
+        "category": "ARTIFACT",  
+        "importance_rating": 5,  
+        "related_elements": "Associated with the Little Prince, symbolizing his attachment and lessons about love.",  
+        "image_prompt_definition": "Single elegant red rose with delicate petals and thorns on a small rocky surface."  
+      },  
+      {  
+        "title": "The Baobabs",  
+        "description": "Giant trees on the Little Prince’s asteroid that threaten to overrun the planet if not carefully uprooted. They symbolize problems that grow if neglected.",  
+        "category": "CREATURE",  
+        "importance_rating": 4,  
+        "related_elements": "Known to the Little Prince as a danger to his home planet.",  
+        "image_prompt_definition": "Large, menacing baobab trees with thick trunks growing on a tiny asteroid."  
+      },  
+      {  
+        "title": "Taming",  
+        "description": "A concept introduced by the Fox, describing the process of establishing meaningful bonds by becoming unique to each other. It highlights themes of friendship and responsibility.",  
+        "category": "MAGIC_SYSTEM",  
+        "importance_rating": 5,  
+        "related_elements": "Central to the Fox and Little Prince relationship and the story’s message on love.",  
+        "image_prompt_definition": "Two figures approaching each other with gentle expressions in a field at sunset."  
+      }  
+    ]  
+  }  
+}

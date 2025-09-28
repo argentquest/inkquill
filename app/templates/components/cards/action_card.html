@@ -1,0 +1,60 @@
+<!-- Action Card Component -->
+<!-- Usage: {% include "components/cards/action_card.html" title="Create Story" description="Start writing your story" icon="edit" action_url="/stories/new" %} -->
+
+<div class="card card-link{% if hover_effect %} card-link-{{ hover_effect }}{% endif %}{% if class %} {{ class }}{% endif %}"{% if action_url %} onclick="window.location.href='{{ action_url }}'"{% endif %}>
+    <div class="card-body text-center">
+        {% if icon %}
+        <div class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg text-{{ icon_color | default('primary') }}" width="48" height="48" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                {% case icon %}
+                    {% when 'edit' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                        <path d="M16 5l3 3"/>
+                    {% when 'plus' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    {% when 'world' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <circle cx="12" cy="12" r="9"/>
+                        <line x1="3.6" y1="9" x2="20.4" y2="9"/>
+                        <line x1="3.6" y1="15" x2="20.4" y2="15"/>
+                        <path d="M11.5 3a17 17 0 0 0 0 18"/>
+                        <path d="M12.5 3a17 17 0 0 1 0 18"/>
+                    {% when 'book' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/>
+                        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/>
+                        <line x1="3" y1="6" x2="3" y2="19"/>
+                        <line x1="12" y1="6" x2="12" y2="19"/>
+                        <line x1="21" y1="6" x2="21" y2="19"/>
+                    {% when 'settings' %}
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    {% else %}
+                        <circle cx="12" cy="12" r="1"/>
+                {% endcase %}
+            </svg>
+        </div>
+        {% endif %}
+        
+        {% if title %}
+        <h3 class="card-title">{{ title }}</h3>
+        {% endif %}
+        
+        {% if description %}
+        <div class="text-muted">{{ description }}</div>
+        {% endif %}
+        
+        {% if action_text %}
+        <div class="mt-3">
+            <span class="btn btn-{{ button_color | default('primary') }} btn-sm">
+                {{ action_text }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</div>

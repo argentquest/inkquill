@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}System Maintenance - {{ app_name }}{% endblock %}
+
+{% block content %}
+<h1>🔧 System Maintenance Notice</h1>
+
+<p>Hello {{ user_name }},</p>
+
+<p>We're writing to inform you about scheduled maintenance for {{ app_name }}. We're constantly working to improve your experience and ensure our platform runs smoothly.</p>
+
+<div class="warning-box">
+    <h2>⚠️ Maintenance Details</h2>
+    <p><strong>{{ maintenance_title }}</strong></p>
+    <p>{{ maintenance_message }}</p>
+    
+    {% if start_time and end_time %}
+    <div class="spacer"></div>
+    <p><strong>Scheduled Time:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Start:</strong> {{ start_time }}</li>
+        <li><strong>Expected End:</strong> {{ end_time }}</li>
+    </ul>
+    {% elif start_time %}
+    <div class="spacer"></div>
+    <p><strong>Scheduled Start:</strong> {{ start_time }}</p>
+    {% endif %}
+</div>
+
+<h2>🚀 What to Expect</h2>
+<p>During the maintenance window:</p>
+<ul>
+    <li><strong>{{ app_name }} may be temporarily unavailable</strong></li>
+    <li><strong>Any work in progress should be saved</strong> before the maintenance begins</li>
+    <li><strong>Some features may be limited</strong> during the maintenance period</li>
+    <li><strong>All your data will remain safe and secure</strong></li>
+</ul>
+
+<div class="info-box">
+    <h2>💡 Preparation Tips</h2>
+    <p>To minimize any disruption to your writing:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Save your work frequently</strong> before the maintenance window</li>
+        <li><strong>Complete any critical tasks</strong> ahead of time</li>
+        <li><strong>Consider working offline</strong> in a text editor during maintenance</li>
+        <li><strong>Check back after the maintenance</strong> for any new features or improvements</li>
+    </ul>
+</div>
+
+<h2>🔄 What We're Improving</h2>
+<p>This maintenance will help us:</p>
+<ul>
+    <li><strong>Enhance system performance</strong> and speed</li>
+    <li><strong>Improve reliability</strong> and uptime</li>
+    <li><strong>Add new features</strong> and capabilities</li>
+    <li><strong>Strengthen security</strong> and data protection</li>
+    <li><strong>Fix any known issues</strong> to improve your experience</li>
+</ul>
+
+<div class="success-box">
+    <h2>✨ After Maintenance</h2>
+    <p>Once maintenance is complete, you'll enjoy:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Improved performance</strong> across all features</li>
+        <li><strong>Enhanced stability</strong> for longer writing sessions</li>
+        <li><strong>Better AI response times</strong> for story generation</li>
+        <li><strong>Any new features or improvements</strong> we've deployed</li>
+    </ul>
+</div>
+
+<h2>📞 Need Support?</h2>
+<p>If you have any questions or concerns about this maintenance:</p>
+<ul>
+    <li><strong>Check our status page</strong> for real-time updates</li>
+    <li><strong>Contact our support team</strong> if you need assistance</li>
+    <li><strong>Follow us on social media</strong> for the latest news</li>
+</ul>
+
+<div class="text-center">
+    {% if status_url %}
+    <a href="{{ status_url }}" class="btn btn-primary">
+        📊 Check System Status
+    </a>
+    {% endif %}
+    <a href="mailto:{{ support_email }}" class="btn btn-secondary">
+        ✉️ Contact Support
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<h2>🙏 Thank You for Your Patience</h2>
+<p>We appreciate your understanding as we work to make {{ app_name }} even better. Our goal is always to provide you with the best possible writing experience, and this maintenance is an important part of that commitment.</p>
+
+<p>We'll notify you as soon as the maintenance is complete and all systems are fully operational.</p>
+
+<div class="spacer"></div>
+
+<p>Thank you for being part of the {{ app_name }} community!</p>
+<p><strong>The {{ app_name }} Team</strong></p>
+
+<div class="spacer"></div>
+
+<p class="text-muted">
+    <em>Maintenance: {{ maintenance_title }} | Notice sent: {{ "now" | strftime('%B %d, %Y at %I:%M %p') }}</em>
+</p>
+{% endblock %}

@@ -1,0 +1,167 @@
+{
+  "world": {
+    "name": "The Cosmic Journey of B-612",
+    "description": "The world of 'Le Petit Prince' is a vast and poetic cosmic landscape interwoven with small, intimate planets and a lone desert on Earth. Central to this universe is Asteroid B-612, home to the Little Prince, which is a tiny, peaceful place threatened by the growth of baobab trees. The planets visited span from bureaucratic to desolate, each revealing quirky and profound truths about human nature through their singular inhabitants. The tone oscillates between melancholy and whimsy, evoking both a child’s innocence and adult themes of insanity and isolation in the universe. The desert on Earth, where the narrator is stranded and meets the prince, becomes a symbol of life’s fragility and interconnectedness within this explorative and isolated realm. The locales—a small asteroid, uncharted planets, and an empty desert—became backdrop to philosophical reflections of friendship, love, and existence. The unique quality of this world lies in how it juxtaposes simplicity against cosmic vastness, mirrored by the story's themes of introspection and tamed isolation."
+  },
+  "characters": [
+    {
+      "name": "The Little Prince",
+      "description": "A small blonde boy embodying childlike innocence and curiosity, traveling across planets to learn about life, love, and loss. He lives on Asteroid B-612 and interacts with various characters during his journey.",
+      "personality_traits": "Innocent, curious, melancholic, wise, introspective, gentle, imaginative",
+      "backstory": "Leaves his tiny home planet due to a misunderstanding with his beloved rose and ends up embarking on a journey through space. Meets the narrator in the desert.",
+      "importance_rating": 5,
+      "relationships": "His rose, the fox, the pilot.",
+      "image_prompt_definition": "Small boy with golden hair standing on a tiny asteroid, looking thoughtful, wearing a simple robe."
+    },
+    {
+      "name": "The Pilot/Narrator",
+      "description": "An aviator who crashes in the Sahara Desert and meets The Little Prince. He's the story's framing narrator who represents the adult perspective looking back on life.",
+      "personality_traits": "Patient, reflective, observant, lonely, grown-up but open to imagination",
+      "backstory": "Crash-lands in the Sahara while flying and meets The Little Prince. He is reflective and learns valuable lessons from the prince's stories.",
+      "importance_rating": 4,
+      "relationships": "The Little Prince.",
+      "image_prompt_definition": "A man in aviator gear, tired, drawing near a crashed plane in the desert."
+    },
+    {
+      "name": "The Rose",
+      "description": "A beautiful but vain rose who grows on Asteroid B-612. She is tender yet complains constantly, embodying love and complexity for the prince.",
+      "personality_traits": "Vain, beautiful, demanding, fragile, tender",
+      "backstory": "The rose claims uniqueness, which pressures The Little Prince to doubt. Despite her demands, she holds a key place in his heart, prompting his return.",
+      "importance_rating": 4,
+      "relationships": "The Little Prince, Asteroid B-612.",
+      "image_prompt_definition": "A beautiful rose with proud stance, on a rocky asteroid with delicate petals."
+    },
+    {
+      "name": "The Fox",
+      "description": "A wise and gentle creature The Little Prince encounters on Earth, teaching him about tameness, friendship, and love.",
+      "personality_traits": "Wise, gentle, sly, kind, observant",
+      "backstory": "The fox lives on Earth and imparts life lessons, such as explaining that to love someone, one must 'tame' them, forming meaningful bonds.",
+      "importance_rating": 4,
+      "relationships": "The Little Prince.",
+      "image_prompt_definition": "A fox with golden fur sitting thoughtfully among wheat fields, calm expression."
+    },
+    {
+      "name": "The King",
+      "description": "A monarch on the first planet visited by The Little Prince, commanding his absent subjects with apparent authority who symbolizes meaningless power.",
+      "personality_traits": "Authoritative, lonely, pompous, logical yet absurd",
+      "backstory": "The King is one of the eccentric adult figures encountered by The Little Prince who possesses invalid power.",
+      "importance_rating": 3,
+      "relationships": "The Little Prince.",
+      "image_prompt_definition": "Old king seated on a throne dressed in regal purple robes facing a small prince."
+    },
+    {
+      "name": "The Lamplighter",
+      "description": "Resident of a tiny planet where day and night succeed each other very rapidly, diligently lighting and extinguishing his lamp every minute.",
+      "personality_traits": "Dedicated, dutiful, obedient, weary.",
+      "backstory": "He lives on a spinning planet where a day lasts one minute, leading to ceaseless labor for no tangible reward.",
+      "importance_rating": 3,
+      "relationships": "The Little Prince.",
+      "image_prompt_definition": "A man in uniform constantly turning on/off a streetlight with tired posture in a small scene."
+    },
+    {
+      "name": "The Drunkard",
+      "description": "A sohren figure on a lone planet, rebelliously drinking to forget his shame of alcoholism.",
+      "personality_traits": "Ashamed, stubborn, afflicted, melancholy.",
+      "backstory": "An alcoholic soaked in regret yet unable to escape his tragic cycle, a desolate sideshow of misery.",
+      "importance_rating": 2,
+      "relationships": "The Little Prince.",
+      "image_prompt_definition": "A man with disheveled attire sitting morosely beside bottles of liquor on a barren asteroid."
+    }
+  ],
+  "locations": [
+    {
+      "name": "Asteroid B-612",
+      "description": "The Little Prince’s home asteroid, a small, planet about the size of a house featuring three volcanoes and one captivating rose.",
+      "atmosphere": "Lonely, serene, simple, innocent.",
+      "scale": "UNKNOWN",
+      "geography": "A small rocky terrain with few volcanic features.",
+      "cultural_context": "The domicile of the prince; reduced to his one-sided conversations with his rose.",
+      "significance": "Central to the story, as it’s the prince's home and symbol of isolation within space.",
+      "importance_rating": 5,
+      "connected_elements": "The Little Prince, the rose.",
+      "image_prompt_definition": "Small asteroid with a small rocky formation, a solitary rose, and a lone boy leaning on a tiny bench."
+    },
+    {
+      "name": "The Desert",
+      "description": "Earth’s Sahara Desert where the narrator, an airplane pilot, meets The Little Prince after crash-landing.",
+      "atmosphere": "Desolate, vast, hot, quiet.",
+      "scale": "REGION",
+      "geography": "Sandy and flat with sparse vegetation.",
+      "cultural_context": "Smattering of sand patiently weathering the desolation contrasts human foliage-meccas:A symbolic exile from society where both man and prince reflect existential bitterness.",
+      "significance": "Framese the jaded pilgrim tale mirroring human reach for wisdom as existential reminder.",
+      "importance_rating": 4,
+      "connected_elements": "The Pilot, The Little Prince.",
+      "image_prompt_definition": "Expanse of sand and dunes, sun setting as a lone aviator and boy exchange connuisance before a fallen metal-biplane glinting its broken gears."
+    },
+    {
+      "name": "The King’s Planet",
+      "description": "A spacious celestial kingdom featuring a nonsensical royal ruler governing no subjects.",
+      "atmosphere": "Pompous, obediently vacant.",
+      "scale": "BUILDING",
+      "geography": "Palace-like structures devoid of populace.",
+      "cultural_context": "A metaphor for empty authoritarian systems use, reflecting satirical bureaucracy.",
+      "significance": "Emphasizes the prince’s discernment of pointless power.",
+      "importance_rating": 3,
+      "connected_elements": "The King, The Little Prince.",
+      "image_prompt_definition": "Barren throne room in a palace, featuring a pompous, purple-robed king with the palpable absence felt throughout."
+    },
+    {
+      "name": "The Lamplighter’s Planet",
+      "description": "A tiny orb where the lamplighter dutifully manages his planet’s speedy day-night cycle.",
+      "atmosphere": "Industrious, fatigued, constancy.",
+      "scale": "BUILDING",
+      "geography": "A pallid composition featuring lightposts amidst twilight graphene strata.",
+      "cultural_context": "Realism's fatigue as allegory of relentless work routines.",
+      "significance": "Reconnaissance that boundless routines are misery.",
+      "importance_rating": 3,
+      "connected_elements": "The Lamplighter, The Little Prince.",
+      "image_prompt_definition": "Constant, mediocre hemisphere of light-tower via constrained lone-standing figure."
+    },
+    {
+      "name": "The Drunkard’s Planet",
+      "description": "Sombre orb confined to inferiority odes: A self-consuming alcoholic living circular despair.",
+      "atmosphere": "Despair dense as sobriety awareness.",
+      "scale": "BUILDING",
+      "geography": "A limited monochromatic canvas strewn casements.",
+      "cultural_context": "A mirror on human psycho-gravitons of paralyzing atonement Prohibition.",
+      "significance": "Manifestation in grappling with self-loathing.",
+      "importance_rating": 2,
+      "connected_elements": "The Drunkard, The Little Prince.",
+      "image_prompt_definition": "Barren habitat disheveled as a lone insignificant dare grow amongst fixtures of resignation."
+    }
+  ],
+  "lore_items": [
+    {
+      "title": "The Baobabs",
+      "description": "Symbolic trees that could destroy Asteroid B-612 if not diligently managed. These represent overlooked threats that become insurmountable if ignored.",
+      "category": "OTHER_LORE",
+      "importance_rating": 3,
+      "related_elements": "Asteroid B-612, The Little Prince",
+      "image_prompt_definition": "Tiny sapling baobab growing mischievously amidst a modest asteroid ground; adjacent uprooted bush in process by a gentle prince figure."
+    },
+    {
+      "title": "The Drawing of a Sheep",
+      "description": "The narrator’s drawing of a sheep that looks like a box—a lesson for adults to see the world through a child’s imaginative eyes.",
+      "category": "ARTIFACT",
+      "importance_rating": 3,
+      "related_elements": "The Pilot, The Little Prince",
+      "image_prompt_definition": "Simple drawing style, a boxed outline, slightly resembling lambsuchery hidden within."
+    },
+    {
+      "title": "The Taming Ritual",
+      "description": "As narrated by the fox: Turning indifferent crowds into affection. Represents the process of genuinely knowing and being known by others.",
+      "category": "CULTURE",
+      "importance_rating": 4,
+      "related_elements": "The Fox, The Little Prince, The Rose",
+      "image_prompt_definition": "Tender shared moment in sunlit wheat field as litten boarded alike amidst forget-me-not flowers."
+    },
+    {
+      "title": "The Prince’s Journey across Planets",
+      "description": "His objective travelogue to resolve realms from pomp to incapability, presenting societal absurdities review.",
+      "category": "HISTORICAL_EVENT",
+      "importance_rating": 5,
+      "related_elements": "The Prince, storylines, earthly significance",
+      "image_prompt_definition": "Micro ever-bronze’s traversing starts as the lonely astronaut wandered spacecraft-prepared vista knowingly."
+    }
+  ]
+}

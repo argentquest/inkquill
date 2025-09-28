@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World List - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header centered">
+            <h1 class="help-title">🌍 World List Guide</h1>
+            <p class="help-subtitle">Master your creative universes and world-building tools</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#overview">What is the World List?</a></li>
+                    <li><a href="#creating-worlds">Creating Your First World</a></li>
+                    <li><a href="#managing-worlds">Managing Existing Worlds</a></li>
+                    <li><a href="#world-features">World Features & Tools</a></li>
+                    <li><a href="#tips">Pro Tips & Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="scrollToSection('creating-worlds')">
+                    <div class="quick-action-icon">✨</div>
+                    <div class="quick-action-text">Create New World</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('managing-worlds')">
+                    <div class="quick-action-icon">⚙️</div>
+                    <div class="quick-action-text">Manage Worlds</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('tips')">
+                    <div class="quick-action-icon">💡</div>
+                    <div class="quick-action-text">Pro Tips</div>
+                </div>
+            </div>
+
+            <section id="overview" class="help-section">
+                <h2 class="help-section-title">What is the World List?</h2>
+                <p>The World List is your central dashboard for managing all your creative universes. Each world contains characters, locations, lore items, and stories - everything you need for rich, context-aware AI storytelling.</p>
+                
+                <div class="help-alert help-alert-success">
+                    <div class="help-alert-icon">🎯</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">Why Worlds Matter</div>
+                        <div class="help-alert-text">Worlds are the foundation of intelligent AI assistance. The more detailed your world, the better the AI understands your creative vision and provides relevant suggestions.</div>
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/worlds" class="help-action-button">
+                        🌍 Go to My Worlds
+                    </a>
+                    <a href="/ui/generator/world" class="help-action-button-secondary">
+                        ✨ Create New World
+                    </a>
+                </div>
+            </section>
+                
+            <section id="creating-worlds" class="help-section">
+                <h2 class="help-section-title">Creating Your First World</h2>
+                <p>Choose the best method for creating your world based on your experience and needs:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">✨ World Builder Wizard</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-beginner">Recommended</span><br>
+                            Answer 20 guided questions and let AI create a rich, detailed world for you. Perfect when you need inspiration or want to explore new ideas.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/generator/world" class="help-action-button">Start Wizard</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📖 Import from Book</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-beginner">Popular</span><br>
+                            Enter the title of an existing book, movie, or story. AI will analyze it and create a world based on that universe, complete with characters and locations.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/worlds/import-book" class="help-action-button">Import Book</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📄 Import from Document</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-intermediate">Intermediate</span><br>
+                            Upload a text document (story, outline, notes) and AI will extract world-building elements automatically. Perfect for existing creative projects.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/worlds/import-document" class="help-action-button">Import Document</a>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🌍 Create Blank World</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-advanced">Advanced</span><br>
+                            Start from scratch with a completely empty world. You have full control over every detail. Best for experienced world-builders with a clear vision.
+                        </div>
+                        <div class="help-actions mt-sm">
+                            <a href="/ui/worlds/new" class="help-action-button">Create Blank</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-card mt-lg">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">🚀 Quick Start: World Builder Wizard</div>
+                        <div class="recipe-card-time">⏱️ 5 minutes</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Start the Wizard:</strong> Click "World Builder Wizard" on your worlds page
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Answer Questions:</strong> Describe your world's genre, technology level, magic system, and key themes
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Review Preview:</strong> Check the AI-generated world description and make adjustments
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Name Your World:</strong> Give it a memorable name and create your universe
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">
+                                <strong>Explore & Expand:</strong> Start adding characters, locations, and stories to bring it to life
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="help-tip">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">💡</i>
+                        First-Time Builder Tip
+                    </div>
+                    <div class="help-tip-content">
+                        Start with a simple concept for your first world. You can always expand and add complexity later as you become more familiar with the tools. Think of it as building a foundation that you'll develop over time.
+                    </div>
+                </div>
+            </section>
+
+            <section id="managing-worlds" class="help-section">
+                <h2 class="help-section-title">Managing Your Worlds</h2>
+                <p>Once you have worlds, you can organize and manage them effectively:</p>
+
+                <h3 class="help-section-subtitle">Understanding World Cards</h3>
+                <p>Each world appears as a card displaying key information:</p>
+                <ul>
+                    <li><strong>🌍 Title & Description:</strong> Your world's name and summary</li>
+                    <li><strong>📊 Element Counts:</strong> Characters, locations, lore items, and stories you've created</li>
+                    <li><strong>🔒 Privacy Status:</strong> Private (only you), shared, or public</li>
+                    <li><strong>⏰ Last Updated:</strong> When you last made changes</li>
+                    <li><strong>🎨 World Image:</strong> Visual representation (if you've added one)</li>
+                </ul>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/worlds" class="help-action-button">
+                        🌍 View My Worlds
+                    </a>
+                </div>
+            </section>
+
+            <section id="world-features" class="help-section">
+                <h2 class="help-section-title">World Features & Tools</h2>
+                
+                <h3 class="help-section-subtitle">Creation Method Comparison</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">✨ World Builder Wizard</div>
+                        <div class="feature-card-description">
+                            <strong>Best for:</strong> New users, need inspiration<br>
+                            <strong>Time:</strong> 5-10 minutes<br>
+                            <strong>Control:</strong> Guided questions
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">📖 Import from Book</div>
+                        <div class="feature-card-description">
+                            <strong>Best for:</strong> Fan fiction, existing universes<br>
+                            <strong>Time:</strong> 2-5 minutes<br>
+                            <strong>Control:</strong> AI-assisted analysis
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">📄 Import from Document</div>
+                        <div class="feature-card-description">
+                            <strong>Best for:</strong> Existing projects, manuscripts<br>
+                            <strong>Time:</strong> 3-10 minutes<br>
+                            <strong>Control:</strong> Content-based extraction
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-title">🌍 Create Blank World</div>
+                        <div class="feature-card-description">
+                            <strong>Best for:</strong> Experienced builders<br>
+                            <strong>Time:</strong> 30+ minutes<br>
+                            <strong>Control:</strong> Complete customization
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-alert help-alert-info mt-lg">
+                    <div class="help-alert-icon">💡</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">Recommendation</div>
+                        <div class="help-alert-text">Start with "World Builder Wizard" if you're new to world-building. You can always create additional worlds using other methods as you gain experience.</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="help-section">
+                <h2 class="help-section-title">World Management Features</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Quick Actions</h3>
+                        <p class="feature-card-description">Edit, duplicate, or delete worlds directly from the list. Hover over a world card to see action buttons.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Privacy Controls</h3>
+                        <p class="feature-card-description">Toggle between private (only you), shared (specific users), or public (everyone can view).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Search & Filter</h3>
+                        <p class="feature-card-description">Use the search bar to find worlds by name or description. Filter by privacy level or creation date.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">World Builder Wizard</h3>
+                        <p class="feature-card-description">The green "Generate New World" button opens an interactive wizard that guides you through 20 questions to create a detailed world automatically.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Element Count Indicators</h2>
+                <p>The colored badges on each world card show:</p>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Badge</th>
+                            <th>Element Type</th>
+                            <th>What It Contains</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>👥 Characters</td>
+                            <td>People & Beings</td>
+                            <td>Protagonists, antagonists, NPCs, and creatures</td>
+                        </tr>
+                        <tr>
+                            <td>🏰 Locations</td>
+                            <td>Places</td>
+                            <td>Cities, buildings, rooms, and regions</td>
+                        </tr>
+                        <tr>
+                            <td>📜 Lore Items</td>
+                            <td>World Knowledge</td>
+                            <td>Magic systems, artifacts, history, and customs</td>
+                        </tr>
+                        <tr>
+                            <td>📚 Stories</td>
+                            <td>Narratives</td>
+                            <td>Complete stories set in this world</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="advanced">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Power User Features
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Bulk Operations</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Select multiple worlds to perform batch operations:</p>
+                        <ul>
+                            <li>Change privacy settings for multiple worlds</li>
+                            <li>Export world data in bulk</li>
+                            <li>Archive completed projects</li>
+                        </ul>
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Ctrl+Click to select multiple worlds\nShift+Click to select range')">Copy</button>
+                            <pre>Ctrl+Click to select multiple worlds
+Shift+Click to select range</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Duplication Strategies</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Use world duplication for:</p>
+                        <ul>
+                            <li><strong>Alternate Timelines:</strong> Create "what if" scenarios</li>
+                            <li><strong>Version Control:</strong> Keep backups before major changes</li>
+                            <li><strong>Template Creation:</strong> Build reusable world foundations</li>
+                        </ul>
+                        
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Cost Note:</strong> Duplicating worlds with many AI-generated elements will consume credits for regenerating embeddings and search indices.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>API Integration</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Advanced users can integrate with external tools:</p>
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'GET /api/worlds\nPOST /api/worlds\nPUT /api/worlds/{id}\nDELETE /api/worlds/{id}')">Copy</button>
+                            <pre>GET /api/worlds
+POST /api/worlds
+PUT /api/worlds/{id}
+DELETE /api/worlds/{id}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Performance Optimization</h2>
+                <p>For large world collections:</p>
+                <ul>
+                    <li><strong>Pagination:</strong> Only 20 worlds load at once by default</li>
+                    <li><strong>Lazy Loading:</strong> World details load when needed</li>
+                    <li><strong>Search Indexing:</strong> Real-time search across all content</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Shortcuts Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="shortcuts">
+            <div class="help-section">
+                <h2 class="help-section-title">Keyboard Shortcuts</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + N</span></td>
+                            <td>Create new world</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + F</span></td>
+                            <td>Focus search box</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Enter</span></td>
+                            <td>Open selected world</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Delete</span></td>
+                            <td>Delete selected world (with confirmation)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + D</span></td>
+                            <td>Duplicate selected world</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Arrow Keys</span></td>
+                            <td>Navigate between world cards</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Credit Usage</h2>
+                <div class="alert alert-info">
+                    <span class="alert-icon">💰</span>
+                    <div>
+                        <strong>Free Operations:</strong> Creating, editing, and organizing worlds doesn't cost credits. Credits are only used for AI features like content generation and smart suggestions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

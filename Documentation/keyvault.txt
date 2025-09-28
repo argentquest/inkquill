@@ -1,0 +1,139 @@
+Okay, here are the instructions for using Azure Key Vault with your FastAPI application, presented as plain text:
+
+Instructions: Using Azure Key Vault for Secure Configuration
+Objective:
+To securely store and access sensitive configuration values (API keys, connection strings, secrets) required by the FastAPI application using Azure Key Vault, leveraging Managed Identities for enhanced security in Azure deployments.
+
+1. Set up Azure Key Vault in Azure:
+
+Create Key Vault Instance:
+Go to the Azure Portal.
+Search for "Key Vault" and click "Create".
+Choose your subscription, resource group (e.g., ai_story_app_rg), provide a unique vault name (e.g., kv-ai-story-app-prod-001), select a region, and choose a pricing tier (Standard).
+Important: Under "Access configuration," select "Azure role-based access control (RBAC)" as the permission model.
+Configure networking as needed (public access might be simpler initially).
+Review and create the vault.
+Add Secrets to Key Vault:
+Navigate to your created vault in the Azure Portal.
+Go to the "Secrets" blade.
+Click "+ Generate/Import".
+Create secrets with clear names for each sensitive value, for example:
+AuthSecretKey (Your JWT secret)
+PostgresPassword (DB password, if not using AAD/MI auth for DB)
+AzureOpenAI--ApiKey
+AzureOpenAI--Endpoint
+AzureOpenAI--ChatDeploymentName
+AzureOpenAI--EmbeddingDeploymentName
+AzureAISearch--ApiKey
+AzureAISearch--Endpoint
+AzureStorage--ConnectionString (If needed)
+AzureStorage--AccountName (If using MI for blob access)
+Provide the name and the actual secret value for each.
+2. Grant Application Access to Key Vault:
+
+For Deployment (Azure App Service with Managed Identity - Recommended):
+Enable Managed Identity: In your App Service -> Settings -> "Identity", turn System assigned status On and Save. Note the Object (principal) ID.
+Assign Key Vault Role: In your Key Vault -> "Access control (IAM)" -> "+ Add" -> "Add role assignment".
+Select role: "Key Vault Secrets User".
+Assign access to: "Managed identity".
+Select members: Find and select your App Service's managed identity.
+Review + assign.
+For Local Development:
+Use DefaultAzureCredential from azure-identity. It automatically uses credentials from Azure CLI (az login), VS Code Azure extension, etc.
+Grant Your User Access: In Key Vault -> "Access control (IAM)", add a role assignment granting your Azure user account the "Key Vault Secrets User" role.
+3. Integrate Key Vault Client in FastAPI Application:
+
+Install Libraries: azure-identity, azure-keyvault-secrets (add to requirements.txt).
+
+Modify Configuration Loading (e.g., app/core/secrets.py):
+
+Use DefaultAzureCredential and SecretClient (async versions) to fetch secrets.
+Cache fetched secrets to avoid repeated calls.
+Python
+
+# Example snippet within app/core/secrets.py
+
+from azure.identity.aio import DefaultAzureCredential # Async version
+from azure.keyvault.secrets.aio import SecretClient # Async version
+import os
+import asyncio
+
+KEY_VAULT_NAME = os.getenv("KEY_VAULT_NAME")
+VAULT_URL = f"https://{KEY_VAULT_NAME}.vault.azure.net/" if KEY_VAULT_NAME else None
+_secret_cache = {}
+_keyvault_client = None
+
+async def _get_keyvault_client():
+    global _keyvault_client
+    if _keyvault_client is None:
+        if not VAULT_URL: return None
+        try:
+            credential = DefaultAzureCredential()
+            client = SecretClient(vault_url=VAULT_URL, credential=credential)
+            _keyvault_client = client
+            print(f"Azure Key Vault client initialized for: {VAULT_URL}")
+        except Exception as e:
+            print(f"ERROR: Failed to initialize Azure Key Vault client: {e}")
+            return None
+    return _keyvault_client
+
+async def initialize_secrets():
+    await _get_keyvault_client()
+
+async def close_keyvault_client():
+    global _keyvault_client
+    client = _keyvault_client
+    _keyvault_client = None
+    if client:
+        try:
+            await client.credential.close()
+            await client.close()
+            print("Azure Key Vault client closed.")
+        except Exception as e: print(f"Error closing Key Vault client: {e}")
+
+async def get_secret(secret_name: str, default_value: Optional[str] = None) -> Optional[str]:
+    if secret_name in _secret_cache: return _secret_cache[secret_name]
+    client = await _get_keyvault_client()
+    if not client: return default_value
+    try:
+        print(f"Fetching secret '{secret_name}' from Key Vault...")
+        retrieved_secret = await client.get_secret(secret_name)
+        value = retrieved_secret.value
+        _secret_cache[secret_name] = value
+        print(f"Successfully fetched secret '{secret_name}'.")
+        return value
+    except Exception as e:
+        print(f"ERROR: Failed to fetch secret '{secret_name}': {e}. Returning default.")
+        return default_value
+Update main.py Lifespan: Call initialize_secrets() on startup and close_keyvault_client() on shutdown.
+
+Python
+
+# In app/main.py
+from app.core.secrets import initialize_secrets, close_keyvault_client # Adjust import
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Application starting up...")
+    await initialize_secrets()
+    # ... other startup tasks ...
+    print("Startup complete.")
+    yield
+    print("Application shutting down...")
+    await close_keyvault_client()
+    # ... other shutdown tasks ...
+    print("Shutdown complete.")
+
+app = FastAPI(..., lifespan=lifespan)
+4. Use Fetched Secrets:
+
+Modify your code (e.g., semantic_kernel_setup.py, service initializations) to call await get_secret("YourSecretName") instead of os.getenv("YOUR_SECRET_VALUE") for sensitive values.
+Non-secret configuration (deployment names, index names) can still come directly from environment variables via the settings object.
+Database Connection: Fetch PostgresPassword secret if using password auth. If using Managed Identity/AAD auth for the database connection itself, the password secret isn't needed.
+
+
+
+
+

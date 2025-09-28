@@ -1,0 +1,147 @@
+{# /ai_rag_story_app/app/templates/pages/terms.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Terms of Service{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="card-title mb-4">Terms of Service</h1>
+                    <p class="text-muted mb-4">Last updated: {{ "now" | strftime("%B %d, %Y") }}</p>
+
+                    <section class="mb-4">
+                        <h2>Acceptance of Terms</h2>
+                        <p>By accessing and using {{ project_name }}, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Description of Service</h2>
+                        <p>{{ project_name }} is an AI-powered storytelling platform that allows users to:</p>
+                        <ul>
+                            <li>Create and manage stories, characters, worlds, and lore</li>
+                            <li>Generate AI-assisted content using advanced language models</li>
+                            <li>Collaborate and share creative content with other users</li>
+                            <li>Access various writing tools and templates</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>User Accounts and Registration</h2>
+                        <p>To access certain features, you must register for an account. You agree to:</p>
+                        <ul>
+                            <li>Provide accurate, current, and complete information</li>
+                            <li>Maintain and update your account information</li>
+                            <li>Keep your password secure and confidential</li>
+                            <li>Accept responsibility for all activities under your account</li>
+                            <li>Notify us immediately of any unauthorized use</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>User Content and Conduct</h2>
+                        <p>You retain ownership of content you create. However, you agree not to:</p>
+                        <ul>
+                            <li>Upload illegal, harmful, threatening, abusive, or offensive content</li>
+                            <li>Violate any intellectual property rights</li>
+                            <li>Spam, harass, or impersonate other users</li>
+                            <li>Attempt to gain unauthorized access to our systems</li>
+                            <li>Use the service for commercial purposes without permission</li>
+                            <li>Generate content that violates our community guidelines</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>AI-Generated Content</h2>
+                        <p>Our service uses AI to generate content. You understand that:</p>
+                        <ul>
+                            <li>AI-generated content may not always be accurate or appropriate</li>
+                            <li>You are responsible for reviewing and editing AI suggestions</li>
+                            <li>We do not guarantee the originality of AI-generated content</li>
+                            <li>You should not rely solely on AI-generated content for important decisions</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Intellectual Property</h2>
+                        <p>{{ project_name }} and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.</p>
+                        <p>You retain rights to your original content, but grant us a license to use, store, and display your content as necessary to provide the service.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Credits and Payment</h2>
+                        <p>Our service operates on a credit-based system:</p>
+                        <ul>
+                            <li>New users receive welcome credits upon registration</li>
+                            <li>AI operations consume credits based on usage</li>
+                            <li>Additional credits may be purchased</li>
+                            <li>Credits are non-refundable unless required by law</li>
+                            <li>We reserve the right to adjust credit costs with notice</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Privacy and Data</h2>
+                        <p>Your privacy is important to us. Please review our <a href="{{ url_for('ui_privacy') }}">Privacy Policy</a>, which also governs your use of the service, to understand our practices.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Service Availability</h2>
+                        <p>We strive to provide reliable service, but:</p>
+                        <ul>
+                            <li>Service may be temporarily unavailable for maintenance</li>
+                            <li>We do not guarantee 100% uptime</li>
+                            <li>We may modify or discontinue features with notice</li>
+                            <li>We are not liable for service interruptions</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Termination</h2>
+                        <p>We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties, or for any other reason.</p>
+                        <p>You may delete your account at any time through your account settings.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Disclaimer of Warranties</h2>
+                        <p>The service is provided "as is" without warranties of any kind, either express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Limitation of Liability</h2>
+                        <p>In no event shall {{ project_name }} be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Governing Law</h2>
+                        <p>These Terms shall be interpreted and governed by the laws of the jurisdiction where our service is operated, without regard to its conflict of law provisions.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Changes to Terms</h2>
+                        <p>We reserve the right to modify these terms at any time. We will notify users of any material changes. Your continued use of the service after such modifications constitutes acceptance of the updated terms.</p>
+                    </section>
+
+                    <section class="mb-4">
+                        <h2>Contact Information</h2>
+                        <p>If you have any questions about these Terms of Service, please contact us at:</p>
+                        <p>
+                            <strong>Email:</strong> support@aqdevv2.azurewebsites.net<br>
+                            <strong>Website:</strong> <a href="https://aqdevv2.azurewebsites.net">{{ project_name }}</a>
+                        </p>
+                    </section>
+
+                    <div class="text-center mt-5">
+                        <a href="{{ url_for('ui_home') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

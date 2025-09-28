@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Generator - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">🎭 Character Generator</h1>
+            <p class="help-subtitle">Create rich, detailed characters using AI assistance</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Navigation -->
+            <div class="help-navigation">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#overview">Generator Overview</a></li>
+                    <li><a href="#generation-types">Generation Types</a></li>
+                    <li><a href="#character-elements">Character Elements</a></li>
+                    <li><a href="#customization">Customization</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="closeHelpModal(); selectGenerationType('guided')">
+                    <div class="quick-action-icon">🎯</div>
+                    <div class="quick-action-text">Guided Creation</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); selectGenerationType('random')">
+                    <div class="quick-action-icon">🎲</div>
+                    <div class="quick-action-text">Random Generation</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[href*=character_list]')?.click()">
+                    <div class="quick-action-icon">👥</div>
+                    <div class="quick-action-text">View Characters</div>
+                </div>
+                <div class="quick-action" onclick="closeHelpModal(); document.querySelector('[href*=character_templates]')?.click()">
+                    <div class="quick-action-icon">📋</div>
+                    <div class="quick-action-text">Character Templates</div>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <div class="help-section" id="overview">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    What is the Character Generator?
+                </h2>
+                <p>The AI Character Generator creates rich, detailed characters for your world using advanced AI assistance. It generates personality traits, backstories, visual descriptions, dialogue samples, and even image prompts - all tailored to your world's genre and context.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🧠 AI-Powered Creation</h3>
+                        <p class="feature-card-description">Advanced AI generates believable personalities and backgrounds.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎨 Visual Integration</h3>
+                        <p class="feature-card-description">Automatic image prompts for visual character representation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🌍 World-Aware</h3>
+                        <p class="feature-card-description">Characters fit naturally into your established world context.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">⚡ Instant Results</h3>
+                        <p class="feature-card-description">Generate complete characters in minutes, not hours.</p>
+                    </div>
+                </div>
+
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🔬 Content Safety</h3>
+                    <p class="ai-feature-description">All generated content passes through AI safety filters to ensure appropriate material. Characters are automatically checked for content policy compliance.</p>
+                </div>
+
+                <div class="credit-usage">
+                    💰 <strong>Cost:</strong> 20-40 credits per character generation, depending on complexity and detail level
+                </div>
+            </div>
+
+            <!-- Generation Types Section -->
+            <div class="help-section" id="generation-types">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Generation Methods
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Guided Creation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Step-by-step character creation with precise control over every aspect:</p>
+                        <ul>
+                            <li><strong>Basic Information:</strong> Name, gender, species, age category</li>
+                            <li><strong>Physical Traits:</strong> Height, build, hair color, distinctive features</li>
+                            <li><strong>Personality Selection:</strong> Choose from 4-8 core personality traits</li>
+                            <li><strong>Background Details:</strong> Profession, social status, family history</li>
+                            <li><strong>Genre Customization:</strong> Answer genre-specific questions for context</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Guided Character Creation Process</h3>
+                                <span class="recipe-card-time">10 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Choose guided creation and select your world</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Fill in basic character information and physical traits</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Select 4-8 personality traits that fit your vision</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Define core motivations and background elements</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Answer genre-specific questions for context</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">6</div>
+                                    <div class="recipe-step-content">Review and generate your complete character</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Random Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Instant character creation for inspiration and quick population:</p>
+                        <ul>
+                            <li><strong>Complete Surprise:</strong> AI creates all aspects randomly</li>
+                            <li><strong>Genre-Appropriate:</strong> Results fit your selected world's tone</li>
+                            <li><strong>Balanced Creation:</strong> Automatically creates well-rounded characters</li>
+                            <li><strong>Inspiration Source:</strong> Perfect for overcoming creative blocks</li>
+                            <li><strong>Quick Iteration:</strong> Generate multiple options rapidly</li>
+                        </ul>
+
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Generation Mode</th>
+                                    <th>Control Level</th>
+                                    <th>Speed</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Guided</td>
+                                    <td>High</td>
+                                    <td>Moderate</td>
+                                    <td>Main characters, specific needs</td>
+                                </tr>
+                                <tr>
+                                    <td>Random</td>
+                                    <td>Low</td>
+                                    <td>Fast</td>
+                                    <td>NPCs, inspiration, world population</td>
+                                </tr>
+                                <tr>
+                                    <td>Template-Based</td>
+                                    <td>Medium</td>
+                                    <td>Fast</td>
+                                    <td>Consistent archetypes, series characters</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Template-Based Generation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Use pre-defined templates for consistent character creation:</p>
+                        <ul>
+                            <li><strong>Archetype Templates:</strong> The Hero, The Mentor, The Trickster</li>
+                            <li><strong>Role Templates:</strong> Knight, Merchant, Scholar, Thief</li>
+                            <li><strong>Genre Templates:</strong> Fantasy, Sci-Fi, Modern, Historical</li>
+                            <li><strong>Custom Templates:</strong> Save your own character patterns</li>
+                            <li><strong>World-Specific:</strong> Templates tailored to your world's unique elements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Character Elements Section -->
+            <div class="help-section" id="character-elements">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Generated Character Elements
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Core Character Data</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Every generated character includes essential information:</p>
+                        <ul>
+                            <li><strong>Basic Identity:</strong> Name, age, gender, species, occupation</li>
+                            <li><strong>Physical Description:</strong> Height, build, hair, eyes, distinctive features</li>
+                            <li><strong>Personality Traits:</strong> 4-8 defining characteristics and quirks</li>
+                            <li><strong>Core Motivations:</strong> What drives the character's actions</li>
+                            <li><strong>Background Summary:</strong> Personal history and formative experiences</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Narrative Elements</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Story-ready content for immediate use:</p>
+                        <ul>
+                            <li><strong>50-Word Backstory:</strong> Concise character history for quick reference</li>
+                            <li><strong>Next Quest Scenario:</strong> What the character might do next in your story</li>
+                            <li><strong>First Meeting Message:</strong> How they would greet someone new</li>
+                            <li><strong>Dialogue Sample:</strong> Example speech that demonstrates their voice</li>
+                            <li><strong>Character Goals:</strong> Short-term and long-term objectives</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Character Voice Examples:\n\nFormal Noble: \"I trust you understand the gravity of our situation, good sir.\"\n\nStreet-Smart Rogue: \"Look, pal, I didn\'t climb outta the gutter just to go back down.\"\n\nWise Elder: \"In my years, I\'ve seen storms that seemed endless... they always pass.\"\n\nEager Youth: \"This is it! This is exactly what I\'ve been training for!\"')">Copy</button>
+                            <pre>Character Voice Examples:
+
+Formal Noble: "I trust you understand the gravity of our situation, good sir."
+
+Street-Smart Rogue: "Look, pal, I didn't climb outta the gutter just to go back down."
+
+Wise Elder: "In my years, I've seen storms that seemed endless... they always pass."
+
+Eager Youth: "This is it! This is exactly what I've been training for!"</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Visual and Creative Assets</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Resources for bringing characters to life visually:</p>
+                        <ul>
+                            <li><strong>AI Image Prompt:</strong> DALL-E compatible description for portrait generation</li>
+                            <li><strong>Detailed Appearance:</strong> Comprehensive physical description</li>
+                            <li><strong>Mannerisms:</strong> How the character moves and gestures</li>
+                            <li><strong>Fashion Style:</strong> Clothing preferences and typical attire</li>
+                            <li><strong>Environmental Fit:</strong> How they interact with their world</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Genre-Specific Content</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Additional elements based on your world's genre:</p>
+                        <ul>
+                            <li><strong>Fantasy:</strong> Magical abilities, favorite spells, relationship with magic</li>
+                            <li><strong>Sci-Fi:</strong> Technology expertise, cybernetic enhancements, space experience</li>
+                            <li><strong>Modern:</strong> Social media presence, career ambitions, lifestyle choices</li>
+                            <li><strong>Historical:</strong> Period-appropriate details, social class markers, era-specific knowledge</li>
+                            <li><strong>Mystery:</strong> Secrets, hidden connections, suspicious behaviors</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customization Section -->
+            <div class="help-section" id="customization">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Customization and Fine-Tuning
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Post-Generation Editing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Refine and personalize generated characters:</p>
+                        <ul>
+                            <li><strong>Selective Regeneration:</strong> Regenerate specific aspects while keeping others</li>
+                            <li><strong>Manual Editing:</strong> Modify any generated content to fit your vision</li>
+                            <li><strong>Trait Adjustment:</strong> Add, remove, or modify personality traits</li>
+                            <li><strong>Background Expansion:</strong> Add more detail to character history</li>
+                            <li><strong>Voice Refinement:</strong> Adjust dialogue style and speech patterns</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Refining Generated Characters</h3>
+                                <span class="recipe-card-time">5 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Review the generated character thoroughly</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Identify elements that don't fit your vision</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Use selective regeneration for specific aspects</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Manually edit text fields as needed</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Save your refined character</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Integration</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Connect characters to your existing world elements:</p>
+                        <ul>
+                            <li><strong>Location Associations:</strong> Link characters to relevant places</li>
+                            <li><strong>Character Relationships:</strong> Define connections with other characters</li>
+                            <li><strong>Organization Membership:</strong> Add guild, faction, or group affiliations</li>
+                            <li><strong>Lore Integration:</strong> Connect characters to world history and culture</li>
+                            <li><strong>Story Roles:</strong> Assign characters to specific story functions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Variants and Versions</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Create multiple versions and explore alternatives:</p>
+                        <ul>
+                            <li><strong>Age Variants:</strong> Generate the same character at different life stages</li>
+                            <li><strong>Alternate Paths:</strong> Explore different backgrounds for the same concept</li>
+                            <li><strong>Gender Variations:</strong> Create versions with different gender presentations</li>
+                            <li><strong>Cultural Adaptations:</strong> Adapt characters to different cultural contexts</li>
+                            <li><strong>Power Level Scales:</strong> Create versions for different story power levels</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Batch Character Creation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Efficiently create multiple characters for world population:</p>
+                        <ul>
+                            <li><strong>Family Groups:</strong> Generate related characters with shared traits</li>
+                            <li><strong>Organization Members:</strong> Create consistent guild or group members</li>
+                            <li><strong>Location Populations:</strong> Generate appropriate residents for specific places</li>
+                            <li><strong>Ensemble Casts:</strong> Create balanced groups of diverse characters</li>
+                            <li><strong>Background Crowds:</strong> Generate numerous NPCs quickly</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Practices Section -->
+            <div class="help-section" id="best-practices">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    Character Generation Best Practices
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Maximizing AI Quality</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Get the best results from character generation:</p>
+                        <ul>
+                            <li><strong>Clear World Context:</strong> Ensure your world has detailed genre and tone information</li>
+                            <li><strong>Specific Requirements:</strong> Be precise about what type of character you need</li>
+                            <li><strong>Genre Consistency:</strong> Select appropriate genre settings for better context</li>
+                            <li><strong>Iterative Refinement:</strong> Generate multiple versions and combine the best elements</li>
+                            <li><strong>Template Development:</strong> Save successful character patterns for reuse</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Cost-Effective Character Creation</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Optimize your credit usage:</p>
+                        <ul>
+                            <li><strong>Plan Character Roles:</strong> Know what function each character serves before generating</li>
+                            <li><strong>Use Random for NPCs:</strong> Save guided generation for main characters</li>
+                            <li><strong>Bulk Generation:</strong> Create multiple similar characters in batches</li>
+                            <li><strong>Template Reuse:</strong> Develop templates for recurring character types</li>
+                            <li><strong>Selective Details:</strong> Focus detail on important characters only</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost Strategy:</strong> Use guided generation for protagonists (30-40 credits), random generation for supporting characters (15-25 credits), and templates for background NPCs (10-20 credits).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Character Development Workflow</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Systematic approach to character creation:</p>
+                        <ul>
+                            <li><strong>Story Role First:</strong> Define what narrative function the character serves</li>
+                            <li><strong>Generate Base:</strong> Create initial character using appropriate method</li>
+                            <li><strong>World Integration:</strong> Connect character to existing world elements</li>
+                            <li><strong>Voice Development:</strong> Refine dialogue and personality expression</li>
+                            <li><strong>Visual Creation:</strong> Generate or commission character artwork</li>
+                            <li><strong>Story Testing:</strong> Use character in writing to identify needed adjustments</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Avoiding Common Pitfalls</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Common mistakes and how to avoid them:</p>
+                        <ul>
+                            <li><strong>Over-Generation:</strong> Don't create more characters than your story needs</li>
+                            <li><strong>Under-Development:</strong> Flesh out important characters beyond AI generation</li>
+                            <li><strong>Inconsistent Tone:</strong> Ensure generated characters fit your world's established mood</li>
+                            <li><strong>Stereotype Reliance:</strong> Edit generic elements to create unique individuals</li>
+                            <li><strong>Integration Neglect:</strong> Connect characters meaningfully to your world</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe Card -->
+            <div class="recipe-card">
+                <div class="recipe-card-header">
+                    <h3 class="recipe-card-title">Creating Your First AI Character</h3>
+                    <span class="recipe-card-time">15 minutes</span>
+                </div>
+                <ol class="recipe-steps">
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">1</div>
+                        <div class="recipe-step-content">Navigate to Character Generator from your world detail page</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">2</div>
+                        <div class="recipe-step-content">Choose guided creation for your first character</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">3</div>
+                        <div class="recipe-step-content">Fill in basic information and select personality traits</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">4</div>
+                        <div class="recipe-step-content">Answer genre-specific questions to provide context</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">5</div>
+                        <div class="recipe-step-content">Generate and review your complete character</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">6</div>
+                        <div class="recipe-step-content">Edit any elements that don't fit your vision</div>
+                    </li>
+                    <li class="recipe-step">
+                        <div class="recipe-step-number">7</div>
+                        <div class="recipe-step-content">Save and integrate into your world</div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Final Tips -->
+            <div class="help-tip">
+                <div class="help-tip-title">
+                    <i class="fas fa-wand-sparkles help-tip-icon"></i>
+                    Character Generation Tip
+                </div>
+                <div class="help-tip-content">
+                    The best generated characters often come from unexpected combinations. Don't be afraid to try random generation for inspiration, then use guided creation to develop the most interesting results further.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Collapsible functionality
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('.collapsible-icon');
+                
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                    icon.textContent = '▼';
+                } else {
+                    content.style.display = 'block';
+                    icon.textContent = '▲';
+                }
+            });
+        });
+
+        // Helper functions for character generation actions
+        function selectGenerationType(type) {
+            console.log(`Selecting generation type: ${type}`);
+            // This would be implemented by the parent application
+        }
+
+        function closeHelpModal() {
+            console.log('Closing help modal...');
+            // This would be implemented by the parent application
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

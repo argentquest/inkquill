@@ -1,0 +1,532 @@
+<div class="container-fluid">
+    <!-- Enhanced Tabler Premium Hero Header with Gradient -->
+    <div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.25); margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <!-- Background Pattern Overlay -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+        
+        <div class="page-body" style="position: relative; z-index: 1;">
+            <div class="container-fluid">
+                <div class="row align-items-center py-4">
+                    <div class="col">
+                        <h1 class="page-title text-white mb-2">
+                            <i class="fas fa-file-import me-2"></i>
+                            Document Import Help
+                        </h1>
+                        <div class="page-subtitle text-white opacity-75 mb-3">
+                            Bring reference materials, research notes, and supporting documents into your workspace
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-file-alt me-1"></i>
+                                Multiple Formats
+                            </span>
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-search me-1"></i>
+                                Smart Search
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-tags me-1"></i>
+                                Auto Organization
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn btn-light">
+                                <i class="fas fa-upload me-1"></i>
+                                Import Now
+                            </button>
+                            <button class="btn btn-outline-light">
+                                <i class="fas fa-folder me-1"></i>
+                                Manage Library
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabler Navigation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card position-sticky" style="top: 1rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Navigation</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#overview" class="list-group-item list-group-item-action">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Import Overview
+                    </a>
+                    <a href="#document-types" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-alt me-2 text-success"></i>
+                        Document Types
+                    </a>
+                    <a href="#upload-methods" class="list-group-item list-group-item-action">
+                        <i class="fas fa-upload me-2 text-blue"></i>
+                        Upload Methods
+                    </a>
+                    <a href="#processing" class="list-group-item list-group-item-action">
+                        <i class="fas fa-cogs me-2 text-purple"></i>
+                        Processing Options
+                    </a>
+                    <a href="#organization" class="list-group-item list-group-item-action">
+                        <i class="fas fa-folder-open me-2 text-orange"></i>
+                        Organization
+                    </a>
+                    <a href="#best-practices" class="list-group-item list-group-item-action">
+                        <i class="fas fa-star me-2 text-yellow"></i>
+                        Best Practices
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabler Main Content -->
+        <div class="col-lg-9">
+            <div class="space-y-4">
+                <!-- Import Overview Card -->
+                <div class="card" id="overview">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Import Overview
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">The Document Import system allows you to bring research materials, notes, reference documents, and other supporting content into your storytelling workspace. These documents become part of your knowledge base, accessible to you and your AI assistant for enhanced writing support.</p>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="text-primary mb-3">Key Features</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-primary-lt me-3">
+                                                <i class="fas fa-file-alt"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Multiple Formats</strong>
+                                                <div class="text-secondary">Support for various document types and formats</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-success-lt me-3">
+                                                <i class="fas fa-brain"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Intelligent Processing</strong>
+                                                <div class="text-secondary">Automatic content extraction and organization</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-blue-lt me-3">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Search Integration</strong>
+                                                <div class="text-secondary">Full-text search across all imported documents</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-purple-lt me-3">
+                                                <i class="fas fa-robot"></i>
+                                            </div>
+                                            <div>
+                                                <strong>AI Context</strong>
+                                                <div class="text-secondary">Documents become available to AI for contextual assistance</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Types Card -->
+                <div class="card" id="document-types">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-file-alt me-2 text-success"></i>
+                            Document Types
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Import various types of documents to support your writing process:</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-blue-lt me-3">
+                                                <i class="fas fa-file-text"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Research Documents</h4>
+                                                <div class="text-secondary">Reference materials and research</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Academic papers</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Historical references</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Technical documentation</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Cultural guides</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-sm border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar avatar-lg bg-orange-lt me-3">
+                                                <i class="fas fa-sticky-note"></i>
+                                            </div>
+                                            <div>
+                                                <h4>Writing Notes</h4>
+                                                <div class="text-secondary">Personal notes and ideas</div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Plot outlines</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Character sketches</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Scene ideas</li>
+                                            <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Brainstorming notes</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <div class="d-flex">
+                                <div class="avatar avatar-sm bg-info-lt me-3">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <h4 class="alert-title">Supported Formats</h4>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Text Documents:</strong>
+                                            <ul class="mb-0">
+                                                <li>.txt, .rtf, .md</li>
+                                                <li>.docx, .odt</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Spreadsheets:</strong>
+                                            <ul class="mb-0">
+                                                <li>.xlsx, .ods</li>
+                                                <li>.csv files</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Other Formats:</strong>
+                                            <ul class="mb-0">
+                                                <li>.pdf files</li>
+                                                <li>Web articles (URL)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Methods Card -->
+                <div class="card" id="upload-methods">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-upload me-2 text-blue"></i>
+                            Upload Methods
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="card card-sm text-center">
+                                    <div class="card-body">
+                                        <div class="avatar avatar-lg bg-primary-lt mb-3 mx-auto">
+                                            <i class="fas fa-mouse-pointer"></i>
+                                        </div>
+                                        <h4>Drag & Drop</h4>
+                                        <p class="text-secondary">Drag files directly into the upload area for quick import</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm text-center">
+                                    <div class="card-body">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-folder-open"></i>
+                                        </div>
+                                        <h4>File Browser</h4>
+                                        <p class="text-secondary">Browse and select multiple files from your computer</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm text-center">
+                                    <div class="card-body">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-link"></i>
+                                        </div>
+                                        <h4>URL Import</h4>
+                                        <p class="text-secondary">Import content directly from web URLs</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Options Card -->
+                <div class="card" id="processing">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-cogs me-2 text-purple"></i>
+                            Processing Options
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="steps steps-counter steps-purple">
+                            <div class="step-item">
+                                <div class="h4 m-0">Text Extraction</div>
+                                <div class="text-secondary">Automatically extract text content from various file formats</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Content Analysis</div>
+                                <div class="text-secondary">Analyze document structure, topics, and key concepts</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Metadata Generation</div>
+                                <div class="text-secondary">Generate tags, categories, and searchable metadata</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="h4 m-0">Index Creation</div>
+                                <div class="text-secondary">Create searchable index for AI and user queries</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organization Card -->
+                <div class="card" id="organization">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-folder-open me-2 text-orange"></i>
+                            Organization
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-primary-lt me-3">
+                                        <i class="fas fa-tags"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Tagging System</strong>
+                                        <div class="text-secondary">Organize documents with custom tags and categories</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-success-lt me-3">
+                                        <i class="fas fa-folder"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Folder Structure</strong>
+                                        <div class="text-secondary">Create hierarchical folders for better organization</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-blue-lt me-3">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Smart Search</strong>
+                                        <div class="text-secondary">Full-text and semantic search across all documents</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-purple-lt me-3">
+                                        <i class="fas fa-link"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Cross-References</strong>
+                                        <div class="text-secondary">Link related documents and content automatically</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices Card -->
+                <div class="card" id="best-practices">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-star me-2 text-yellow"></i>
+                            Best Practices
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 class="text-yellow mb-3">Preparation Tips</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Clean Formatting:</strong> Remove unnecessary formatting for better text extraction
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Descriptive Names:</strong> Use clear, descriptive file names
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Consistent Structure:</strong> Maintain consistent document structure
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Size Optimization:</strong> Keep files under 25MB for optimal processing
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="text-yellow mb-3">Organization Tips</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Logical Grouping:</strong> Group related documents together
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Meaningful Tags:</strong> Use relevant, searchable tags
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Regular Reviews:</strong> Periodically review and organize documents
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Version Control:</strong> Keep track of document versions
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-rocket me-2 text-success"></i>
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-primary-lt mb-3 mx-auto">
+                                            <i class="fas fa-upload"></i>
+                                        </div>
+                                        <h4>Import Documents</h4>
+                                        <p class="text-secondary">Start importing your documents</p>
+                                        <button class="btn btn-primary">Import Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-folder"></i>
+                                        </div>
+                                        <h4>Manage Documents</h4>
+                                        <p class="text-secondary">Organize your document library</p>
+                                        <button class="btn btn-success">Manage Library</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <h4>Search Documents</h4>
+                                        <p class="text-secondary">Find specific content</p>
+                                        <button class="btn btn-blue">Search Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Tip Alert -->
+                <div class="alert alert-success">
+                    <div class="d-flex">
+                        <div class="avatar avatar-sm bg-success-lt me-3">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">💡 Pro Tip</h4>
+                            <div class="text-secondary">Tag your documents with relevant keywords when importing. This makes them easier to find later and helps the AI provide more accurate contextual assistance when you're writing.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('.list-group-item-action').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Highlight active navigation item
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('[id]');
+        const navLinks = document.querySelectorAll('.list-group-item-action');
+        
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentSection) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>

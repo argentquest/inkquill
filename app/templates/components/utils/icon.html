@@ -1,0 +1,140 @@
+<!-- Icon Component -->
+<!-- Usage: {% include "components/utils/icon.html" name="check" size="lg" color="success" %} -->
+
+{% assign icon_size = size | default('24') %}
+{% assign icon_class = 'icon' %}
+
+{% if size == 'sm' %}
+    {% assign icon_size = '16' %}
+{% elsif size == 'lg' %}
+    {% assign icon_size = '32' %}
+    {% assign icon_class = icon_class | append: ' icon-lg' %}
+{% elsif size == 'xl' %}
+    {% assign icon_size = '48' %}
+    {% assign icon_class = icon_class | append: ' icon-xl' %}
+{% endif %}
+
+{% if color %}
+    {% assign icon_class = icon_class | append: ' text-' | append: color %}
+{% endif %}
+
+{% if class %}
+    {% assign icon_class = icon_class | append: ' ' | append: class %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" 
+     class="{{ icon_class }}" 
+     width="{{ icon_size }}" 
+     height="{{ icon_size }}" 
+     viewBox="0 0 24 24" 
+     stroke-width="{{ stroke_width | default('2') }}" 
+     stroke="currentColor" 
+     fill="none" 
+     stroke-linecap="round" 
+     stroke-linejoin="round"
+     {% if id %}id="{{ id }}"{% endif %}
+     {{ attrs | default('') }}>
+    
+    {% case name %}
+        <!-- Success/Check Icons -->
+        {% when 'check' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M5 12l5 5l10 -10"/>
+        {% when 'circle-check' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M9 12l2 2l4 -4"/>
+        
+        <!-- Warning/Alert Icons -->
+        {% when 'alert-triangle' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 9v2m0 4v.01"/>
+            <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"/>
+        {% when 'alert-circle' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+        
+        <!-- Info Icons -->
+        {% when 'info-circle' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+            <line x1="12" y1="12" x2="12" y2="16"/>
+        
+        <!-- Action Icons -->
+        {% when 'edit' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+            <path d="M16 5l3 3"/>
+        {% when 'plus' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        {% when 'save' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"/>
+            <circle cx="12" cy="14" r="2"/>
+            <polyline points="14,4 14,8 8,8 8,4"/>
+        {% when 'delete' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="4" y1="7" x2="20" y2="7"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+        {% when 'close' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+        
+        <!-- Navigation Icons -->
+        {% when 'arrow-left' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="5" y1="12" x2="11" y2="18"/>
+            <line x1="5" y1="12" x2="11" y2="6"/>
+        {% when 'arrow-right' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="13" y1="18" x2="19" y2="12"/>
+            <line x1="13" y1="6" x2="19" y2="12"/>
+        
+        <!-- Common Icons -->
+        {% when 'user' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="7" r="4"/>
+            <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+        {% when 'users' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
+        {% when 'email' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M16 12v1.5a2.5 2.5 0 0 0 5 0v-1.5a9 9 0 1 0 -5.5 8.28"/>
+        {% when 'search' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="10" cy="10" r="7"/>
+            <path d="M21 21l-6 -6"/>
+        {% when 'settings' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/>
+            <circle cx="12" cy="12" r="3"/>
+        {% when 'star' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"/>
+        {% when 'bell' %}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/>
+            <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
+        
+        <!-- Default -->
+        {% else %}
+            <circle cx="12" cy="12" r="1"/>
+    {% endcase %}
+</svg>

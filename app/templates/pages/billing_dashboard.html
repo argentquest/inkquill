@@ -1,0 +1,504 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Billing Dashboard{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Billing & Credits</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="text-center">
+                    <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <i class="fas fa-credit-card me-3"></i>
+                        Billing & Credits
+                    </h1>
+                    <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                        Manage your billing information and purchase credits
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark me-2 px-3 py-2">
+                            <i class="fas fa-coins me-1"></i>
+                            Current Balance: Loading...
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-history me-1"></i>
+                            Recent Transactions
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <button class="btn btn-light btn-sm" 
+                            onclick="openHelpModal('billing')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with billing">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="billing-dashboard-page">
+
+    <div class="container-fluid">
+    
+        <!-- Add Credits Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-status-top bg-success"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-coins me-2"></i>Buy More Coins
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info" role="alert">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="fas fa-info-circle me-2"></i>
+                                </div>
+                                <div>
+                                    <h4 class="alert-title">Coin purchases are not available yet</h4>
+                                    <div class="text-secondary">
+                                        We're currently setting up our payment system. To add more coins to your account, please send an email to 
+                                        <a href="mailto:support@inkandquill.io" class="alert-link">support@inkandquill.io</a> 
+                                        and we'll help you add coins manually.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-cards" id="credit-packages">
+                            <!-- Credit packages will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Transactions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-status-top bg-primary"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-history me-2"></i>Recent Transactions
+                        </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="location.reload()" data-bs-toggle="tooltip" title="Refresh transactions">
+                                <i class="fas fa-refresh me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table" id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Balance After</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Transactions will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Balance Chart -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-status-top bg-info"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line me-2"></i>Balance Over Time (Last 7 Days)
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="balanceChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<!-- Add Credits Modal -->
+<div class="modal fade" id="addCreditsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);">
+                <h4 class="modal-title text-white">
+                    <i class="fas fa-coins me-2"></i>Add Coins
+                </h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-credits-form">
+                    <input type="hidden" id="selected-package-id">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Selected Package</label>
+                        <div id="selected-package-info" class="alert alert-azure border-0"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment-reference" class="form-label fw-medium">Payment Reference</label>
+                        <input type="text" class="form-control" id="payment-reference" required placeholder="Enter payment reference">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Enter your payment processor transaction ID (for demo: any text)
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirm-add-credits">
+                    <i class="fas fa-plus me-1"></i>Add Coins
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block styles %}
+<style>
+.billing-dashboard-page {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-status-top {
+    height: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+}
+
+.table-vcenter td {
+    vertical-align: middle;
+}
+
+.card-table {
+    margin-bottom: 0;
+}
+
+.card-table th {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-top: none;
+    font-weight: 600;
+    color: var(--tblr-body-color);
+    font-size: 0.875rem;
+}
+
+.card-table tbody tr:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--tblr-purple) 0%, var(--tblr-primary) 100%);
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    border-color: var(--tblr-primary);
+    color: var(--tblr-primary);
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+    border-color: var(--tblr-primary);
+    transform: translateY(-1px);
+}
+
+.card-actions .btn {
+    box-shadow: none;
+}
+
+/* Credit package cards */
+.credit-package-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+}
+
+.credit-package-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--tblr-box-shadow-lg);
+    border-color: var(--tblr-primary);
+}
+
+.modal-content {
+    border: none;
+    box-shadow: var(--tblr-box-shadow-lg);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--tblr-border-color);
+}
+
+.alert-azure {
+    background-color: var(--tblr-azure-lt);
+    color: var(--tblr-azure-fg);
+}
+
+#transactions-table th,
+#transactions-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#transactions-table th:first-child,
+#transactions-table td:first-child {
+    text-align: left;
+}
+</style>
+{% endblock %}
+{% endblock %}
+
+{% block scripts %}
+<style>
+#transactions-table th,
+#transactions-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script>
+console.log('Inline billing script loaded!');
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('DOM loaded, testing billing dashboard...');
+    
+    // Test the dashboard API call
+    try {
+        const response = await fetch('/api/v1/billing/dashboard');
+        console.log('Dashboard API status:', response.status);
+        const data = await response.json();
+        console.log('Dashboard API data:', data);
+        
+        // Balance is now shown in the sidebar navigation only
+        console.log('Account data:', data.account);
+        
+        // Show credit packages
+        const container = document.getElementById('credit-packages');
+        console.log('Available packages:', data.available_packages);
+        console.log('Number of packages:', data.available_packages ? data.available_packages.length : 0);
+        
+        if (container && data.available_packages && data.available_packages.length > 0) {
+            container.innerHTML = data.available_packages.map(pkg => `
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">${pkg.name}</h5>
+                            <h4 class="text-primary">${parseInt(pkg.credit_amount)} Coins</h4>
+                            <p class="text-muted">for $${parseFloat(pkg.price_usd).toFixed(2)}</p>
+                            <button class="btn btn-secondary w-100" onclick="showSupportMessage()" disabled>
+                                Coming Soon
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            console.log('Updated credit packages display');
+        } else {
+            if (container) {
+                container.innerHTML = '<div class="col-12"><p class="text-muted">No credit packages available. Please run the seed script.</p></div>';
+            }
+            console.log('No credit packages to display or container not found');
+        }
+        
+        // Show transactions
+        const transactionsTableBody = document.querySelector('#transactions-table tbody');
+        if (transactionsTableBody && data.recent_transactions) {
+            console.log('Recent transactions:', data.recent_transactions);
+            console.log('Number of transactions:', data.recent_transactions.length);
+            
+            if (data.recent_transactions.length === 0) {
+                transactionsTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No transactions yet</td></tr>';
+                console.log('No transactions to display');
+            } else {
+                transactionsTableBody.innerHTML = data.recent_transactions.map(tx => {
+                    const amount = parseFloat(tx.amount);
+                    const balanceAfter = parseFloat(tx.balance_after);
+                    const amountClass = amount >= 0 ? 'text-success' : 'text-danger';
+                    const amountSign = amount >= 0 ? '+' : '';
+                    const typeDisplay = tx.transaction_type.replace(/_/g, ' ')
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                    
+                    return `
+                        <tr>
+                            <td><code>${tx.id}</code></td>
+                            <td>${new Date(tx.created_at).toLocaleString()}</td>
+                            <td><span class="badge bg-secondary">${typeDisplay}</span></td>
+                            <td class="${amountClass}">${amountSign}${Math.abs(amount).toFixed(0)} Coins</td>
+                            <td>${balanceAfter.toFixed(0)} Coins</td>
+                            <td>${tx.description || ''}</td>
+                        </tr>
+                    `;
+                }).join('');
+                console.log('Updated transactions display');
+            }
+        } else {
+            console.log('Transactions table body not found or no transaction data');
+        }
+        
+        // Create balance chart
+        createBalanceChart(data.recent_transactions);
+        
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+// Function to create balance chart
+function createBalanceChart(transactions) {
+    console.log('Creating balance chart with transactions:', transactions);
+    
+    if (!transactions || transactions.length === 0) {
+        console.log('No transactions for chart');
+        return;
+    }
+    
+    // Filter transactions to last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    // Sort transactions by date (oldest first) and filter last 7 days
+    const recentTransactions = transactions
+        .filter(tx => new Date(tx.created_at) >= sevenDaysAgo)
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    
+    console.log('Filtered transactions for chart:', recentTransactions);
+    
+    if (recentTransactions.length === 0) {
+        console.log('No transactions in last 7 days');
+        return;
+    }
+    
+    // Prepare chart data
+    const labels = recentTransactions.map(tx => {
+        const date = new Date(tx.created_at);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    });
+    
+    const balanceData = recentTransactions.map(tx => parseFloat(tx.balance_after));
+    
+    const ctx = document.getElementById('balanceChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Balance (Coins)',
+                data: recentTransactions.map(tx => ({
+                    x: new Date(tx.created_at).getTime(),
+                    y: parseFloat(tx.balance_after)
+                })),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Balance (Coins)'
+                    }
+                },
+                x: {
+                    type: 'time',
+                    title: {
+                        display: true,
+                        text: 'Date & Time'
+                    },
+                    time: {
+                        displayFormats: {
+                            hour: 'MMM DD HH:mm',
+                            day: 'MMM DD'
+                        }
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Coin Balance Over Time'
+                },
+                legend: {
+                    display: true
+                }
+            }
+        }
+    });
+    
+    console.log('Balance chart created successfully');
+}
+
+// Show support message function
+function showSupportMessage() {
+    alert(`Coin purchases are not available yet.\n\nTo add more coins to your account, please send an email to support@inkandquill.io and we'll help you add coins manually.\n\nThank you for your patience!`);
+}
+</script>
+{% endblock %}

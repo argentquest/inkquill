@@ -1,0 +1,38 @@
+<!-- Textarea Component -->
+<!-- Usage: {% include "components/forms/textarea.html" name="description" label="Description" rows=4 %} -->
+
+<div class="mb-3{% if class %} {{ class }}{% endif %}">
+    {% if label %}
+    <label class="form-label{% if required %} required{% endif %}" 
+           {% if for %}for="{{ for }}"{% elif name %}for="{{ name }}"{% endif %}>
+        {{ label }}
+        {% if description %}
+        <span class="form-label-description">{{ description }}</span>
+        {% endif %}
+        {% if maxlength %}
+        <span class="form-label-description">
+            <span id="char-count-{{ name | default('textarea') }}">{{ value | length | default(0) }}</span>/{{ maxlength }}
+        </span>
+        {% endif %}
+    </label>
+    {% endif %}
+    
+    <textarea class="form-control{% if input_class %} {{ input_class }}{% endif %}" 
+              {% if name %}name="{{ name }}"{% endif %}
+              {% if id %}id="{{ id }}"{% elif name %}id="{{ name }}"{% endif %}
+              {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+              {% if required %}required{% endif %}
+              {% if readonly %}readonly{% endif %}
+              {% if disabled %}disabled{% endif %}
+              {% if rows %}rows="{{ rows }}"{% else %}rows="3"{% endif %}
+              {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+              {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+              {% if maxlength %}
+              oninput="document.getElementById('char-count-{{ name | default('textarea') }}').textContent = this.value.length"
+              {% endif %}
+              {{ attrs | default('') }}>{{ value | default('') }}</textarea>
+    
+    {% if hint %}
+    <small class="form-hint">{{ hint }}</small>
+    {% endif %}
+</div>

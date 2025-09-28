@@ -1,0 +1,31 @@
+{# /ai_rag_story_app/app/templates/partials/_link_location_modal.html #}
+<div class="modal fade" id="linkLocationModal" tabindex="-1" aria-labelledby="linkLocationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkLocationModalLabel">Link Location to Story</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="link-location-form">
+                    <div class="mb-3">
+                        <label for="select-world-location" class="form-label">Select Location from World:</label>
+                        <select class="form-select" id="select-world-location" name="location_id" required>
+                            <option value="">Loading locations...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location-significance-to-story" class="form-label">Location's Significance in this Story (Optional):</label>
+                        <textarea class="form-control" id="location-significance-to-story" name="significance_to_story" rows="3" placeholder="e.g., Main setting for Act 1, Site of the final confrontation"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirm-link-location-btn">
+                    <i class="fas fa-link me-1"></i> Link Location
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

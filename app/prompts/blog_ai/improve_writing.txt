@@ -1,0 +1,5 @@
+{improvement_instruction}
+
+{content}
+
+Please provide the improved version while maintaining the original meaning and key points.

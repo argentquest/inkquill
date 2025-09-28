@@ -1,0 +1,147 @@
+{# 
+   SOCIAL SHARING COMPONENT
+   Reusable social sharing buttons for public content
+   
+   Usage:
+   {% set share_config = {
+       'content_type': 'published_story',
+       'content_id': story.id,
+       'content_title': story.title,
+       'content_description': story.description,
+       'content_url': url_for('ui_published_story_detail', story_id=story.id, _external=True),
+       'content_image': story.cover_image_url if story.cover_image_url else None,
+       'hashtags': '#AIStory #CreativeWriting'
+   } %}
+   {% include 'partials/_social_sharing.html' %}
+   
+   Parameters:
+   - content_type: Type of content ('image_preview', 'published_story', 'ai_public_chat')
+   - content_id: Unique identifier for the content
+   - content_title: Title to share
+   - content_description: Description/excerpt to share
+   - content_url: Full URL to share
+   - content_image: Image URL for platforms that support it (optional)
+   - hashtags: Hashtags to include (optional)
+#}
+
+<!-- Social Sharing Debug: Config exists = {{ share_config is defined and share_config }} -->
+{% if share_config %}
+<div class="social-sharing-container" data-content-type="{{ share_config.content_type }}" data-content-id="{{ share_config.content_id }}">
+    <div class="social-sharing-header">
+        <h5 class="social-sharing-title">
+            <i class="fas fa-share-alt me-2"></i>
+            Share this {{ share_config.content_type.replace('_', ' ').title() }}
+        </h5>
+        <p class="social-sharing-subtitle text-muted">
+            Share and earn 20 coins each time
+        </p>
+    </div>
+    
+    <div class="social-sharing-buttons">
+        <!-- Facebook -->
+        <button class="social-share-btn facebook" 
+                data-platform="facebook"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                data-description="{{ share_config.content_description }}"
+                data-image="{{ share_config.content_image or '' }}"
+                title="Share on Facebook">
+            <i class="fab fa-facebook-f"></i>
+        </button>
+        
+        <!-- Twitter/X -->
+        <button class="social-share-btn twitter" 
+                data-platform="twitter"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                data-hashtags="{{ share_config.hashtags or '' }}"
+                title="Share on Twitter/X">
+            <i class="fab fa-twitter"></i>
+        </button>
+        
+        <!-- LinkedIn -->
+        <button class="social-share-btn linkedin" 
+                data-platform="linkedin"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                data-description="{{ share_config.content_description }}"
+                title="Share on LinkedIn">
+            <i class="fab fa-linkedin-in"></i>
+        </button>
+        
+        <!-- Reddit -->
+        <button class="social-share-btn reddit" 
+                data-platform="reddit"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                title="Share on Reddit">
+            <i class="fab fa-reddit-alien"></i>
+        </button>
+        
+        <!-- WhatsApp -->
+        <button class="social-share-btn whatsapp" 
+                data-platform="whatsapp"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                title="Share on WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </button>
+        
+        <!-- Email -->
+        <button class="social-share-btn email" 
+                data-platform="email"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                data-description="{{ share_config.content_description }}"
+                title="Share via Email">
+            <i class="fas fa-envelope"></i>
+        </button>
+        
+        <!-- Copy Link -->
+        <button class="social-share-btn copy-link" 
+                data-platform="copy_link"
+                data-url="{{ share_config.content_url }}"
+                title="Copy Link">
+            <i class="fas fa-link"></i>
+        </button>
+        
+        <!-- Pinterest -->
+        <button class="social-share-btn pinterest" 
+                data-platform="pinterest"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                data-description="{{ share_config.content_description }}"
+                data-image="{{ share_config.content_image or '' }}"
+                title="Share on Pinterest">
+            <i class="fab fa-pinterest-p"></i>
+        </button>
+        
+        <!-- Telegram -->
+        <button class="social-share-btn telegram" 
+                data-platform="telegram"
+                data-url="{{ share_config.content_url }}"
+                data-title="{{ share_config.content_title }}"
+                title="Share on Telegram">
+            <i class="fab fa-telegram-plane"></i>
+        </button>
+    </div>
+    
+    <!-- Share feedback message -->
+    <div class="social-sharing-feedback" style="display: none;">
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle me-1"></i>
+            <span class="feedback-message"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Include required CSS and JavaScript -->
+<link rel="stylesheet" href="/static/css/components/social-sharing.css">
+<script src="/static/js/social-sharing.js"></script>
+
+{% else %}
+<!-- Social Sharing Debug: Config is missing or false. Check that share_config is properly set before including this template. -->
+<div style="background: #ffebee; border: 1px solid #f44336; padding: 10px; margin: 10px 0; border-radius: 4px;">
+    <strong>Social Sharing Debug:</strong> Configuration not found. Ensure share_config is set before including this template.
+</div>
+{% endif %}

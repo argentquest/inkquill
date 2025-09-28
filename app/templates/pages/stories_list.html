@@ -1,0 +1,635 @@
+{# /ai_rag_story_app/app/templates/pages/stories_list.html #}
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Your Stories - {{ project_name | default('AI Story App') }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Force gradient background override Tabler defaults */
+    .stories-hero-header {
+        background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%) !important;
+        border: none !important;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        min-height: 200px;
+    }
+    
+    .stories-hero-header .hero-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), 
+                    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .stories-hero-header .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Enhanced Grid with Fade-in Animation */
+    .story-item-container {
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .story-item-container:nth-child(1) { animation-delay: 0.1s; }
+    .story-item-container:nth-child(2) { animation-delay: 0.2s; }
+    .story-item-container:nth-child(3) { animation-delay: 0.3s; }
+    .story-item-container:nth-child(4) { animation-delay: 0.4s; }
+    .story-item-container:nth-child(5) { animation-delay: 0.5s; }
+    .story-item-container:nth-child(6) { animation-delay: 0.6s; }
+    .story-item-container:nth-child(n+7) { animation-delay: 0.7s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Enhanced Story Creation Card Hover Effects */
+    .story-creation-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        border-color: var(--tblr-primary) !important;
+    }
+    
+    .story-creation-card:hover .avatar {
+        transform: scale(1.1);
+    }
+    
+    .story-creation-card .avatar {
+        transition: transform 0.3s ease;
+    }
+    
+    /* Dynamic Image Container for Story Cards - Respects Aspect Ratios */
+    .card-img-container {
+        position: relative;
+        width: 100%;
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+        border-bottom: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+        overflow: hidden;
+    }
+    
+    /* Aspect ratio specific containers */
+    .card-img-container[data-aspect-ratio="16x9"] {
+        padding-top: 56.25%; /* 16:9 ratio */
+    }
+    
+    .card-img-container[data-aspect-ratio="5x4"] {
+        padding-top: 80%; /* 5:4 ratio */
+    }
+    
+    .card-img-container[data-aspect-ratio="1x1"] {
+        padding-top: 100%; /* 1:1 ratio (square) */
+    }
+    
+    /* Fallback for unknown aspect ratios */
+    .card-img-container:not([data-aspect-ratio]),
+    .card-img-container[data-aspect-ratio=""] {
+        padding-top: 100%; /* Default to square */
+    }
+
+    .card-img-container .card-img-top,
+    .card-img-container .card-img-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-img-container .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tblr-text-muted);
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+    }
+
+    .card-img-container .card-img-placeholder .fas {
+        font-size: 3rem;
+        opacity: 0.6;
+    }
+    
+    /* Legacy support for existing square containers */
+    .card-img-square-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        background: linear-gradient(135deg, var(--tblr-bg-surface-secondary) 0%, var(--tblr-border-color) 100%);
+        border-bottom: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+        overflow: hidden;
+    }
+    
+    /* Card hover effects */
+    .card-link-pop:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .stories-hero-header {
+            min-height: 150px !important;
+        }
+        
+        .stories-hero-header .py-5 {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+        
+        .stories-hero-header .page-title {
+            font-size: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Enhanced Tabler Premium Hero Header with Gradient -->
+<div class="page-header d-print-none" style="background: linear-gradient(135deg, #206bc4 0%, #a855f7 100%); margin-bottom: 2rem; position: relative; overflow: hidden; min-height: 200px;">
+    <!-- Background Pattern Overlay -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+    
+    <div class="container-fluid" style="position: relative; z-index: 1;">
+        <div class="row align-items-center py-5">
+            <div class="col">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-lg bg-white text-primary me-3" style="backdrop-filter: blur(10px); background: rgba(255,255,255,0.2) !important;">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{{ url_for('ui_home') }}" class="text-white-50">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Your Stories</li>
+                        </ol>
+                    </nav>
+                </div>
+                <h1 class="page-title text-white mb-3" style="font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="fas fa-book me-3"></i>
+                    Your Stories
+                </h1>
+                <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                    Create and manage your narrative projects with powerful storytelling tools
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-list me-1"></i>
+                        {{ stories|length if stories else 0 }} Stories
+                    </span>
+                    <span class="badge bg-light text-dark me-2 px-3 py-2">
+                        <i class="fas fa-pen-fancy me-1"></i>
+                        Creative Writing
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="fas fa-globe me-1"></i>
+                        World Building
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-list">
+                    <a href="{{ url_for('published_stories_gallery') }}" class="btn btn-light"
+                       data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                       title="Browse published stories from the community">
+                        <i class="fas fa-book-open me-1"></i>
+                        Browse Published
+                    </a>
+                    <button class="btn btn-light" 
+                            onclick="openHelpModal('story_list')"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            title="Get help with managing your stories">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Enhanced Story Creation Options -->
+    <div class="mb-5">
+        <div class="text-center mb-4">
+            <h2 class="mb-2">Create Your Next Story</h2>
+            <p class="text-muted">Choose the perfect storytelling approach for your creative vision</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="{% if current_user %}col-lg-5{% else %}col-lg-6{% endif %}">
+                <a href="{{ url_for('ui_create_basic_story_form') }}" class="card card-link h-100 story-creation-card"
+                   style="border: 2px solid var(--tblr-success); box-shadow: 0 4px 15px rgba(var(--tblr-success-rgb), 0.2); transition: all 0.3s ease;">
+                    <div class="card-status-top bg-success"></div>
+                    <div class="card-body text-center p-4">
+                        <div class="avatar avatar-2xl bg-success mb-4 mx-auto" style="background: linear-gradient(135deg, var(--tblr-success) 0%, #20c997 100%);">
+                            <i class="fas fa-rocket" style="font-size: 2.5rem; color: white;"></i>
+                        </div>
+                        <h3 class="card-title mb-3" style="color: var(--tblr-success); font-weight: 700;">
+                            {% if current_user %}🚀 Basic Story{% else %}✍️ Create Story{% endif %}
+                        </h3>
+                        <p class="text-muted mb-3" style="font-size: 1.1rem; line-height: 1.5;">
+                            <strong>Perfect for quick creative writing</strong>
+                        </p>
+                        <div class="text-start mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <span>Instant start - no setup required</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <span>AI writing assistant for inspiration</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <span>Simple, distraction-free editor</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <span>Easy publishing and sharing</span>
+                            </div>
+                        </div>
+                        <div class="badge bg-success-lt text-success px-3 py-2 mb-3">
+                            <i class="fas fa-clock me-1"></i>
+                            Start writing in seconds
+                        </div>
+                        <div class="mt-3">
+                            <strong class="text-success">Best for:</strong> Short stories, quick ideas, writing practice
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% if current_user %}
+            <div class="col-lg-5">
+                <a href="{{ url_for('ui_create_story_form_generic') }}" class="card card-link h-100 story-creation-card"
+                   style="border: 2px solid var(--tblr-primary); box-shadow: 0 4px 15px rgba(var(--tblr-primary-rgb), 0.2); transition: all 0.3s ease;">
+                    <div class="card-status-top bg-primary"></div>
+                    <div class="card-body text-center p-4">
+                        <div class="avatar avatar-2xl bg-primary mb-4 mx-auto" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);">
+                            <i class="fas fa-globe" style="font-size: 2.5rem; color: white;"></i>
+                        </div>
+                        <h3 class="card-title mb-3" style="color: var(--tblr-primary); font-weight: 700;">
+                            🌍 Advanced Story
+                        </h3>
+                        <p class="text-muted mb-3" style="font-size: 1.1rem; line-height: 1.5;">
+                            <strong>Complete world-building and story management</strong>
+                        </p>
+                        <div class="text-start mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                <span>Rich world-building tools</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                <span>Character & location management</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                <span>Multi-act story structure</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                <span>AI-powered world generation</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                <span>Comprehensive story analytics</span>
+                            </div>
+                        </div>
+                        <div class="badge bg-primary-lt text-primary px-3 py-2 mb-3">
+                            <i class="fas fa-magic me-1"></i>
+                            Full creative suite
+                        </div>
+                        <div class="mt-3">
+                            <strong class="text-primary">Best for:</strong> Novels, series, complex narratives
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if not current_user %}
+        <div class="text-center mt-4">
+            <div class="alert alert-info d-inline-block">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Want advanced features?</strong> 
+                <a href="{{ url_for('ui_register_form') }}" class="text-decoration-none">Create a free account</a> 
+                to unlock world-building tools and advanced story management.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if stories %}
+        <div id="stories-list-container" class="row row-cards" data-masonry='{"percentPosition": true}'>
+            {% for story_item in stories %} 
+                <div class="col-sm-6 col-lg-4 story-item-container">
+                    <div class="card card-sm h-100">
+                        <div class="card-status-top bg-primary"></div>
+                        
+                        <!-- Dynamic Aspect Ratio Image Container -->
+                        <div class="card-img-container" data-aspect-ratio="{{ story_item.current_image.aspect_ratio if story_item.current_image and story_item.current_image.aspect_ratio else '1x1' }}">
+                            {% if story_item.image_url %}
+                                <img src="{{ story_item.image_url }}" class="card-img-top" alt="Cover for {{ story_item.title | e }}">
+                            {% else %}
+                                <div class="card-img-placeholder">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                {% if story_item.story_type == 'basic' %}
+                                <a href="{{ url_for('ui_basic_story_editor', story_id=story_item.id) }}" class="text-reset text-decoration-none">
+                                    {{ story_item.title | e }}
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('ui_story_detail', story_id=story_item.id) }}" class="text-reset text-decoration-none">
+                                    {{ story_item.title | e }}
+                                </a>
+                                {% endif %}
+                            </h3>
+                            
+                            <div class="mb-2">
+                                {% if story_item.story_type == 'basic' %}
+                                <span class="badge bg-success text-white" title="Basic Story - Focus on writing">Basic</span>
+                                {% else %}
+                                <span class="badge bg-primary text-white" title="Advanced Story - Full world-building features">Advanced</span>
+                                {% endif %}
+                                {% if story_item.published_version %}
+                                <span class="badge bg-azure ms-1" title="This story has been published">
+                                    <i class="icon icon-tabler icon-share me-1"></i>Published
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if story_item.world %}
+                                <div class="text-muted small mb-2">
+                                    <i class="icon icon-tabler icon-world me-1"></i>
+                                    In World: <a href="{{ url_for('ui_world_detail', world_id=story_item.world.id) }}" class="text-muted">{{ story_item.world.name | e }}</a>
+                                </div>
+                            {% endif %}
+                            
+                            {% if story_item.short_description %}
+                            <p class="text-muted small">{{ story_item.short_description | e | truncate(120, True) }}</p>
+                            {% endif %}
+                            
+                            <div class="card-meta d-flex align-items-center text-muted small">
+                                <i class="icon icon-tabler icon-calendar me-1"></i>
+                                Updated: {{ story_item.updated_at.strftime('%Y-%m-%d') if story_item.updated_at else 'N/A' }}
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="btn-list justify-content-center w-100">
+                                {% if story_item.story_type == 'basic' %}
+                                <a href="{{ url_for('ui_basic_story_editor', story_id=story_item.id) }}" class="btn btn-primary flex-fill"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="Edit this Basic Story">
+                                    <i class="icon icon-tabler icon-edit me-1"></i>Edit
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('ui_story_detail', story_id=story_item.id) }}" class="btn btn-primary flex-fill"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="Edit this story">
+                                    <i class="icon icon-tabler icon-edit me-1"></i>Edit
+                                </a>
+                                {% endif %}
+                                <button class="delete-story-btn btn btn-outline-danger" data-story-id="{{ story_item.id }}"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="Permanently delete this story and all its acts and scenes">
+                                    <i class="icon icon-tabler icon-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="empty-img">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNCAyaDE2djIwSDRWMnptMTQgMkg2djE2aDEyVjR6TTggNmg4djJIOFY2em0wIDRoOHYySDhWMTB6bTAgNGg4djJIOFYxNHoiIGZpbGw9IiNjOGRhZjgiLz4KPC9zdmc+" alt="" height="128" width="128">
+            </div>
+            <p class="empty-title">No stories yet</p>
+            <p class="empty-subtitle text-muted">
+                You haven't created any stories yet. Start your storytelling journey by creating your first story!
+            </p>
+            <div class="empty-action">
+                <a href="#" onclick="showStoryCreationModal()" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Create your first story
+                </a>
+                {% if current_user %}
+                <a href="{{ url_for('ui_new_story') }}" class="btn btn-outline-primary ms-2">
+                    <i class="fas fa-magic me-1"></i>Advanced Story
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    <script src="{{ url_for('static', path='/js/story_crud.js') }}"></script>
+    <script>
+    // Simple story creation modal
+    function showStoryCreationModal() {
+        // For now, redirect to the story creation modal from index page
+        // In the future, this could be a dedicated modal on the stories page
+        window.location.href = '/';
+        // Trigger the modal on the index page after redirect
+        setTimeout(() => {
+            const modalElement = document.getElementById('storyCreationModal');
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        }, 100);
+    }
+    </script>
+    <script>
+    // World selection for AI story generation
+    async function showWorldSelectionForAIStory() {
+        try {
+            const response = await fetch('/worlds/', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch worlds');
+            
+            const worlds = await response.json();
+            
+            if (worlds.length === 0) {
+                showToast('error', 'You need to create a world first before generating a story!');
+                setTimeout(() => {
+                    window.location.href = '/ui/worlds/new';
+                }, 2000);
+                return;
+            }
+            
+            if (worlds.length === 1) {
+                // If only one world, use it directly
+                generateAIStory(worlds[0].id);
+            } else {
+                // Show world selection modal
+                showWorldSelectionModal(worlds, 'ai');
+            }
+        } catch (error) {
+            console.error('Error fetching worlds:', error);
+            showToast('error', 'Failed to load worlds. Please try again.');
+        }
+    }
+    
+    async function showWorldSelectionForAdvancedStory() {
+        try {
+            const response = await fetch('/worlds/', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch worlds');
+            
+            const worlds = await response.json();
+            
+            if (worlds.length === 0) {
+                showToast('error', 'You need to create a world first before generating a story!');
+                setTimeout(() => {
+                    window.location.href = '/ui/worlds/new';
+                }, 2000);
+                return;
+            }
+            
+            if (worlds.length === 1) {
+                // If only one world, go directly to advanced generation
+                window.location.href = `/ui/worlds/${worlds[0].id}#story-generation`;
+            } else {
+                // Show world selection modal
+                showWorldSelectionModal(worlds, 'advanced');
+            }
+        } catch (error) {
+            console.error('Error fetching worlds:', error);
+            showToast('error', 'Failed to load worlds. Please try again.');
+        }
+    }
+    
+    function showWorldSelectionModal(worlds, mode) {
+        // Create modal HTML
+        const modalHtml = `
+            <div class="modal fade" id="worldSelectionModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Select a World</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Select which world you want to generate a story for:</p>
+                            <div class="list-group">
+                                ${worlds.map(world => `
+                                    <a href="#" class="list-group-item list-group-item-action" 
+                                       data-world-id="${world.id}" data-mode="${mode}">
+                                        <h6 class="mb-1">${world.name}</h6>
+                                        ${world.description ? `<p class="mb-0 small text-muted">${world.description}</p>` : ''}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove any existing modal
+        const existingModal = document.getElementById('worldSelectionModal');
+        if (existingModal) existingModal.remove();
+        
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('worldSelectionModal'));
+        modal.show();
+        
+        // Handle world selection
+        document.querySelectorAll('#worldSelectionModal .list-group-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const worldId = e.currentTarget.dataset.worldId;
+                const mode = e.currentTarget.dataset.mode;
+                modal.hide();
+                
+                if (mode === 'ai') {
+                    generateAIStory(worldId);
+                } else {
+                    window.location.href = `/ui/worlds/${worldId}#story-generation`;
+                }
+            });
+        });
+    }
+    
+    async function generateAIStory(worldId) {
+        // Show loading state
+        const btn = document.getElementById('generate-ai-story-btn');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating...';
+        
+        try {
+            const response = await fetch(`/worlds/${worldId}/generate-story`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Failed to generate story');
+            }
+            
+            const result = await response.json();
+            showToast('success', 'Story generated successfully!');
+            
+            // Redirect to the new story
+            setTimeout(() => {
+                window.location.href = `/ui/stories/${result.story_id}`;
+            }, 1500);
+            
+        } catch (error) {
+            console.error('Error generating story:', error);
+            showToast('error', error.message || 'Failed to generate story. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+    </script>
+{% endblock %}

@@ -1,0 +1,780 @@
+<div class="container-fluid">
+    <!-- Enhanced Tabler Premium Hero Header with Gradient -->
+    <div class="page-header d-print-none" style="background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%); margin-top: calc(var(--tblr-gutter-x, 1.5rem) * 0.25); margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <!-- Background Pattern Overlay -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
+        
+        <div class="page-body" style="position: relative; z-index: 1;">
+            <div class="container-fluid">
+                <div class="row align-items-center py-4">
+                    <div class="col">
+                        <h1 class="page-title text-white mb-2">
+                            <i class="fas fa-list me-2"></i>
+                            Lore Item List Help
+                        </h1>
+                        <div class="page-subtitle text-white opacity-75 mb-3">
+                            Organize, browse, and manage your world's complete lore collection with powerful tools
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-th me-1"></i>
+                                Multiple Views
+                            </span>
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-filter me-1"></i>
+                                Advanced Filtering
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-chart-line me-1"></i>
+                                Visualizations
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn btn-light">
+                                <i class="fas fa-list me-1"></i>
+                                View Lore
+                            </button>
+                            <button class="btn btn-outline-light">
+                                <i class="fas fa-plus me-1"></i>
+                                Create Lore
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tabler Navigation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card position-sticky" style="top: 1rem;">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Navigation</h3>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#overview" class="list-group-item list-group-item-action">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        List Overview
+                    </a>
+                    <a href="#navigation" class="list-group-item list-group-item-action">
+                        <i class="fas fa-compass me-2 text-success"></i>
+                        Navigation
+                    </a>
+                    <a href="#organization" class="list-group-item list-group-item-action">
+                        <i class="fas fa-folder-open me-2 text-blue"></i>
+                        Organization
+                    </a>
+                    <a href="#searching" class="list-group-item list-group-item-action">
+                        <i class="fas fa-search me-2 text-purple"></i>
+                        Searching
+                    </a>
+                    <a href="#bulk-operations" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tasks me-2 text-orange"></i>
+                        Bulk Operations
+                    </a>
+                    <a href="#visualization" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line me-2 text-pink"></i>
+                        Visualization
+                    </a>
+                    <a href="#workflow" class="list-group-item list-group-item-action">
+                        <i class="fas fa-stream me-2 text-indigo"></i>
+                        Workflow
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabler Main Content -->
+        <div class="col-lg-9">
+            <div class="space-y-4">
+                <!-- List Overview Card -->
+                <div class="card" id="overview">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            List Overview
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">The Lore Item List is your central hub for managing all the lore elements in your fictional world. From this comprehensive view, you can browse, organize, search, and manage every piece of lore you've created—from ancient prophecies to cultural traditions, magical artifacts to historical events.</p>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="text-primary mb-3">Key Features</h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-primary-lt me-3">
+                                                <i class="fas fa-list-ul"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Comprehensive View</strong>
+                                                <div class="text-secondary">See all your lore items in one organized list</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-success-lt me-3">
+                                                <i class="fas fa-th"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Multiple Views</strong>
+                                                <div class="text-secondary">Switch between card, table, and timeline views</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-blue-lt me-3">
+                                                <i class="fas fa-filter"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Advanced Filtering</strong>
+                                                <div class="text-secondary">Find specific lore items quickly</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-purple-lt me-3">
+                                                <i class="fas fa-check-double"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Bulk Operations</strong>
+                                                <div class="text-secondary">Manage multiple items at once</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="avatar avatar-sm bg-orange-lt me-3">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Visual Relationships</strong>
+                                                <div class="text-secondary">See connections between lore elements</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Card -->
+                <div class="card" id="navigation">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-compass me-2 text-success"></i>
+                            Navigation
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Master the lore list interface to efficiently browse and manage your world's elements:</p>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-eye me-2 text-success"></i>
+                                            View Options
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Card View:</strong> Visual cards showing lore item previews
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Table View:</strong> Detailed columns with sortable information
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Timeline View:</strong> Chronological arrangement of historical lore
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Relationship View:</strong> Interactive map showing connections
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-cogs me-2 text-blue"></i>
+                                            List Controls
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Sort Options:</strong> By name, category, creation date, or importance
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Page Size:</strong> Adjust how many items appear per page
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Selection Mode:</strong> Toggle between single and multiple selection
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Quick Actions:</strong> Access common operations from the toolbar
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="fas fa-search-plus me-2 text-purple"></i>
+                                            Item Preview
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item px-0">
+                                                <strong>Hover Details:</strong> See item information without clicking
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Quick Edit:</strong> Make fast changes to basic properties
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Status Indicators:</strong> Visual cues for completion and importance
+                                            </div>
+                                            <div class="list-group-item px-0">
+                                                <strong>Relationship Links:</strong> See connected items at a glance
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organization Card -->
+                <div class="card" id="organization">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-folder-open me-2 text-blue"></i>
+                            Organization
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Keep your lore collection organized and easily navigable:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-blue mb-3">Categories</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Default Categories:</strong> Historical Events, Cultural Elements, Artifacts, etc.
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Custom Categories:</strong> Create your own classification system
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Category Filtering:</strong> Show only items from specific categories
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Category Statistics:</strong> See item counts for each category
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-blue mb-3">Tagging System</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Custom Tags:</strong> Add descriptive labels to items
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Tag Autocomplete:</strong> Reuse existing tags consistently
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Tag Filtering:</strong> Filter by one or multiple tags
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Tag Cloud:</strong> Visual representation of tag usage
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-blue mb-3">Importance Levels</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <span class="badge bg-red me-2">Critical</span> World-defining elements essential to your story
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <span class="badge bg-orange me-2">Major</span> Important elements that significantly impact the world
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <span class="badge bg-yellow me-2">Minor</span> Supporting details that add depth and flavor
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <span class="badge bg-gray me-2">Background</span> Subtle elements that enhance authenticity
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Searching Card -->
+                <div class="card" id="searching">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-search me-2 text-purple"></i>
+                            Searching
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Find exactly what you're looking for with powerful search capabilities:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-purple mb-3">Search Types</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Quick Search:</strong> Simple text search across names and descriptions
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Advanced Search:</strong> Multiple criteria with boolean operators
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Semantic Search:</strong> Find items by meaning and concept
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Relationship Search:</strong> Find items connected to specific elements
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-purple mb-3">Search Filters</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Category Filter:</strong> Limit search to specific categories
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Tag Filter:</strong> Include or exclude specific tags
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Date Range:</strong> Filter by creation or modification date
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Importance Level:</strong> Filter by significance rating
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-purple mb-3">Search Results</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Highlighted Matches:</strong> See exactly what matched your search
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Relevance Scoring:</strong> Results ranked by relevance
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Result Grouping:</strong> Group results by category or type
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Saved Searches:</strong> Save frequent searches for quick access
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Operations Card -->
+                <div class="card" id="bulk-operations">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-tasks me-2 text-orange"></i>
+                            Bulk Operations
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Efficiently manage multiple lore items with bulk operations:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-orange mb-3">Selection Methods</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Individual Selection:</strong> Click checkboxes to select specific items
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Range Selection:</strong> Select multiple items with shift-click
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Filter Selection:</strong> Select all items matching current filters
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Category Selection:</strong> Select all items in a category
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-orange mb-3">Bulk Actions</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Category Change:</strong> Move items to different categories
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Tag Management:</strong> Add or remove tags from multiple items
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Importance Update:</strong> Change importance levels in bulk
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Status Change:</strong> Update completion status for multiple items
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-orange mb-3">Export Options</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>CSV Export:</strong> Export to spreadsheet format
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>PDF Report:</strong> Generate formatted document
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>World Bible:</strong> Create comprehensive world guide
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Backup Archive:</strong> Export for backup purposes
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization Card -->
+                <div class="card" id="visualization">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line me-2 text-pink"></i>
+                            Visualization
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Understand your lore through visual representations and analytics:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-pink mb-3">Relationship Maps</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Connection Diagrams:</strong> See how lore items relate to each other
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Character Networks:</strong> Visualize character-lore relationships
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Timeline Flows:</strong> Show historical connections over time
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Influence Maps:</strong> Understand item impact and reach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-pink mb-3">Statistical Views</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Category Distribution:</strong> See how lore is categorized
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Completion Status:</strong> Track development progress
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Activity Timeline:</strong> See when items were created or modified
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Complexity Metrics:</strong> Understand lore depth and detail
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-pink mb-3">Interactive Features</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Clickable Elements:</strong> Navigate directly from visualizations
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Zoom and Pan:</strong> Explore large relationship networks
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Layer Filtering:</strong> Show/hide different types of connections
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Export Visuals:</strong> Save charts and diagrams
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Card -->
+                <div class="card" id="workflow">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-stream me-2 text-indigo"></i>
+                            Workflow
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Optimize your lore management workflow for maximum efficiency:</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h4 class="text-indigo mb-3">Creation Workflow</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Quick Add:</strong> Create new lore items directly from the list
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Template Usage:</strong> Use templates for consistent structure
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Batch Creation:</strong> Create multiple related items at once
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Import Integration:</strong> Add lore from imported documents
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-indigo mb-3">Review and Refinement</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Completion Tracking:</strong> Mark items as complete or in-progress
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Quality Checks:</strong> Review and improve existing lore
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Consistency Reviews:</strong> Ensure lore fits together logically
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Expansion Planning:</strong> Identify areas needing more detail
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-indigo mb-3">Integration with Writing</h4>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item px-0">
+                                        <strong>Reference Panel:</strong> Quick access while writing
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Story Integration:</strong> Track which lore appears in stories
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>Consistency Checking:</strong> Ensure story matches established lore
+                                    </div>
+                                    <div class="list-group-item px-0">
+                                        <strong>AI Context:</strong> Provide lore context to AI assistant
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-rocket me-2 text-success"></i>
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-primary-lt mb-3 mx-auto">
+                                            <i class="fas fa-list"></i>
+                                        </div>
+                                        <h4>View All Lore</h4>
+                                        <p class="text-secondary">Browse your complete lore collection</p>
+                                        <button class="btn btn-primary">View Lore</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-success-lt mb-3 mx-auto">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <h4>Create New Item</h4>
+                                        <p class="text-secondary">Add a new lore item to your world</p>
+                                        <button class="btn btn-success">Create Lore</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-sm border">
+                                    <div class="card-body text-center">
+                                        <div class="avatar avatar-lg bg-blue-lt mb-3 mx-auto">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <h4>Search Lore</h4>
+                                        <p class="text-secondary">Find specific lore items quickly</p>
+                                        <button class="btn btn-blue">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recipe Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-magic me-2 text-teal"></i>
+                            Recipe for Effective Lore Management
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-teal-lt me-3">
+                                        <i class="fas fa-folder"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Consistent Categorization</strong>
+                                        <div class="text-secondary">Use clear, logical categories</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-teal-lt me-3">
+                                        <i class="fas fa-tags"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Descriptive Tags</strong>
+                                        <div class="text-secondary">Add meaningful tags for easy searching</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-teal-lt me-3">
+                                        <i class="fas fa-sync"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Regular Reviews</strong>
+                                        <div class="text-secondary">Periodically update and refine your lore</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-teal-lt me-3">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Connection Mapping</strong>
+                                        <div class="text-secondary">Link related lore items together</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="avatar avatar-sm bg-teal-lt me-3">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Priority Focus</strong>
+                                        <div class="text-secondary">Develop critical lore first</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-teal">
+                            <div class="d-flex">
+                                <div class="avatar avatar-sm bg-teal-lt me-3">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div>
+                                    <strong>Result:</strong> A well-organized, easily navigable lore collection that supports your writing and enhances your world-building process.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Tip Alert -->
+                <div class="alert alert-success">
+                    <div class="d-flex">
+                        <div class="avatar avatar-sm bg-success-lt me-3">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">💡 Pro Tip</h4>
+                            <div class="text-secondary">Use the relationship view regularly to discover gaps in your world-building. Missing connections between lore items often reveal opportunities for new stories or deeper world development.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('.list-group-item-action').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Highlight active navigation item
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('[id]');
+        const navLinks = document.querySelectorAll('.list-group-item-action');
+        
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentSection) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Detail - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">Story Detail</h1>
+            <p class="help-subtitle">Craft compelling narratives with AI assistance</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"structure\"]').click()">
+                <div class="quick-action-icon">📚</div>
+                <div class="quick-action-text">Story Structure</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"writing\"]').click()">
+                <div class="quick-action-icon">✍️</div>
+                <div class="quick-action-text">Writing Tools</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-tools\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Tools</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="structure">Structure</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="writing">Writing</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-tools">AI Tools</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="metadata">Metadata</button></li>
+            </ul>
+        </div>
+
+        <!-- Structure Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="structure">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Understanding Story Structure
+                </h2>
+                <p>Stories in the AI Storytelling Assistant follow a hierarchical structure: <strong>Stories contain Acts, Acts contain Scenes</strong>. This organization helps both writers and AI maintain narrative coherence.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">📖 Story Level</h3>
+                        <p class="feature-card-description">Overall narrative container with title, summary, genre, and tone settings.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎭 Act Level</h3>
+                        <p class="feature-card-description">Major story divisions (Setup, Confrontation, Resolution) with their own themes and goals.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">🎬 Scene Level</h3>
+                        <p class="feature-card-description">Individual dramatic units where specific events happen in specific locations with specific characters.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Creating Your Story Structure</h3>
+                        <span class="recipe-card-time">10 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Fill in story metadata (title, description, genre, tone)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Plan your act structure (typically 3-5 acts)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Associate relevant world elements (characters, locations, lore)</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Break acts down into individual scenes</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">5</div>
+                            <div class="recipe-step-content">Begin writing with AI assistance</div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Writing Tip:</strong> Start with a simple three-act structure: Setup (25%), Confrontation (50%), Resolution (25%). You can always add complexity later.
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Act Management</h2>
+                <p>Acts represent major story divisions and help organize your narrative flow:</p>
+                
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Act Type</th>
+                            <th>Purpose</th>
+                            <th>Typical Content</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Act I - Setup</td>
+                            <td>Establish world and characters</td>
+                            <td>Character introduction, world-building, inciting incident</td>
+                        </tr>
+                        <tr>
+                            <td>Act II - Confrontation</td>
+                            <td>Build tension and conflict</td>
+                            <td>Obstacles, character development, rising action</td>
+                        </tr>
+                        <tr>
+                            <td>Act III - Resolution</td>
+                            <td>Resolve conflicts and conclude</td>
+                            <td>Climax, falling action, resolution</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Adding and Managing Acts</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li><strong>Add Act:</strong> Click "Add New Act" button or use Ctrl+Shift+A</li>
+                            <li><strong>Reorder Acts:</strong> Drag and drop to change sequence</li>
+                            <li><strong>Edit Act:</strong> Click act title or use the edit button</li>
+                            <li><strong>Delete Act:</strong> Use context menu (right-click) for removal options</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Writing Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="writing">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Writing and Editing Tools
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Act Editor Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>The Act Editor provides a distraction-free writing environment with:</p>
+                        <ul>
+                            <li><strong>Rich Text Editor:</strong> Full formatting options for narrative text</li>
+                            <li><strong>Real-time AI Assistance:</strong> Suggestions and continuations as you write</li>
+                            <li><strong>Word Count Tracking:</strong> Monitor progress with target goals</li>
+                            <li><strong>Version History:</strong> Automatic saves and revision tracking</li>
+                            <li><strong>Focus Mode:</strong> Distraction-free full-screen writing</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'Act Editor Shortcuts:\nCtrl + S: Save current work\nCtrl + Z: Undo last change\nCtrl + Y: Redo last change\nF11: Toggle full-screen mode\nCtrl + /: AI suggestion at cursor')">Copy</button>
+                            <pre>Act Editor Shortcuts:
+Ctrl + S: Save current work
+Ctrl + Z: Undo last change
+Ctrl + Y: Redo last change
+F11: Toggle full-screen mode
+Ctrl + /: AI suggestion at cursor</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Scene Editor Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Scene-level editing provides granular control:</p>
+                        <ul>
+                            <li><strong>Scene Metadata:</strong> Purpose, setting, characters present</li>
+                            <li><strong>Dramatic Structure:</strong> Goal, conflict, disaster tracking</li>
+                            <li><strong>Character Dialogue:</strong> Smart formatting and voice consistency</li>
+                            <li><strong>Setting Integration:</strong> Automatic location and atmosphere details</li>
+                            <li><strong>Emotional Arc:</strong> Track character emotional journey</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">✨</span>
+                            <div>
+                                <strong>Pro Tip:</strong> Use scene templates for common types like "dialogue scene," "action scene," or "emotional revelation" to maintain consistency.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Collaboration Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>When working with co-authors:</p>
+                        <ul>
+                            <li><strong>Comment System:</strong> Leave notes and feedback on specific text</li>
+                            <li><strong>Suggested Edits:</strong> Propose changes without overwriting</li>
+                            <li><strong>Version Branching:</strong> Create alternate versions for comparison</li>
+                            <li><strong>Real-time Sync:</strong> See changes as others make them</li>
+                            <li><strong>Permission Levels:</strong> Control who can view, comment, or edit</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Writing Best Practices</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Start with Outlines</h3>
+                        <p class="feature-card-description">Plan act and scene structures before detailed writing. AI works better with clear direction.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Use World Elements</h3>
+                        <p class="feature-card-description">Associate relevant characters, locations, and lore with each scene for richer AI assistance.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Maintain Consistency</h3>
+                        <p class="feature-card-description">Review AI suggestions for character voice and world consistency before accepting.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Iterate and Refine</h3>
+                        <p class="feature-card-description">Use AI for first drafts, then edit and refine to match your vision.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Tools Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-tools">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI-Powered Writing Assistance
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧠 Contextual AI Writing</h3>
+                    <p class="ai-feature-description">AI understands your world, characters, and story context to provide relevant suggestions and continuations that feel natural to your narrative.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Real-Time Writing Assistance</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>As you write, AI provides:</p>
+                        <ul>
+                            <li><strong>Sentence Completion:</strong> Intelligent auto-complete based on context</li>
+                            <li><strong>Paragraph Continuation:</strong> Extend your writing in the established style</li>
+                            <li><strong>Dialogue Suggestions:</strong> Character-appropriate speech patterns</li>
+                            <li><strong>Description Enhancement:</strong> Rich sensory details for scenes</li>
+                            <li><strong>Pacing Guidance:</strong> Suggestions for tension and flow</li>
+                        </ul>
+
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 1-3 credits per AI suggestion, 5-10 credits per paragraph generation
+                        </div>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'AI Writing Triggers:\nPress Tab: Accept AI suggestion\nCtrl + /: Request AI continuation\nCtrl + Shift + /: Get multiple options\nEsc: Dismiss AI suggestions')">Copy</button>
+                            <pre>AI Writing Triggers:
+Press Tab: Accept AI suggestion
+Ctrl + /: Request AI continuation
+Ctrl + Shift + /: Get multiple options
+Esc: Dismiss AI suggestions</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story Analysis Tools</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can analyze your story for:</p>
+                        <ul>
+                            <li><strong>Character Development:</strong> Track character arcs and growth</li>
+                            <li><strong>Plot Consistency:</strong> Identify plot holes or contradictions</li>
+                            <li><strong>Pacing Analysis:</strong> Evaluate narrative rhythm and tension</li>
+                            <li><strong>Theme Tracking:</strong> Ensure thematic elements are developed</li>
+                            <li><strong>Dialogue Quality:</strong> Check for distinct character voices</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Running Story Analysis</h3>
+                                <span class="recipe-card-time">5 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Click "AI Analysis" button in story toolbar</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Choose analysis type (character, plot, pacing, etc.)</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Select scope (single act, multiple acts, or full story)</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Review AI feedback and suggestions</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Apply recommendations selectively</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Content Generation Options</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can generate various content types:</p>
+                        <ul>
+                            <li><strong>Scene Outlines:</strong> Structured summaries of scene events</li>
+                            <li><strong>Character Interactions:</strong> Dialogue and relationship dynamics</li>
+                            <li><strong>Descriptive Passages:</strong> Rich environmental and emotional descriptions</li>
+                            <li><strong>Action Sequences:</strong> Dynamic and engaging combat or chase scenes</li>
+                            <li><strong>Exposition:</strong> Natural information delivery within narrative</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Quality Control:</strong> Always review AI-generated content for consistency with your vision. AI is a tool to enhance creativity, not replace it.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">RAG Context System</h2>
+                <p>The Retrieval Augmented Generation (RAG) system ensures AI has access to your world knowledge:</p>
+                <ul>
+                    <li><strong>Character Knowledge:</strong> AI remembers character traits, relationships, and history</li>
+                    <li><strong>World Consistency:</strong> References established lore, locations, and rules</li>
+                    <li><strong>Story Continuity:</strong> Maintains plot threads and character development</li>
+                    <li><strong>Contextual Relevance:</strong> Suggestions fit the current scene and act</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">🔍</span>
+                    <div>
+                        <strong>How RAG Works:</strong> When you request AI assistance, the system searches your world elements and previous story content to provide contextually relevant suggestions.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadata Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="metadata">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Story Metadata and Settings
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Basic Story Information</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Purpose</th>
+                                    <th>AI Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Title</td>
+                                    <td>Story identification</td>
+                                    <td>Helps AI understand story focus</td>
+                                </tr>
+                                <tr>
+                                    <td>Description</td>
+                                    <td>Story summary</td>
+                                    <td>Provides context for AI suggestions</td>
+                                </tr>
+                                <tr>
+                                    <td>Genre</td>
+                                    <td>Story category</td>
+                                    <td>Influences AI tone and style</td>
+                                </tr>
+                                <tr>
+                                    <td>Tone</td>
+                                    <td>Emotional atmosphere</td>
+                                    <td>Guides AI mood and language</td>
+                                </tr>
+                                <tr>
+                                    <td>Conflict Type</td>
+                                    <td>Primary tension source</td>
+                                    <td>Shapes AI plot suggestions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Genre and Tone Guidelines</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p><strong>Popular Genres:</strong></p>
+                        <ul>
+                            <li><strong>Fantasy:</strong> Magic, mythical creatures, alternate worlds</li>
+                            <li><strong>Science Fiction:</strong> Technology, space, future societies</li>
+                            <li><strong>Mystery:</strong> Puzzles, investigation, revelation</li>
+                            <li><strong>Romance:</strong> Relationships, emotional connection, love</li>
+                            <li><strong>Thriller:</strong> Suspense, danger, fast pacing</li>
+                            <li><strong>Historical:</strong> Past settings, period accuracy, cultural context</li>
+                        </ul>
+
+                        <p><strong>Tone Options:</strong></p>
+                        <ul>
+                            <li><strong>Dark:</strong> Serious, somber, pessimistic themes</li>
+                            <li><strong>Light:</strong> Upbeat, optimistic, humorous elements</li>
+                            <li><strong>Epic:</strong> Grand scale, heroic, larger-than-life</li>
+                            <li><strong>Intimate:</strong> Personal, character-focused, emotional</li>
+                            <li><strong>Satirical:</strong> Critical, ironic, social commentary</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Story Statistics and Progress</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Track your story development with:</p>
+                        <ul>
+                            <li><strong>Word Count:</strong> Total words across all acts and scenes</li>
+                            <li><strong>Completion Percentage:</strong> How much of planned content is written</li>
+                            <li><strong>Last Modified:</strong> When story was last updated</li>
+                            <li><strong>Revision Count:</strong> Number of editing sessions</li>
+                            <li><strong>AI Assistance Usage:</strong> Credits spent on AI features</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">📊</span>
+                            <div>
+                                <strong>Progress Tracking:</strong> Set target word counts for acts and scenes to monitor writing progress and maintain pacing goals.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Export and Publishing</h2>
+                <p>When your story is ready to share:</p>
+                <ul>
+                    <li><strong>PDF Export:</strong> Formatted for reading or printing</li>
+                    <li><strong>EPUB Format:</strong> Compatible with e-readers</li>
+                    <li><strong>Word Document:</strong> For further editing in other tools</li>
+                    <li><strong>HTML:</strong> For web publishing</li>
+                    <li><strong>Screenplay Format:</strong> Industry-standard script formatting</li>
+                </ul>
+
+                <div class="code-block">
+                    <button class="copy-button" onclick="copyToClipboard(this, 'Export includes:\n- Story metadata\n- Full text with formatting\n- Character and location references\n- Author notes and comments\n- Version history (optional)')">Copy</button>
+                    <pre>Export includes:
+- Story metadata
+- Full text with formatting  
+- Character and location references
+- Author notes and comments
+- Version history (optional)</pre>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Keyboard Shortcuts</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + S</span></td>
+                            <td>Save story</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + E</span></td>
+                            <td>Edit story metadata</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + A</span></td>
+                            <td>Add new act</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + S</span></td>
+                            <td>Add new scene</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + P</span></td>
+                            <td>Preview/Print story</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">F5</span></td>
+                            <td>Refresh/reload story data</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

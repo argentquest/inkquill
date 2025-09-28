@@ -1,0 +1,50 @@
+# /ai_rag_story_app/alembic/README
+
+# Alembic Configuration for AI Storytelling Assistant
+
+This directory contains the database migration scripts managed by Alembic.
+
+## Database Connection
+
+**IMPORTANT:** The database connection URL for Alembic is **NOT** configured in `alembic.ini`.
+
+Instead, the connection URL is dynamically constructed within the `alembic/env.py` script. This script imports the `SQLALCHEMY_DATABASE_URI` from the main application's configuration (`app.core.config`).
+
+To configure the database for migrations, you must set the following environment variables, typically in the `.env` file in the project's root directory:
+
+-   `POSTGRES_USER`
+-   `POSTGRES_PASSWORD`
+-   `POSTGRES_SERVER`
+-   `POSTGRES_PORT`
+-   `POSTGRES_DB`
+
+This ensures that your migrations always run against the same database that your FastAPI application is configured to use.
+
+## Model Detection for Autogeneration
+
+For Alembic's `--autogenerate` feature to detect changes to your SQLAlchemy models, you must ensure that every model is imported within `alembic/env.py`. All current models from the `app/models/` directory are already imported there. If you add a new model, be sure to add its import to `env.py` as well.
+
+## Common Alembic Commands
+
+To generate a new migration script after changing your models:
+
+```bash
+alembic revision --autogenerate -m "A brief description of model changes"
+Use code with caution.
+Markdown
+To apply all migrations and upgrade the database to the latest version:
+alembic upgrade head
+Use code with caution.
+Bash
+To downgrade to a specific version or by a step:
+# Downgrade one version
+alembic downgrade -1
+
+# Downgrade to the very beginning (empty schema)
+alembic downgrade base
+Use code with caution.
+Bash
+---
+This task is now complete. The `README` in the `alembic` directory is now accurate and helpful for any developer working on the project.
+
+Shall we proceed to the next task, **`P6_02_ENHANCE_PERSONA_IN_PROMPTS`**?

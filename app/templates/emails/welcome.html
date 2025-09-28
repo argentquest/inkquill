@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to {{ app_name }}!{% endblock %}
+
+{% block content %}
+<h1>Welcome to {{ app_name }}, {{ user_name }}! 🎉</h1>
+
+<p>We're thrilled to have you join our community of storytellers! Your account has been successfully created, and you're now ready to embark on an exciting journey of AI-powered storytelling.</p>
+
+<div class="success-box">
+    <h2>🚀 What's Next?</h2>
+    <p><strong>Here's how to get started:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Complete the Welcome Interview</strong> - Earn 150 bonus coins!</li>
+        <li><strong>Brainstorm Your First Story</strong> - Get AI-powered story ideas</li>
+        <li><strong>Create Your First World</strong> - Build rich, detailed story worlds</li>
+        <li><strong>Start Writing</strong> - Use our AI-assisted writing tools</li>
+    </ul>
+</div>
+
+<div class="text-center">
+    <a href="{{ dashboard_url }}" class="btn btn-primary">
+        🏠 Go to Your Dashboard
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<h2>🎁 Special Welcome Bonus</h2>
+<p>As a new member, you'll receive <strong>150 free coins</strong> when you complete our quick welcome interview. These coins can be used for:</p>
+<ul>
+    <li>AI story generation and brainstorming</li>
+    <li>Character and world creation assistance</li>
+    <li>Advanced writing features</li>
+    <li>Story analysis and feedback</li>
+</ul>
+
+<div class="info-box">
+    <h2>📚 Need Help Getting Started?</h2>
+    <p>Check out our comprehensive guides:</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>User Guide</strong> - Complete walkthrough of all features</li>
+        <li><strong>Story Writing Tips</strong> - Best practices for AI-assisted writing</li>
+        <li><strong>World Building Guide</strong> - Create rich, immersive story worlds</li>
+    </ul>
+    <div class="spacer"></div>
+    <p>
+        <a href="{{ app_url }}/help" style="color: #206bc4; text-decoration: none;">
+            📖 View Help Documentation →
+        </a>
+    </p>
+</div>
+
+<h2>🤝 Join Our Community</h2>
+<p>Connect with other writers, share your stories, and get inspiration from our growing community of storytellers. We're here to support your creative journey every step of the way!</p>
+
+<div class="text-center">
+    <a href="{{ login_url }}" class="btn btn-secondary">
+        🔑 Login to Your Account
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<p>Happy writing!</p>
+<p><strong>The {{ app_name }} Team</strong></p>
+
+<div class="spacer"></div>
+
+<p class="text-muted">
+    <em>Account ID: #{{ user_id }} | Created: {{ "now" | strftime('%B %d, %Y') }}</em>
+</p>
+{% endblock %}

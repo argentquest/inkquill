@@ -1,0 +1,229 @@
+{% extends "layouts/base.html" %}
+{% block title %}News & Updates - {{ project_name }}{% endblock %}
+
+{% block content %}
+<div class="news-list-page">
+    {# Standardized Page Header #}
+    {% set page_title = 'News & Updates' %}
+    {% set page_icon = 'fas fa-newspaper' %}
+    {% set page_description = 'Stay up to date with the latest features, announcements, and updates' %}
+    {% set page_stats = [
+        {'icon': 'fas fa-newspaper', 'text': (recent_articles|length|string + ' recent article' + ('s' if recent_articles|length != 1 else ''))},
+        {'icon': 'fas fa-calendar', 'text': 'Updated regularly'}
+    ] %}
+    {% set help_topic = 'news' %}
+    {% if current_user and current_user.is_admin %}
+        {% set header_actions %}
+            <a href="{{ url_for('admin_news_create_form') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>
+                Create Article
+            </a>
+        {% endset %}
+    {% endif %}
+    {% include 'partials/_page_header.html' %}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Enhanced Featured/Pinned Articles -->
+            {% if pinned_articles %}
+            <section class="pinned-articles mb-5">
+                <div class="mb-3">
+                    <h3 class="mb-0">
+                        <i class="ti ti-pin me-2 text-yellow"></i>
+                        Pinned Announcements
+                    </h3>
+                </div>
+                <div class="row g-3">
+                    {% for article in pinned_articles %}
+                    <div class="col-md-6">
+                        <div class="card card-link hover-lift border-yellow-lt">
+                            <div class="ribbon ribbon-bookmark bg-yellow">
+                                <i class="ti ti-pin"></i>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-yellow-lt text-yellow">
+                                        <i class="ti ti-pin me-1"></i>
+                                        Pinned
+                                    </span>
+                                    <div class="text-muted small">
+                                        <i class="ti ti-calendar me-1"></i>
+                                        {{ article.created_at.strftime('%b %d, %Y') }}
+                                    </div>
+                                </div>
+                                <h4 class="card-title mb-2">
+                                    <a href="{{ url_for('ui_news_detail', article_id=article.id) }}" 
+                                       class="text-body">
+                                        {{ article.title }}
+                                    </a>
+                                </h4>
+                                <p class="text-muted mb-3">
+                                    {{ article.content_preview }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="text-muted small">
+                                        <i class="ti ti-user me-1"></i>{{ article.author }}
+                                        <i class="ti ti-eye ms-3 me-1"></i>{{ article.view_count }}
+                                    </div>
+                                    <a href="{{ url_for('ui_news_detail', article_id=article.id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="ti ti-arrow-right me-1"></i>
+                                        Read More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Enhanced Recent Articles -->
+            <section class="recent-articles">
+                <div class="mb-4">
+                    <h3 class="mb-0">
+                        <i class="ti ti-clock me-2"></i>
+                        Recent Articles
+                    </h3>
+                </div>
+                
+                {% if recent_articles %}
+                <div class="row">
+                    {% for article in recent_articles %}
+                    <div class="col-lg-6 mb-4">
+                        <article class="card h-100 hover-lift">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="text-muted small">
+                                        <i class="ti ti-calendar me-1"></i>
+                                        {{ article.created_at.strftime('%B %d, %Y') }}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <span class="me-2">
+                                            <i class="ti ti-eye me-1"></i>{{ article.view_count }}
+                                        </span>
+                                        {% if article.reply_count > 0 %}
+                                        <span>
+                                            <i class="ti ti-message me-1"></i>{{ article.reply_count }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <h4 class="card-title mb-3">
+                                    <a href="{{ url_for('ui_news_detail', article_id=article.id) }}" 
+                                       class="text-body">
+                                        {{ article.title }}
+                                    </a>
+                                </h4>
+                                
+                                <p class="text-muted mb-4">
+                                    {{ article.content_preview }}
+                                </p>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <div class="d-flex align-items-center">
+                                        <span class="avatar avatar-sm bg-primary-lt me-2">
+                                            <i class="ti ti-user"></i>
+                                        </span>
+                                        <span class="text-muted small">{{ article.author }}</span>
+                                    </div>
+                                    <a href="{{ url_for('ui_news_detail', article_id=article.id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="ti ti-arrow-right me-1"></i>
+                                        Read Article
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Enhanced Pagination -->
+                {% if has_next or page > 1 %}
+                <nav aria-label="News pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('ui_news_list', page=page-1) }}">
+                                <i class="ti ti-chevron-left me-1"></i>Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in range(max(1, page-2), min(total_pages+1, page+3)) %}
+                        <li class="page-item {% if page_num == page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('ui_news_list', page=page_num) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('ui_news_list', page=page+1) }}">
+                                Next<i class="ti ti-chevron-right ms-1"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <!-- Enhanced Empty State -->
+                <div class="empty">
+                    <div class="empty-img"><img src="./static/img/undraw_newspaper.svg" height="128" alt="">
+                    </div>
+                    <p class="empty-title">No News Articles Yet</p>
+                    <p class="empty-subtitle text-muted">
+                        {% if current_user and current_user.is_admin %}
+                            Be the first to publish a news article for the community.
+                        {% else %}
+                            Check back soon for the latest news and updates.
+                        {% endif %}
+                    </p>
+                    {% if current_user and current_user.is_admin %}
+                    <div class="empty-action">
+                        <a href="{{ url_for('admin_news_create_form') }}" class="btn btn-primary">
+                            <i class="ti ti-plus me-1"></i>
+                            Create First Article
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Enhanced Newsletter Signup -->
+            <section class="newsletter-signup mt-5 mb-4">
+                <div class="card card-link hover-lift bg-gradient-primary text-white">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-3">
+                            <span class="avatar avatar-xl bg-white bg-opacity-25">
+                                <i class="ti ti-bell text-white"></i>
+                            </span>
+                        </div>
+                        <h3 class="card-title text-white mb-3">
+                            Stay Updated
+                        </h3>
+                        <p class="text-white-75 mb-4">
+                            Join our community forum to get notified of new features and updates.
+                        </p>
+                        <a href="{{ url_for('ui_forum_home') }}" class="btn btn-white btn-pill">
+                            <i class="ti ti-messages me-1"></i>
+                            Join Community Forum
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}

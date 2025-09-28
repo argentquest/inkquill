@@ -1,0 +1,15 @@
+Suggest 5-8 relevant tags for this blog post:
+
+{source_text}
+
+Existing popular tags to consider (use these when relevant):
+{existing_tags}
+
+Requirements:
+- Choose tags that accurately represent the content
+- Prefer existing popular tags when relevant
+- Suggest new tags only when necessary
+- Keep tags concise (1-3 words)
+- Focus on topics, themes, and key concepts
+
+Return tags as a comma-separated list.

@@ -1,0 +1,519 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ page_title }} - {{ project_name }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- Quill Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('ui_forum_home') }}">Forum</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('ui_forum_category', category_slug=thread.category.slug) }}">
+                            {{ thread.category.name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">{{ thread.title }}</li>
+                </ol>
+            </nav>
+
+            <!-- Thread Header -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="h3 mb-2">
+                                {% if thread.is_pinned %}
+                                    <i class="fas fa-thumbtack text-warning me-2" title="Pinned"></i>
+                                {% endif %}
+                                {% if thread.is_locked %}
+                                    <i class="fas fa-lock text-danger me-2" title="Locked"></i>
+                                {% endif %}
+                                {{ thread.title }}
+                            </h1>
+                            <div class="text-muted small">
+                                Started by <strong>{{ thread.user.username }}</strong> • 
+                                {{ thread.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                {% if thread.world %}
+                                    • <i class="fas fa-globe me-1"></i>{{ thread.world.name }}
+                                {% endif %}
+                                {% if thread.story %}
+                                    • <i class="fas fa-book me-1"></i>{{ thread.story.title }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            {% if current_user %}
+                            <button class="btn btn-outline-primary btn-sm" 
+                                    onclick="alert('Subscription feature coming soon!')">
+                                <i class="fas fa-{% if is_subscribed %}bell-slash{% else %}bell{% endif %} me-1"></i>
+                                {% if is_subscribed %}Unsubscribe{% else %}Subscribe{% endif %}
+                            </button>
+                            {% endif %}
+                            {% if can_edit_thread %}
+                            <button class="btn btn-outline-secondary btn-sm" 
+                                    onclick="alert('Edit thread feature coming soon!')">
+                                <i class="fas fa-edit me-1"></i>
+                                Edit
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body py-2">
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <small class="text-muted">Posts</small>
+                            <div class="fw-bold">{{ thread.post_count }}</div>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted">Views</small>
+                            <div class="fw-bold">{{ thread.view_count }}</div>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted">Last Reply</small>
+                            <div class="fw-bold">
+                                {% if thread.last_post_at %}
+                                    {{ thread.last_post_at.strftime('%b %d') }}
+                                {% else %}
+                                    No replies
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <small class="text-muted">Status</small>
+                            <div class="fw-bold">
+                                {% if thread.is_locked %}
+                                    <span class="text-danger">Locked</span>
+                                {% else %}
+                                    <span class="text-success">Open</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Public Access Notice -->
+            {% if not current_user %}
+            <div class="alert alert-info mb-3" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span class="small">
+                        You're viewing this discussion in read-only mode. 
+                        <a href="{{ url_for('ui_login_form') }}" class="alert-link">Log in</a> to vote, reply, and participate.
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Posts -->
+            <div class="posts-container">
+                {% for post in posts %}
+                <div class="card mb-3 forum-post" id="post-{{ post.id }}">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- User Info Sidebar -->
+                            <div class="col-md-2 text-center border-end">
+                                <div class="user-avatar mb-2">
+                                    <i class="fas fa-user-circle fa-3x text-muted"></i>
+                                </div>
+                                <h6 class="mb-1">{{ post.user_display_name or post.user }}</h6>
+                                <small class="text-muted">Member</small>
+                                
+                                <!-- Post Meta -->
+                                <div class="mt-3 small text-muted">
+                                    <div>Posts: --</div>
+                                    <div>Karma: --</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Post Content -->
+                            <div class="col-md-10">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="small text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                        {% if post.edited_at %}
+                                            • <i class="fas fa-edit me-1"></i>
+                                            Edited {{ post.edited_at.strftime('%b %d, %Y') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link btn-sm text-muted" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#post-{{ post.id }}">
+                                                <i class="fas fa-link me-2"></i>Link to Post
+                                            </a></li>
+                                            {% if current_user %}
+                                            <li><a class="dropdown-item quote-btn" href="#" 
+                                                   data-post-id="{{ post.id }}" 
+                                                   data-username="{{ post.user }}" 
+                                                   data-content="{{ post.content[:100] }}...">
+                                                <i class="fas fa-quote-left me-2"></i>Quote
+                                            </a></li>
+                                            {% if post.can_edit %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="#" onclick="alert('Edit post feature coming soon!')">
+                                                <i class="fas fa-edit me-2"></i>Edit
+                                            </a></li>
+                                            {% endif %}
+                                            {% if post.can_delete %}
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="alert('Delete post feature coming soon!')">
+                                                <i class="fas fa-trash me-2"></i>Delete
+                                            </a></li>
+                                            {% endif %}
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Post Content -->
+                                <div class="post-content mb-3">
+                                    {% if post.character_name or post.location_name %}
+                                    <div class="alert alert-info py-2 mb-3">
+                                        <small>
+                                            <i class="fas fa-tag me-1"></i>
+                                            Referenced: 
+                                            {% if post.character_name %}
+                                                <strong>{{ post.character_name }}</strong> (Character)
+                                            {% endif %}
+                                            {% if post.location_name %}
+                                                <strong>{{ post.location_name }}</strong> (Location)
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="post-text">
+                                        {{ post.content|replace('\n', '<br>')|safe }}
+                                    </div>
+                                </div>
+
+                                <!-- Post Actions -->
+                                {% if current_user %}
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="post-voting">
+                                        <button class="btn btn-outline-success btn-sm voting-btn" 
+                                                data-post-id="{{ post.id }}" data-vote="upvote"
+                                                {% if post.user_vote == 'upvote' %}disabled{% endif %}>
+                                            <i class="fas fa-thumbs-up me-1"></i>
+                                            {{ post.upvote_count }}
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm voting-btn" 
+                                                data-post-id="{{ post.id }}" data-vote="downvote"
+                                                {% if post.user_vote == 'downvote' %}disabled{% endif %}>
+                                            <i class="fas fa-thumbs-down me-1"></i>
+                                            {{ post.downvote_count }}
+                                        </button>
+                                        <span class="ms-2 small text-muted">
+                                            Score: <strong>{{ post.score }}</strong>
+                                        </span>
+                                    </div>
+                                    {% if can_post %}
+                                    <button class="btn btn-outline-primary btn-sm reply-btn" 
+                                            data-post-id="{{ post.id }}" 
+                                            data-username="{{ post.user }}">
+                                        <i class="fas fa-reply me-1"></i>
+                                        Reply
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <!-- Read-only view for non-authenticated users -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="post-voting-readonly">
+                                        <span class="badge bg-light text-muted me-2">
+                                            <i class="fas fa-thumbs-up me-1"></i>
+                                            {{ post.upvote_count }}
+                                        </span>
+                                        <span class="badge bg-light text-muted me-2">
+                                            <i class="fas fa-thumbs-down me-1"></i>
+                                            {{ post.downvote_count }}
+                                        </span>
+                                        <span class="small text-muted">
+                                            Score: <strong>{{ post.score }}</strong>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">
+                                        <a href="{{ url_for('ui_login_form') }}" class="text-decoration-none">Log in</a> to reply
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Error Message -->
+            {% if request.query_params.get('error') == 'reply_failed' %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Failed to post reply. Please try again.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            <!-- Reply Form -->
+            {% if can_post %}
+            <div class="card" id="replyForm">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-reply me-2"></i>
+                        Post Reply
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('ui_reply_to_thread', thread_id=thread.id) }}" id="postReplyForm">
+                        <!-- Reply Content -->
+                        <div class="mb-3">
+                            <label for="reply_content" class="form-label">
+                                <i class="fas fa-comment me-1"></i>
+                                Your Reply
+                            </label>
+                            <!-- Quill Editor -->
+                            <div id="reply-content-editor" style="min-height: 150px; background: white; border: 1px solid #dee2e6; border-radius: 0.375rem;"></div>
+                            
+                            <!-- Hidden textarea for form submission -->
+                            <textarea class="d-none" 
+                                      id="reply_content" 
+                                      name="content" 
+                                      required></textarea>
+                            <div class="form-text">
+                                Use the rich text editor to format your reply with headings, lists, links, and more.
+                            </div>
+                        </div>
+
+                        <!-- Optional References -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="character_id" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Reference Character (Optional)
+                                </label>
+                                <select class="form-select" id="character_id" name="character_id">
+                                    <option value="">No character selected</option>
+                                    {% for character in world_characters %}
+                                    <option value="{{ character.id }}">{{ character.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Reference a character from the linked world.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location_id" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Reference Location (Optional)
+                                </label>
+                                <select class="form-select" id="location_id" name="location_id">
+                                    <option value="">No location selected</option>
+                                    {% for location in world_locations %}
+                                    <option value="{{ location.id }}">{{ location.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Reference a location from the linked world.</div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden fields for replies -->
+                        <input type="hidden" id="parent_post_id" name="parent_post_id" value="">
+
+                        <!-- Character Counter -->
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <span id="replyCharCount">0</span> characters
+                            </small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" onclick="clearReplyForm()">
+                                <i class="fas fa-times me-1"></i>
+                                Clear
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="submitReplyBtn">
+                                <i class="fas fa-paper-plane me-1"></i>
+                                Post Reply
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% elif thread.is_locked %}
+            <div class="alert alert-warning">
+                <i class="fas fa-lock me-2"></i>
+                This thread has been locked and no longer accepts new replies.
+            </div>
+            {% elif not current_user %}
+            <div class="alert alert-info">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Please <a href="{{ url_for('ui_login_form') }}">log in</a> to participate in this discussion.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.forum-post {
+    transition: box-shadow 0.2s ease;
+}
+.forum-post:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.post-content {
+    line-height: 1.6;
+}
+.voting-btn:disabled {
+    opacity: 0.6;
+}
+.user-avatar {
+    position: sticky;
+    top: 20px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Voting functionality (placeholder)
+    document.querySelectorAll('.voting-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            alert('Voting functionality will be implemented in the next phase!');
+        });
+    });
+});
+</script>
+
+<!-- Quill Editor JavaScript -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script src="{{ url_for('static', path='js/quill_manager.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill editor for reply content
+    const quillEditor = QuillManager.initialize('reply-content-editor', 'reply_content', {
+        placeholder: 'Type your reply here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['link'],
+                ['blockquote'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Setup character counter for Quill
+    QuillManager.setupCharacterCounter('reply-content-editor', 'replyCharCount');
+
+    // Override functions to work with Quill
+    window.clearReplyForm = function() {
+        QuillManager.clearContent('reply-content-editor');
+        document.getElementById('parent_post_id').value = '';
+        document.getElementById('character_id').value = '';
+        document.getElementById('location_id').value = '';
+        
+        // Update form header to show regular reply
+        const header = document.querySelector('#replyForm .card-header h6');
+        header.innerHTML = '<i class="fas fa-reply me-2"></i>Post Reply';
+    };
+
+    // Override form validation to work with Quill
+    const replyForm = document.getElementById('postReplyForm');
+    if (replyForm) {
+        replyForm.addEventListener('submit', function(e) {
+            const content = QuillManager.getContentText('reply-content-editor').trim();
+            const submitBtn = document.getElementById('submitReplyBtn');
+            
+            if (!content || content.length < 3) {
+                e.preventDefault();
+                alert('Please enter a reply with at least 3 characters.');
+                QuillManager.focusEditor('reply-content-editor');
+                return;
+            }
+            
+            // Disable submit button to prevent double submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Posting...';
+        });
+    }
+    
+    // Update reply buttons to focus Quill editor
+    document.querySelectorAll('.reply-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const username = this.getAttribute('data-username');
+            
+            // Set parent post ID
+            document.getElementById('parent_post_id').value = postId;
+            
+            // Update form header to show reply target
+            const header = document.querySelector('#replyForm .card-header h6');
+            header.innerHTML = `<i class="fas fa-reply me-2"></i>Reply to ${username}`;
+            
+            // Scroll to reply form
+            document.getElementById('replyForm').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            // Focus on Quill editor
+            setTimeout(() => {
+                QuillManager.focusEditor('reply-content-editor');
+            }, 500);
+        });
+    });
+    
+    // Update quote functionality to work with Quill
+    document.querySelectorAll('.quote-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const postId = this.getAttribute('data-post-id');
+            const username = this.getAttribute('data-username');
+            const content = this.getAttribute('data-content');
+            
+            // Set parent post ID
+            document.getElementById('parent_post_id').value = postId;
+            
+            // Add quoted content to Quill editor
+            const quotedHtml = `<blockquote><p><strong>${username} wrote:</strong></p><p>${content}</p></blockquote><p><br></p>`;
+            QuillManager.setContentHtml('reply-content-editor', quotedHtml);
+            
+            // Update form header
+            const header = document.querySelector('#replyForm .card-header h6');
+            header.innerHTML = `<i class="fas fa-quote-left me-2"></i>Quote from ${username}`;
+            
+            // Scroll to reply form
+            document.getElementById('replyForm').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            // Focus at end of editor
+            setTimeout(() => {
+                const quillInstance = QuillManager.getInstance('reply-content-editor');
+                if (quillInstance) {
+                    quillInstance.setSelection(quillInstance.getLength());
+                }
+            }, 500);
+        });
+    });
+});
+</script>
+{% endblock %}

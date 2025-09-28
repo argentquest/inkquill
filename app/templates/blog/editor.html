@@ -1,0 +1,3908 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Blog Editor{% endblock %}
+{% block meta_description %}Create and edit your blog posts with our AI-powered editor.{% endblock %}
+
+{% block head %}
+<!-- Cache busting: 2025-01-26-v3-websocket-fix -->
+<!-- Quill Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- CodeMirror CSS for HTML editing -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+
+<style>
+    /* Modern Navigation Styles */
+    .modern-blog-nav {
+        background: linear-gradient(to bottom, #ffffff, #fafafa) !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        padding: 2.25rem 0 !important; /* 3x the original 0.75rem */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(10px) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    .modern-blog-nav::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 1px !important;
+        background: linear-gradient(90deg, transparent, rgba(var(--tblr-primary-rgb), 0.3), transparent) !important;
+        animation: shimmer 3s infinite !important;
+    }
+    
+    @keyframes shimmer {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+    }
+    
+    .modern-blog-nav.scrolled {
+        padding: 0.45rem 0 !important; /* 40% less than original 0.75rem */
+        background: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .blog-logo {
+        height: 90px !important; /* Increased to match 3x nav height */
+        width: auto !important;
+        transition: all 0.3s ease !important;
+        margin-right: 2rem !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) !important;
+    }
+    
+    .modern-blog-nav.scrolled .blog-logo {
+        height: 32px !important; /* Smaller when scrolled */
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05)) !important;
+    }
+    
+    .logo-container {
+        display: flex !important;
+        align-items: center !important;
+        text-decoration: none !important;
+        margin-right: 2rem !important;
+        position: relative !important;
+    }
+    
+    .logo-container::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 120% !important;
+        height: 120% !important;
+        background: radial-gradient(circle, rgba(var(--tblr-primary-rgb), 0.1), transparent 70%) !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+        pointer-events: none !important;
+    }
+    
+    .logo-container:hover::after {
+        opacity: 1 !important;
+    }
+    
+    .logo-text {
+        margin-left: 0.75rem !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: var(--tblr-primary) !important;
+        transition: font-size 0.3s ease !important;
+    }
+    
+    .modern-blog-nav.scrolled .logo-text {
+        font-size: 1.25rem !important;
+    }
+    
+    .modern-blog-nav .nav-link {
+        color: #374151 !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+    }
+    
+    .modern-blog-nav .nav-link:hover,
+    .modern-blog-nav .nav-link.active {
+        color: var(--tblr-primary) !important;
+        background: rgba(var(--tblr-primary-rgb), 0.1) !important;
+    }
+    
+    .search-form {
+        position: relative !important;
+    }
+    
+    .search-form .form-control {
+        border-radius: 20px !important;
+        padding-left: 2.5rem !important;
+        border: 1px solid #d1d5db !important;
+    }
+    
+    .search-form .search-icon {
+        position: absolute !important;
+        left: 0.75rem !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        color: #6b7280 !important;
+    }
+    /* Editor Hero Section - Matching Blog Post Detail */
+    .editor-hero {
+        position: relative !important;
+        height: 200px !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        margin-bottom: 3rem !important;
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%) !important;
+    }
+    
+    .editor-hero-overlay {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.3)) !important;
+        padding: 1.5rem 2rem 2rem !important;
+        color: white !important;
+    }
+    
+    .editor-hero-title {
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+        margin-bottom: 1rem !important;
+        color: white !important;
+    }
+    
+    .editor-hero-subtitle {
+        font-size: 1.125rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: 0 !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    .editor-container {
+        background: white;
+        border-radius: var(--tblr-border-radius);
+        box-shadow: var(--tblr-box-shadow);
+        margin-bottom: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: calc(100vh - 300px);
+        min-height: 600px;
+        display: flex;
+        flex-direction: column;
+    }
+    .editor-container:hover {
+        box-shadow: var(--tblr-box-shadow-lg);
+    }
+    
+    .editor-container .card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .editor-container .card-body {
+        flex: 1;
+        overflow-y: auto;
+        max-height: calc(100vh - 400px);
+    }
+    .ai-panel {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        color: white;
+        border-radius: var(--tblr-border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .ai-panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    }
+    .ai-suggestion {
+        background: var(--tblr-bg-surface-secondary);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 1rem;
+        margin: 0.5rem 0;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ai-suggestion:hover {
+        box-shadow: var(--tblr-box-shadow);
+        border-color: var(--tblr-primary);
+    }
+    .ai-thinking {
+        background: var(--tblr-yellow-lt);
+        border: 1px solid var(--tblr-yellow);
+        color: var(--tblr-yellow-fg);
+        padding: 0.75rem;
+        border-radius: var(--tblr-border-radius);
+        margin: 0.5rem 0;
+    }
+    .tag-input {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        min-height: 3rem;
+        background: white;
+    }
+    .tag-item {
+        background: linear-gradient(45deg, var(--tblr-primary), var(--tblr-purple));
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: fadeIn 0.3s ease;
+    }
+    .tag-remove {
+        cursor: pointer;
+        background: rgba(255,255,255,0.3);
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.2s ease;
+    }
+    .tag-remove:hover {
+        background: rgba(255,255,255,0.5);
+    }
+    .sidebar {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+    #editor {
+        min-height: 600px;
+        height: 600px;
+    }
+    
+    #editor .ql-editor {
+        min-height: 550px;
+        max-height: 550px;
+        overflow-y: auto;
+    }
+    
+    
+    /* Enhanced Quill Editor Styling */
+    .ql-toolbar.ql-snow {
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius) var(--tblr-border-radius) 0 0;
+        background: var(--tblr-bg-surface-secondary);
+        padding: 8px;
+        position: relative;
+    }
+    
+    /* Custom toolbar buttons for HTML/Visual toggle */
+    .custom-toolbar-buttons {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 2px;
+    }
+    
+    .custom-toolbar-btn {
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 6px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #333;
+        font-weight: 500;
+    }
+    
+    .custom-toolbar-btn:hover {
+        background: var(--tblr-primary);
+        color: white;
+        border-color: var(--tblr-primary);
+    }
+    
+    .custom-toolbar-btn.active {
+        background: var(--tblr-primary);
+        color: white;
+        border-color: var(--tblr-primary);
+    }
+    
+    .custom-toolbar-btn i {
+        margin-right: 4px;
+        font-size: 11px;
+    }
+    
+    .ql-container.ql-snow {
+        border: 1px solid var(--tblr-border-color);
+        border-top: none;
+        border-radius: 0 0 var(--tblr-border-radius) var(--tblr-border-radius);
+        font-size: 1rem;
+        font-family: var(--tblr-font-sans-serif);
+    }
+    
+    /* Toolbar button hover effects */
+    .ql-toolbar button:hover,
+    .ql-toolbar button:focus,
+    .ql-toolbar button.ql-active,
+    .ql-toolbar .ql-picker-label:hover,
+    .ql-toolbar .ql-picker-label.ql-active,
+    .ql-toolbar .ql-picker-item:hover {
+        color: var(--tblr-primary) !important;
+    }
+    
+    .ql-toolbar button:hover .ql-fill,
+    .ql-toolbar button:focus .ql-fill,
+    .ql-toolbar button.ql-active .ql-fill,
+    .ql-toolbar .ql-picker-label:hover .ql-fill,
+    .ql-toolbar .ql-picker-label.ql-active .ql-fill {
+        fill: var(--tblr-primary) !important;
+    }
+    
+    .ql-toolbar button:hover .ql-stroke,
+    .ql-toolbar button:focus .ql-stroke,
+    .ql-toolbar button.ql-active .ql-stroke,
+    .ql-toolbar .ql-picker-label:hover .ql-stroke,
+    .ql-toolbar .ql-picker-label.ql-active .ql-stroke {
+        stroke: var(--tblr-primary) !important;
+    }
+    
+    /* Picker dropdown styling */
+    .ql-snow .ql-picker-options {
+        background: var(--tblr-bg-surface);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        box-shadow: var(--tblr-box-shadow);
+    }
+    
+    .ql-snow .ql-picker-item:hover {
+        background: var(--tblr-bg-surface-secondary);
+    }
+    
+    /* Tooltip styling */
+    .ql-toolbar button[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--tblr-dark);
+        color: white;
+        padding: 4px 8px;
+        border-radius: var(--tblr-border-radius-sm);
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 1000;
+        pointer-events: none;
+    }
+    
+    .ql-toolbar button {
+        position: relative;
+    }
+    
+    /* Color picker enhancement */
+    .ql-snow .ql-color-picker .ql-picker-item,
+    .ql-snow .ql-background .ql-picker-item {
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--tblr-border-color);
+        margin: 2px;
+    }
+    
+    /* Custom image styling classes - with !important to override Quill styles */
+    .ql-editor .img-blog-small { max-width: 25% !important; width: 25% !important; height: auto !important; }
+    .ql-editor .img-blog-medium { max-width: 50% !important; width: 50% !important; height: auto !important; }
+    .ql-editor .img-blog-large { max-width: 75% !important; width: 75% !important; height: auto !important; }
+    .ql-editor .img-blog-full { max-width: 100% !important; width: 100% !important; height: auto !important; }
+    
+    .ql-editor .img-blog-left { float: left !important; margin: 0 15px 15px 0 !important; }
+    
+    /* Custom form-select styling for blog editor */
+    .form-select {
+        border: 1.5px solid var(--border-primary) !important;
+        border-radius: var(--radius-md) !important;
+        padding: 0 !important;
+        background-color: var(--bg-surface) !important;
+        color: var(--text-primary) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+    }
+    .ql-editor .img-blog-right { float: right !important; margin: 0 0 15px 15px !important; }
+    .ql-editor .img-blog-center { display: block !important; margin: 15px auto !important; }
+    
+    .ql-editor .img-blog-border { border: 1px solid var(--tblr-border-color) !important; }
+    .ql-editor .img-blog-shadow { box-shadow: var(--tblr-box-shadow) !important; }
+    .ql-editor .img-blog-rounded { border-radius: var(--tblr-border-radius) !important; }
+    
+    /* Image wrapper for captions */
+    .img-blog-wrapper {
+        display: inline-block;
+        max-width: 100%;
+    }
+    
+    .img-blog-wrapper.center {
+        display: block;
+        text-align: center;
+        margin: 15px auto;
+    }
+    
+    .img-blog-wrapper.left {
+        float: left;
+        margin: 0 15px 15px 0;
+    }
+    
+    .img-blog-wrapper.right {
+        float: right;
+        margin: 0 0 15px 15px;
+    }
+    
+    .img-blog-caption {
+        display: block;
+        font-size: 0.875rem;
+        color: var(--tblr-text-secondary);
+        font-style: italic;
+        margin-top: 5px;
+        text-align: center;
+    }
+    
+    /* Clickable image indicator */
+    .ql-editor img {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    
+    .ql-editor img:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .character-count {
+        font-size: 0.875rem;
+        color: var(--tblr-text-secondary);
+    }
+    
+    /* Custom modal fallback styles */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1055;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        outline: 0;
+    }
+    
+    .modal.show {
+        display: block !important;
+    }
+    
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1050;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000;
+        opacity: 0.5;
+    }
+    
+    body.modal-open {
+        overflow: hidden;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .page-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Mobile Responsiveness for Editor Hero */
+    @media (max-width: 768px) {
+        .editor-hero {
+            height: 150px !important;
+        }
+        
+        .editor-hero-title {
+            font-size: 2rem !important;
+        }
+        
+        .editor-hero-overlay {
+            padding: 1rem 1.5rem 1.5rem !important;
+        }
+        
+        .editor-container {
+            height: calc(100vh - 250px);
+            min-height: 500px;
+        }
+        
+        .editor-container .card-body {
+            max-height: calc(100vh - 350px);
+        }
+    }
+    
+    /* Author Card Styling */
+    .author-card {
+        background: var(--tblr-bg-surface) !important;
+        border: 1px solid var(--tblr-border-color) !important;
+        border-radius: var(--tblr-border-radius) !important;
+        transition: all 0.3s ease !important;
+        overflow: hidden;
+    }
+    
+    .author-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--tblr-box-shadow-lg) !important;
+    }
+    
+    .author-card .avatar {
+        width: 3rem;
+        height: 3rem;
+    }
+    
+    .author-card .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .author-card .avatar-initials {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .author-card .card-text {
+        color: var(--tblr-text-secondary) !important;
+        line-height: 1.4;
+    }
+    
+    .author-card .btn {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    /* Modern Sidebar Styling - Matching Blog Post Detail */
+    .modern-sidebar {
+        position: sticky !important;
+        top: 120px !important;
+        height: fit-content !important;
+    }
+    
+    .sidebar-card {
+        background: white !important;
+        border-radius: 12px !important;
+        padding: 2rem !important;
+        margin-bottom: 2rem !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .sidebar-title {
+        font-size: 1.25rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 1.5rem !important;
+        color: #1f2937 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+    
+    /* Focus Mode Styles - Full Screen */
+    .focus-mode-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #1a1a1a;
+        z-index: 9999;
+        display: none;
+        overflow: hidden;
+    }
+    
+    .focus-mode-overlay.active {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .focus-mode-container {
+        width: 100%;
+        height: 100vh;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .focus-mode-header {
+        background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .focus-mode-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .focus-mode-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .focus-mode-content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+        background: #fafafa;
+    }
+    
+    .focus-mode-content .mb-3:last-child {
+        margin-bottom: 4rem !important;
+    }
+    
+    .focus-mode #focusEditor {
+        min-height: calc(100vh - 250px);
+        height: auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .focus-mode #focusEditor .ql-editor {
+        min-height: calc(100vh - 300px);
+        max-height: none;
+        overflow-y: auto;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        padding: 2rem;
+    }
+    
+    .focus-mode #focusHtmlEditor {
+        min-height: calc(100vh - 180px);
+        height: calc(100vh - 180px);
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        resize: vertical;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+        padding: 1.5rem !important;
+    }
+    
+    .focus-mode .form-control-lg {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        font-size: 1.5rem;
+        padding: 1rem 1.5rem;
+    }
+    
+    .focus-mode .form-control-lg:focus {
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        border-color: var(--tblr-primary);
+    }
+    
+    /* Focus mode button */
+    .focus-mode-toggle {
+        position: relative;
+        transition: all 0.2s ease;
+    }
+    
+    .focus-mode-toggle:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Custom toolbar buttons for HTML/Visual toggle */
+    .custom-toolbar-buttons {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 10px;
+        gap: 4px;
+        border-left: 1px solid #ccc;
+        padding-left: 10px;
+    }
+    
+    .custom-toolbar-btn {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .custom-toolbar-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+    
+    .custom-toolbar-btn.active {
+        background: var(--tblr-primary);
+        color: white;
+        border-color: var(--tblr-primary);
+    }
+    
+    .custom-toolbar-btn i {
+        font-size: 11px;
+    }
+    
+    /* Sticky Quill Toolbar */
+    .ql-toolbar.ql-snow {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1040 !important;
+        background: white !important;
+        border-bottom: 2px solid #e5e7eb !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        backdrop-filter: blur(10px) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Enhanced toolbar styling when sticky */
+    .ql-toolbar.ql-snow::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--tblr-primary), transparent);
+        opacity: 0.6;
+    }
+    
+    /* Ensure editor content has proper spacing */
+    .ql-container.ql-snow {
+        border-top: none !important;
+    }
+    
+    /* Editor wrapper adjustments for sticky toolbar */
+    .editor-wrapper {
+        position: relative;
+    }
+    
+    /* Focus mode sticky toolbar */
+    .focus-mode .ql-toolbar.ql-snow {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1041 !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(15px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Full height editor container */
+    body > div > div.page-wrapper > div.page-body > div.container-fluid > div > div.col-lg-8 > div > div {
+        height: calc(100vh - 200px) !important;
+        min-height: calc(100vh - 200px) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Make the editor wrapper take full height */
+    .editor-wrapper {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    
+    /* Make the card take full height */
+    .editor-container .card {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    
+    /* Make the card body take remaining space */
+    .editor-container .card-body {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+    
+    /* Make the editor wrapper inside card-body take remaining space */
+    .editor-container .card-body .editor-wrapper {
+        flex: 1 !important;
+        min-height: 0 !important;
+    }
+    
+    /* Adjust Quill editor to fill available space when visible */
+    #editor:not([style*="display: none"]) {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+    }
+    
+    /* Hide Quill editor when HTML mode is active */
+    #editor[style*="display: none"] {
+        display: none !important;
+        flex: none !important;
+    }
+    
+    /* Make Quill container take full height when visible */
+    #editor:not([style*="display: none"]) .ql-container.ql-snow {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Make the actual editor content area scrollable and full height */
+    #editor:not([style*="display: none"]) .ql-editor {
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        max-height: none !important;
+    }
+    
+    /* HTML editor container adjustments when visible */
+    #htmlEditorContainer:not([style*="display: none"]) {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+    }
+    
+    /* Hide HTML editor when not active */
+    #htmlEditorContainer[style*="display: none"] {
+        display: none !important;
+        flex: none !important;
+    }
+    
+    /* CodeMirror wrapper adjustments when HTML editor is visible */
+    #htmlEditorContainer:not([style*="display: none"]) .CodeMirror {
+        flex: 1 !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+    
+    /* Ensure only one editor is shown at a time */
+    .editor-wrapper {
+        position: relative;
+    }
+    
+    /* Reset any conflicting styles when editors are hidden */
+    #editor[style*="display: none"],
+    #htmlEditorContainer[style*="display: none"] {
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+    
+    /* Adjust form elements to not take up unnecessary space */
+    .editor-container .mb-3:not(:last-child) {
+        flex-shrink: 0 !important;
+    }
+    
+    /* FORCE the content editor div (2nd child in card-body) to use ALL available vertical space */
+    body > div > div.page-wrapper > div.page-body > div.container-fluid > div > div.col-lg-8 > div > div > div.card-body > div:nth-child(2) {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        position: relative !important;
+        overflow: hidden !important;
+        flex-grow: 1 !important;
+        flex-shrink: 0 !important;
+        flex-basis: 0 !important;
+    }
+    
+    /* FORCE the editor wrapper within this div to take ALL space */
+    body > div > div.page-wrapper > div.page-body > div.container-fluid > div > div.col-lg-8 > div > div > div.card-body > div:nth-child(2) .editor-wrapper {
+        flex: 1 1 auto !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: 100% !important;
+        width: 100% !important;
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        flex-grow: 1 !important;
+        flex-shrink: 0 !important;
+        flex-basis: 0 !important;
+    }
+    
+    /* Override any margin/padding that might interfere */
+    body > div > div.page-wrapper > div.page-body > div.container-fluid > div > div.col-lg-8 > div > div > div.card-body > div:nth-child(2),
+    body > div > div.page-wrapper > div.page-body > div.container-fluid > div > div.col-lg-8 > div > div > div.card-body > div:nth-child(2) .editor-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+    
+    /* Ensure the parent card-body is also properly configured */
+    body > div > div.page-wrapper > div.page-body > div.container-fluid > div > div.col-lg-8 > div > div > div.card-body {
+        height: 100% !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+    
+    /* Blog Image Styles */
+    .img-blog-wrapper {
+        display: block;
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+    
+    .img-blog-wrapper.left {
+        float: left;
+        margin-right: 1.5rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+    
+    .img-blog-wrapper.right {
+        float: right;
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+        text-align: right;
+    }
+    
+    .img-blog-wrapper.center {
+        text-align: center;
+        clear: both;
+    }
+    
+    /* Image Size Classes */
+    .img-blog-small {
+        width: 25% !important;
+        height: auto !important;
+    }
+    
+    .img-blog-medium {
+        width: 50% !important;
+        height: auto !important;
+    }
+    
+    .img-blog-large {
+        width: 75% !important;
+        height: auto !important;
+    }
+    
+    .img-blog-full {
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Image Alignment Classes (when not in wrapper) */
+    .img-blog-left {
+        float: left;
+        margin-right: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .img-blog-right {
+        float: right;
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .img-blog-center {
+        display: block;
+        margin: 1.5rem auto;
+    }
+    
+    /* Image Effects */
+    .img-blog-border {
+        border: 2px solid #e5e7eb !important;
+    }
+    
+    .img-blog-shadow {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .img-blog-rounded {
+        border-radius: 8px !important;
+    }
+    
+    /* Image Caption */
+    .img-blog-caption {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-style: italic;
+        text-align: center;
+    }
+    
+    /* Ensure images in editor are responsive */
+    #editor img,
+    #focusEditor img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    #editor img:hover,
+    #focusEditor img:hover {
+        outline: 2px solid var(--tblr-primary);
+        outline-offset: 2px;
+    }
+    
+    /* CodeMirror Styles */
+    .CodeMirror {
+        height: 700px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        border: 1px solid var(--tblr-border-color);
+        border-radius: 4px;
+    }
+    
+    .CodeMirror-focused {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), 0.25);
+    }
+    
+    #htmlEditorContainer {
+        display: none;
+    }
+    
+    .cm-s-monokai.CodeMirror {
+        background: #272822;
+        color: #f8f8f2;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Modern Navigation -->
+<nav class="modern-blog-nav" id="blogNav">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <!-- Main Site Link -->
+                <a href="{{ url_for('ui_home') }}" class="nav-link me-3" style="color: var(--tblr-primary) !important; font-weight: 600 !important; border: 1px solid var(--tblr-primary) !important; border-radius: 20px !important; padding: 0.35rem 0.75rem !important;">
+                    <i class="fas fa-arrow-left me-1"></i>Main Site
+                </a>
+                
+                <!-- Logo -->
+                <a href="{{ url_for('blog_home') }}" class="logo-container">
+                    <img src="/static/images/logo.jpeg" alt="Blog Logo" class="blog-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="logo-text" style="display: none;">BlogName</div>
+                </a>
+                
+                <!-- Navigation Links -->
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('blog_home') }}" class="nav-link">Home</a>
+                    <a href="{{ url_for('blog_home') }}?trending=1" class="nav-link">Trending</a>
+                    {% for category in categories[:6] %}
+                    <a href="{{ url_for('blog_home') }}?category_id={{ category.id }}" class="nav-link">{{ category.name }}</a>
+                    {% endfor %}
+                    {% if current_user %}
+                    <a href="{{ url_for('blog_editor') }}" class="nav-link active">
+                        <i class="fas fa-plus me-1"></i>Write
+                    </a>
+                    <a href="{{ url_for('blog_dashboard') }}" class="nav-link">Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="search-form">
+                <form method="get" action="{{ url_for('blog_home') }}">
+                    <div class="position-relative">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="q" class="form-control" placeholder="Search posts..." style="width: 300px;">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Editor Hero Section - Matching Blog Post Detail -->
+<div class="container-fluid mt-4">
+    <div class="editor-hero">
+        <div class="editor-hero-overlay">
+            <h1 class="editor-hero-title">
+                <i class="fas fa-feather-alt me-3" style="color: rgba(255,255,255,0.9);"></i>
+                Blog Editor
+            </h1>
+            <p class="editor-hero-subtitle">Create amazing content with our AI-powered writing assistant</p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Editor Content -->
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Main Editor Area -->
+            <div class="col-lg-8">
+                <div class="editor-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <button type="button" class="btn btn-outline-primary focus-mode-toggle" id="focusModeToggle" title="Focus Mode - Distraction-free writing">
+                                        <i class="fas fa-expand me-1"></i>
+                                        Focus Mode
+                                    </button>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="btn-list">
+                                        <button type="button" class="btn btn-primary" id="savePost">
+                                            <i class="fas fa-save me-1"></i>
+                                            Save Draft
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="publishPost">
+                                            <i class="fas fa-rocket me-1"></i>
+                                            Publish
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="unpublishPost" style="display: none;">
+                                            <i class="fas fa-eye-slash me-1"></i>
+                                            Unpublish
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="previewPost">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Preview
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="deletePost" style="display: none;">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Title -->
+                            <div class="mb-3">
+                                <label for="postTitle" class="form-label fw-bold">Title</label>
+                                <input type="text" class="form-control form-control-lg" id="postTitle" 
+                                       placeholder="Enter your blog post title..." maxlength="100">
+                                <div class="character-count mt-1">
+                                    <span id="titleCount">0</span>/100 characters
+                                </div>
+                            </div>
+                            
+                            <!-- Content Editor -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Content</label>
+                                <div class="editor-wrapper">
+                                    <div id="editor"></div>
+                                    <div id="htmlEditorContainer" style="display: none;">
+                                        <textarea id="htmlEditor"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modern Sidebar -->
+            <div class="col-lg-4">
+                <div class="modern-sidebar">
+                    <!-- Author Card -->
+                    <div class="sidebar-card">
+                        <h4 class="sidebar-title">
+                            <i class="fas fa-user text-primary"></i>
+                            About the Author
+                        </h4>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="author-avatar">
+                                {% if current_user.display_name %}
+                                {{ current_user.display_name[0].upper() }}
+                                {% else %}
+                                {{ current_user.username[0].upper() }}
+                                {% endif %}
+                            </div>
+                            <div class="author-info flex-grow-1">
+                                <h6 class="mb-1">{{ current_user.display_name or current_user.username }}</h6>
+                                <small class="text-muted">Author</small>
+                            </div>
+                        </div>
+                        {% if current_user.bio %}
+                        <p class="mb-3 small">{{ current_user.bio }}</p>
+                        {% endif %}
+                        <div class="d-grid">
+                            <a href="{{ url_for('blog_dashboard') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-chart-line me-1"></i>
+                                Dashboard
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Featured Image Card -->
+                    <div class="sidebar-card">
+                        <h4 class="sidebar-title">
+                            <i class="fas fa-image text-primary"></i>
+                            Featured Image
+                        </h4>
+                        <div id="featuredImageContainer">
+                            <div id="featuredImagePreview" class="mb-3" style="display: none;">
+                                <img id="featuredImage" src="" alt="Featured Image" class="img-fluid rounded" style="width: 100%; height: auto; max-height: 200px; object-fit: cover;">
+                                <button type="button" class="btn btn-sm btn-outline-danger mt-2 w-100" id="removeFeaturedImage">
+                                    <i class="fas fa-trash me-1"></i>Remove Image
+                                </button>
+                            </div>
+                            <div id="noFeaturedImage" class="text-center py-4">
+                                <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-3">No featured image selected</p>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="openImageGenerationModal()">
+                                    <i class="fas fa-magic me-1"></i>Generate Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Post Settings Card -->
+                    <div class="sidebar-card">
+                        <h4 class="sidebar-title">
+                            <i class="fas fa-cog text-primary"></i>
+                            Post Settings
+                        </h4>
+                        
+                        <!-- Excerpt -->
+                        <div class="mb-3">
+                            <label for="postExcerpt" class="form-label fw-bold">Excerpt</label>
+                            <textarea class="form-control" id="postExcerpt" rows="3" 
+                                      placeholder="Brief description of your post..." maxlength="300"></textarea>
+                            <div class="character-count mt-1">
+                                <span id="excerptCount">0</span>/300 characters
+                            </div>
+                        </div>
+                        
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="postCategory" class="form-label fw-bold">Category</label>
+                            <select class="form-select" id="postCategory">
+                                <option value="">Select a category...</option>
+                                {% if categories %}
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        
+                        <!-- Tags -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tags</label>
+                            <div class="tag-input" id="tagContainer">
+                                <input type="text" id="tagInput" placeholder="Add tags..." 
+                                       style="border: none; outline: none; flex: 1; min-width: 100px; background: transparent;">
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Press Enter to add tags</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Featured Post -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="postFeatured" role="switch">
+                                <label class="form-check-label fw-bold" for="postFeatured">
+                                    <i class="fas fa-star me-1 text-warning"></i>
+                                    Mark as Featured
+                                </label>
+                                <div class="form-hint">Featured posts appear in the hero section on the blog home page</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Assistant Card with Tabs -->
+                    <div class="sidebar-card">
+                        <h4 class="sidebar-title">
+                            <i class="fas fa-magic text-primary"></i>
+                            AI Assistant
+                        </h4>
+                        <div class="card">
+                            <div class="card-header">
+                                <ul class="nav nav-tabs card-header-tabs" id="aiPaneTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="ai-triggers-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#ai-triggers-pane" type="button" role="tab">
+                                            <i class="fas fa-magic me-1"></i> AI Tools
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="ai-results-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#ai-results-pane" type="button" role="tab">
+                                            <i class="fas fa-eye me-1"></i> Results
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                    <div class="tab-content flex-grow-1" id="aiPaneTabContent">
+                        <!-- AI Tools Tab -->
+                        <div class="tab-pane fade show active p-3" id="ai-triggers-pane" role="tabpanel">
+                            <!-- Content Generation Section -->
+                            <h6 class="mb-3"><i class="fas fa-magic me-2 text-primary"></i>Content Generation</h6>
+                            <div class="mb-3">
+                                <label for="aiTopic" class="form-label fw-bold">Topic/Theme</label>
+                                <input type="text" class="form-control" id="aiTopic" 
+                                       placeholder="What's your post about?">
+                            </div>
+                            <div class="mb-3">
+                                <label for="aiStyle" class="form-label fw-bold">Writing Style</label>
+                                <select class="form-select" id="aiStyle">
+                                    <option value="informative">Informative</option>
+                                    <option value="conversational">Conversational</option>
+                                    <option value="professional">Professional</option>
+                                    <option value="creative">Creative</option>
+                                    <option value="tutorial">Tutorial</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="aiLength" class="form-label fw-bold">Length</label>
+                                <select class="form-select" id="aiLength">
+                                    <option value="short">Short (300-500 words)</option>
+                                    <option value="medium" selected>Medium (600-1000 words)</option>
+                                    <option value="long">Long (1200-2000 words)</option>
+                                </select>
+                            </div>
+                            <div class="btn-list flex-wrap mb-4">
+                                <button type="button" class="btn btn-primary" id="generateContent">
+                                    <i class="fas fa-magic me-1"></i>
+                                    Generate Content
+                                </button>
+                            </div>
+                            
+                            <!-- Writing Enhancement Section -->
+                            <h6 class="mb-3"><i class="fas fa-edit me-2 text-primary"></i>Writing Enhancement</h6>
+                            <div class="btn-list flex-wrap mb-4">
+                                <button type="button" class="btn btn-primary" id="generateTitle">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    Suggest Titles
+                                </button>
+                                <button type="button" class="btn btn-primary" id="generateExcerpt">
+                                    <i class="fas fa-file-text me-1"></i>
+                                    Generate Excerpt
+                                </button>
+                                <button type="button" class="btn btn-primary" id="suggestTags">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Suggest Tags
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" id="improveWriting">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Improve Writing
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" id="checkGrammar">
+                                    <i class="fas fa-spell-check me-1"></i>
+                                    Check Grammar
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" id="optimizeSEO">
+                                    <i class="fas fa-search me-1"></i>
+                                    SEO Optimize
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" id="getWritingTips">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    Writing Tips
+                                </button>
+                            </div>
+                            
+                            <!-- Writing Statistics Section -->
+                            <h6 class="mb-3"><i class="fas fa-chart-bar me-2 text-primary"></i>Writing Statistics</h6>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4 mb-0 text-primary" id="wordCount">0</div>
+                                    <small class="text-muted">Words</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 mb-0 text-success" id="charCount">0</div>
+                                    <small class="text-muted">Characters</small>
+                                </div>
+                            </div>
+                            <div class="row text-center mt-2">
+                                <div class="col-6">
+                                    <div class="h4 mb-0 text-info" id="readingTime">0</div>
+                                    <small class="text-muted">Min read</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 mb-0 text-warning" id="seoScore">--</div>
+                                    <small class="text-muted">SEO Score</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Results Tab -->
+                        <div class="tab-pane fade p-3" id="ai-results-pane" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0"><i class="fas fa-eye me-2 text-info"></i>AI Results</h6>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="clearResults" onclick="clearAIResults()">
+                                    <i class="fas fa-trash me-1"></i>Clear
+                                </button>
+                            </div>
+                            <div id="aiSuggestions">
+                                <div class="text-center text-muted py-4" id="emptyResultsMessage">
+                                    <i class="fas fa-lightbulb fa-2x mb-2"></i>
+                                    <p>AI suggestions will appear here when you use the AI tools.</p>
+                                    <small>Try generating content, titles, or tags to see results.</small>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Focus Mode Overlay -->
+<div class="focus-mode-overlay" id="focusModeOverlay">
+    <div class="focus-mode-container">
+        <div class="focus-mode-header">
+            <h3 class="focus-mode-title">
+                <i class="fas fa-feather-alt me-2"></i>
+                Focus Mode - Distraction-Free Writing
+            </h3>
+            <div class="focus-mode-controls">
+                <button type="button" class="btn btn-light btn-sm" id="focusModeSave">
+                    <i class="fas fa-save me-1"></i>
+                    Save
+                </button>
+                <button type="button" class="btn btn-light btn-sm" id="focusModeClose">
+                    <i class="fas fa-compress me-1"></i>
+                    Exit Focus
+                </button>
+            </div>
+        </div>
+        <div class="focus-mode-content">
+            <!-- Title -->
+            <div class="mb-3">
+                <label for="focusPostTitle" class="form-label fw-bold">Title</label>
+                <input type="text" class="form-control form-control-lg" id="focusPostTitle" 
+                       placeholder="Enter your blog post title..." maxlength="100">
+            </div>
+            
+            <!-- Content Editor -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Content</label>
+                <div class="focus-editor-wrapper">
+                    <div id="focusEditor"></div>
+                    <textarea id="focusHtmlEditor" class="form-control" style="display: none; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace; font-size: 15px; line-height: 1.6; padding: 1.5rem;"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Properties Modal -->
+<div class="modal modal-blur fade" id="imagePropertiesModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-image me-2"></i>
+                    Image Properties
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="closeImagePropertiesModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Image Preview -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Preview</label>
+                            <div class="border rounded p-3 text-center bg-light" style="min-height: 200px;">
+                                <img id="imagePreview" src="" alt="Image preview" class="img-fluid" style="max-height: 180px;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Properties -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="imageAltText" class="form-label">Alt Text</label>
+                            <input type="text" class="form-control" id="imageAltText" placeholder="Describe the image for accessibility">
+                            <small class="form-text text-muted">Important for accessibility and SEO</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="imageCaption" class="form-label">Caption</label>
+                            <input type="text" class="form-control" id="imageCaption" placeholder="Optional caption text">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="imageAlignment" class="form-label">Alignment</label>
+                            <select class="form-select" id="imageAlignment">
+                                <option value="none">None</option>
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="imageSize" class="form-label">Size</label>
+                            <select class="form-select" id="imageSize">
+                                <option value="auto">Original Size</option>
+                                <option value="small">Small (25%)</option>
+                                <option value="medium">Medium (50%)</option>
+                                <option value="large">Large (75%)</option>
+                                <option value="full">Full Width (100%)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Border & Effects</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="imageBorder">
+                                <label class="form-check-label" for="imageBorder">
+                                    Add border
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="imageShadow">
+                                <label class="form-check-label" for="imageShadow">
+                                    Add shadow
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="imageRounded">
+                                <label class="form-check-label" for="imageRounded">
+                                    Rounded corners
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeImagePropertiesModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyImageProperties()">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Quill Editor JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<!-- CodeMirror JS for HTML editing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closetag.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/xml-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/html-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/selection/active-line.min.js"></script>
+
+<!-- JS Beautify for HTML formatting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
+
+<script>
+    // Global variables
+    let quill;
+    let htmlCodeMirror;
+    
+    // WebSocket connection for AI assistance
+    let ws = null;
+    let sessionId = Date.now().toString();
+    
+    // Connect to AI assistant
+    async function connectAI() {
+        try {
+            const response = await fetch('/api/v1/auth/ws-ticket', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                // WebSocket URL construction based on current location
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const host = window.location.host;
+                const wsUrl = `${protocol}//${host}/ws/blog-ai/${sessionId}?ticket=${data.ticket}`;
+                
+                console.log('=== Blog AI WebSocket Connection ===');
+                console.log('Current page:', window.location.href);
+                console.log('WebSocket URL:', wsUrl);
+                console.log('Session ID:', sessionId);
+                console.log('====================================');
+                
+                
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    console.log('AI assistant connected');
+                    showToast('AI assistant ready', 'success');
+                };
+                
+                ws.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    handleAIMessage(message);
+                };
+                
+                ws.onclose = function() {
+                    console.log('AI assistant disconnected');
+                    showToast('AI assistant disconnected', 'warning');
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('AI assistant WebSocket error:', error);
+                    console.error('Failed WebSocket URL was:', wsUrl);
+                    showToast('AI assistant connection failed. Please refresh the page.', 'error');
+                };
+            } else {
+                showToast('Failed to connect to AI assistant', 'error');
+            }
+        } catch (error) {
+            console.error('Error connecting to AI:', error);
+            showToast('Failed to connect to AI assistant', 'error');
+        }
+    }
+    
+    // Handle AI messages (updated for tabbed interface)
+    function handleAIMessage(message) {
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        
+        switch (message.type) {
+            case 'thinking':
+                showAIThinking(message.message);
+                break;
+                
+            case 'content_generated':
+                hideAIThinking();
+                switchToResultsTab();
+                showContentSuggestion(message.content);
+                break;
+                
+            case 'titles_generated':
+                hideAIThinking();
+                switchToResultsTab();
+                showTitleSuggestions(message.titles);
+                break;
+                
+            case 'excerpt_generated':
+                hideAIThinking();
+                switchToResultsTab();
+                showExcerptSuggestion(message.excerpt);
+                break;
+                
+            case 'tags_suggested':
+                hideAIThinking();
+                switchToResultsTab();
+                showTagSuggestions(message.suggested_tags);
+                break;
+                
+            case 'content_improved':
+                hideAIThinking();
+                switchToResultsTab();
+                showImprovedContent(message.improved_content, message.improvement_type);
+                break;
+                
+            case 'writing_tips':
+                hideAIThinking();
+                switchToResultsTab();
+                showWritingTips(message.tips);
+                break;
+                
+            case 'error':
+                hideAIThinking();
+                showToast(message.message, 'error');
+                break;
+        }
+    }
+    
+    // Switch to Results tab when AI responses arrive
+    function switchToResultsTab() {
+        const resultsTab = document.getElementById('ai-results-tab');
+        const resultsPane = document.getElementById('ai-results-pane');
+        const triggersTab = document.getElementById('ai-triggers-tab');
+        const triggersPane = document.getElementById('ai-triggers-pane');
+        
+        if (resultsTab && resultsPane) {
+            // Remove active from all tabs
+            triggersTab.classList.remove('active');
+            triggersPane.classList.remove('show', 'active');
+            
+            // Add active to results tab
+            resultsTab.classList.add('active');
+            resultsPane.classList.add('show', 'active');
+        }
+    }
+    
+    // Show AI thinking indicator
+    function showAIThinking(message) {
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        
+        // Clear existing thinking indicator
+        hideAIThinking();
+        
+        const thinkingDiv = document.createElement('div');
+        thinkingDiv.className = 'ai-thinking alert alert-info';
+        thinkingDiv.id = 'ai-thinking';
+        thinkingDiv.innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                <span>${message}</span>
+            </div>
+        `;
+        suggestionsDiv.appendChild(thinkingDiv);
+        
+        // Switch to results tab to show thinking indicator
+        switchToResultsTab();
+    }
+    
+    // Hide AI thinking indicator
+    function hideAIThinking() {
+        const thinkingDiv = document.getElementById('ai-thinking');
+        if (thinkingDiv) {
+            thinkingDiv.remove();
+        }
+    }
+    
+    // Clear AI results
+    function clearAIResults() {
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        
+        // Clear all AI suggestions and restore empty state
+        suggestionsDiv.innerHTML = `
+            <div class="text-center text-muted py-4" id="emptyResultsMessage">
+                <i class="fas fa-lightbulb fa-2x mb-2"></i>
+                <p>AI suggestions will appear here when you use the AI tools.</p>
+                <small>Try generating content, titles, or tags to see results.</small>
+            </div>
+        `;
+        
+        // Show success message
+        showToast('AI results cleared', 'info');
+    }
+    
+    // Helper function to remove empty state message when showing results
+    function removeEmptyMessage() {
+        const emptyMessage = document.getElementById('emptyResultsMessage');
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+    }
+    
+    // Tag management
+    let tags = [];
+    
+    function addTag(tagName) {
+        if (tagName && !tags.includes(tagName)) {
+            tags.push(tagName);
+            updateTagDisplay();
+        }
+    }
+    
+    function removeTag(tagName) {
+        tags = tags.filter(tag => tag !== tagName);
+        updateTagDisplay();
+    }
+    
+    function updateTagDisplay() {
+        const container = document.getElementById('tagContainer');
+        const input = document.getElementById('tagInput');
+        
+        // Clear existing tags
+        container.querySelectorAll('.tag-item').forEach(tag => tag.remove());
+        
+        // Add tag elements
+        tags.forEach(tag => {
+            const tagElement = document.createElement('div');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tag}
+                <span class="tag-remove" onclick="removeTag('${tag}')">×</span>
+            `;
+            container.insertBefore(tagElement, input);
+        });
+    }
+    
+    // Update statistics
+    function updateStats() {
+        if (!quill) {
+            console.warn('Quill editor not initialized, cannot update stats');
+            return;
+        }
+        
+        const text = quill.getText();
+        const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+        const charCount = text.length;
+        const readingTime = Math.ceil(wordCount / 200); // 200 words per minute
+        
+        document.getElementById('wordCount').textContent = wordCount;
+        document.getElementById('charCount').textContent = charCount;
+        document.getElementById('readingTime').textContent = readingTime;
+    }
+    
+    function updateTitleCount() {
+        const title = document.getElementById('postTitle').value;
+        document.getElementById('titleCount').textContent = title.length;
+    }
+    
+    function updateExcerptCount() {
+        const excerpt = document.getElementById('postExcerpt').value;
+        document.getElementById('excerptCount').textContent = excerpt.length;
+    }
+    
+    // Toast notifications
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast position-fixed top-0 end-0 m-3 ${type === 'error' ? 'bg-danger text-white' : type === 'warning' ? 'bg-warning text-dark' : 'bg-success text-white'}`;
+        toast.innerHTML = `
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // Preview post function
+    function previewPost() {
+        if (!quill) {
+            showToast('Editor not initialized', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('postTitle').value;
+        const content = quill.root.innerHTML;
+        const excerpt = document.getElementById('postExcerpt').value;
+        
+        if (!title && !content) {
+            showToast('Please add some content to preview', 'error');
+            return;
+        }
+        
+        // Create a new window for preview
+        const previewWindow = window.open('', 'preview', 'width=800,height=600,scrollbars=yes');
+        const previewHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Preview: ${title || 'Untitled'}</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+                    .preview-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; }
+                    
+                    /* Blog Image Styles for Preview */
+                    .img-blog-wrapper {
+                        display: block;
+                        margin: 1.5rem 0;
+                        text-align: center;
+                    }
+                    
+                    .img-blog-wrapper.left {
+                        float: left;
+                        margin-right: 1.5rem;
+                        margin-bottom: 1rem;
+                        text-align: left;
+                    }
+                    
+                    .img-blog-wrapper.right {
+                        float: right;
+                        margin-left: 1.5rem;
+                        margin-bottom: 1rem;
+                        text-align: right;
+                    }
+                    
+                    .img-blog-wrapper.center {
+                        text-align: center;
+                        clear: both;
+                    }
+                    
+                    /* Image Size Classes */
+                    .img-blog-small {
+                        width: 25% !important;
+                        height: auto !important;
+                    }
+                    
+                    .img-blog-medium {
+                        width: 50% !important;
+                        height: auto !important;
+                    }
+                    
+                    .img-blog-large {
+                        width: 75% !important;
+                        height: auto !important;
+                    }
+                    
+                    .img-blog-full {
+                        width: 100% !important;
+                        height: auto !important;
+                    }
+                    
+                    /* Image Alignment Classes */
+                    .img-blog-left {
+                        float: left;
+                        margin-right: 1.5rem;
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .img-blog-right {
+                        float: right;
+                        margin-left: 1.5rem;
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .img-blog-center {
+                        display: block;
+                        margin: 1.5rem auto;
+                    }
+                    
+                    /* Image Effects */
+                    .img-blog-border {
+                        border: 2px solid #dee2e6 !important;
+                    }
+                    
+                    .img-blog-shadow {
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+                    }
+                    
+                    .img-blog-rounded {
+                        border-radius: 8px !important;
+                    }
+                    
+                    /* Image Caption */
+                    .img-blog-caption {
+                        display: block;
+                        margin-top: 0.5rem;
+                        font-size: 0.875rem;
+                        color: #6c757d;
+                        font-style: italic;
+                        text-align: center;
+                    }
+                    
+                    /* Responsive image behavior */
+                    @media (max-width: 768px) {
+                        .img-blog-small,
+                        .img-blog-medium,
+                        .img-blog-large {
+                            width: 100% !important;
+                        }
+                        
+                        .img-blog-wrapper.left,
+                        .img-blog-wrapper.right,
+                        .img-blog-left,
+                        .img-blog-right {
+                            float: none;
+                            margin: 1.5rem 0;
+                            text-align: center;
+                        }
+                    }
+                    
+                    /* Content styling */
+                    .preview-content {
+                        line-height: 1.7;
+                        font-size: 1.1rem;
+                    }
+                    
+                    .preview-content h1, .preview-content h2, .preview-content h3,
+                    .preview-content h4, .preview-content h5, .preview-content h6 {
+                        margin-top: 2rem;
+                        margin-bottom: 1rem;
+                        color: #2d3748;
+                    }
+                    
+                    .preview-content p {
+                        margin-bottom: 1.5rem;
+                    }
+                    
+                    .preview-content blockquote {
+                        border-left: 4px solid #6366f1;
+                        padding-left: 1.5rem;
+                        margin: 2rem 0;
+                        font-style: italic;
+                        color: #4a5568;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="preview-header p-4 mb-4">
+                    <div class="container">
+                        <h1 class="display-4">${title || 'Untitled Post'}</h1>
+                        ${excerpt ? `<p class="lead">${excerpt}</p>` : ''}
+                        <small>Preview Mode</small>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 mx-auto">
+                            <div class="preview-content">
+                                ${content || '<p>No content to preview.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        previewWindow.document.write(previewHTML);
+        previewWindow.document.close();
+    }
+    
+    // AI content generation functions
+    function generateContent() {
+        const topic = document.getElementById('aiTopic').value;
+        const style = document.getElementById('aiStyle').value;
+        const length = document.getElementById('aiLength').value;
+        
+        if (!topic) {
+            showToast('Please enter a topic to generate content', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'generate_content',
+                topic: topic,
+                style: style,
+                length: length
+            }));
+            showAIThinking('Generating content...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function generateTitles() {
+        const topic = document.getElementById('aiTopic').value;
+        const content = quill.getText().substring(0, 500); // First 500 chars
+        
+        if (!topic && !content) {
+            showToast('Please enter a topic or some content to generate titles', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'generate_title',
+                topic: topic,
+                content: content
+            }));
+            showAIThinking('Generating title suggestions...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function generateExcerpt() {
+        const title = document.getElementById('postTitle').value;
+        const content = quill.getText().substring(0, 1000); // First 1000 chars
+        
+        if (!title && !content) {
+            showToast('Please add a title or content to generate an excerpt', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'generate_excerpt',
+                title: title,
+                content: content
+            }));
+            showAIThinking('Generating excerpt...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function suggestTags() {
+        const title = document.getElementById('postTitle').value;
+        const content = quill.getText().substring(0, 1000);
+        const topic = document.getElementById('aiTopic').value;
+        
+        if (!title && !content && !topic) {
+            showToast('Please add content, title, or topic to suggest tags', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'suggest_tags',
+                title: title,
+                content: content,
+                topic: topic
+            }));
+            showAIThinking('Suggesting tags...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function improveWriting() {
+        const selectedText = getSelectedText();
+        const content = selectedText || quill.getText();
+        
+        if (!content.trim()) {
+            showToast('Please select text or add content to improve', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'improve_writing',
+                content: content,
+                selected: !!selectedText
+            }));
+            showAIThinking('Improving writing...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function checkGrammar() {
+        const selectedText = getSelectedText();
+        const content = selectedText || quill.getText();
+        
+        if (!content.trim()) {
+            showToast('Please select text or add content to check grammar', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'check_grammar',
+                content: content,
+                selected: !!selectedText
+            }));
+            showAIThinking('Checking grammar...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function optimizeSEO() {
+        const title = document.getElementById('postTitle').value;
+        const content = quill.getText();
+        const excerpt = document.getElementById('postExcerpt').value;
+        
+        if (!title && !content) {
+            showToast('Please add a title and content for SEO optimization', 'error');
+            return;
+        }
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'optimize_seo',
+                title: title,
+                content: content,
+                excerpt: excerpt
+            }));
+            showAIThinking('Optimizing for SEO...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function getWritingTips() {
+        const content = quill.getText();
+        const style = document.getElementById('aiStyle').value;
+        
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'get_writing_tips',
+                content: content,
+                style: style
+            }));
+            showAIThinking('Getting writing tips...');
+        } else {
+            showToast('AI assistant not connected', 'error');
+        }
+    }
+    
+    function getSelectedText() {
+        const selection = quill.getSelection();
+        if (selection && selection.length > 0) {
+            return quill.getText(selection.index, selection.length);
+        }
+        return null;
+    }
+    
+    // AI response handlers (these were referenced but missing)
+    function showContentSuggestion(content) {
+        removeEmptyMessage(); // Remove empty state message
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'ai-suggestion card mb-3';
+        
+        // Store content in a data attribute to avoid escaping issues
+        suggestionDiv.setAttribute('data-content', content);
+        
+        // Convert markdown to HTML for display
+        let displayContent = markdownToHTML(content);
+        
+        suggestionDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-magic me-2 text-primary"></i>Generated Content</h6>
+                <div class="card-text mb-3" style="background: var(--tblr-bg-surface-secondary); padding: 1rem; border-radius: 0.375rem; max-height: 400px; overflow-y: auto;">
+                    ${displayContent}
+                </div>
+                <div class="btn-list">
+                    <button class="btn btn-primary btn-sm ai-insert-btn">
+                        <i class="fas fa-plus me-1"></i>Insert into Editor
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="this.closest('.ai-suggestion').remove()">
+                        <i class="fas fa-times me-1"></i>Dismiss
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Add click handler after element is added to DOM
+        suggestionsDiv.appendChild(suggestionDiv);
+        
+        // Attach event listener to insert button
+        const insertBtn = suggestionDiv.querySelector('.ai-insert-btn');
+        insertBtn.addEventListener('click', function() {
+            const originalContent = suggestionDiv.getAttribute('data-content');
+            insertContent(originalContent);
+            suggestionDiv.remove();
+        });
+    }
+    
+    function showTitleSuggestions(titles) {
+        removeEmptyMessage(); // Remove empty state message
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'ai-suggestion card mb-3';
+        let titlesHTML = '';
+        titles.forEach(title => {
+            titlesHTML += `
+                <div class="mb-2 p-2 border rounded" style="background: var(--tblr-bg-surface-secondary);">
+                    <div class="mb-2">${title}</div>
+                    <button class="btn btn-primary btn-sm" onclick="insertTitle('${title.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                        <i class="fas fa-plus me-1"></i>Use This Title
+                    </button>
+                </div>
+            `;
+        });
+        suggestionDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-lightbulb me-2 text-warning"></i>Title Suggestions</h6>
+                ${titlesHTML}
+                <button class="btn btn-outline-secondary btn-sm mt-2" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times me-1"></i>Dismiss
+                </button>
+            </div>
+        `;
+        suggestionsDiv.appendChild(suggestionDiv);
+    }
+    
+    function showExcerptSuggestion(excerpt) {
+        removeEmptyMessage(); // Remove empty state message
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'ai-suggestion card mb-3';
+        suggestionDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-file-text me-2 text-info"></i>Generated Excerpt</h6>
+                <div class="card-text mb-3" style="background: var(--tblr-bg-surface-secondary); padding: 1rem; border-radius: 0.375rem;">${excerpt}</div>
+                <div class="btn-list">
+                    <button class="btn btn-primary btn-sm" onclick="insertExcerpt('${excerpt.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                        <i class="fas fa-plus me-1"></i>Use This Excerpt
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        <i class="fas fa-times me-1"></i>Dismiss
+                    </button>
+                </div>
+            </div>
+        `;
+        suggestionsDiv.appendChild(suggestionDiv);
+    }
+    
+    function showTagSuggestions(suggestedTags) {
+        removeEmptyMessage(); // Remove empty state message
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'ai-suggestion card mb-3';
+        let tagsHTML = '';
+        suggestedTags.forEach(tag => {
+            tagsHTML += `
+                <button class="btn btn-outline-primary btn-sm me-1 mb-1" onclick="addTag('${tag.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                    <i class="fas fa-plus me-1"></i>${tag}
+                </button>
+            `;
+        });
+        suggestionDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-tags me-2 text-success"></i>Suggested Tags</h6>
+                <div class="card-text mb-3" style="background: var(--tblr-bg-surface-secondary); padding: 1rem; border-radius: 0.375rem;">${tagsHTML}</div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">
+                    <i class="fas fa-times me-1"></i>Dismiss
+                </button>
+            </div>
+        `;
+        suggestionsDiv.appendChild(suggestionDiv);
+    }
+    
+    function showImprovedContent(improvedContent, improvementType) {
+        removeEmptyMessage(); // Remove empty state message
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'ai-suggestion card mb-3';
+        
+        // Store content in a data attribute
+        suggestionDiv.setAttribute('data-content', improvedContent);
+        
+        // Convert markdown to HTML for display
+        let displayContent = markdownToHTML(improvedContent);
+        
+        suggestionDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-edit me-2 text-purple"></i>${improvementType || 'Content'} Improvements</h6>
+                <div class="card-text mb-3" style="background: var(--tblr-bg-surface-secondary); padding: 1rem; border-radius: 0.375rem; max-height: 400px; overflow-y: auto;">
+                    ${displayContent}
+                </div>
+                <div class="btn-list">
+                    <button class="btn btn-primary btn-sm ai-apply-btn">
+                        <i class="fas fa-check me-1"></i>Apply Changes
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="this.closest('.ai-suggestion').remove()">
+                        <i class="fas fa-times me-1"></i>Dismiss
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Add to DOM
+        suggestionsDiv.appendChild(suggestionDiv);
+        
+        // Attach event listener to apply button
+        const applyBtn = suggestionDiv.querySelector('.ai-apply-btn');
+        applyBtn.addEventListener('click', function() {
+            const originalContent = suggestionDiv.getAttribute('data-content');
+            replaceContent(originalContent);
+            suggestionDiv.remove();
+        });
+    }
+    
+    function showWritingTips(tips) {
+        removeEmptyMessage(); // Remove empty state message
+        const suggestionsDiv = document.getElementById('aiSuggestions');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'ai-suggestion card mb-3';
+        let tipsHTML = '';
+        
+        // Handle both string and array formats for tips
+        if (Array.isArray(tips)) {
+            tips.forEach(tip => {
+                tipsHTML += `<li class="mb-1">${tip}</li>`;
+            });
+            tipsHTML = `<ul class="mb-0">${tipsHTML}</ul>`;
+        } else if (typeof tips === 'string') {
+            tipsHTML = `<div class="mb-0">${tips}</div>`;
+        }
+        
+        suggestionDiv.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-lightbulb me-2 text-info"></i>Writing Tips</h6>
+                <div class="card-text mb-3" style="background: var(--tblr-bg-surface-secondary); padding: 1rem; border-radius: 0.375rem;">${tipsHTML}</div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">
+                    <i class="fas fa-times me-1"></i>Dismiss
+                </button>
+            </div>
+        `;
+        suggestionsDiv.appendChild(suggestionDiv);
+    }
+    
+    // Convert markdown to HTML
+    function markdownToHTML(markdown) {
+        let html = markdown;
+        
+        // Headers
+        html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+        html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+        html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+        
+        // Bold
+        html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Italic
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Lists
+        html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
+        html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
+        
+        // Links
+        html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>');
+        
+        // Code blocks
+        html = html.replace(/```([^\n]*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        
+        // Inline code
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Paragraphs
+        html = html.split('\n\n').map(para => {
+            if (!para.match(/^<[^>]+>/)) {
+                return '<p>' + para + '</p>';
+            }
+            return para;
+        }).join('\n');
+        
+        // Line breaks
+        html = html.replace(/\n/g, '<br>');
+        
+        return html;
+    }
+    
+    // Helper functions for inserting content
+    function insertContent(content) {
+        // Get current HTML content
+        const currentHTML = quill.root.innerHTML;
+        
+        // Convert markdown to HTML for proper insertion
+        let htmlContent = markdownToHTML(content);
+        
+        // Append the new content
+        quill.root.innerHTML = currentHTML + htmlContent;
+        
+        // Move cursor to end
+        quill.setSelection(quill.getLength() - 1);
+        
+        updateStats();
+    }
+    
+    function insertTitle(title) {
+        document.getElementById('postTitle').value = title;
+        updateTitleCount();
+    }
+    
+    function insertExcerpt(excerpt) {
+        document.getElementById('postExcerpt').value = excerpt;
+        updateExcerptCount();
+    }
+    
+    function replaceContent(newContent) {
+        // Convert markdown to HTML for proper insertion
+        let htmlContent = markdownToHTML(newContent);
+        
+        const selection = quill.getSelection();
+        if (selection && selection.length > 0) {
+            // Replace selected content
+            quill.deleteText(selection.index, selection.length);
+            // Insert HTML at the selection point
+            const delta = quill.clipboard.convert(htmlContent);
+            quill.updateContents(delta.ops, 'user');
+        } else {
+            // Replace all content
+            quill.root.innerHTML = htmlContent;
+        }
+        updateStats();
+    }
+    
+    // Unpublish post function
+    async function unpublishPost() {
+        const postId = document.getElementById('postId')?.value;
+        
+        if (!postId) {
+            showToast('No post to unpublish', 'error');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to unpublish this post? It will no longer be visible to readers.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/blog/posts/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: document.getElementById('postTitle').value,
+                    content: quill.root.innerHTML,
+                    excerpt: document.getElementById('postExcerpt').value,
+                    category_id: document.getElementById('postCategory').value ? parseInt(document.getElementById('postCategory').value) : null,
+                    tags: tags,
+                    status: 'draft'
+                })
+            });
+            
+            if (response.ok) {
+                showToast('Post unpublished successfully!', 'success');
+                updateButtonVisibility('draft');
+            } else {
+                const error = await response.json();
+                showToast(error.detail || 'Failed to unpublish post', 'error');
+            }
+        } catch (error) {
+            console.error('Error unpublishing post:', error);
+            showToast('An error occurred while unpublishing the post', 'error');
+        }
+    }
+    
+    // Delete post function
+    async function deletePost() {
+        const postId = document.getElementById('postId')?.value;
+        
+        if (!postId) {
+            showToast('No post to delete', 'error');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to DELETE this post? This action cannot be undone!')) {
+            return;
+        }
+        
+        // Double confirmation for delete
+        if (!confirm('This will permanently delete the post and all its data. Are you absolutely sure?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/blog/posts/${postId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                showToast('Post deleted successfully!', 'success');
+                // Redirect to blog home after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/blog';
+                }, 2000);
+            } else {
+                const error = await response.json();
+                showToast(error.detail || 'Failed to delete post', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            showToast('An error occurred while deleting the post', 'error');
+        }
+    }
+    
+    // Update button visibility based on post status
+    function updateButtonVisibility(status) {
+        const publishBtn = document.getElementById('publishPost');
+        const unpublishBtn = document.getElementById('unpublishPost');
+        const deleteBtn = document.getElementById('deletePost');
+        const postId = document.getElementById('postId')?.value;
+        
+        if (postId) {
+            // Show delete button for existing posts
+            deleteBtn.style.display = 'inline-block';
+            
+            if (status === 'published') {
+                publishBtn.style.display = 'none';
+                unpublishBtn.style.display = 'inline-block';
+            } else {
+                publishBtn.style.display = 'inline-block';
+                unpublishBtn.style.display = 'none';
+            }
+        } else {
+            // New post - hide unpublish and delete buttons
+            unpublishBtn.style.display = 'none';
+            deleteBtn.style.display = 'none';
+            publishBtn.style.display = 'inline-block';
+        }
+    }
+    
+    // Load existing post data into the editor
+    function loadPostData(postData) {
+        console.log('Loading post data:', postData);
+        
+        // Set post ID for future saves
+        const existingPostId = document.getElementById('postId');
+        if (existingPostId) {
+            existingPostId.remove();
+        }
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.id = 'postId';
+        hiddenInput.value = postData.id;
+        document.body.appendChild(hiddenInput);
+        
+        // Populate form fields
+        document.getElementById('postTitle').value = postData.title || '';
+        document.getElementById('postExcerpt').value = postData.excerpt || '';
+        
+        // Set category
+        if (postData.category_id) {
+            document.getElementById('postCategory').value = postData.category_id;
+        }
+        
+        // Set featured status
+        document.getElementById('postFeatured').checked = postData.is_featured || false;
+        
+        // Set featured image
+        if (postData.featured_image_url) {
+            updateFeaturedImagePreview(postData.featured_image_url);
+        }
+        
+        // Set content in Quill editor
+        if (postData.content) {
+            quill.root.innerHTML = postData.content;
+        }
+        
+        // Load tags
+        if (postData.tags && postData.tags.length > 0) {
+            tags = [...postData.tags];
+            updateTagDisplay();
+        }
+        
+        // Update character counts
+        updateTitleCount();
+        updateExcerptCount();
+        updateStats();
+        
+        // Update button visibility based on status
+        updateButtonVisibility(postData.status);
+        
+        showToast('Post loaded for editing', 'success');
+    }
+    
+    // Save post function
+    async function savePost(publish = false) {
+        if (!quill) {
+            showToast('Editor not initialized', 'error');
+            return;
+        }
+        
+        const title = document.getElementById('postTitle').value;
+        const content = quill.root.innerHTML;
+        const excerpt = document.getElementById('postExcerpt').value;
+        const selectedCategory = document.getElementById('postCategory').value;
+        const isFeatured = document.getElementById('postFeatured').checked;
+        
+        if (!title) {
+            showToast('Please enter a title for your post', 'error');
+            return;
+        }
+        
+        if (!content || content === '<p><br></p>') {
+            showToast('Please add some content to your post', 'error');
+            return;
+        }
+        
+        const postData = {
+            title: title,
+            content: content,
+            excerpt: excerpt || null,
+            category_id: selectedCategory ? parseInt(selectedCategory) : null,
+            tags: tags, // Use the tags array from tag management
+            status: publish ? 'published' : 'draft',
+            is_featured: isFeatured,
+            featured_image_url: getCurrentFeaturedImageUrl()
+        };
+        
+        try {
+            const postId = document.getElementById('postId')?.value;
+            let response;
+            
+            if (postId) {
+                // Update existing post
+                response = await fetch(`/api/blog/posts/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+            } else {
+                // Create new post
+                response = await fetch('/api/blog/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+            }
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (!postId) {
+                    // Add hidden input for post ID for future saves
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = 'postId';
+                    hiddenInput.value = result.id;
+                    document.body.appendChild(hiddenInput);
+                }
+                showToast(publish ? 'Post published successfully!' : 'Post saved as draft!', 'success');
+                
+                // Update button visibility based on new status
+                updateButtonVisibility(publish ? 'published' : 'draft');
+                
+                // If published, redirect to the post
+                if (publish && result.slug) {
+                    setTimeout(() => {
+                        window.location.href = `/blog/post/${result.slug}`;
+                    }, 1500);
+                }
+                
+                // Return the saved post data
+                return result;
+            } else {
+                const error = await response.json();
+                showToast(error.detail || 'Failed to save post', 'error');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error saving post:', error);
+            showToast('An error occurred while saving the post', 'error');
+            return null;
+        }
+    }
+    
+    // Custom image upload function for Quill editor
+    function selectLocalImage() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+        
+        input.onchange = () => {
+            const file = input.files[0];
+            if (file) {
+                uploadImageToAzure(file);
+            }
+        };
+    }
+    
+    async function uploadImageToAzure(file) {
+        try {
+            // Show loading indicator
+            const loadingMsg = showToast('Uploading image...', 'info', 0); // 0 means no auto-dismiss
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('alt_text', ''); // Will be set in properties modal
+            formData.append('caption', '');
+            
+            // Upload to Azure via our API
+            const response = await fetch('/api/blog/media/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                const imageUrl = result.media.url;
+                
+                // Insert image into Quill editor
+                const range = quill.getSelection();
+                const index = range ? range.index : quill.getLength();
+                quill.insertEmbed(index, 'image', imageUrl);
+                
+                // Move cursor after the image
+                quill.setSelection(index + 1);
+                
+                // Clear loading and show success
+                if (loadingMsg && loadingMsg.remove) loadingMsg.remove();
+                showToast('Image uploaded successfully! Click the image to edit properties.', 'success');
+                
+                // Auto-open properties modal for new image
+                setTimeout(() => {
+                    const images = quill.root.querySelectorAll('img');
+                    const newImage = images[images.length - 1]; // Get the last inserted image
+                    if (newImage && newImage.src === imageUrl) {
+                        openImagePropertiesModal(newImage);
+                    }
+                }, 500);
+                
+            } else {
+                const error = await response.json();
+                throw new Error(error.detail || 'Upload failed');
+            }
+            
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            showToast(`Failed to upload image: ${error.message}`, 'error');
+        }
+    }
+    
+    // Global variable to track current image being edited
+    let currentEditingImage = null;
+    
+    // Open image properties modal
+    function openImagePropertiesModal(imgElement) {
+        console.log('Opening image properties modal for:', imgElement);
+        currentEditingImage = imgElement;
+        
+        try {
+            // Set preview
+            const preview = document.getElementById('imagePreview');
+            if (preview) {
+                preview.src = imgElement.src;
+            }
+            
+            // Get current properties
+            const altTextInput = document.getElementById('imageAltText');
+            if (altTextInput) {
+                altTextInput.value = imgElement.alt || '';
+            }
+            
+            // Check for caption wrapper
+            const wrapper = imgElement.closest('.img-blog-wrapper');
+            const captionElement = wrapper ? wrapper.querySelector('.img-blog-caption') : null;
+            const captionInput = document.getElementById('imageCaption');
+            if (captionInput) {
+                captionInput.value = captionElement ? captionElement.textContent : '';
+            }
+            
+            // Get current alignment
+            let alignment = 'none';
+            if (imgElement.classList.contains('img-blog-left') || (wrapper && wrapper.classList.contains('left'))) {
+                alignment = 'left';
+            } else if (imgElement.classList.contains('img-blog-right') || (wrapper && wrapper.classList.contains('right'))) {
+                alignment = 'right';
+            } else if (imgElement.classList.contains('img-blog-center') || (wrapper && wrapper.classList.contains('center'))) {
+                alignment = 'center';
+            }
+            const alignmentSelect = document.getElementById('imageAlignment');
+            if (alignmentSelect) {
+                alignmentSelect.value = alignment;
+            }
+            
+            // Get current size
+            let size = 'auto';
+            if (imgElement.classList.contains('img-blog-small')) size = 'small';
+            else if (imgElement.classList.contains('img-blog-medium')) size = 'medium';
+            else if (imgElement.classList.contains('img-blog-large')) size = 'large';
+            else if (imgElement.classList.contains('img-blog-full')) size = 'full';
+            const sizeSelect = document.getElementById('imageSize');
+            if (sizeSelect) {
+                sizeSelect.value = size;
+            }
+            
+            // Get current effects
+            const borderCheck = document.getElementById('imageBorder');
+            const shadowCheck = document.getElementById('imageShadow');
+            const roundedCheck = document.getElementById('imageRounded');
+            
+            if (borderCheck) borderCheck.checked = imgElement.classList.contains('img-blog-border');
+            if (shadowCheck) shadowCheck.checked = imgElement.classList.contains('img-blog-shadow');
+            if (roundedCheck) roundedCheck.checked = imgElement.classList.contains('img-blog-rounded');
+            
+            // Show modal - try Bootstrap first, then fallback
+            const modalElement = document.getElementById('imagePropertiesModal');
+            if (modalElement) {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    console.log('Using Bootstrap modal');
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                } else {
+                    console.log('Bootstrap not available, using custom modal');
+                    // Fallback: show modal manually
+                    modalElement.style.display = 'block';
+                    modalElement.classList.add('show');
+                    document.body.classList.add('modal-open');
+                    
+                    // Add backdrop
+                    const backdrop = document.createElement('div');
+                    backdrop.className = 'modal-backdrop fade show';
+                    backdrop.id = 'imageModalBackdrop';
+                    document.body.appendChild(backdrop);
+                }
+            } else {
+                console.error('Modal element not found');
+                showToast('Error: Image properties modal not found', 'error');
+            }
+            
+        } catch (error) {
+            console.error('Error opening image properties modal:', error);
+            showToast('Error opening image properties', 'error');
+        }
+    }
+    
+    // Apply image properties
+    function applyImageProperties() {
+        if (!currentEditingImage) {
+            console.error('No current editing image found');
+            return;
+        }
+        
+        const img = currentEditingImage;
+        const altText = document.getElementById('imageAltText').value;
+        const caption = document.getElementById('imageCaption').value;
+        const alignment = document.getElementById('imageAlignment').value;
+        const size = document.getElementById('imageSize').value;
+        const hasBorder = document.getElementById('imageBorder').checked;
+        const hasShadow = document.getElementById('imageShadow').checked;
+        const hasRounded = document.getElementById('imageRounded').checked;
+        
+        console.log('Applying image properties:', { altText, caption, alignment, size, hasBorder, hasShadow, hasRounded });
+        
+        // Set alt text
+        img.alt = altText;
+        
+        // Remove existing classes
+        img.classList.remove('img-blog-small', 'img-blog-medium', 'img-blog-large', 'img-blog-full');
+        img.classList.remove('img-blog-left', 'img-blog-right', 'img-blog-center');
+        img.classList.remove('img-blog-border', 'img-blog-shadow', 'img-blog-rounded');
+        
+        // Remove any inline styles that might override our classes
+        img.style.width = '';
+        img.style.height = '';
+        img.style.maxWidth = '';
+        img.style.float = '';
+        img.style.margin = '';
+        img.style.display = '';
+        
+        // Remove existing wrapper if it exists
+        const existingWrapper = img.closest('.img-blog-wrapper');
+        if (existingWrapper) {
+            existingWrapper.replaceWith(img);
+        }
+        
+        // Apply size
+        if (size !== 'auto') {
+            img.classList.add(`img-blog-${size}`);
+            console.log('Applied size class:', `img-blog-${size}`);
+        }
+        
+        // Apply effects
+        if (hasBorder) img.classList.add('img-blog-border');
+        if (hasShadow) img.classList.add('img-blog-shadow');
+        if (hasRounded) img.classList.add('img-blog-rounded');
+        
+        // Handle alignment and caption
+        if (caption || alignment !== 'none') {
+            // Create wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = 'img-blog-wrapper';
+            
+            // Add alignment class to wrapper
+            if (alignment !== 'none') {
+                wrapper.classList.add(alignment);
+            }
+            
+            // Replace image with wrapper
+            img.parentNode.replaceChild(wrapper, img);
+            wrapper.appendChild(img);
+            
+            // Add caption if provided
+            if (caption) {
+                const captionElement = document.createElement('span');
+                captionElement.className = 'img-blog-caption';
+                captionElement.textContent = caption;
+                wrapper.appendChild(captionElement);
+            }
+        } else if (alignment !== 'none') {
+            // Apply alignment directly to image if no caption
+            img.classList.add(`img-blog-${alignment}`);
+        }
+        
+        // Close modal
+        const modalElement = document.getElementById('imagePropertiesModal');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        } else {
+            // Fallback: hide modal manually
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            
+            // Remove backdrop
+            const backdrop = document.getElementById('imageModalBackdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+        
+        // Log final state for debugging
+        console.log('Final image classes:', img.className);
+        console.log('Final image style:', img.style.cssText);
+        console.log('Image element:', img);
+        
+        // Force Quill to recognize the changes by updating the HTML
+        if (quill) {
+            // Get the current HTML content
+            const currentHTML = quill.root.innerHTML;
+            // Set it back to trigger Quill's internal update
+            quill.root.innerHTML = currentHTML;
+            // Emit text-change event to ensure Quill tracks the change
+            quill.emitter.emit('text-change');
+        }
+        
+        // Update editor content
+        updateStats();
+        
+        showToast('Image properties updated!', 'success');
+    }
+    
+    // Close modal function
+    function closeImagePropertiesModal() {
+        const modalElement = document.getElementById('imagePropertiesModal');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        } else {
+            // Fallback: hide modal manually
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            
+            // Remove backdrop
+            const backdrop = document.getElementById('imageModalBackdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+        currentEditingImage = null;
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation scroll effect
+        const blogNav = document.getElementById('blogNav');
+        let scrolled = false;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 50 && !scrolled) {
+                blogNav.classList.add('scrolled');
+                scrolled = true;
+            } else if (scrollTop <= 50 && scrolled) {
+                blogNav.classList.remove('scrolled');
+                scrolled = false;
+            }
+        });
+        
+        // Initialize Quill editor
+        const editorElement = document.getElementById('editor');
+        if (!editorElement) {
+            console.error('Quill editor element #editor not found');
+            showToast('Error: Editor element not found', 'error');
+            return;
+        }
+        
+        try {
+            // Register custom image format to preserve attributes
+            const Image = Quill.import('formats/image');
+            class ImageWithAttributes extends Image {
+                static create(value) {
+                    let node = super.create(value);
+                    if (typeof value === 'object') {
+                        if (value.alt) node.setAttribute('alt', value.alt);
+                        if (value.class) node.setAttribute('class', value.class);
+                        if (value.style) node.setAttribute('style', value.style);
+                        if (value.src) node.setAttribute('src', value.src);
+                    }
+                    return node;
+                }
+                
+                static value(node) {
+                    return {
+                        src: node.getAttribute('src'),
+                        alt: node.getAttribute('alt'),
+                        class: node.getAttribute('class'),
+                        style: node.getAttribute('style')
+                    };
+                }
+            }
+            Quill.register(ImageWithAttributes);
+            
+            quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        // Formatting styles dropdown
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+                        
+                        // Text formatting
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        
+                        // Paragraph formatting
+                        [{ 'align': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        
+                        // Insert elements
+                        ['blockquote', 'code-block'],
+                        ['link', 'image', 'video'],
+                        
+                        // Clear formatting
+                        ['clean']
+                    ],
+                    clipboard: {
+                        matchers: [
+                            // Custom matcher to preserve image classes and attributes
+                            ['IMG', function(node, delta) {
+                                const ops = [];
+                                const src = node.getAttribute('src');
+                                const alt = node.getAttribute('alt') || '';
+                                const className = node.getAttribute('class') || '';
+                                const style = node.getAttribute('style') || '';
+                                
+                                // Create image embed that preserves all attributes
+                                ops.push({
+                                    insert: {
+                                        image: src
+                                    },
+                                    attributes: {
+                                        alt: alt,
+                                        class: className,
+                                        style: style
+                                    }
+                                });
+                                
+                                return new Delta(ops);
+                            }]
+                        ]
+                    }
+                },
+                placeholder: 'Start writing your blog post...'
+            });
+            
+            // Add custom image handler for image generation modal
+            quill.getModule('toolbar').addHandler('image', function() {
+                openImageGenerationModal();
+            });
+            
+            // Add click handler for images in the editor
+            quill.root.addEventListener('click', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                    openImagePropertiesModal(e.target);
+                }
+            });
+            
+            // Add custom HTML/Visual toggle buttons to main editor toolbar
+            addCustomToolbarButtons('editor', function(mode) {
+                toggleEditorMode('main', mode);
+            });
+            
+            // Debug: Check if modal exists and Bootstrap availability
+            setTimeout(() => {
+                const modalExists = document.getElementById('imagePropertiesModal');
+                console.log('Modal element check:', modalExists ? 'Found' : 'Not found');
+                console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+                if (modalExists) {
+                    console.log('Modal HTML:', modalExists.outerHTML.substring(0, 100) + '...');
+                }
+            }, 1000);
+            
+            // Add tooltips to toolbar buttons after Quill initializes
+            setTimeout(() => {
+                const toolbar = document.querySelector('.ql-toolbar');
+                if (toolbar) {
+                    // Helper function to safely set attributes
+                    const setTooltip = (selector, title) => {
+                        const element = toolbar.querySelector(selector);
+                        if (element) element.setAttribute('title', title);
+                    };
+                    
+                    // Text formatting tooltips
+                    setTooltip('.ql-bold', 'Bold (Ctrl+B)');
+                    setTooltip('.ql-italic', 'Italic (Ctrl+I)');
+                    setTooltip('.ql-underline', 'Underline (Ctrl+U)');
+                    setTooltip('.ql-strike', 'Strikethrough');
+                    
+                    // Header dropdown
+                    setTooltip('.ql-header .ql-picker-label', 'Heading styles');
+                    
+                    // Font controls
+                    setTooltip('.ql-font .ql-picker-label', 'Font family');
+                    setTooltip('.ql-size .ql-picker-label', 'Font size');
+                    
+                    // Color controls
+                    setTooltip('.ql-color .ql-picker-label', 'Text color');
+                    setTooltip('.ql-background .ql-picker-label', 'Background color');
+                    
+                    // Script buttons
+                    setTooltip('.ql-script[value="sub"]', 'Subscript');
+                    setTooltip('.ql-script[value="super"]', 'Superscript');
+                    
+                    // Alignment - handle all align buttons
+                    setTooltip('.ql-align .ql-picker-label', 'Text alignment');
+                    setTooltip('.ql-align[value=""]', 'Align left');
+                    setTooltip('.ql-align[value="center"]', 'Align center');
+                    setTooltip('.ql-align[value="right"]', 'Align right');
+                    setTooltip('.ql-align[value="justify"]', 'Justify');
+                    
+                    // List buttons
+                    setTooltip('.ql-list[value="ordered"]', 'Numbered list');
+                    setTooltip('.ql-list[value="bullet"]', 'Bullet list');
+                    setTooltip('.ql-list[value="check"]', 'Checklist');
+                    
+                    // Indent buttons
+                    setTooltip('.ql-indent[value="-1"]', 'Decrease indent');
+                    setTooltip('.ql-indent[value="+1"]', 'Increase indent');
+                    
+                    // Block elements
+                    setTooltip('.ql-blockquote', 'Quote');
+                    setTooltip('.ql-code-block', 'Code block');
+                    
+                    // Insert elements
+                    setTooltip('.ql-link', 'Insert link');
+                    setTooltip('.ql-image', 'Upload image from computer');
+                    setTooltip('.ql-video', 'Insert video');
+                    
+                    // Clean button
+                    setTooltip('.ql-clean', 'Clear formatting');
+                }
+            }, 100);
+            
+            // Add custom HTML/Visual toggle buttons to toolbar
+            addCustomToolbarButtons('editor', function(mode) {
+                toggleEditorMode('main', mode);
+            });
+            
+            console.log('Quill editor initialized successfully');
+            
+            // Add mutation observer to handle dynamically added images
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.tagName === 'IMG') {
+                            // Remove any width/height styles that Quill might add
+                            if (node.style.width && !node.className.includes('img-blog-')) {
+                                node.style.width = '';
+                                node.style.height = '';
+                            }
+                        }
+                    });
+                });
+            });
+            
+            // Start observing the editor for changes
+            observer.observe(quill.root, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['style', 'width', 'height']
+            });
+            
+        } catch (error) {
+            console.error('Error initializing Quill editor:', error);
+            showToast('Error initializing editor', 'error');
+            return;
+        }
+        
+        // Load existing post data if editing
+        {% if post_data %}
+        loadPostData({{ post_data | tojson }});
+        {% endif %}
+        
+        // Connect to AI assistant
+        connectAI();
+        
+        // Editor change listener
+        quill.on('text-change', updateStats);
+        
+        // Title and excerpt counters
+        document.getElementById('postTitle').addEventListener('input', updateTitleCount);
+        document.getElementById('postExcerpt').addEventListener('input', updateExcerptCount);
+        
+        // Tag input
+        document.getElementById('tagInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const tagName = this.value.trim();
+                if (tagName) {
+                    addTag(tagName);
+                    this.value = '';
+                }
+            }
+        });
+        
+        // Post action buttons
+        document.getElementById('savePost').addEventListener('click', async function() {
+            await savePost(false);
+        });
+        
+        document.getElementById('publishPost').addEventListener('click', async function() {
+            await savePost(true);
+        });
+        
+        document.getElementById('previewPost').addEventListener('click', function() {
+            previewPost();
+        });
+        
+        document.getElementById('unpublishPost').addEventListener('click', function() {
+            unpublishPost();
+        });
+        
+        document.getElementById('deletePost').addEventListener('click', function() {
+            deletePost();
+        });
+        
+        // AI assistant buttons
+        document.getElementById('generateContent').addEventListener('click', function() {
+            generateContent();
+        });
+        
+        document.getElementById('generateTitle').addEventListener('click', function() {
+            generateTitles();
+        });
+        
+        document.getElementById('generateExcerpt').addEventListener('click', function() {
+            generateExcerpt();
+        });
+        
+        document.getElementById('suggestTags').addEventListener('click', function() {
+            suggestTags();
+        });
+        
+        // Writing tools buttons
+        document.getElementById('improveWriting').addEventListener('click', function() {
+            improveWriting();
+        });
+        
+        document.getElementById('checkGrammar').addEventListener('click', function() {
+            checkGrammar();
+        });
+        
+        document.getElementById('optimizeSEO').addEventListener('click', function() {
+            optimizeSEO();
+        });
+        
+        document.getElementById('getWritingTips').addEventListener('click', function() {
+            getWritingTips();
+        });
+        
+        // Auto-save draft every 30 seconds
+        setInterval(async () => {
+            const title = document.getElementById('postTitle').value;
+            const content = quill.root.innerHTML;
+            
+            if (title && content && content !== '<p><br></p>') {
+                await savePost(false);
+                showToast('Draft auto-saved', 'info');
+            }
+        }, 30000); // 30 seconds
+        
+        // Initial stats update
+        updateStats();
+        
+        // Set initial button visibility
+        updateButtonVisibility('new');
+        
+        // Add custom toolbar buttons function
+        function addCustomToolbarButtons(editorId, toggleCallback) {
+            console.log('addCustomToolbarButtons called for:', editorId);
+            // Quill places the toolbar as a sibling, not inside the editor div
+            const editorElement = document.querySelector(`#${editorId}`);
+            const toolbar = editorElement ? editorElement.previousElementSibling : null;
+            console.log('Editor element:', editorElement);
+            console.log('Toolbar found:', toolbar);
+            console.log('Is toolbar a Quill toolbar?', toolbar && toolbar.classList.contains('ql-toolbar'));
+            
+            if (toolbar && toolbar.classList.contains('ql-toolbar')) {
+                const customButtons = document.createElement('div');
+                customButtons.className = 'custom-toolbar-buttons';
+                customButtons.innerHTML = `
+                    <button type="button" class="custom-toolbar-btn active" data-mode="visual" title="Visual Editor">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button type="button" class="custom-toolbar-btn" data-mode="html" title="HTML Source Code">
+                        <i class="fas fa-code"></i>
+                    </button>
+                `;
+                toolbar.appendChild(customButtons);
+                console.log('Custom buttons added to toolbar');
+                
+                // Add click handlers
+                customButtons.addEventListener('click', function(e) {
+                    // Find the button even if clicking on the icon inside
+                    const button = e.target.closest('.custom-toolbar-btn');
+                    if (button) {
+                        const mode = button.dataset.mode;
+                        const buttons = customButtons.querySelectorAll('.custom-toolbar-btn');
+                        buttons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        toggleCallback(mode);
+                        console.log('Switching to mode:', mode);
+                    }
+                });
+            } else {
+                console.error('Toolbar not found for editor:', editorId);
+                // Try again after a short delay
+                setTimeout(() => {
+                    console.log('Retrying to find toolbar...');
+                    const retryEditor = document.querySelector(`#${editorId}`);
+                    const retryToolbar = retryEditor ? retryEditor.previousElementSibling : null;
+                    if (retryToolbar && retryToolbar.classList.contains('ql-toolbar')) {
+                        console.log('Toolbar found on retry, calling function again');
+                        addCustomToolbarButtons(editorId, toggleCallback);
+                    } else {
+                        console.error('Toolbar still not found after retry');
+                        // Try one more approach - find by class
+                        const allToolbars = document.querySelectorAll('.ql-toolbar');
+                        console.log('All Quill toolbars found:', allToolbars.length);
+                        if (allToolbars.length > 0) {
+                            console.log('Using first toolbar found');
+                            const toolbar = allToolbars[0];
+                            const customButtons = document.createElement('div');
+                            customButtons.className = 'custom-toolbar-buttons';
+                            customButtons.innerHTML = `
+                                <button type="button" class="custom-toolbar-btn active" data-mode="visual" title="Visual Editor">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="custom-toolbar-btn" data-mode="html" title="HTML Source Code">
+                                    <i class="fas fa-code"></i>
+                                </button>
+                            `;
+                            toolbar.appendChild(customButtons);
+                            console.log('Custom buttons added to toolbar (fallback method)');
+                            
+                            // Add click handlers
+                            customButtons.addEventListener('click', function(e) {
+                                const target = e.target.closest('.custom-toolbar-btn');
+                                if (target) {
+                                    const mode = target.dataset.mode;
+                                    const buttons = customButtons.querySelectorAll('.custom-toolbar-btn');
+                                    buttons.forEach(btn => btn.classList.remove('active'));
+                                    target.classList.add('active');
+                                    toggleCallback(mode);
+                                }
+                            });
+                        }
+                    }
+                }, 500);
+            }
+        }
+        
+        // Toggle editor mode function
+        function toggleEditorMode(editorType, mode) {
+            console.log('toggleEditorMode called:', editorType, mode);
+            if (editorType === 'main') {
+                if (mode === 'html') {
+                    document.getElementById('editor').style.display = 'none';
+                    document.getElementById('htmlEditorContainer').style.display = 'block';
+                    
+                    // Initialize CodeMirror if not already initialized
+                    if (!htmlCodeMirror) {
+                        htmlCodeMirror = CodeMirror.fromTextArea(document.getElementById('htmlEditor'), {
+                            mode: 'htmlmixed',
+                            theme: 'monokai',
+                            lineNumbers: true,
+                            lineWrapping: true,
+                            autoCloseTags: true,
+                            autoCloseBrackets: true,
+                            foldGutter: true,
+                            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                            extraKeys: {
+                                "Ctrl-Space": "autocomplete",
+                                "F11": function(cm) {
+                                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                                },
+                                "Esc": function(cm) {
+                                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                                },
+                                "Shift-Alt-F": function(cm) {
+                                    // Format HTML
+                                    const currentHtml = cm.getValue();
+                                    const beautifiedHtml = html_beautify(currentHtml, {
+                                        indent_size: 2,
+                                        indent_char: ' ',
+                                        max_preserve_newlines: 1,
+                                        preserve_newlines: true,
+                                        indent_inner_html: true,
+                                        wrap_line_length: 80,
+                                        wrap_attributes: 'auto',
+                                        unformatted: ['code', 'pre'],
+                                        content_unformatted: ['pre'],
+                                        extra_liners: ['head', 'body', '/body']
+                                    });
+                                    cm.setValue(beautifiedHtml);
+                                    showToast('HTML formatted!', 'success');
+                                }
+                            },
+                            styleActiveLine: true,
+                            matchBrackets: true
+                        });
+                    }
+                    
+                    // Get HTML from Quill and beautify it
+                    const rawHtml = quill.root.innerHTML;
+                    const beautifiedHtml = html_beautify(rawHtml, {
+                        indent_size: 2,
+                        indent_char: ' ',
+                        max_preserve_newlines: 1,
+                        preserve_newlines: true,
+                        indent_inner_html: true,
+                        wrap_line_length: 80,
+                        wrap_attributes: 'auto',
+                        unformatted: ['code', 'pre'],
+                        content_unformatted: ['pre'],
+                        extra_liners: ['head', 'body', '/body']
+                    });
+                    
+                    // Set beautified content to CodeMirror
+                    htmlCodeMirror.setValue(beautifiedHtml);
+                    setTimeout(() => {
+                        htmlCodeMirror.refresh();
+                    }, 100);
+                } else {
+                    document.getElementById('editor').style.display = 'block';
+                    document.getElementById('htmlEditorContainer').style.display = 'none';
+                    
+                    // Get content from CodeMirror and properly set it in Quill
+                    if (htmlCodeMirror) {
+                        const htmlContent = htmlCodeMirror.getValue();
+                        if (htmlContent) {
+                            // Custom approach to preserve image classes and other attributes
+                            try {
+                                // First, clear the editor
+                                quill.setText('');
+                                
+                                // Set the HTML directly to preserve all attributes and classes
+                                quill.root.innerHTML = htmlContent;
+                                
+                                // Force Quill to recognize the content by triggering a change
+                                quill.history.clear();
+                                quill.update();
+                                
+                                // Update stats after content change
+                                updateStats();
+                            } catch (error) {
+                                console.warn('Direct HTML setting failed, falling back to clipboard conversion:', error);
+                                
+                                // Fallback to clipboard conversion if direct setting fails
+                                const delta = quill.clipboard.convert(htmlContent);
+                                quill.setContents(delta);
+                                updateStats();
+                            }
+                        }
+                    }
+                }
+            } else if (editorType === 'focus') {
+                if (mode === 'html') {
+                    document.getElementById('focusEditor').style.display = 'none';
+                    document.getElementById('focusHtmlEditor').style.display = 'block';
+                    if (focusQuill) {
+                        document.getElementById('focusHtmlEditor').value = focusQuill.root.innerHTML;
+                    }
+                } else {
+                    document.getElementById('focusEditor').style.display = 'block';
+                    document.getElementById('focusHtmlEditor').style.display = 'none';
+                    const htmlContent = document.getElementById('focusHtmlEditor').value;
+                    if (htmlContent && focusQuill) {
+                        focusQuill.root.innerHTML = htmlContent;
+                    }
+                }
+            }
+        }
+        
+        // Focus Mode functionality
+        let focusQuill = null;
+        // Make focusQuill globally accessible
+        window.focusQuill = null;
+        
+        // Add event listeners for focus mode elements if they exist
+        const focusModeToggle = document.getElementById('focusModeToggle');
+        if (focusModeToggle) {
+            focusModeToggle.addEventListener('click', function() {
+                enterFocusMode();
+            });
+        }
+        
+        const focusModeClose = document.getElementById('focusModeClose');
+        if (focusModeClose) {
+            focusModeClose.addEventListener('click', function() {
+                exitFocusMode();
+            });
+        }
+        
+        const focusModeSave = document.getElementById('focusModeSave');
+        if (focusModeSave) {
+            focusModeSave.addEventListener('click', function() {
+                syncFocusToMain();
+                savePost(false); // Save as draft
+            });
+        }
+        
+        // Focus mode editor toggle
+        const focusVisualMode = document.getElementById('focusVisualMode');
+        if (focusVisualMode) {
+            focusVisualMode.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('focusEditor').style.display = 'block';
+                    document.getElementById('focusHtmlEditor').style.display = 'none';
+                    // Sync HTML back to Quill
+                    const htmlContent = document.getElementById('focusHtmlEditor').value;
+                    if (htmlContent && focusQuill) {
+                        focusQuill.root.innerHTML = htmlContent;
+                    }
+                }
+            });
+        }
+        
+        const focusHtmlMode = document.getElementById('focusHtmlMode');
+        if (focusHtmlMode) {
+            focusHtmlMode.addEventListener('change', function() {
+                if (this.checked) {
+                document.getElementById('focusEditor').style.display = 'none';
+                document.getElementById('focusHtmlEditor').style.display = 'block';
+                // Sync Quill content to HTML editor
+                if (focusQuill) {
+                    document.getElementById('focusHtmlEditor').value = focusQuill.root.innerHTML;
+                }
+            }
+        });
+        }
+        
+        function enterFocusMode() {
+            // Sync current content to focus mode
+            document.getElementById('focusPostTitle').value = document.getElementById('postTitle').value;
+            
+            // Initialize focus mode Quill editor if not already done
+            if (!focusQuill) {
+                focusQuill = new Quill('#focusEditor', {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                            [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'script': 'sub'}, { 'script': 'super' }],
+                            [{ 'align': [] }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                            [{ 'indent': '-1'}, { 'indent': '+1' }],
+                            ['blockquote', 'code-block'],
+                            ['link', 'image', 'video'],
+                            ['clean']
+                        ]
+                    },
+                    placeholder: 'Focus on your writing...'
+                });
+                
+                // Make focusQuill globally accessible
+                window.focusQuill = focusQuill;
+                
+                // Add custom image handler for focus mode
+                focusQuill.getModule('toolbar').addHandler('image', function() {
+                    openImageGenerationModal();
+                });
+                
+                // Add custom HTML/Visual toggle buttons to focus mode editor toolbar
+                addCustomToolbarButtons('focusEditor', function(mode) {
+                    toggleEditorMode('focus', mode);
+                });
+            }
+            
+            // Copy content from main editor
+            focusQuill.root.innerHTML = quill.root.innerHTML;
+            
+            // Show focus mode overlay
+            document.getElementById('focusModeOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Focus on the editor
+            setTimeout(() => {
+                focusQuill.focus();
+            }, 300);
+        }
+        
+        function exitFocusMode() {
+            // Sync content back to main editor
+            syncFocusToMain();
+            
+            // Hide focus mode overlay
+            document.getElementById('focusModeOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function syncFocusToMain() {
+            // Sync title
+            document.getElementById('postTitle').value = document.getElementById('focusPostTitle').value;
+            updateTitleCount();
+            
+            // Sync content
+            if (focusQuill) {
+                quill.root.innerHTML = focusQuill.root.innerHTML;
+                updateStats();
+            }
+        }
+        
+        // ESC key to exit focus mode
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('focusModeOverlay').classList.contains('active')) {
+                exitFocusMode();
+            }
+        });
+    });
+</script>
+
+<!-- Include Image Generation Modal -->
+{% include "partials/image_generation_modal.html" %}
+
+<script>
+// Add AI Image Generation button functionality
+function openImageGenerationModal() {
+    const postTitle = document.getElementById('postTitle').value || 'blog post';
+    const defaultPrompt = `Create a featured image for a blog post titled "${postTitle}"`;
+    
+    // Get the current post ID from the URL parameters or use 'new' for new posts
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('post_id') || 'new';
+    
+    // Initialize the image generation modal with blog_post entity type
+    initImageGenerationModal(
+        'blog_post', 
+        postId === 'new' ? 1 : parseInt(postId), // Use 1 for new posts, actual ID for existing
+        defaultPrompt,
+        function(result) {
+            // Callback when image is applied
+            console.log('Image callback result:', result);
+            
+            if (result && (result.url || result.image_url)) {
+                const imageUrl = result.url || result.image_url;
+                console.log('Image applied:', imageUrl);
+                
+                // Insert image into the current Quill editor
+                insertImageIntoEditor(imageUrl, result.prompt || 'Generated image');
+                
+                showToast('Image inserted into editor!', 'success');
+            } else {
+                console.error('No image URL found in result:', result);
+                showToast('Error inserting image', 'error');
+            }
+        }
+    );
+}
+
+
+// Function to update the featured image preview
+function updateFeaturedImagePreview(imageUrl) {
+    const featuredImagePreview = document.getElementById('featuredImagePreview');
+    const featuredImage = document.getElementById('featuredImage');
+    const noFeaturedImage = document.getElementById('noFeaturedImage');
+    
+    if (imageUrl) {
+        // Show the preview
+        featuredImage.src = imageUrl;
+        featuredImagePreview.style.display = 'block';
+        noFeaturedImage.style.display = 'none';
+        
+        // Store the URL for when saving the post
+        document.getElementById('postTitle').setAttribute('data-featured-image', imageUrl);
+    } else {
+        // Hide the preview
+        featuredImagePreview.style.display = 'none';
+        noFeaturedImage.style.display = 'block';
+        
+        // Remove the stored URL
+        document.getElementById('postTitle').removeAttribute('data-featured-image');
+    }
+}
+
+// Function to get the current featured image URL
+function getCurrentFeaturedImageUrl() {
+    return document.getElementById('postTitle').getAttribute('data-featured-image') || null;
+}
+
+// Function to insert generated image into the Quill editor
+function insertImageIntoEditor(imageUrl, altText = '') {
+    // Determine which editor is currently active
+    let activeEditor = null;
+    const focusMode = document.getElementById('focusEditor');
+    const focusModeOverlay = document.getElementById('focusModeOverlay');
+    
+    // Check if focus mode is active and focusQuill exists
+    const isFocusModeActive = focusModeOverlay && focusModeOverlay.classList.contains('active');
+    
+    if (isFocusModeActive && window.focusQuill) {
+        // Focus mode is active and focusQuill is available
+        activeEditor = window.focusQuill;
+    } else if (quill) {
+        // Main editor is active
+        activeEditor = quill;
+    }
+    
+    if (activeEditor) {
+        const range = activeEditor.getSelection(true);
+        const index = range ? range.index : activeEditor.getLength();
+        
+        // Insert the image
+        activeEditor.insertEmbed(index, 'image', imageUrl);
+        
+        // Set alt text if provided
+        const img = activeEditor.root.querySelector(`img[src="${imageUrl}"]`);
+        if (img && altText) {
+            img.alt = altText;
+        }
+        
+        // Move cursor after the image
+        activeEditor.setSelection(index + 1);
+        
+        // Update stats
+        updateStats();
+        
+        // Sync content between editors if both exist
+        if (isFocusModeActive && window.focusQuill && quill) {
+            // If we're in focus mode, sync back to main editor
+            if (activeEditor === window.focusQuill) {
+                quill.setContents(window.focusQuill.getContents());
+            }
+        }
+    } else {
+        console.error('No active Quill editor found');
+        showToast('Error: No active editor found', 'error');
+    }
+}
+
+// Add featured image event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove featured image button
+    document.getElementById('removeFeaturedImage').addEventListener('click', function() {
+        updateFeaturedImagePreview(null);
+        showToast('Featured image removed', 'info');
+    });
+    
+    // Add the AI Image Generation button to the Writing Enhancement section
+    const writingEnhancementSection = document.querySelector('#ai-triggers-pane .btn-list');
+    if (writingEnhancementSection) {
+        const aiImageBtn = document.createElement('button');
+        aiImageBtn.type = 'button';
+        aiImageBtn.className = 'btn btn-primary btn-sm';
+        aiImageBtn.id = 'generateAIImage';
+        aiImageBtn.innerHTML = '<i class="fas fa-image me-1"></i>Generate AI Image';
+        aiImageBtn.onclick = openImageGenerationModal;
+        
+        writingEnhancementSection.appendChild(aiImageBtn);
+    }
+});
+
+// Expose the function globally for onclick handlers
+window.showImageGenerationModal = openImageGenerationModal;
+</script>
+{% endblock %}

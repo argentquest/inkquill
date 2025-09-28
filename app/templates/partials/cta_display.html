@@ -1,0 +1,198 @@
+{# CTA Display Partial - Renders a Call to Action block using Tabler Premium components #}
+{# Parameters: cta (CTAContent object), current_user (User object or None) #}
+
+{% if cta %}
+<div class="card cta-card mb-4 
+            {% if cta.style == 'minimal' %}bg-surface{% endif %}
+            {% if not cta.is_active %}opacity-75{% endif %}"
+     style="{% if cta.style == 'gradient' and cta.background_color %}background: {{ cta.background_color }};{% elif cta.style == 'gradient' %}background: linear-gradient(135deg, var(--tblr-primary) 0%, var(--tblr-purple) 100%);{% elif cta.background_color %}background-color: {{ cta.background_color }};{% endif %}
+            {% if cta.style != 'minimal' %}color: {{ cta.text_color | default('#FFFFFF') }};{% endif %}
+            transition: all 0.3s ease;"
+     data-cta-id="{{ cta.id }}"
+     data-cta-position="{{ cta.position.value }}"
+     {% if cta.campaign %}data-campaign="{{ cta.campaign.name }}"{% endif %}
+     onmouseenter="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--tblr-box-shadow-lg)'"
+     onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='var(--tblr-box-shadow)'">
+    
+    {# Card status bar for visual hierarchy #}
+    {% if cta.style == 'gradient' %}
+    <div class="card-status-top" style="background: linear-gradient(90deg, var(--tblr-primary), var(--tblr-purple))"></div>
+    {% elif cta.style == 'bordered' %}
+    <div class="card-status-top bg-primary"></div>
+    {% endif %}
+    
+    <div class="card-body{% if cta.style == 'gradient' %} text-white{% endif %}">
+        
+        {# Card Header with Title and Icon #}
+        <div class="card-title-section mb-3">
+            <h3 class="card-title m-0 {% if cta.style == 'minimal' %}text-dark{% endif %}">
+                {% if cta.icon_class %}
+                    <span class="avatar avatar-sm me-2 {% if cta.style == 'gradient' %}bg-white-10{% else %}bg-primary-lt{% endif %}">
+                        <i class="{{ cta.icon_class }} {% if cta.style == 'gradient' %}text-white{% else %}text-primary{% endif %}"></i>
+                    </span>
+                {% endif %}
+                {{ cta.title }}
+            </h3>
+        </div>
+        
+        {# Subtitle with proper Tabler typography #}
+        {% if cta.subtitle %}
+        <p class="{% if cta.style == 'minimal' %}text-secondary{% else %}text-white-75{% endif %} mb-3">
+            {{ cta.subtitle }}
+        </p>
+        {% endif %}
+        
+        {# Rich content with proper styling #}
+        {% if cta.content %}
+        <div class="cta-content mb-4 {% if cta.style == 'minimal' %}text-dark{% else %}text-white-90{% endif %}">
+            {{ cta.content | safe }}
+        </div>
+        {% endif %}
+        
+        {# Feature list using Tabler list components #}
+        {% if cta.features %}
+        <div class="list-group list-group-flush mb-4">
+            {% for feature in cta.features %}
+            <div class="list-group-item border-0 px-0 py-2 {% if cta.style == 'gradient' %}bg-transparent text-white-90{% else %}bg-transparent{% endif %}">
+                <div class="d-flex align-items-center">
+                    <span class="avatar avatar-xs me-3 {% if cta.style == 'gradient' %}bg-white-10{% else %}bg-success-lt{% endif %}">
+                        <i class="{{ feature.icon | default('ti ti-check') }} {% if cta.style == 'gradient' %}text-white{% else %}text-success{% endif %}" 
+                           {% if feature.color and cta.style != 'gradient' %}style="color: {{ feature.color }} !important;"{% endif %}></i>
+                    </span>
+                    <span class="{% if cta.style == 'minimal' %}text-dark{% else %}text-inherit{% endif %}">{{ feature.text }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {# Action buttons with proper Tabler styling #}
+        <div class="card-actions">
+            {% if current_user %}
+                {# Authenticated user buttons #}
+                {% if cta.primary_button and cta.primary_button.text %}
+                <a href="{{ cta.primary_button.url }}{% if cta.campaign %}?utm_source={{ cta.campaign.utm_source }}&utm_medium={{ cta.campaign.utm_medium }}&utm_campaign={{ cta.campaign.utm_campaign }}{% endif %}" 
+                   class="btn w-100 {% if cta.style == 'minimal' %}btn-primary{% elif cta.style == 'gradient' %}btn-light{% else %}btn-primary{% endif %}"
+                   style="font-weight: 600; transition: all 0.2s ease;"
+                   onmouseenter="this.style.transform='translateY(-1px)'"
+                   onmouseleave="this.style.transform='translateY(0)'">
+                    {% if cta.primary_button.icon %}
+                        <i class="{{ cta.primary_button.icon }} me-2"></i>
+                    {% endif %}
+                    {{ cta.primary_button.text }}
+                </a>
+                {% endif %}
+            {% else %}
+                {# Anonymous user buttons #}
+                {% if cta.secondary_button and cta.secondary_button.text %}
+                <a href="{{ cta.secondary_button.url }}{% if cta.campaign %}?utm_source={{ cta.campaign.utm_source }}&utm_medium={{ cta.campaign.utm_medium }}&utm_campaign={{ cta.campaign.utm_campaign }}{% endif %}" 
+                   class="btn w-100 {% if cta.style == 'minimal' %}btn-primary{% elif cta.style == 'gradient' %}btn-light{% else %}btn-primary{% endif %}"
+                   style="font-weight: 600; transition: all 0.2s ease;"
+                   onmouseenter="this.style.transform='translateY(-1px)'"
+                   onmouseleave="this.style.transform='translateY(0)'">
+                    {% if cta.secondary_button.icon %}
+                        <i class="{{ cta.secondary_button.icon }} me-2"></i>
+                    {% endif %}
+                    {{ cta.secondary_button.text }}
+                </a>
+                
+                {# Login link for anonymous users #}
+                <div class="text-center mt-3">
+                    <small class="{% if cta.style == 'minimal' %}text-secondary{% else %}text-white-75{% endif %}">
+                        Already have an account? 
+                        <a href="{{ url_for('ui_login_form') }}" 
+                           class="link-{% if cta.style == 'minimal' %}primary{% else %}light{% endif %} text-decoration-underline">
+                            Login here
+                        </a>
+                    </small>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    {# Campaign badge for tracking #}
+    {% if cta.campaign %}
+    <div class="card-footer {% if cta.style == 'gradient' %}bg-white-10 border-white-20{% elif cta.style == 'minimal' %}bg-light{% endif %}">
+        <div class="d-flex align-items-center justify-content-center">
+            <span class="badge {% if cta.style == 'gradient' %}bg-white-20 text-white{% else %}bg-primary-lt text-primary{% endif %}">
+                <i class="ti ti-chart-line me-1"></i>
+                {{ cta.campaign.name }}
+            </span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{# Enhanced CTA styling #}
+<style>
+.cta-card {
+    border: none;
+    box-shadow: var(--tblr-box-shadow);
+    overflow: hidden;
+}
+
+.cta-card:hover {
+    box-shadow: var(--tblr-box-shadow-lg);
+    border-color: var(--tblr-primary);
+}
+
+.cta-card .card-status-top {
+    height: 3px;
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.cta-card .avatar {
+    transition: all 0.2s ease;
+}
+
+.cta-card:hover .avatar {
+    transform: scale(1.05);
+}
+
+.cta-card .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+.cta-card .list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* Gradient text utilities for better readability */
+.text-white-90 { color: rgba(255, 255, 255, 0.9) !important; }
+.text-white-75 { color: rgba(255, 255, 255, 0.75) !important; }
+.text-white-20 { color: rgba(255, 255, 255, 0.2) !important; }
+.bg-white-10 { background-color: rgba(255, 255, 255, 0.1) !important; }
+.bg-white-20 { background-color: rgba(255, 255, 255, 0.2) !important; }
+.border-white-20 { border-color: rgba(255, 255, 255, 0.2) !important; }
+
+/* Enhanced button hover effects */
+.cta-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+</style>
+
+{# Analytics tracking script #}
+{% if cta.campaign %}
+<script>
+    // Track CTA impression
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'view_promotion', {
+            'promotion_id': 'cta_{{ cta.id }}',
+            'promotion_name': '{{ cta.campaign.name }}',
+            'creative_name': '{{ cta.title }}',
+            'creative_slot': '{{ cta.position.value }}'
+        });
+    }
+</script>
+{% endif %}
+{% endif %}

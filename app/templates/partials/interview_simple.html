@@ -1,0 +1,87 @@
+<!-- Simple Interview Modal - No Recursion -->
+<div class="modal modal-blur fade" id="interviewModal" tabindex="-1" aria-labelledby="interviewModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="interviewModalLabel">
+                    <i class="ti ti-clipboard-text me-2"></i>
+                    Welcome! Let's get to know you better
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loading State -->
+                <div id="interview-loading" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Loading interview questions...</p>
+                </div>
+                
+                <!-- Error State -->
+                <div id="interview-error" class="d-none">
+                    <div class="alert alert-danger" role="alert">
+                        <div class="d-flex">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="alert-title">Error Loading Interview</h4>
+                                <div class="text-muted" id="interview-error-message">Something went wrong loading the interview questions.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-outline-secondary" onclick="location.reload()">
+                            <i class="ti ti-refresh me-2"></i>Try Again
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Interview Content -->
+                <div id="interview-content" class="d-none">
+                    <!-- Progress Info -->
+                    <div class="mb-3 text-center">
+                        <small class="text-muted" id="progress-text">Question 1 of 7</small>
+                        <div class="progress" style="height: 4px;">
+                            <div class="progress-bar bg-primary" id="progress-bar" role="progressbar" style="width: 14%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Steps Progress -->
+                    <div class="steps steps-center steps-lime mb-4">
+                        <span class="step step-active" data-step="1">1</span>
+                        <span class="step" data-step="2">2</span>
+                        <span class="step" data-step="3">3</span>
+                        <span class="step" data-step="4">4</span>
+                        <span class="step" data-step="5">5</span>
+                        <span class="step" data-step="6">6</span>
+                        <span class="step" data-step="7">7</span>
+                    </div>
+                    
+                    <!-- Question Content -->
+                    <div id="question-container">
+                        <!-- Question will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="prev-button" style="display: none;">
+                    <i class="ti ti-arrow-left me-2"></i>Previous
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="skip-button" style="display: none;">
+                    Skip Question
+                </button>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="next-button">
+                        Next <i class="ti ti-arrow-right ms-2"></i>
+                    </button>
+                    <button type="button" class="btn btn-success" id="submit-button" style="display: none;">
+                        <i class="ti ti-check me-2"></i>Complete Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

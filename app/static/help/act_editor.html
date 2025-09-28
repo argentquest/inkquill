@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Act Editor Guide - AI Storytelling Assistant</title>
+    <link rel="stylesheet" href="help-styles.css">
+    <style>
+        .ai-context-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 24px 0;
+        }
+        
+        .context-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        
+        .context-card h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        
+        .context-features {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0 0 0;
+        }
+        
+        .context-features li {
+            padding: 3px 0;
+            font-size: 14px;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .ai-context-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header centered">
+            <h1 class="help-title">✍️ AI-Assisted Writing Editor</h1>
+            <p class="help-subtitle">Master the art of collaborative writing - AI assistance varies by story type</p>
+        </div>
+
+        <div class="help-content-wrapper">
+            <!-- Quick Navigation -->
+            <div class="help-navigation">
+                <h4>Quick Navigation</h4>
+                <ul>
+                    <li><a href="#interface">Editor Interface</a></li>
+                    <li><a href="#ai-modes">AI Generation Modes</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="#advanced-features">Advanced Features</a></li>
+                    <li><a href="#troubleshooting">Tips & Troubleshooting</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action" onclick="scrollToSection('ai-modes')">
+                    <div class="quick-action-icon">🤖</div>
+                    <div class="quick-action-text">AI Modes</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('best-practices')">
+                    <div class="quick-action-icon">⭐</div>
+                    <div class="quick-action-text">Best Practices</div>
+                </div>
+                <div class="quick-action" onclick="scrollToSection('advanced-features')">
+                    <div class="quick-action-icon">🎯</div>
+                    <div class="quick-action-text">Advanced</div>
+                </div>
+            </div>
+
+            <section id="overview" class="help-section">
+                <h2 class="help-section-title">Welcome to AI-Assisted Writing</h2>
+                <p>Write your stories with real-time AI assistance tailored to your story type. The editor provides contextual suggestions and helps maintain consistency throughout your narrative.</p>
+                
+                <div class="ai-context-comparison">
+                    <div class="context-card">
+                        <h3><span class="badge badge-success">Basic Story AI</span></h3>
+                        <div class="help-alert help-alert-info">
+                            <div class="help-alert-icon">✍️</div>
+                            <div class="help-alert-content">
+                                <div class="help-alert-title">Writing Craft Focus</div>
+                                <div class="help-alert-text">Your AI co-author focuses on pure storytelling - helping with pacing, dialogue, description, and narrative techniques without world-building complexity.</div>
+                            </div>
+                        </div>
+                        <ul class="context-features">
+                            <li>✅ Plot development assistance</li>
+                            <li>✅ Character development (narrative focus)</li>
+                            <li>✅ Dialogue improvement</li>
+                            <li>✅ Pacing and flow suggestions</li>
+                            <li>✅ Writing style guidance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="context-card">
+                        <h3><span class="badge badge-primary">Advanced Story AI</span></h3>
+                        <div class="help-alert help-alert-success">
+                            <div class="help-alert-icon">🎭</div>
+                            <div class="help-alert-content">
+                                <div class="help-alert-title">Intelligent Context Awareness</div>
+                                <div class="help-alert-text">Your AI co-author knows your world's characters, their personalities, relationships, and the rules of your universe - making suggestions that fit seamlessly into your story.</div>
+                            </div>
+                        </div>
+                        <ul class="context-features">
+                            <li>✅ All Basic Story features</li>
+                            <li>✅ Character personality consistency</li>
+                            <li>✅ World knowledge integration</li>
+                            <li>✅ Relationship dynamics</li>
+                            <li>✅ World consistency checking</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="interface" class="help-section">
+                <h2 class="help-section-title">Understanding the Editor Interface</h2>
+                
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Split-Screen Layout</div>
+                            <div class="help-step-description">The editor features a <strong>Writing Area</strong> (left side) for your manuscript and an <strong>AI Assistant Panel</strong> (right side) for AI interactions and suggestions.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">AI Assistant Tabs</div>
+                            <div class="help-step-description">Switch between different AI functions: <strong>Generate</strong> (content creation), <strong>Review</strong> (feedback), and <strong>Chat</strong> (brainstorming).</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Toolbar Functions</div>
+                            <div class="help-step-description">Access formatting, save options, word count, and quick AI actions from the toolbar above your writing area.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Preview and Incorporate</div>
+                            <div class="help-step-description">AI suggestions appear in a preview box. Review, edit if needed, then click <strong>"Incorporate"</strong> to add content to your manuscript.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ai-modes" class="help-section">
+                <h2 class="help-section-title">AI Generation Modes</h2>
+                <p>Choose the right AI mode for your specific writing needs:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">➡️ Continue/Append</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-beginner">Most Popular</span><br>
+                            Extends your writing from where you left off. Perfect for overcoming writer's block or when you know the direction but need help with the details.
+                            <ul class="mt-sm">
+                                <li>Maintains your established tone</li>
+                                <li>Follows your story's logical progression</li>
+                                <li>Integrates seamlessly with existing text</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🔄 Rewrite/Improve</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-intermediate">Refinement</span><br>
+                            Improves selected text while preserving the core meaning. Great for enhancing dialogue, descriptions, or pacing issues.
+                            <ul class="mt-sm">
+                                <li>Enhances clarity and flow</li>
+                                <li>Improves word choice and variety</li>
+                                <li>Maintains original intent</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📝 Elaborate/Expand</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-intermediate">Detail Enhancement</span><br>
+                            Adds depth and detail to existing ideas. Perfect for developing scenes, expanding on character emotions, or enriching descriptions.
+                            <ul class="mt-sm">
+                                <li>Adds sensory details</li>
+                                <li>Develops character psychology</li>
+                                <li>Enriches world-building elements</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">💭 Custom Instruction</div>
+                        <div class="feature-card-description">
+                            <span class="difficulty-badge difficulty-advanced">Specific Control</span><br>
+                            Use specific instructions for targeted changes. Example: "Add dialogue showing tension" or "Describe the magic system in action."
+                            <ul class="mt-sm">
+                                <li>Precise control over output</li>
+                                <li>Targeted scene development</li>
+                                <li>Specific character interactions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-card mt-lg">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">🎯 Effective AI Prompting</div>
+                        <div class="recipe-card-time">⏱️ Improve results instantly</div>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">
+                                <strong>Be Specific:</strong> Instead of "write more," try "write dialogue between John and Sarah where John reveals his secret"
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">
+                                <strong>Include Context:</strong> Mention emotions, location, or recent events: "Sarah is angry after discovering the truth"
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">
+                                <strong>Reference Characters:</strong> Use character names for voice consistency: "Write this in Marcus's confident speaking style"
+                            </div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">
+                                <strong>Set the Tone:</strong> Specify mood: "Make this tense and suspenseful" or "Add humor to lighten the scene"
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="best-practices" class="help-section">
+                <h2 class="help-section-title">Writing Best Practices</h2>
+                
+                <h3 class="help-section-subtitle">Collaboration Workflow</h3>
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Start with Your Voice</div>
+                            <div class="help-step-description">Write the opening of each scene or chapter yourself to establish tone, then use AI to help develop and expand.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Use AI for Momentum</div>
+                            <div class="help-step-description">When you're stuck, ask AI to continue or suggest what might happen next. Use its ideas as springboards for your own creativity.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Edit AI Suggestions</div>
+                            <div class="help-step-description">Always review and personalize AI output. Adjust word choices, add your unique voice, and ensure it matches your vision.</div>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-number"></div>
+                        <div class="help-step-content">
+                            <div class="help-step-title">Iterate and Refine</div>
+                            <div class="help-step-description">Use multiple AI generations with different instructions to explore options, then combine the best elements.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-alert help-alert-info mt-lg">
+                    <div class="help-alert-icon">💡</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">The 80/20 Rule</div>
+                        <div class="help-alert-text">Aim for 80% your own writing and 20% AI assistance. This maintains your unique voice while leveraging AI for inspiration, momentum, and enhancement.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="advanced-features" class="help-section">
+                <h2 class="help-section-title">Advanced Features</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-title">🌍 World Context Integration</div>
+                        <div class="feature-card-description">AI automatically accesses your world's characters, locations, and lore for contextually appropriate suggestions that maintain story consistency.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">🗣️ Character Voice Consistency</div>
+                        <div class="feature-card-description">AI adapts dialogue and actions to match each character's established personality, speaking patterns, and behavioral traits.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">📊 Real-time Review</div>
+                        <div class="feature-card-description">Get instant feedback on pacing, engagement, character development, and plot coherence as you write.</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-title">💾 Auto-Save & Versioning</div>
+                        <div class="feature-card-description">Your work is automatically saved as you type, with version history to track changes and revert if needed.</div>
+                    </div>
+                </div>
+
+                <h3 class="help-section-subtitle">AI Review & Analysis</h3>
+                <p>Use the "Review with AI" feature for comprehensive manuscript analysis:</p>
+                <ul>
+                    <li><strong>📈 Engagement Metrics:</strong> Scores for pacing, tension, character development</li>
+                    <li><strong>🎯 Improvement Suggestions:</strong> Specific, actionable advice for enhancement</li>
+                    <li><strong>📝 Plot Coherence:</strong> Analysis of story logic and character motivation</li>
+                    <li><strong>🎭 Character Consistency:</strong> Checks for voice and behavior alignment</li>
+                    <li><strong>⚡ Pacing Analysis:</strong> Identification of slow or rushed sections</li>
+                </ul>
+
+                <div class="help-actions mt-lg">
+                    <a href="/help/act_ai_review.html" class="help-action-button">
+                        📊 AI Review Guide
+                    </a>
+                    <a href="/ui/prompts" class="help-action-button-secondary">
+                        📝 Prompt Library
+                    </a>
+                </div>
+            </section>
+
+            <section id="troubleshooting" class="help-section">
+                <h2 class="help-section-title">Tips & Troubleshooting</h2>
+                
+                <div class="help-alert help-alert-warning">
+                    <div class="help-alert-icon">⚠️</div>
+                    <div class="help-alert-content">
+                        <div class="help-alert-title">Common Issues</div>
+                        <div class="help-alert-text">If AI suggestions seem off-target, check that your story is properly linked to a world and that character details are complete.</div>
+                    </div>
+                </div>
+
+                <h3 class="help-section-subtitle">Improving AI Performance</h3>
+                <ul>
+                    <li><strong>🎯 Be Specific:</strong> Detailed prompts yield better results than vague requests</li>
+                    <li><strong>📚 Rich World Data:</strong> More character and world details improve AI context</li>
+                    <li><strong>🔄 Iterate:</strong> Try multiple variations to find the best approach</li>
+                    <li><strong>✂️ Edit Liberally:</strong> Use AI output as raw material for your own refinement</li>
+                    <li><strong>💾 Save Frequently:</strong> Use Ctrl+S or rely on auto-save for peace of mind</li>
+                </ul>
+
+                <h3 class="help-section-subtitle">Keyboard Shortcuts</h3>
+                <div class="help-table">
+                    <div class="help-table-row">
+                        <div class="help-table-cell"><span class="keyboard-shortcut">Ctrl + S</span></div>
+                        <div class="help-table-cell">Save all changes</div>
+                    </div>
+                    <div class="help-table-row">
+                        <div class="help-table-cell"><span class="keyboard-shortcut">Ctrl + Enter</span></div>
+                        <div class="help-table-cell">Generate AI content</div>
+                    </div>
+                    <div class="help-table-row">
+                        <div class="help-table-cell"><span class="keyboard-shortcut">Ctrl + Z</span></div>
+                        <div class="help-table-cell">Undo last change</div>
+                    </div>
+                    <div class="help-table-row">
+                        <div class="help-table-cell"><span class="keyboard-shortcut">Ctrl + Y</span></div>
+                        <div class="help-table-cell">Redo last change</div>
+                    </div>
+                </div>
+
+                <div class="help-tip mt-lg">
+                    <div class="help-tip-title">
+                        <i class="help-tip-icon">🎓</i>
+                        Pro Writing Tip
+                    </div>
+                    <div class="help-tip-content">
+                        Start each writing session by reading the last few paragraphs you wrote. This helps you reconnect with your story's voice and momentum before engaging the AI assistant.
+                    </div>
+                </div>
+
+                <div class="help-actions mt-lg">
+                    <a href="/ui/stories" class="help-action-button">
+                        📚 My Stories
+                    </a>
+                    <a href="/help/user_guide.html" class="help-action-button-secondary">
+                        📖 Full User Guide
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Helper function for quick actions
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    </script>
+</body>
+</html>
