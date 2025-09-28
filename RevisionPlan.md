@@ -2,7 +2,7 @@ Project Plan: Dynamic LLM Configurations - Final Status
 Overall Goal: To replace hardcoded LLM settings with a flexible, database-driven system for managing different AI model "presets," while ensuring accurate logging and a seamless user experience.
 Phase 1: Database and Data Foundation
 Status: ✅ COMPLETE
-Task 1.1: Create SQLAlchemy Model (ai_model_config.py) - The new table model was created and finalized.
+Task 1.1: Create SQLAlchemy Modelf (ai_model_config.py) - The new table model was created and finalized.
 Task 1.2: Update Call Log Model (ai_cost_log.py) - The logging table was updated with the new foreign key and prompt field.
 Task 1.3: Create Pydantic Schemas - New schemas for AIModelConfigurationRead and updated AICallLogCreate were created.
 Task 1.4: Run Database Migration - Alembic was used to generate and successfully apply the schema changes to the database.
