@@ -78,6 +78,33 @@ class UserRead(UserBase):
     is_admin: Optional[bool] = False
     created_at: datetime
     updated_at: datetime
+    
+    # New fields for token response
+    access_token: Optional[str] = Field(None, description="JWT access token")
+    refresh_token: Optional[str] = Field(None, description="JWT refresh token")
+    token_type: Optional[str] = Field(None, description="Type of the token (e.g., bearer)")
+
+    class Config:
+        # Enables compatibility with ORM models (like SQLAlchemy).
+        # Allows Pydantic to read data directly from ORM object attributes.
+        # Replaces `orm_mode = True` from Pydantic v1.
+        from_attributes = True
+
+class UserToken(BaseModel):
+    """
+    Schema for returning tokens after successful login or refresh.
+    Matches the required fields from the migration document's Phase 3.1.
+    """
+    access_token: str = Field(..., description="JWT access token")
+    refresh_token: Optional[str] = Field(None, description="JWT refresh token")
+    token_type: str = Field("bearer", description="Type of the token")
+    expires_in: int = Field(..., description="Access token expiry in seconds")
+
+class UserTokenWithDetails(UserToken):
+    """
+    Includes user details along with the token. Useful for initial login response.
+    """
+    user: UserRead
 
     class Config:
         # Enables compatibility with ORM models (like SQLAlchemy).

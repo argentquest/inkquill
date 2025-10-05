@@ -54,13 +54,15 @@ from app.services import sk_kernel_instance
 
 # --- API Router imports ---
 from app.routers import (
-    auth, 
+    auth,
     oauth,  # OAuth router
-    users, 
-    story, 
+    users,
+    dashboard,  # Dashboard API router
+    batch,  # Batch operations router
+    story,
     basic_stories,  # Basic stories router
-    document_upload, 
-    ai_assisted_writing, 
+    document_upload,
+    ai_assisted_writing,
     ai_scene_writing,
     prompt as prompt_api_router,
     story_wizard_api,
@@ -280,6 +282,8 @@ api_v1_prefix = settings.API_V1_STR
 app.include_router(auth.router, prefix=api_v1_prefix)
 app.include_router(oauth.router, prefix=api_v1_prefix)  # OAuth routes
 app.include_router(users.router, prefix=api_v1_prefix)
+app.include_router(dashboard.router)  # Dashboard API router
+app.include_router(batch.router)  # Batch operations router
 app.include_router(interview.router)  # Interview router (includes own prefix)
 app.include_router(welcome_interview.router)  # Welcome interview router (includes own prefix)
 

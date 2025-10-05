@@ -15,9 +15,8 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# --- REVERTED: oauth2_scheme is defined back in this file ---
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
-# --- END REVERT ---
+# OAuth2 scheme for Bearer token authentication (API access)
+oauth2_bearer_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_local() as session:
@@ -116,5 +115,76 @@ async def get_current_user_with_anonymous_support(
                 return user
         except (ValueError, Exception) as e:
             logger.warning(f"Invalid anonymous user cookie: {e}")
-    
+
     return None
+
+# --- Bearer Token Authentication Functions ---
+async def get_current_user_from_bearer_token(
+    token: str = Depends(oauth2_bearer_scheme),
+    db: AsyncSession = Depends(get_db_session)
+) -> Optional[User]:
+    """
+    Get current user from Bearer token (for API authentication).
+    Validates JWT access token and checks refresh token validity.
+    """
+    try:
+        # Decode the access token
+        payload: Optional[Dict[str, Any]] = await security.decode_access_token(token=token)
+
+        if payload is None:
+            logger.warning("Bearer token decoding returned None (invalid, expired, or error during decoding).")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired access token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        # Extract user info from token
+        username_from_payload: Optional[str] = payload.get("sub")
+        user_id_from_payload: Optional[int] = payload.get("user_id")
+
+        if username_from_payload is None or user_id_from_payload is None:
+            logger.warning("Username or user_id not found in Bearer token payload.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        # Get user from database
+        user = await crud_user.get_user_by_username(db, username=username_from_payload)
+        if user is None:
+            logger.warning(f"User '{username_from_payload}' from Bearer token not found in database.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        return user
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error processing Bearer token: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+async def get_current_active_user_from_bearer_token(
+    current_user: User = Depends(get_current_user_from_bearer_token)
+) -> User:
+    """
+    Get current active user from Bearer token, ensuring user is active.
+    """
+    if not current_user.is_active:
+        logger.warning(f"Attempt to access protected route by inactive user: {current_user.username}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user"
+        )
+
+    logger.debug(f"Active user '{current_user.username}' authenticated via Bearer token.")
+    return current_user

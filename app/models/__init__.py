@@ -4,6 +4,7 @@
 # and ending with models that have foreign keys to others.
 
 from .user import User
+from .refresh_token import RefreshToken
 from .prompt import Prompt, PromptTypeEnum, AgeTargetEnum
 from .ai_model_config import AIModelConfiguration, AIProviderEnum, AIModelTypeEnum
 from .job_status import JobStatus

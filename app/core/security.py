@@ -9,13 +9,17 @@ import logging
 
 # --- Core Application Imports ---
 from app.core.config import settings
+from app.schemas.user import UserToken
 
 logger = logging.getLogger(__name__)
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 ALGORITHM = settings.AUTH_ALGORITHM
-SECRET_KEY = settings.AUTH_SECRET_KEY 
+SECRET_KEY = settings.AUTH_SECRET_KEY
+# Token expiration settings (with defaults)
+ACCESS_TOKEN_EXPIRE_MINUTES = getattr(settings, 'AUTH_ACCESS_TOKEN_EXPIRE_MINUTES', 60 * 24 * 7)  # 7 days default
+REFRESH_TOKEN_EXPIRE_DAYS = getattr(settings, 'REFRESH_TOKEN_EXPIRE_DAYS', 30)  # 30 days default 
 
 class JWTError(Exception):
     """Custom exception for JWT related errors."""
@@ -56,6 +60,55 @@ def create_access_token(
     except JoseJWTError as e:
         logger.error(f"Error encoding JWT: {e}", exc_info=True)
         raise JWTError(f"Could not create access token: {str(e)}") from e
+
+def create_access_token_and_refresh_token(
+    user_id: int, 
+    ip_address: Optional[str] = None, 
+    user_agent: Optional[str] = None,
+    db: Optional[Any] = None # Should be AsyncSession, but Any for now to avoid circular dependency import
+) -> UserToken:
+    """
+    Creates a JWT access token and a database-backed refresh token.
+    """
+    
+    # 1. Create JWT Access Token
+    access_token_payload = {
+        "sub": str(user_id)
+    }
+    access_token = create_access_token(
+        data=access_token_payload, 
+        expires_delta=timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    
+    # 2. Create Refresh Token (Database-backed)
+    # Lazy import to avoid circular dependency
+    if db is None:
+        logger.warning("Database session not provided for token creation. Cannot create refresh token.")
+        refresh_token_value = None
+    else:
+        from app.crud.refresh_token import refresh_token_crud
+        
+        try:
+            db_refresh_token = refresh_token_crud.create(
+                db=db,
+                user_id=user_id,
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
+            refresh_token_value = db_refresh_token.token
+        except Exception as e:
+            # Need to catch any database errors if the commit fails.
+            logger.error(f"Failed to create refresh token for user {user_id}: {e}", exc_info=True)
+            refresh_token_value = None
+            
+    
+    # 3. Return the combined token response model
+    return UserToken(
+        access_token=access_token,
+        refresh_token=refresh_token_value,
+        token_type="bearer",
+        expires_in=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES * 60 # Convert minutes to seconds
+    )
 
 
 async def decode_access_token(token: str) -> Optional[Dict[str, Any]]:

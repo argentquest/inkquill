@@ -62,3 +62,10 @@ class ReferralTrackingResponse(BaseModel):
     reward_given: bool = False
     reward_amount: int = 0
     referral_id: Optional[int] = None
+
+
+class ReferralCodeResponse(BaseModel):
+    """Response containing user's referral code."""
+    referral_code: str = Field(..., description="The referral code for this user")
+    created_at: Optional[datetime] = Field(None, description="When the referral code was first used")
+    usage_count: int = Field(default=0, description="How many times this code has been used")

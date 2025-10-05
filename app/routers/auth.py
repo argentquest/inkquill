@@ -12,6 +12,7 @@ import uuid
 
 # --- Core Application Imports ---
 from app.schemas import user as schema_user
+from app.schemas.base import ApiResponse
 from app.crud import user as crud_user
 from app.core import security 
 from app.core.deps import get_db_session, get_current_active_user 
@@ -35,7 +36,7 @@ class PasswordResetConfirm(BaseModel):
     token: str
     new_password: str
 
-@router.post("/register", response_model=schema_user.UserRead, status_code=status.HTTP_201_CREATED, name="register_new_user", summary="Register a new user account.")
+@router.post("/register", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="register_new_user", summary="Register a new user account.")
 async def register_new_user(user_in: schema_user.UserCreate, response: Response, request: Request, db: AsyncSession = Depends(get_db_session)):
     logger.info(f"Attempting registration for username: {user_in.username}, email: {user_in.email}")
     
@@ -126,7 +127,7 @@ async def register_new_user(user_in: schema_user.UserCreate, response: Response,
                 logger.error(f"Failed to send welcome email to {created_user.email}: {email_error}")
                 # Don't fail registration if email fails
         
-        return created_user
+        return ApiResponse.success_response(data=created_user)
     except Exception as e:
         await db.rollback() 
         logger.error(f"Error during user registration for '{user_in.username}': {e}", exc_info=True)

@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from .blog_view import BlogView
     from .blog_author_profile import BlogAuthorProfile
     from .blog_subscription import BlogSubscription 
+    from .refresh_token import RefreshToken
 
 class User(Base):
     __tablename__ = "users"
@@ -279,6 +280,13 @@ class User(Base):
     # Blog subscriptions
     blog_subscriptions: Mapped[List["BlogSubscription"]] = relationship(
         "BlogSubscription",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # Refresh tokens relationship
+    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
+        "RefreshToken",
         back_populates="user",
         cascade="all, delete-orphan"
     )
