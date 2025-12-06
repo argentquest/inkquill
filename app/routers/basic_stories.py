@@ -12,6 +12,7 @@ from app.services.story_service import story_service, BasicStoryCreate
 from app.services.basic_story_ai_service import basic_story_ai_service
 from app.services.anonymous_user_service import anonymous_user_service
 from app.schemas.story import StoryResponse, BasicStoryCreateResponse
+from app.schemas.base import ApiResponse
 from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
@@ -122,7 +123,7 @@ class StoryUpgradeRequest:
         self.new_world_name = new_world_name
 
 
-@router.post("/create", response_model=BasicStoryCreateResponse)
+@router.post("/create", response_model=ApiResponse)
 async def create_basic_story(
     request_data: dict,  # Using dict for now, can create Pydantic model later
     request: Request,
@@ -198,7 +199,7 @@ async def create_basic_story(
 
 
 
-@router.get("/{story_id}", response_model=StoryResponse)
+@router.get("/{story_id}", response_model=ApiResponse)
 async def get_basic_story(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -247,7 +248,7 @@ async def get_basic_story(
         )
 
 
-@router.put("/{story_id}", response_model=StoryResponse)
+@router.put("/{story_id}", response_model=ApiResponse)
 async def update_basic_story(
     story_id: int,
     request_data: dict,  # Using dict for now
@@ -266,7 +267,8 @@ async def update_basic_story(
         from app.crud import story as story_crud
         from app.crud import act as act_crud
         from app.schemas.story import StoryUpdate
-        
+        from app.schemas.base import ApiResponse
+
         # Get and validate story
         story = await story_crud.get_story_for_user(db, story_id, current_user.id)
         if not story:
@@ -761,7 +763,7 @@ async def publish_basic_story(
         )
 
 
-@router.post("/{story_id}/upgrade", response_model=StoryResponse)
+@router.post("/{story_id}/upgrade", response_model=ApiResponse)
 async def upgrade_story_to_advanced(
     story_id: int,
     request: dict,  # Using dict for now
@@ -813,7 +815,7 @@ async def upgrade_story_to_advanced(
         )
 
 
-@router.get("/list", response_model=List[StoryResponse])
+@router.get("/list", response_model=ApiResponse)
 async def list_basic_stories(
     skip: int = 0,
     limit: int = 100,

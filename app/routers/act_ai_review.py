@@ -13,6 +13,7 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User as ModelUser
 from app.models.act import Act as ModelAct
 from app.schemas.ai_review import ActAIReviewResponse
+from app.schemas.base import ApiResponse
 from app.core.config import settings
 
 # --- FIX: Import the model cache and new dependencies ---
@@ -93,7 +94,7 @@ def _format_linked_elements_for_prompt(elements: List[Dict[str, Any]], element_t
         
     return f"Key {element_type_name}s for this Story:\n" + "\n".join(formatted_list)
 
-@router.post("/review", response_model=ActAIReviewResponse, name="trigger_ai_review_for_act_content")
+@router.post("/review", response_model=ApiResponse, name="trigger_ai_review_for_act_content")
 async def trigger_ai_review_for_act_content_api(
     payload: AIReviewRequestPayload, 
     db_act: ModelAct = Depends(get_act_and_verify_ownership), 

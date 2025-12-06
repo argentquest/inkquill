@@ -17,6 +17,7 @@ from app.models.location import Location as ModelLocation
 from app.models.story import Story as ModelStory
 from app.models.uploaded_document import UploadedDocument, SourceElementTypeEnum
 from app.schemas.location import LocationCreate, LocationRead, LocationUpdate, StoryLocationLinkCreate, LocationInStoryRead
+from app.schemas.base import ApiResponse
 from app.schemas.image import GeneratedImageRead
 from app.crud import generated_image as crud_generated_image
 from app.crud import location as crud_location
@@ -66,7 +67,7 @@ async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_
 
 # ... (create, get_single, update, delete endpoints remain the same) ...
 
-@router_world_locations.post("/", response_model=LocationRead, status_code=status.HTTP_201_CREATED, name="create_new_location_for_world")
+@router_world_locations.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_location_for_world")
 async def create_new_location_for_world(
     world_id: int,
     location_in: LocationCreate,
@@ -101,7 +102,7 @@ async def create_new_location_for_world(
         logger.error(f"Error creating location '{location_in.name}': {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Could not create location.")
 
-@router_world_locations.get("/", response_model=List[LocationRead])
+@router_world_locations.get("/", response_model=ApiResponse)
 async def list_locations_in_world(
     world_id: int,
     skip: int = Query(0, ge=0),
@@ -126,7 +127,7 @@ async def list_locations_in_world(
         
     return response_locations
 
-@router_locations.get("/{location_id}", response_model=LocationRead, name="get_single_location")
+@router_locations.get("/{location_id}", response_model=ApiResponse, name="get_single_location")
 async def get_single_location(
     db_location: ModelLocation = Depends(get_location_and_verify_ownership),
     blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
@@ -136,7 +137,7 @@ async def get_single_location(
     loc_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     return loc_read
 
-@router_locations.put("/{location_id}", response_model=LocationRead, name="update_existing_location")
+@router_locations.put("/{location_id}", response_model=ApiResponse, name="update_existing_location")
 async def update_existing_location(
     location_in: LocationUpdate,
     background_tasks: BackgroundTasks,
@@ -197,7 +198,7 @@ async def delete_existing_location(
         logger.error(f"Error deleting location ID {db_location.id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Could not delete location.")
 
-@router_locations.get("/{location_id}/images", response_model=List[GeneratedImageRead])
+@router_locations.get("/{location_id}/images", response_model=ApiResponse)
 async def list_images_for_location(
     location: ModelLocation = Depends(get_location_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
@@ -207,7 +208,7 @@ async def list_images_for_location(
     )
     return images
 
-@router_locations.post("/{location_id}/set-current-image/{image_id}", response_model=LocationRead)
+@router_locations.post("/{location_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_location(
     location: ModelLocation = Depends(get_location_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
@@ -262,7 +263,7 @@ async def unlink_location_from_story_endpoint(
     await db.commit()
     return
 
-@router_story_locations.get("/", response_model=List[LocationInStoryRead], name="list_locations_for_story")
+@router_story_locations.get("/", response_model=ApiResponse, name="list_locations_for_story")
 async def list_locations_for_story_endpoint(
     story_id: int,
     db_story: ModelStory = Depends(get_story_and_verify_ownership),
@@ -288,7 +289,7 @@ async def list_locations_for_story_endpoint(
     return response_locations
     # --- END FIX ---
 
-@router_locations.get("/{location_id}/generated-rag-content", response_model=RAGContentResponse, name="get_location_generated_rag_content")
+@router_locations.get("/{location_id}/generated-rag-content", response_model=ApiResponse, name="get_location_generated_rag_content")
 async def get_location_generated_rag_content_endpoint(
     db_location: ModelLocation = Depends(get_location_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session),

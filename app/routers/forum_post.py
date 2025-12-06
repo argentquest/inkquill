@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session, get_current_user
 from app.models.user import User
 from app.models.forum import VoteType
+from app.schemas.base import ApiResponse
 from app.schemas.forum import (
     ForumPostCreate,
     ForumPostUpdate,
@@ -18,7 +19,7 @@ from app.crud import forum_post as crud_post
 router = APIRouter(prefix="/api/forum/posts", tags=["forum_posts"])
 
 
-@router.get("/thread/{thread_id}", response_model=List[ForumPostResponse])
+@router.get("/thread/{thread_id}", response_model=ApiResponse)
 async def get_thread_posts(
     thread_id: int,
     skip: int = 0,
@@ -113,7 +114,7 @@ async def get_thread_posts(
     return response_posts
 
 
-@router.get("/user/{user_id}", response_model=List[ForumPostResponse])
+@router.get("/user/{user_id}", response_model=ApiResponse)
 async def get_user_posts(
     user_id: int,
     skip: int = 0,
@@ -158,7 +159,7 @@ async def get_user_posts(
     return response_posts
 
 
-@router.get("/{post_id}", response_model=ForumPostResponse)
+@router.get("/{post_id}", response_model=ApiResponse)
 async def get_post(
     post_id: int,
     current_user: Optional[User] = Depends(get_current_user),
@@ -207,7 +208,7 @@ async def get_post(
     )
 
 
-@router.post("/", response_model=ForumPostResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_post(
     post: ForumPostCreate,
     current_user: User = Depends(get_current_user),
@@ -255,7 +256,7 @@ async def create_post(
         )
 
 
-@router.put("/{post_id}", response_model=ForumPostResponse)
+@router.put("/{post_id}", response_model=ApiResponse)
 async def update_post(
     post_id: int,
     post_update: ForumPostUpdate,
@@ -364,7 +365,7 @@ async def vote_on_post(
         )
 
 
-@router.get("/user/{user_id}/stats", response_model=UserForumStats)
+@router.get("/user/{user_id}/stats", response_model=ApiResponse)
 async def get_user_forum_stats(
     user_id: int,
     db: AsyncSession = Depends(get_db_session)

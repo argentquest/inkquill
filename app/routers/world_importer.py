@@ -18,6 +18,7 @@ from app.processing.importer_jobs import create_world_and_extract_elements_from_
 from app.crud import job_status as crud_job_status
 from app.models.job_status import JobTypeEnum
 from app.schemas.general import JobSubmissionResponse
+from app.schemas.base import ApiResponse
 from app.schemas.job_status import JobStatusRead
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class WorldImportResponse(BaseModel):
 
 @router.post(
     "/import-from-book-title", 
-    response_model=JobSubmissionResponse,
+    response_model=ApiResponse,
     status_code=status.HTTP_202_ACCEPTED, 
     summary="Generate and import a world definition based on a book title."
 )
@@ -83,7 +84,7 @@ async def import_world_from_book_api(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not start world import job.")
 
 
-@router.post("/import/create-from-document", response_model=JobSubmissionResponse, status_code=status.HTTP_202_ACCEPTED, name="create_world_from_document_api")
+@router.post("/import/create-from-document", response_model=ApiResponse, status_code=status.HTTP_202_ACCEPTED, name="create_world_from_document_api")
 async def create_world_from_document_api(
     background_tasks: BackgroundTasks,
     world_name: str = Form(...),
@@ -141,7 +142,7 @@ async def create_world_from_document_api(
             shutil.rmtree(temp_dir, ignore_errors=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to start world creation process.")
 
-@router.get("/import/job-status/{job_id}", response_model=JobStatusRead, name="get_job_status")
+@router.get("/import/job-status/{job_id}", response_model=ApiResponse, name="get_job_status")
 async def get_job_status_api(
     job_id: str,
     current_user: User = Depends(get_current_active_user),

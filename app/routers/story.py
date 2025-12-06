@@ -25,6 +25,7 @@ from app.models.user import User
 from app.models.story import Story 
 from app.models.published_story import PublishedStory
 from app.schemas import story as schema_story
+from app.schemas.base import ApiResponse, ApiMeta
 from app.crud import story as crud_story
 from app.crud import act as crud_act
 from app.crud import scene as crud_scene
@@ -112,7 +113,7 @@ class StoryPublishResponse(BaseModel):
 
 # --- API Endpoint Definitions ---
 
-@router.post("/", response_model=schema_story.StoryRead, status_code=status.HTTP_201_CREATED, name="create_new_story", summary="Create a new story for the authenticated user.")
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_story", summary="Create a new story for the authenticated user.")
 async def create_new_story(
     story: schema_story.StoryCreate,
     db: AsyncSession = Depends(get_db_session),
@@ -122,7 +123,7 @@ async def create_new_story(
     try:
         from app.crud import world as crud_world
         from app.schemas.world import WorldCreate
-        
+
         # If creating an advanced story and no world_id is provided (or world_id is None/0), create a generic world first
         if story.story_type == 'advanced' and (story.world_id is None or story.world_id == 0):
             logger.info(f"Creating generic world for advanced story for user '{current_user.username}'")
@@ -155,7 +156,7 @@ async def create_new_story(
         await db.commit()
         await db.refresh(created_story)
         logger.info(f"Story '{created_story.title}' (ID: {created_story.id}) created successfully for user ID: {current_user.id} with world_id: {created_story.world_id}")
-        return created_story
+        return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(created_story))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating story '{story.title}' for user '{current_user.username}': {e}", exc_info=True)
@@ -164,7 +165,7 @@ async def create_new_story(
             detail="An unexpected error occurred while creating the story."
         )
 
-@router.get("/", response_model=List[schema_story.StoryRead], name="list_user_stories", summary="List all stories for the authenticated user.")
+@router.get("/", response_model=ApiResponse, name="list_user_stories", summary="List all stories for the authenticated user.")
 async def list_user_stories(
     skip: int = Query(0, ge=0, description="Number of records to skip for pagination."),
     limit: int = Query(100, ge=1, le=200, description="Maximum number of records to return."),
@@ -174,9 +175,12 @@ async def list_user_stories(
     logger.info(f"User '{current_user.username}' listing their stories (skip: {skip}, limit: {limit}).")
     stories = await crud_story.get_stories_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
     logger.info(f"Found {len(stories)} stories for user '{current_user.username}'.")
-    return stories
+    return ApiResponse.success_response(
+        data=[schema_story.StoryRead.from_orm(s) for s in stories],
+        meta=ApiMeta(page=skip // limit + 1 if limit > 0 else 1, limit=limit, total=len(stories))
+    )
 
-@router.get("/{story_id}", response_model=schema_story.StoryRead, name="get_single_story", summary="Get a specific story by ID.")
+@router.get("/{story_id}", response_model=ApiResponse, name="get_single_story", summary="Get a specific story by ID.")
 async def get_single_story(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -190,9 +194,9 @@ async def get_single_story(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Story not found or not accessible by the current user."
         )
-    return db_story
+    return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(db_story))
 
-@router.put("/{story_id}", response_model=schema_story.StoryRead, name="update_existing_story", summary="Update an existing story.")
+@router.put("/{story_id}", response_model=ApiResponse, name="update_existing_story", summary="Update an existing story.")
 async def update_existing_story(
     story_id: int,
     story_update: schema_story.StoryUpdate,
@@ -234,12 +238,12 @@ async def update_existing_story(
                         logger.info(f"Story completion email sent successfully to {current_user.email} for story {story_id}")
                     else:
                         logger.warning(f"Failed to send story completion email to {current_user.email} for story {story_id}")
-                        
+
             except Exception as e:
                 logger.error(f"Error checking/sending story completion email: {e}")
                 # Don't fail the update operation if email fails
-        
-        return updated_story
+
+        return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(updated_story))
     except HTTPException:
         raise
     except Exception as e:
@@ -277,7 +281,7 @@ async def delete_existing_story(
         )
 
 # --- NEW PUBLISH STORY ENDPOINT ---
-@router.post("/{story_id}/publish", response_model=StoryPublishResponse, name="publish_story_to_html", summary="Compile story acts into an HTML file and upload it.")
+@router.post("/{story_id}/publish", response_model=ApiResponse, name="publish_story_to_html", summary="Compile story acts into an HTML file and upload it.")
 async def publish_story_to_html(
     story_id: int,
     request: StoryPublishRequest,
@@ -834,7 +838,7 @@ class StoryUpgradeRequest(BaseModel):
     """Request model for upgrading a Basic Story to Advanced"""
     world_id: Optional[int] = None  # If None, creates new world
 
-@router.post("/{story_id}/upgrade", response_model=schema_story.StoryRead)
+@router.post("/{story_id}/upgrade", response_model=ApiResponse)
 async def upgrade_story_to_advanced(
     story_id: int,
     upgrade_request: StoryUpgradeRequest,

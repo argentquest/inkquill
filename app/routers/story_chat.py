@@ -13,6 +13,7 @@ from app.core.deps_ws import get_current_user_from_ws_ticket
 from app.models.user import User
 from app.models.story import Story
 from app.services.story_chat_service import StoryChatService
+from app.schemas.base import ApiResponse
 from app.schemas.story_chat import (
     StoryChatSessionCreate, SendStoryChatMessageRequest,
     StoryChatSessionRead, StoryChatSessionWithMessages
@@ -67,7 +68,7 @@ story_chat_manager = StoryChatConnectionManager()
 
 # --- REST API Endpoints ---
 
-@router.post("/stories/{story_id}/sessions", response_model=StoryChatSessionRead)
+@router.post("/stories/{story_id}/sessions", response_model=ApiResponse)
 async def create_chat_session(
     story_id: int,
     session_data: StoryChatSessionCreate,
@@ -88,7 +89,7 @@ async def list_chat_sessions(
     service = StoryChatService(db)
     return await service.get_sessions(story_id, current_user.id)
 
-@router.get("/stories/{story_id}/sessions/{session_id}", response_model=StoryChatSessionWithMessages)
+@router.get("/stories/{story_id}/sessions/{session_id}", response_model=ApiResponse)
 async def get_chat_session(
     story_id: int,
     session_id: int,

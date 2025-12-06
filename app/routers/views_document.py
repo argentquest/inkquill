@@ -13,6 +13,7 @@ from app.crud import document as crud_document
 from app.crud import world as crud_world
 # <<< MODIFICATION: Import the Pydantic schema >>>
 from app.schemas.document import UploadedDocumentRead
+from app.schemas.base import ApiResponse
 from app.core.config import settings
 import logging
 

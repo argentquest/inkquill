@@ -13,6 +13,7 @@ from app.models.published_story import PublishedStory
 from app.models.story import Story
 from app.models.story_rating import StoryRating
 from app.models.story_comment import StoryComment
+from app.schemas.base import ApiResponse
 from app.schemas.published_story import (
     PublishedStoryRead, 
     PublishedStoryList,
@@ -31,7 +32,7 @@ router = APIRouter(
     tags=["published-stories"]
 )
 
-@router.get("/", response_model=PublishedStoryList, name="list_published_stories")
+@router.get("/", response_model=ApiResponse, name="list_published_stories")
 async def list_published_stories(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
@@ -105,7 +106,7 @@ async def list_published_stories(
         per_page=per_page
     )
 
-@router.get("/{story_id}", response_model=PublishedStoryDetail, name="get_published_story")
+@router.get("/{story_id}", response_model=ApiResponse, name="get_published_story")
 async def get_published_story(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -159,7 +160,7 @@ async def get_published_story(
     
     return story_detail
 
-@router.post("/{story_id}/rate", response_model=StoryRatingRead, name="rate_published_story")
+@router.post("/{story_id}/rate", response_model=ApiResponse, name="rate_published_story")
 async def rate_published_story(
     story_id: int,
     rating_data: StoryRatingCreate,
@@ -234,7 +235,7 @@ async def rate_published_story(
     
     return rating_read
 
-@router.get("/{story_id}/comments", response_model=List[StoryCommentRead], name="get_story_comments")
+@router.get("/{story_id}/comments", response_model=ApiResponse, name="get_story_comments")
 async def get_story_comments(
     story_id: int,
     db: AsyncSession = Depends(get_db_session)
@@ -274,7 +275,7 @@ async def get_story_comments(
     
     return comment_reads
 
-@router.post("/{story_id}/comments", response_model=StoryCommentRead, name="create_story_comment")
+@router.post("/{story_id}/comments", response_model=ApiResponse, name="create_story_comment")
 async def create_story_comment(
     story_id: int,
     comment_data: StoryCommentCreate,

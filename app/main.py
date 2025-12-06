@@ -221,11 +221,12 @@ logger.info("ProxyHeadersMiddleware added to trust X-Forwarded-* headers.")
 
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
-        CORSMiddleware, 
-        allow_origins=[str(o).strip() for o in settings.BACKEND_CORS_ORIGINS], 
-        allow_credentials=True, 
-        allow_methods=["*"], 
-        allow_headers=["*"]
+        CORSMiddleware,
+        allow_origins=[str(o).strip() for o in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["X-Total-Count", "X-Page", "X-Per-Page", "X-Pages"]  # For pagination metadata
     )
 logger.info(f"CORS configured for origins: {settings.BACKEND_CORS_ORIGINS}")
 

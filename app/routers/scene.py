@@ -15,6 +15,7 @@ from app.models.story import Story
 from app.models.scene import Scene
 from app.models.generated_image import GeneratedImage
 from app.schemas.scene import SceneCreate, SceneRead, SceneUpdate
+from app.schemas.base import ApiResponse
 from app.schemas.image import GeneratedImageRead
 from app.crud import scene as crud_scene
 from app.crud import story as crud_story
@@ -74,7 +75,7 @@ async def trigger_generate_scenes_for_act(
     return {"message": f"Scene generation started for Act '{db_act.title}'. Results will be available shortly."}
 
 
-@router_act_scenes.get("/", response_model=List[SceneRead], name="list_scenes_for_act")
+@router_act_scenes.get("/", response_model=ApiResponse, name="list_scenes_for_act")
 async def list_scenes_for_act(
     db_act: Act = Depends(get_act_and_verify_ownership), 
     skip: int = Query(0, ge=0),
@@ -83,7 +84,7 @@ async def list_scenes_for_act(
 ):
     return await crud_scene.get_scenes_by_act(db, act_id=db_act.id, skip=skip, limit=limit)
 
-@router_act_scenes.post("/", response_model=SceneRead, status_code=status.HTTP_201_CREATED, name="create_new_scene_for_act")
+@router_act_scenes.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_scene_for_act")
 async def create_new_scene_for_act(
     scene_in: SceneCreate, 
     db_act: Act = Depends(get_act_and_verify_ownership), 
@@ -103,11 +104,11 @@ async def create_new_scene_for_act(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create scene.")
 
 
-@router_scenes.get("/{scene_id}", response_model=SceneRead, name="get_single_scene")
+@router_scenes.get("/{scene_id}", response_model=ApiResponse, name="get_single_scene")
 async def get_single_scene(db_scene: Scene = Depends(get_scene_and_verify_ownership)):
     return db_scene
 
-@router_scenes.put("/{scene_id}", response_model=SceneRead, name="update_existing_scene")
+@router_scenes.put("/{scene_id}", response_model=ApiResponse, name="update_existing_scene")
 async def update_existing_scene(
     scene_in: SceneUpdate,
     db_scene: Scene = Depends(get_scene_and_verify_ownership),
@@ -146,7 +147,7 @@ async def delete_existing_scene(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not delete scene.")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router_scenes.get("/{scene_id}/images", response_model=List[GeneratedImageRead])
+@router_scenes.get("/{scene_id}/images", response_model=ApiResponse)
 async def list_images_for_scene(
     db_scene: Scene = Depends(get_scene_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
@@ -158,7 +159,7 @@ async def list_images_for_scene(
     logger.info(f"API: Found {len(images)} images for scene ID: {db_scene.id}")
     return images
 
-@router_scenes.post("/{scene_id}/set-current-image/{image_id}", response_model=SceneRead)
+@router_scenes.post("/{scene_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_scene(
     db_scene: Scene = Depends(get_scene_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),

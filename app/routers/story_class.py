@@ -8,6 +8,7 @@ import logging
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.schemas.story_class import StoryClassCreate, StoryClassUpdate, StoryClass, StoryClassOption
+from app.schemas.base import ApiResponse
 from app.crud import story_class as crud_story_class
 from app.crud import world as crud_world
 from app.crud import story as crud_story
@@ -21,7 +22,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=StoryClass, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_story_class(
     *,
     db: AsyncSession = Depends(get_db_session),
@@ -59,7 +60,7 @@ async def create_story_class(
     return story_class
 
 
-@router.get("/", response_model=List[StoryClass])
+@router.get("/", response_model=ApiResponse)
 async def list_story_classes(
     *,
     db: AsyncSession = Depends(get_db_session),
@@ -115,7 +116,7 @@ async def list_story_classes(
     return story_classes
 
 
-@router.get("/options", response_model=List[StoryClassOption])
+@router.get("/options", response_model=ApiResponse)
 async def list_story_class_options(
     *,
     db: AsyncSession = Depends(get_db_session),
@@ -168,7 +169,7 @@ async def list_story_class_options(
     return options
 
 
-@router.get("/{story_class_id}", response_model=StoryClass)
+@router.get("/{story_class_id}", response_model=ApiResponse)
 async def get_story_class(
     *,
     db: AsyncSession = Depends(get_db_session),
@@ -202,7 +203,7 @@ async def get_story_class(
     return story_class
 
 
-@router.put("/{story_class_id}", response_model=StoryClass)
+@router.put("/{story_class_id}", response_model=ApiResponse)
 async def update_story_class(
     *,
     db: AsyncSession = Depends(get_db_session),

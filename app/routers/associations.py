@@ -9,6 +9,7 @@ from app.models.user import User
 from app.models.story_associations import StoryCharacterAssociation, StoryLocationAssociation, StoryLoreItemAssociation
 from app.models.act_associations import ActCharacterAssociation, ActLocationAssociation, ActLoreItemAssociation
 from app.models.scene_associations import SceneCharacterAssociation, SceneLocationAssociation, SceneLoreItemAssociation
+from app.schemas.base import ApiResponse
 from app.schemas.story_associations import (
     StoryCharacterAssociationCreate, StoryCharacterAssociationRead, StoryCharacterAssociationUpdate,
     StoryLocationAssociationCreate, StoryLocationAssociationRead, StoryLocationAssociationUpdate,
@@ -69,7 +70,7 @@ async def get_role_suggestions(
 
 # === STORY ASSOCIATIONS ===
 
-@router.post("/story/{story_id}/character/{character_id}", response_model=StoryCharacterAssociationRead)
+@router.post("/story/{story_id}/character/{character_id}", response_model=ApiResponse)
 async def create_story_character_association(
     story_id: int,
     character_id: int,
@@ -127,7 +128,7 @@ async def create_story_character_association(
     
     return StoryCharacterAssociationRead.from_orm(db_association)
 
-@router.get("/story/{story_id}/characters", response_model=List[StoryCharacterAssociationRead])
+@router.get("/story/{story_id}/characters", response_model=ApiResponse)
 async def get_story_character_associations(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -150,7 +151,7 @@ async def get_story_character_associations(
     
     return [StoryCharacterAssociationRead.from_orm(assoc) for assoc in associations]
 
-@router.put("/story/{story_id}/character/{character_id}", response_model=StoryCharacterAssociationRead)
+@router.put("/story/{story_id}/character/{character_id}", response_model=ApiResponse)
 async def update_story_character_association(
     story_id: int,
     character_id: int,
@@ -222,7 +223,7 @@ async def delete_story_character_association(
 # === SIMILAR ENDPOINTS FOR LOCATIONS AND LORE ITEMS ===
 # I'll add the location and lore item endpoints following the same pattern
 
-@router.post("/story/{story_id}/location/{location_id}", response_model=StoryLocationAssociationRead)
+@router.post("/story/{story_id}/location/{location_id}", response_model=ApiResponse)
 async def create_story_location_association(
     story_id: int,
     location_id: int,
@@ -310,7 +311,7 @@ async def get_all_story_associations(
 
 # === ACT ASSOCIATIONS ===
 
-@router.post("/act/{act_id}/character/{character_id}", response_model=ActCharacterAssociationRead)
+@router.post("/act/{act_id}/character/{character_id}", response_model=ApiResponse)
 async def create_act_character_association(
     act_id: int,
     character_id: int,
@@ -453,7 +454,7 @@ async def get_all_scene_associations(
 
 # === LOCATION ASSOCIATIONS ===
 
-@router.post("/act/{act_id}/location/{location_id}", response_model=ActLocationAssociationRead)
+@router.post("/act/{act_id}/location/{location_id}", response_model=ApiResponse)
 async def create_act_location_association(
     act_id: int,
     location_id: int,
@@ -502,7 +503,7 @@ async def create_act_location_association(
     
     return ActLocationAssociationRead.from_orm(db_association)
 
-@router.post("/story/{story_id}/lore_item/{lore_item_id}", response_model=StoryLoreItemAssociationRead)
+@router.post("/story/{story_id}/lore_item/{lore_item_id}", response_model=ApiResponse)
 async def create_story_lore_item_association(
     story_id: int,
     lore_item_id: int,
@@ -549,7 +550,7 @@ async def create_story_lore_item_association(
 
 # === LORE ITEM ASSOCIATIONS ===
 
-@router.post("/act/{act_id}/lore_item/{lore_item_id}", response_model=ActLoreItemAssociationRead)
+@router.post("/act/{act_id}/lore_item/{lore_item_id}", response_model=ApiResponse)
 async def create_act_lore_item_association(
     act_id: int,
     lore_item_id: int,

@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session, get_current_user
 from app.models.user import User
 from app.models.forum import ThreadStatus
+from app.schemas.base import ApiResponse
 from app.schemas.forum import (
     ForumThreadCreate,
     ForumThreadUpdate,
@@ -19,7 +20,7 @@ from app.crud import forum_post as crud_post
 router = APIRouter(prefix="/api/forum/threads", tags=["forum_threads"])
 
 
-@router.get("/", response_model=List[ForumThreadListResponse])
+@router.get("/", response_model=ApiResponse)
 async def get_threads(
     category_id: Optional[int] = None,
     world_id: Optional[int] = None,
@@ -73,7 +74,7 @@ async def get_threads(
     return response_threads
 
 
-@router.get("/{thread_id}", response_model=ForumThreadDetailResponse)
+@router.get("/{thread_id}", response_model=ApiResponse)
 async def get_thread(
     thread_id: int,
     current_user: Optional[User] = Depends(get_current_user),
@@ -163,7 +164,7 @@ async def get_thread(
     return thread_response
 
 
-@router.post("/", response_model=ForumThreadDetailResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_thread(
     thread: ForumThreadCreate,
     current_user: User = Depends(get_current_user),
@@ -244,7 +245,7 @@ async def create_thread(
         )
 
 
-@router.put("/{thread_id}", response_model=ForumThreadListResponse)
+@router.put("/{thread_id}", response_model=ApiResponse)
 async def update_thread(
     thread_id: int,
     thread_update: ForumThreadUpdate,
@@ -308,7 +309,7 @@ async def delete_thread(
     return None
 
 
-@router.post("/{thread_id}/toggle-lock", response_model=ForumThreadListResponse)
+@router.post("/{thread_id}/toggle-lock", response_model=ApiResponse)
 async def toggle_thread_lock(
     thread_id: int,
     current_user: User = Depends(get_current_user),
@@ -350,7 +351,7 @@ async def toggle_thread_lock(
     )
 
 
-@router.post("/{thread_id}/toggle-pin", response_model=ForumThreadListResponse)
+@router.post("/{thread_id}/toggle-pin", response_model=ApiResponse)
 async def toggle_thread_pin(
     thread_id: int,
     current_user: User = Depends(get_current_user),

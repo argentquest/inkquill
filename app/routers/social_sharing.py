@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db_session, get_current_user
 from app.models.user import User
+from app.schemas.base import ApiResponse
 from app.schemas.social_share import (
     SocialShareCreate, SocialShareResponse,
     ShareUrlRequest, ShareUrlResponse,
@@ -25,7 +26,7 @@ def get_social_sharing_service(db: AsyncSession = Depends(get_db_session)) -> So
     return SocialSharingService(db, billing_service)
 
 
-@router.post("/share/url", response_model=ShareUrlResponse)
+@router.post("/share/url", response_model=ApiResponse)
 async def generate_share_url(
     request: ShareUrlRequest,
     url: str,
@@ -55,7 +56,7 @@ async def generate_share_url(
         )
 
 
-@router.post("/share/track", response_model=SocialShareResponse)
+@router.post("/share/track", response_model=ApiResponse)
 async def track_share(
     share_data: SocialShareCreate,
     request: Request,
@@ -106,7 +107,7 @@ async def get_daily_stats(
         )
 
 
-@router.get("/share/analytics", response_model=SocialShareAnalytics)
+@router.get("/share/analytics", response_model=ApiResponse)
 async def get_sharing_analytics(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,

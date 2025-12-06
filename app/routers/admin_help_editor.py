@@ -13,6 +13,7 @@ from typing import List, Dict
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.core.config import settings
+from app.schemas.base import ApiResponse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ async def help_editor_page(
     )
 
 
-@router.get("/files", response_model=List[Dict], name="admin_help_files_list")
+@router.get("/files", response_model=ApiResponse, name="admin_help_files_list")
 async def list_help_files(
     current_user: User = Depends(get_admin_user)
 ):
@@ -137,7 +138,7 @@ async def list_help_files(
         )
 
 
-@router.get("/file/{filename:path}", response_model=Dict, name="admin_get_help_file")
+@router.get("/file/{filename:path}", response_model=ApiResponse, name="admin_get_help_file")
 async def get_help_file_content(
     filename: str,
     current_user: User = Depends(get_admin_user)
@@ -177,7 +178,7 @@ async def get_help_file_content(
         )
 
 
-@router.post("/save", response_model=Dict, name="admin_save_help_file")
+@router.post("/save", response_model=ApiResponse, name="admin_save_help_file")
 async def save_help_file(
     data: Dict,
     current_user: User = Depends(get_admin_user)
@@ -223,7 +224,7 @@ async def save_help_file(
         )
 
 
-@router.post("/create", response_model=Dict, name="admin_create_help_file")
+@router.post("/create", response_model=ApiResponse, name="admin_create_help_file")
 async def create_help_file(
     data: Dict,
     current_user: User = Depends(get_admin_user)

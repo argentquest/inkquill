@@ -23,7 +23,7 @@ class TestWebSocketAIEndpoints:
         # This tests the endpoint structure and dependencies
 
         with patch('app.routers.ai_assisted_writing.get_current_user_from_ws_ticket') as mock_ws_auth, \
-             patch('app.crud.act.act_crud.get') as mock_get_act, \
+             patch('app.crud.act.get_act') as mock_get_act, \
              patch('app.services.ai_service.AIWritingService.generate_act_content') as mock_ai_generate:
 
             # Mock WebSocket ticket authentication

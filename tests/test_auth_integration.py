@@ -17,7 +17,7 @@ from app.models.user import User
 from app.crud.user import create_user, get_user_by_username
 
 # Test configuration
-BASE_URL = f"http://localhost:{settings.APP_PORT}"
+BASE_URL = settings.APP_URL
 
 @pytest.fixture(scope="session")
 async def setup_database():

@@ -8,6 +8,7 @@ from app.core.deps import get_db_session, get_current_active_user, get_current_u
 from app.models.user import User
 from app.crud.billing import billing_crud
 from app.services.billing_service import billing_service
+from app.schemas.base import ApiResponse
 from app.schemas.billing import (
     UserAccountResponse, 
     UserTransactionResponse, 
@@ -22,7 +23,7 @@ from app.crud import ai_cost_log as crud_ai_cost
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/billing", tags=["billing"])
 
-@router.get("/account", response_model=UserAccountResponse)
+@router.get("/account", response_model=ApiResponse)
 async def get_user_account(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -50,7 +51,7 @@ async def get_user_balance(
         logger.error(f"Error getting balance for user {current_user.id if current_user else 'unknown'}: {e}")
         return {"balance": 0.0, "currency": "Coins", "error": str(e)}
 
-@router.get("/transactions", response_model=List[UserTransactionResponse])
+@router.get("/transactions", response_model=ApiResponse)
 async def get_user_transactions(
     limit: int = 50,
     offset: int = 0,
@@ -62,7 +63,7 @@ async def get_user_transactions(
     transactions = await billing_crud.get_user_transactions(db, account.id, limit, offset)
     return transactions
 
-@router.get("/packages", response_model=List[CreditPackageResponse])
+@router.get("/packages", response_model=ApiResponse)
 async def get_credit_packages(db: AsyncSession = Depends(get_db_session)):
     """Get available credit packages"""
     packages = await billing_crud.get_active_credit_packages(db)
@@ -87,7 +88,7 @@ async def add_credits(
     
     return result
 
-@router.get("/dashboard", response_model=BillingDashboardResponse)
+@router.get("/dashboard", response_model=ApiResponse)
 async def get_billing_dashboard(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -103,7 +104,7 @@ async def get_billing_dashboard(
         available_packages=available_packages
     )
 
-@router.get("/balance-check/{required_amount}", response_model=BalanceCheckResponse)
+@router.get("/balance-check/{required_amount}", response_model=ApiResponse)
 async def check_balance(
     required_amount: Decimal,
     current_user: User = Depends(get_current_active_user),
@@ -119,7 +120,7 @@ async def check_balance(
         required_amount=required_amount
     )
 
-@router.get("/ai-costs/recent", response_model=RecentAICostResponse)
+@router.get("/ai-costs/recent", response_model=ApiResponse)
 async def get_recent_ai_costs(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -169,7 +170,7 @@ async def get_recent_ai_costs(
             last_call_time=None
         )
 
-@router.get("/ai-costs/last", response_model=LastAICallResponse)
+@router.get("/ai-costs/last", response_model=ApiResponse)
 async def get_last_ai_call(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)

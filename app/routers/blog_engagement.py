@@ -11,6 +11,7 @@ from app.models.blog_post import BlogPost
 from app.models.blog_like import BlogLike
 from app.models.blog_follow import BlogFollow
 from app.schemas.blog import BlogPostRead
+from app.schemas.base import ApiResponse
 from app.services.blog_service import blog_service
 
 logger = logging.getLogger(__name__)
@@ -243,7 +244,7 @@ async def get_follow_status(
         )
 
 
-@router.get("/my-liked-posts", response_model=List[BlogPostRead])
+@router.get("/my-liked-posts", response_model=ApiResponse)
 async def get_my_liked_posts(
     skip: int = 0,
     limit: int = 20,
@@ -283,7 +284,7 @@ async def get_my_liked_posts(
         )
 
 
-@router.get("/following-posts", response_model=List[BlogPostRead])
+@router.get("/following-posts", response_model=ApiResponse)
 async def get_following_posts(
     skip: int = 0,
     limit: int = 20,

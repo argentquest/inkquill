@@ -22,6 +22,7 @@ from app.models.location import Location as ModelLocation
 from app.models.lore_item import LoreItem as ModelLoreItem, LoreItemCategoryEnum
 from app.models.uploaded_document import UploadedDocument as ModelUploadedDocument
 from app.schemas.character import CharacterRead, CharacterGeneratorInput, CharacterGeneratorResult
+from app.schemas.base import ApiResponse
 from app.schemas.location import LocationRead
 from app.schemas.lore_item import LoreItemRead
 from app.schemas.world import WorldRead

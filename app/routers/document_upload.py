@@ -16,6 +16,7 @@ import logging
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User as ModelUser
 from app.schemas.document import UploadedDocumentCreate, UploadedDocumentRead
+from app.schemas.base import ApiResponse
 from app.models.uploaded_document import DocumentStatus, SourceElementTypeEnum
 from app.crud import document as crud_document_db
 from app.core.config import settings
@@ -43,7 +44,7 @@ ALLOWED_EXTENSIONS = [".pdf", ".txt", ".docx"]
 
 @router.post(
     "/upload", 
-    response_model=JobSubmissionResponse,
+    response_model=ApiResponse,
     status_code=status.HTTP_202_ACCEPTED,
     # <<< MODIFICATION: Added name attribute to match the template's url_for call >>>
     name="upload_document_for_rag",

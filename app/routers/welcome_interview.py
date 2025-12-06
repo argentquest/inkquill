@@ -17,6 +17,7 @@ from app.crud import user as crud_user
 from app.crud import ai_model_config as ai_model_crud
 from app.crud.billing import billing_crud
 from app.schemas.billing import UserTransactionCreate
+from app.schemas.base import ApiResponse
 from app.services.semantic_kernel_setup import kernel
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
@@ -52,7 +53,7 @@ class BonusResponse(BaseModel):
     already_claimed: bool = Field(..., description="Whether bonus was already claimed")
 
 
-@router.post("/analyze", response_model=Dict[str, Any])
+@router.post("/analyze", response_model=ApiResponse)
 async def analyze_interview(
     request: AnalysisRequest,
     current_user: User = Depends(get_current_active_user),
@@ -372,7 +373,7 @@ async def get_bonus_status(
         )
 
 
-@router.post("/claim-bonus", response_model=BonusResponse)
+@router.post("/claim-bonus", response_model=ApiResponse)
 async def claim_bonus(
     request: BonusRequest,
     current_user: User = Depends(get_current_active_user),

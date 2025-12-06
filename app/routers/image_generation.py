@@ -31,6 +31,7 @@ from app.models.act import Act
 from app.crud import job_status as crud_job_status
 from app.crud import prompt as crud_prompt
 from app.schemas.general import JobSubmissionResponse
+from app.schemas.base import ApiResponse
 from app.services.billing_service import billing_service
 from app.models.prompt import PromptTypeEnum
 
@@ -463,7 +464,7 @@ async def generate_and_save_image_task(
             await credential_for_storage_async.close()
 
 
-@router.post("/", response_model=JobSubmissionResponse, status_code=status.HTTP_202_ACCEPTED)
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_202_ACCEPTED)
 async def handle_image_generation_request(
     request: ImageGenerationRequest,
     background_tasks: BackgroundTasks,
@@ -1112,7 +1113,7 @@ async def upload_image(
         )
 
 
-@router.get("/{entity_type}/{entity_id}", response_model=List[ImageResponse])
+@router.get("/{entity_type}/{entity_id}", response_model=ApiResponse)
 async def get_entity_images(
     entity_type: str,
     entity_id: int,
@@ -1176,7 +1177,7 @@ async def get_entity_images(
     return image_list
 
 
-@router.post("/{entity_type}/{entity_id}/set-current/{image_id}", response_model=SetCurrentImageResponse)
+@router.post("/{entity_type}/{entity_id}/set-current/{image_id}", response_model=ApiResponse)
 async def set_current_image(
     entity_type: str,
     entity_id: int,

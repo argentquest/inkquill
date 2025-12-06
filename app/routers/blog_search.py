@@ -7,13 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session
 from app.services.blog_search_service import blog_search_service
 from app.schemas.blog import BlogPostRead
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/search", tags=["blog-search"])
 
 
-@router.get("/", response_model=List[BlogPostRead])
+@router.get("/", response_model=ApiResponse)
 async def search_blog_posts(
     q: str = Query(..., min_length=1, description="Search query"),
     skip: int = Query(0, ge=0),
@@ -74,7 +75,7 @@ async def get_search_suggestions(
         )
 
 
-@router.get("/related/{post_id}", response_model=List[BlogPostRead])
+@router.get("/related/{post_id}", response_model=ApiResponse)
 async def get_related_posts(
     post_id: int,
     limit: int = Query(5, ge=1, le=20),
@@ -92,7 +93,7 @@ async def get_related_posts(
         )
 
 
-@router.get("/trending", response_model=List[BlogPostRead])
+@router.get("/trending", response_model=ApiResponse)
 async def get_trending_posts(
     days: int = Query(7, ge=1, le=30, description="Number of days to look back"),
     limit: int = Query(10, ge=1, le=50),

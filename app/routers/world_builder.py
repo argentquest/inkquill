@@ -13,6 +13,7 @@ from app.models.user import User
 from app.models.world import World
 from app.services.world_builder_service import world_builder_service
 from app.schemas.world import WorldRead
+from app.schemas.base import ApiResponse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class WorldBuilderCreateRequest(BaseModel):
 
 @router.get(
     "/questions",
-    response_model=WorldBuilderQuestionsResponse,
+    response_model=ApiResponse,
     summary="Get all world builder questions"
 )
 async def get_world_builder_questions(
@@ -104,7 +105,7 @@ async def get_world_builder_questions(
 
 @router.get(
     "/questions/{question_id}",
-    response_model=WorldBuilderQuestion,
+    response_model=ApiResponse,
     summary="Get a specific world builder question"
 )
 async def get_world_builder_question(
@@ -152,7 +153,7 @@ async def validate_world_builder_answers(
 
 @router.post(
     "/generate",
-    response_model=WorldBuilderGenerationResponse,
+    response_model=ApiResponse,
     summary="Generate world description from answers"
 )
 async def generate_world_description(
@@ -201,7 +202,7 @@ async def generate_world_description(
 
 @router.post(
     "/create",
-    response_model=WorldRead,
+    response_model=ApiResponse,
     summary="Create a new world from world builder"
 )
 async def create_world_from_builder(
@@ -253,7 +254,7 @@ async def create_world_from_builder(
 
 @router.put(
     "/worlds/{world_id}",
-    response_model=WorldRead,
+    response_model=ApiResponse,
     summary="Update existing world with world builder"
 )
 async def update_world_from_builder(

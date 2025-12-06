@@ -11,6 +11,7 @@ from app.core.deps import get_db_session
 from app.core.deps import get_current_active_user
 from app.models.user import User as ModelUser # Alias to avoid conflict with Pydantic User
 from app.schemas import user as schema_user
+from app.schemas.base import ApiResponse
 from app.crud import user as crud_user
 from app.core.config import settings # For API prefix
 
@@ -27,7 +28,7 @@ router = APIRouter(
 
 # --- User Endpoint Definitions ---
 
-@router.get("/me", response_model=schema_user.UserRead, name="read_current_user_profile")
+@router.get("/me", response_model=ApiResponse, name="read_current_user_profile")
 async def read_users_me(
     current_user: ModelUser = Depends(get_current_active_user) # Dependency injects the authenticated user
 ):
@@ -41,7 +42,7 @@ async def read_users_me(
     # Pydantic's UserRead schema will automatically convert it for the response.
     return current_user
 
-@router.get("/{user_id}", response_model=schema_user.UserRead, name="read_user_by_id")
+@router.get("/{user_id}", response_model=ApiResponse, name="read_user_by_id")
 async def read_user_by_id(
     user_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -71,7 +72,7 @@ async def read_user_by_id(
     return db_user
 
 # --- Admin-only route: List all users ---
-@router.get("/", response_model=List[schema_user.UserRead], name="list_all_users")
+@router.get("/", response_model=ApiResponse, name="list_all_users")
 async def list_all_users(
     skip: int = 0,
     limit: int = 100,
@@ -95,7 +96,7 @@ async def list_all_users(
 
 
 # --- Admin-only route: Toggle user activation status ---
-@router.patch("/{user_id}/toggle-active", response_model=schema_user.UserRead, name="toggle_user_active")
+@router.patch("/{user_id}/toggle-active", response_model=ApiResponse, name="toggle_user_active")
 async def toggle_user_active(
     user_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -145,7 +146,7 @@ async def toggle_user_active(
 
 
 # --- Admin-only route: Edit user details ---
-@router.patch("/{user_id}/edit", response_model=schema_user.UserRead, name="edit_user")
+@router.patch("/{user_id}/edit", response_model=ApiResponse, name="edit_user")
 async def edit_user(
     user_id: int,
     user_update: schema_user.UserUpdate,
@@ -192,7 +193,7 @@ async def edit_user(
     return updated_user
 
 # --- Example: Update user (typically for a user to update their own profile) ---
-# @router.put("/me", response_model=schema_user.UserRead, name="update_current_user_profile")
+# @router.put("/me", response_model=ApiResponse, name="update_current_user_profile")
 # async def update_users_me(
 #     user_in: schema_user.UserUpdate, # Pydantic schema for update data
 #     db: AsyncSession = Depends(get_db_session),

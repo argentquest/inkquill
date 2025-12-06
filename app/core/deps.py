@@ -36,35 +36,51 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 async def get_current_user(
-    request: Request, 
+    request: Request,
     db: AsyncSession = Depends(get_db_session)
 ) -> Optional[User]:
-    token = request.cookies.get("access_token")
+    """
+    Get current user supporting both cookie-based and Bearer token authentication.
+    Tries Bearer token from Authorization header first, then falls back to cookie.
+    """
+    token = None
+
+    # Try to get token from Authorization header first (Bearer token)
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.replace("Bearer ", "")
+        logger.debug("Using Bearer token from Authorization header")
+    else:
+        # Fall back to cookie-based authentication
+        token = request.cookies.get("access_token")
+        if token:
+            logger.debug("Using token from access_token cookie")
+
     if not token:
-        logger.debug("No access_token cookie found in request for get_current_user.")
-        return None 
+        logger.debug("No access_token found in Authorization header or cookie for get_current_user.")
+        return None
 
     try:
-        payload: Optional[Dict[str, Any]] = await security.decode_access_token(token=token) 
-        
-        if payload is None: 
+        payload: Optional[Dict[str, Any]] = await security.decode_access_token(token=token)
+
+        if payload is None:
             logger.warning("Token decoding returned None (invalid, expired, or error during decoding).")
-            return None 
-        
-        username_from_payload: Optional[str] = payload.get("sub") 
+            return None
+
+        username_from_payload: Optional[str] = payload.get("sub")
         if username_from_payload is None:
             logger.warning("Username (sub) not found in token payload.")
             return None
-        
-    except Exception as e_unhandled: 
+
+    except Exception as e_unhandled:
         logger.error(f"Unexpected error processing token in get_current_user: {e_unhandled}", exc_info=True)
         return None
-    
+
     user = await crud_user.get_user_by_username(db, username=username_from_payload)
     if user is None:
         logger.warning(f"User '{username_from_payload}' from token not found in database for get_current_user.")
-        return None 
-    
+        return None
+
     return user
 
 async def get_current_active_user(

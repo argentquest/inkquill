@@ -14,6 +14,7 @@ from app.models.act import Act as ModelAct
 from app.models.scene import Scene as ModelScene
 from app.models.generated_image import GeneratedImage
 from app.schemas.act import ActCreate, ActRead, ActUpdate
+from app.schemas.base import ApiResponse
 from app.schemas.image import GeneratedImageRead
 from app.crud import act as crud_act
 from app.crud import scene as crud_scene
@@ -35,7 +36,7 @@ acts_router = APIRouter(
     tags=["acts"]
 )
 
-@story_acts_router.post("/", response_model=ActRead, status_code=status.HTTP_201_CREATED, name="create_new_act_for_story")
+@story_acts_router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_act_for_story")
 async def create_new_act_for_story(act_in: ActCreate, story_owner_verified: ModelStory = Depends(verify_story_owner_for_act_operations), db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)):
     story_id_for_creation = story_owner_verified.id
     username = current_user.username  # Capture username to avoid lazy loading issues
@@ -52,17 +53,17 @@ async def create_new_act_for_story(act_in: ActCreate, story_owner_verified: Mode
              raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"An act with number '{act_in.act_number}' already exists for this story.")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create act.")
 
-@story_acts_router.get("/", response_model=List[ActRead], name="list_acts_for_story")
+@story_acts_router.get("/", response_model=ApiResponse, name="list_acts_for_story")
 async def list_acts_for_story(story_owner_verified: ModelStory = Depends(verify_story_owner_for_act_operations), skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=200), db: AsyncSession = Depends(get_db_session)):
     story_id_for_listing = story_owner_verified.id
     acts = await crud_act.get_acts_by_story(db, story_id=story_id_for_listing, skip=skip, limit=limit)
     return acts
 
-@acts_router.get("/{act_id}", response_model=ActRead, name="get_single_act")
+@acts_router.get("/{act_id}", response_model=ApiResponse, name="get_single_act")
 async def get_single_act(db_act: ModelAct = Depends(get_act_and_verify_ownership)):
     return db_act
 
-@acts_router.put("/{act_id}", response_model=ActRead, name="update_existing_act")
+@acts_router.put("/{act_id}", response_model=ApiResponse, name="update_existing_act")
 async def update_existing_act(
     act_in: ActUpdate, 
     request: Request,
@@ -143,7 +144,7 @@ async def delete_existing_act(db_act: ModelAct = Depends(get_act_and_verify_owne
         logger.error(f"Failed to delete act ID {db_act.id} for user {username}: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not delete act.")
 
-@acts_router.post("/{act_id}/compile-scenes", response_model=ActRead, name="compile_scenes_to_act_content")
+@acts_router.post("/{act_id}/compile-scenes", response_model=ApiResponse, name="compile_scenes_to_act_content")
 async def compile_scenes_to_act_content(db_act: ModelAct = Depends(get_act_and_verify_ownership), db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)):
     logger.info(f"User {current_user.username} compiling scenes for Act ID: {db_act.id}")
     scenes: List[ModelScene] = await crud_scene.get_scenes_by_act(db, act_id=db_act.id, limit=1000)
@@ -174,7 +175,7 @@ async def compile_scenes_to_act_content(db_act: ModelAct = Depends(get_act_and_v
     logger.info(f"Act ID: {db_act.id} description updated from compiled scenes by user {current_user.username}.")
     return updated_act
 
-@acts_router.get("/{act_id}/images", response_model=List[GeneratedImageRead])
+@acts_router.get("/{act_id}/images", response_model=ApiResponse)
 async def list_images_for_act(
     db_act: ModelAct = Depends(get_act_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
@@ -186,7 +187,7 @@ async def list_images_for_act(
     logger.info(f"API: Found {len(images)} images for act ID: {db_act.id}")
     return images
 
-@acts_router.post("/{act_id}/set-current-image/{image_id}", response_model=ActRead)
+@acts_router.post("/{act_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_act(
     db_act: ModelAct = Depends(get_act_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
@@ -209,7 +210,7 @@ class ActImageGenerationRequest(BaseModel):
     custom_prompt: Optional[str] = None
     image_style: Optional[str] = None
 
-@acts_router.post("/{act_id}/generate-image", response_model=JobSubmissionResponse, status_code=status.HTTP_202_ACCEPTED)
+@acts_router.post("/{act_id}/generate-image", response_model=ApiResponse, status_code=status.HTTP_202_ACCEPTED)
 async def generate_act_image(
     act_image_request: ActImageGenerationRequest,
     db_act: ModelAct = Depends(get_act_and_verify_ownership),
@@ -280,7 +281,7 @@ async def generate_act_image(
         job_id=job_id
     )
 
-@acts_router.post("/{act_id}/generate-summary", response_model=ActRead)
+@acts_router.post("/{act_id}/generate-summary", response_model=ApiResponse)
 async def generate_summary_for_act(
     db_act: ModelAct = Depends(get_act_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session),

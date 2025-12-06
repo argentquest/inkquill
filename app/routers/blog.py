@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session, get_current_active_user, get_current_user
 from app.models.user import User
 from app.services.blog_service import blog_service
+from app.schemas.base import ApiResponse
 from app.schemas.blog import (
     BlogPostCreate, BlogPostUpdate, BlogPostRead, BlogPostSummary,
     BlogCategoryRead, BlogTagRead
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/blog", tags=["blog"])
 
 
-@router.post("/posts", response_model=BlogPostRead, status_code=status.HTTP_201_CREATED)
+@router.post("/posts", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_blog_post(
     post_data: BlogPostCreate,
     current_user: User = Depends(get_current_active_user),
@@ -35,7 +36,7 @@ async def create_blog_post(
         )
 
 
-@router.get("/posts", response_model=List[BlogPostRead])
+@router.get("/posts", response_model=ApiResponse)
 async def get_blog_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
@@ -78,7 +79,7 @@ async def get_blog_posts(
         )
 
 
-@router.get("/posts/{slug}", response_model=BlogPostRead)
+@router.get("/posts/{slug}", response_model=ApiResponse)
 async def get_blog_post(
     slug: str,
     current_user: Optional[User] = Depends(get_current_user),
@@ -120,7 +121,7 @@ async def get_blog_post(
         )
 
 
-@router.put("/posts/{post_id}", response_model=BlogPostRead)
+@router.put("/posts/{post_id}", response_model=ApiResponse)
 async def update_blog_post(
     post_id: int,
     post_data: BlogPostUpdate,
@@ -144,7 +145,7 @@ async def update_blog_post(
         )
 
 
-@router.post("/posts/{post_id}/publish", response_model=BlogPostRead)
+@router.post("/posts/{post_id}/publish", response_model=ApiResponse)
 async def publish_blog_post(
     post_id: int,
     current_user: User = Depends(get_current_active_user),
@@ -191,7 +192,7 @@ async def delete_blog_post(
         )
 
 
-@router.get("/my-posts", response_model=List[BlogPostRead])
+@router.get("/my-posts", response_model=ApiResponse)
 async def get_my_blog_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),

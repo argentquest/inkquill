@@ -1,11 +1,12 @@
 # /ai_rag_story_app/app/routers/auth.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
-from fastapi.responses import RedirectResponse 
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime, timedelta, timezone 
-from pydantic import BaseModel 
+from datetime import datetime, timedelta, timezone
+from pydantic import BaseModel
+from typing import Optional
 import logging
 import secrets
 import uuid 
@@ -163,6 +164,194 @@ async def login_for_access_token(response: Response, db: AsyncSession = Depends(
     return {"message": "Login successful. Token set in cookie."}
 
 
+# --- NEW: Token-based auth endpoints for React SPA ---
+
+class TokenResponse(BaseModel):
+    """Response model for token-based authentication"""
+    access_token: str
+    refresh_token: Optional[str] = None
+    token_type: str = "bearer"
+    expires_in: int  # seconds
+
+class RefreshTokenRequest(BaseModel):
+    """Request model for refreshing access token"""
+    refresh_token: str
+
+@router.post("/token", response_model=ApiResponse, name="get_access_token", summary="Get access and refresh tokens (for React SPA)")
+async def get_access_token(
+    response: Response,
+    db: AsyncSession = Depends(get_db_session),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    request: Request = None
+):
+    """
+    OAuth2 compatible token endpoint for React SPA.
+    Returns both access_token and refresh_token in the response body.
+
+    This is the preferred method for React applications as it allows
+    storing tokens in memory/state rather than cookies.
+    """
+    logger.info(f"Token request for username: {form_data.username}")
+
+    # Authenticate user
+    user = await crud_user.get_user_by_username(db, username=form_data.username)
+    if not user or not security.verify_password(form_data.password, user.hashed_password):
+        logger.warning(f"Token request failed for username: {form_data.username} - Incorrect username or password.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    if not user.is_active:
+        logger.warning(f"Token request failed for username: {form_data.username} - Inactive user account.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user account."
+        )
+
+    # Get client info
+    ip_address = request.client.host if request else None
+    user_agent = request.headers.get("user-agent") if request else None
+
+    # Create access token
+    access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        data={"sub": user.username, "type": "access"},
+        expires_delta=access_token_expires
+    )
+
+    # Create refresh token (stored in database)
+    from app.crud.refresh_token import refresh_token_crud
+    try:
+        db_refresh_token = await refresh_token_crud.create(
+            db=db,
+            user_id=user.id,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        await db.commit()
+        refresh_token_value = db_refresh_token.token
+    except Exception as e:
+        logger.error(f"Failed to create refresh token for user {user.id}: {e}", exc_info=True)
+        await db.rollback()
+        refresh_token_value = None
+
+    logger.info(f"User '{user.username}' obtained tokens successfully via /token endpoint.")
+
+    token_response = TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token_value,
+        token_type="bearer",
+        expires_in=int(access_token_expires.total_seconds())
+    )
+
+    return ApiResponse.success_response(data=token_response)
+
+
+@router.post("/refresh", response_model=ApiResponse, name="refresh_access_token", summary="Refresh access token using refresh token")
+async def refresh_access_token(
+    refresh_request: RefreshTokenRequest,
+    db: AsyncSession = Depends(get_db_session)
+):
+    """
+    Refresh an expired access token using a valid refresh token.
+    Returns a new access token.
+    """
+    logger.info(f"Refresh token request received")
+
+    from app.crud.refresh_token import refresh_token_crud
+
+    # Validate refresh token
+    db_refresh_token = await refresh_token_crud.get_by_token(db, token=refresh_request.refresh_token)
+
+    if not db_refresh_token:
+        logger.warning(f"Invalid refresh token provided")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token"
+        )
+
+    if not db_refresh_token.is_active:
+        logger.warning(f"Inactive refresh token used")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token has been revoked"
+        )
+
+    if db_refresh_token.is_expired:
+        logger.warning(f"Expired refresh token used")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token has expired"
+        )
+
+    # Get user
+    user = await crud_user.get_user(db, user_id=db_refresh_token.user_id)
+    if not user or not user.is_active:
+        logger.warning(f"Refresh token for inactive or non-existent user")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is inactive or does not exist"
+        )
+
+    # Update refresh token last used
+    await refresh_token_crud.update_last_used(db, db_obj=db_refresh_token)
+    await db.commit()
+
+    # Create new access token
+    access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        data={"sub": user.username, "type": "access"},
+        expires_delta=access_token_expires
+    )
+
+    logger.info(f"Access token refreshed successfully for user '{user.username}'")
+
+    token_response = TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        expires_in=int(access_token_expires.total_seconds())
+    )
+
+    return ApiResponse.success_response(data=token_response)
+
+
+@router.post("/logout", name="logout_user", summary="Logout user and revoke refresh tokens")
+async def logout_user(
+    response: Response,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db_session),
+    revoke_all: bool = False
+):
+    """
+    Logout the current user by:
+    1. Clearing the access_token cookie (for cookie-based auth)
+    2. Revoking refresh tokens (optional: all tokens or just the current session)
+    """
+    logger.info(f"User '{current_user.username}' logging out")
+
+    # Clear cookie
+    response.delete_cookie(key="access_token", path="/")
+
+    # Revoke refresh tokens
+    from app.crud.refresh_token import refresh_token_crud
+    try:
+        if revoke_all:
+            # Revoke all refresh tokens for this user
+            await refresh_token_crud.revoke_all_for_user(db, user_id=current_user.id)
+            logger.info(f"All refresh tokens revoked for user '{current_user.username}'")
+        # For single token revocation, client should send the token to revoke
+        # For now, we just clear the cookie
+        await db.commit()
+    except Exception as e:
+        logger.error(f"Error revoking refresh tokens for user '{current_user.username}': {e}")
+        await db.rollback()
+
+    logger.info(f"User '{current_user.username}' logged out successfully")
+    return ApiResponse.success_response(data={"message": "Logout successful"})
+
+
 # --- FIX: LOGOUT ENDPOINT IS REMOVED FROM HERE ---
 
 
@@ -171,25 +360,25 @@ class WSTicketResponse(BaseModel):
     ticket: str
     expires_at: datetime 
 
-@router.get("/ws-ticket", response_model=WSTicketResponse, name="get_websocket_ticket", summary="Get a short-lived ticket for WebSocket authentication.")
+@router.get("/ws-ticket", response_model=ApiResponse, name="get_websocket_ticket", summary="Get a short-lived ticket for WebSocket authentication.")
 async def get_websocket_ticket(
-    current_user: User = Depends(get_current_active_user) 
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     Provides a short-lived JWT to be used as a ticket for authenticating
     WebSocket connections.
     """
     logger.info(f"User '{current_user.username}' requesting WebSocket ticket.")
-    
+
     ticket_expires_delta = timedelta(seconds=300) # 5 minutes
-    
+
     ticket_jwt = security.create_access_token(
-        data={"sub": current_user.username, "type": "ws-ticket"}, 
+        data={"sub": current_user.username, "type": "ws-ticket"},
         expires_delta=ticket_expires_delta
     )
     expires_at = datetime.now(timezone.utc) + ticket_expires_delta
     logger.info(f"WebSocket ticket generated for user '{current_user.username}', expires at {expires_at.isoformat()} (in {ticket_expires_delta.total_seconds()} seconds)")
-    return WSTicketResponse(ticket=ticket_jwt, expires_at=expires_at)
+    return ApiResponse.success_response(data=WSTicketResponse(ticket=ticket_jwt, expires_at=expires_at))
 
 
 # --- Impersonation endpoints (admin only) ---

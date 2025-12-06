@@ -10,6 +10,7 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.models.world import World as ModelWorld
 from app.models.location import LocationConnection as ModelLocationConnection
+from app.schemas.base import ApiResponse
 from app.schemas.location import (
     LocationConnectionCreate, 
     LocationConnectionRead, 
@@ -36,7 +37,7 @@ router_location_connections = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-@router_world_location_connections.post("/", response_model=LocationConnectionRead, status_code=status.HTTP_201_CREATED)
+@router_world_location_connections.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_location_connection_for_world(
     world_id: int,
     connection_in: LocationConnectionCreate,
@@ -90,7 +91,7 @@ async def create_location_connection_for_world(
             detail="An unexpected error occurred while creating the location connection."
         )
 
-@router_world_location_connections.get("/", response_model=List[LocationConnectionWithLocations])
+@router_world_location_connections.get("/", response_model=ApiResponse)
 async def list_location_connections_for_world(
     world_id: int,
     db_world: ModelWorld = Depends(get_world_dependency),
@@ -103,7 +104,7 @@ async def list_location_connections_for_world(
     connections = await crud_location_connection.get_connections_for_world(db, db_world.id)
     return connections
 
-@router_location_connections.get("/{from_location_id}/{to_location_id}", response_model=LocationConnectionRead)
+@router_location_connections.get("/{from_location_id}/{to_location_id}", response_model=ApiResponse)
 async def get_location_connection(
     from_location_id: int = Path(..., description="ID of the source location"),
     to_location_id: int = Path(..., description="ID of the destination location"),
@@ -131,7 +132,7 @@ async def get_location_connection(
     
     return connection
 
-@router_location_connections.put("/{from_location_id}/{to_location_id}", response_model=LocationConnectionRead)
+@router_location_connections.put("/{from_location_id}/{to_location_id}", response_model=ApiResponse)
 async def update_location_connection(
     connection_in: LocationConnectionUpdate,
     from_location_id: int = Path(..., description="ID of the source location"),
@@ -214,7 +215,7 @@ async def delete_location_connection(
 
 # Additional endpoints for advanced features
 
-@router_world_location_connections.get("/location/{location_id}", response_model=List[LocationConnectionWithLocations])
+@router_world_location_connections.get("/location/{location_id}", response_model=ApiResponse)
 async def get_connections_for_location(
     world_id: int,
     location_id: int,
@@ -237,7 +238,7 @@ async def get_connections_for_location(
     )
     return connections
 
-@router_world_location_connections.get("/hierarchy", response_model=List[dict])
+@router_world_location_connections.get("/hierarchy", response_model=ApiResponse)
 async def get_world_location_hierarchy(
     world_id: int,
     db_world: ModelWorld = Depends(get_world_dependency),

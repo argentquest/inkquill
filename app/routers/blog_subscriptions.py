@@ -10,6 +10,7 @@ from app.core.deps import get_db_session, get_current_user, get_current_active_u
 from app.models.user import User
 from app.models.blog_subscription import SubscriptionFrequency, SubscriptionStatus
 from app.services.blog_subscription_service import blog_subscription_service
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class SubscriptionUpdateRequest(BaseModel):
     include_tags: Optional[List[int]] = None
 
 
-@router.post("/subscribe", response_model=Dict[str, Any], status_code=status.HTTP_201_CREATED)
+@router.post("/subscribe", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def subscribe_to_newsletter(
     subscription_data: SubscriptionRequest,
     request: Request,
@@ -184,7 +185,7 @@ async def unsubscribe_from_newsletter(
         )
 
 
-@router.get("/my-subscription", response_model=Dict[str, Any])
+@router.get("/my-subscription", response_model=ApiResponse)
 async def get_my_subscription(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -223,7 +224,7 @@ async def get_my_subscription(
         )
 
 
-@router.put("/my-subscription", response_model=Dict[str, Any])
+@router.put("/my-subscription", response_model=ApiResponse)
 async def update_my_subscription(
     update_data: SubscriptionUpdateRequest,
     current_user: User = Depends(get_current_active_user),
@@ -304,7 +305,7 @@ async def unsubscribe_current_user(
 
 
 # Admin endpoints
-@router.get("/stats", response_model=Dict[str, Any])
+@router.get("/stats", response_model=ApiResponse)
 async def get_subscription_stats(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -330,7 +331,7 @@ async def get_subscription_stats(
         )
 
 
-@router.get("/list", response_model=List[Dict[str, Any]])
+@router.get("/list", response_model=ApiResponse)
 async def list_subscriptions(
     status_filter: Optional[SubscriptionStatus] = Query(None),
     frequency_filter: Optional[SubscriptionFrequency] = Query(None),

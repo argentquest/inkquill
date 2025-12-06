@@ -7,6 +7,7 @@ import logging
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.crud.billing import billing_crud
+from app.schemas.base import ApiResponse
 from app.schemas.billing import (
     UserAccountResponse, 
     UserTransactionResponse,
@@ -26,7 +27,7 @@ def verify_admin_user(current_user: User = Depends(get_current_active_user)):
         )
     return current_user
 
-@router.get("/dashboard", response_model=AdminBillingDashboardResponse)
+@router.get("/dashboard", response_model=ApiResponse)
 async def get_admin_billing_dashboard(
     current_admin: User = Depends(verify_admin_user),
     db: AsyncSession = Depends(get_db_session)
@@ -55,7 +56,7 @@ async def get_admin_billing_dashboard(
             detail="Error loading admin dashboard"
         )
 
-@router.get("/transactions", response_model=List[UserTransactionResponse])
+@router.get("/transactions", response_model=ApiResponse)
 async def get_all_transactions(
     limit: int = 100,
     offset: int = 0,
@@ -66,7 +67,7 @@ async def get_all_transactions(
     transactions = await billing_crud.get_all_transactions_for_admin(db, limit, offset)
     return transactions
 
-@router.get("/users", response_model=List[UserAccountResponse])
+@router.get("/users", response_model=ApiResponse)
 async def get_all_user_accounts(
     limit: int = 100,
     offset: int = 0,

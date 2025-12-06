@@ -10,6 +10,7 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.models.user_interview_response import UserInterviewResponse
 from app.models.user import User
 from app.services.interview_validation_service import validation_service
+from app.schemas.base import ApiResponse
 from pydantic import BaseModel, Field
 from datetime import datetime
 import logging
@@ -91,7 +92,7 @@ async def get_interview_questions(interview_id: str):
         )
 
 
-@router.post("/submit", response_model=InterviewSubmissionResponse)
+@router.post("/submit", response_model=ApiResponse)
 async def submit_interview(
     submission: InterviewSubmissionRequest,
     current_user: User = Depends(get_current_active_user),

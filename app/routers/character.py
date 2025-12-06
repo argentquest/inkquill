@@ -18,6 +18,7 @@ from app.models.story import Story as ModelStory
 from app.models.uploaded_document import UploadedDocument, SourceElementTypeEnum
 from app.models.generated_image import GeneratedImage
 from app.schemas.character import CharacterCreate, CharacterRead, CharacterUpdate, StoryCharacterLinkCreate, CharacterInStoryRead
+from app.schemas.base import ApiResponse
 from app.schemas.image import GeneratedImageRead
 from app.crud import character as crud_character, generated_image as crud_generated_image
 from app.crud import story as crud_story
@@ -64,7 +65,7 @@ async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_
         logger.warning(f"Could not check for blob '{blob_path}' due to error: {e}")
     return None
 
-@router_world_characters.post("/", response_model=CharacterRead, status_code=status.HTTP_201_CREATED, name="create_new_character_for_world")
+@router_world_characters.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_character_for_world")
 async def create_new_character_for_world(
     world_id: int, 
     character_in: CharacterCreate,
@@ -85,7 +86,7 @@ async def create_new_character_for_world(
     await db.refresh(new_char)
     return new_char
 
-@router_world_characters.get("/", response_model=List[CharacterRead], name="list_characters_for_world_api")
+@router_world_characters.get("/", response_model=ApiResponse, name="list_characters_for_world_api")
 async def list_characters_in_world(
     world_id: int, 
     skip: int = Query(0, ge=0),
@@ -112,7 +113,7 @@ async def list_characters_in_world(
     
     return response_characters
 
-@router_characters.get("/{character_id}", response_model=CharacterRead, name="get_single_character")
+@router_characters.get("/{character_id}", response_model=ApiResponse, name="get_single_character")
 async def get_single_character(
     db_character: ModelCharacter = Depends(get_character_and_verify_ownership),
     blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
@@ -122,7 +123,7 @@ async def get_single_character(
     char_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     return char_read
 
-@router_characters.put("/{character_id}", response_model=CharacterRead, name="update_existing_character")
+@router_characters.put("/{character_id}", response_model=ApiResponse, name="update_existing_character")
 async def update_existing_character(
     character_in: CharacterUpdate,
     background_tasks: BackgroundTasks,
@@ -160,7 +161,7 @@ async def delete_existing_character(
     await db.commit()
     return
 
-@router_characters.get("/{character_id}/images", response_model=List[GeneratedImageRead])
+@router_characters.get("/{character_id}/images", response_model=ApiResponse)
 async def list_images_for_character(
     character: ModelCharacter = Depends(get_character_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
@@ -172,7 +173,7 @@ async def list_images_for_character(
     logger.info(f"API: Found {len(images)} images for character ID: {character.id}")
     return images
 
-@router_characters.post("/{character_id}/set-current-image/{image_id}", response_model=CharacterRead)
+@router_characters.post("/{character_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_character(
     character: ModelCharacter = Depends(get_character_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
@@ -232,7 +233,7 @@ async def unlink_character_from_story_endpoint(
     await db.commit()
     return
 
-@router_story_characters.get("/", response_model=List[CharacterInStoryRead], name="list_characters_for_story")
+@router_story_characters.get("/", response_model=ApiResponse, name="list_characters_for_story")
 async def list_characters_for_story_endpoint(
     story_id: int,
     db_story: ModelStory = Depends(get_story_and_verify_ownership),
@@ -257,7 +258,7 @@ async def list_characters_for_story_endpoint(
         
     return response_characters
 
-@router_characters.get("/{character_id}/generated-rag-content", response_model=RAGContentResponse, name="get_character_generated_rag_content")
+@router_characters.get("/{character_id}/generated-rag-content", response_model=ApiResponse, name="get_character_generated_rag_content")
 async def get_character_generated_rag_content_endpoint(
     db_character: ModelCharacter = Depends(get_character_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session),

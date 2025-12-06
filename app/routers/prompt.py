@@ -10,6 +10,7 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User as ModelUser
 from app.models.prompt import Prompt, PromptTypeEnum, AgeTargetEnum
 from app.schemas import prompt as schema_prompt
+from app.schemas.base import ApiResponse
 from app.crud import prompt as crud_prompt
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-@router.post("/", response_model=schema_prompt.PromptRead, status_code=status.HTTP_201_CREATED, name="create_new_prompt")
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_prompt")
 async def create_new_prompt(
     prompt_in: schema_prompt.PromptCreate,
     db: AsyncSession = Depends(get_db_session),
@@ -38,7 +39,7 @@ async def create_new_prompt(
         logger.error(f"Error creating prompt '{prompt_in.title}': {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create prompt.")
 
-@router.get("/story-options", response_model=Dict[str, List[schema_prompt.PromptRead]], name="get_story_options")
+@router.get("/story-options", response_model=ApiResponse, name="get_story_options")
 async def get_story_options(
     db: AsyncSession = Depends(get_db_session),
     current_user: ModelUser = Depends(get_current_active_user)
@@ -80,7 +81,7 @@ async def get_story_options(
         )
 
 
-@router.get("/character-roles", response_model=List[schema_prompt.PromptRead], name="get_character_roles")
+@router.get("/character-roles", response_model=ApiResponse, name="get_character_roles")
 async def get_character_roles(
     db: AsyncSession = Depends(get_db_session),
     current_user: ModelUser = Depends(get_current_active_user)
@@ -103,7 +104,7 @@ async def get_character_roles(
         )
 
 
-@router.get("/art-styles", response_model=List[schema_prompt.PromptRead], name="get_art_styles")
+@router.get("/art-styles", response_model=ApiResponse, name="get_art_styles")
 async def get_art_styles(
     db: AsyncSession = Depends(get_db_session),
     current_user: ModelUser = Depends(get_current_active_user)
@@ -126,7 +127,7 @@ async def get_art_styles(
         )
 
 
-@router.get("/my-prompts", response_model=List[schema_prompt.PromptRead], name="list_my_prompts")
+@router.get("/my-prompts", response_model=ApiResponse, name="list_my_prompts")
 async def list_my_prompts(
     skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=200),
     filter_prompt_type: Optional[PromptTypeEnum] = Query(None), # Reverted to use Enum directly
@@ -147,7 +148,7 @@ async def list_my_prompts(
     logger.info(f"API list_my_prompts found {len(prompts)} prompts for user '{current_user.username}' with the specified filters.")
     return prompts
 
-@router.get("/shared", response_model=List[schema_prompt.PromptRead], name="list_shared_prompts")
+@router.get("/shared", response_model=ApiResponse, name="list_shared_prompts")
 async def list_shared_prompts(
     skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=200),
     filter_prompt_type: Optional[PromptTypeEnum] = Query(None), # Reverted to use Enum directly
@@ -166,7 +167,7 @@ async def list_shared_prompts(
 
 # ... the rest of the file (get_single_prompt, update_existing_prompt, delete_existing_prompt) remains unchanged ...
 
-@router.get("/{prompt_id}", response_model=schema_prompt.PromptRead, name="get_single_prompt")
+@router.get("/{prompt_id}", response_model=ApiResponse, name="get_single_prompt")
 async def get_single_prompt(
     prompt_id: int, db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)
 ):
@@ -177,7 +178,7 @@ async def get_single_prompt(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this prompt")
     return db_prompt
 
-@router.put("/{prompt_id}", response_model=schema_prompt.PromptRead, name="update_existing_prompt")
+@router.put("/{prompt_id}", response_model=ApiResponse, name="update_existing_prompt")
 async def update_existing_prompt(
     prompt_id: int, prompt_in: schema_prompt.PromptUpdate,
     db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)

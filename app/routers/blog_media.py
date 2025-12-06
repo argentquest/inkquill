@@ -12,6 +12,7 @@ import io
 from app.core.deps import get_db_session, get_current_active_user
 from app.core.config import settings
 from app.models.user import User
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
@@ -201,7 +202,7 @@ async def create_thumbnail(image_path: Path, thumbnail_path: Path, size: tuple =
         return False
 
 
-@router.post("/upload", response_model=Dict[str, Any])
+@router.post("/upload", response_model=ApiResponse)
 async def upload_media(
     file: UploadFile = File(...),
     alt_text: Optional[str] = Form(None),
@@ -347,7 +348,7 @@ async def upload_media(
         )
 
 
-@router.get("/list", response_model=List[Dict[str, Any]])
+@router.get("/list", response_model=ApiResponse)
 async def list_media(
     file_type: Optional[str] = None,
     skip: int = 0,
@@ -457,7 +458,7 @@ async def delete_media(
         )
 
 
-@router.get("/info/{filename}", response_model=Dict[str, Any])
+@router.get("/info/{filename}", response_model=ApiResponse)
 async def get_media_info(
     filename: str,
     current_user: User = Depends(get_current_active_user),
@@ -530,7 +531,7 @@ async def get_media_info(
         )
 
 
-@router.post("/bulk-upload", response_model=List[Dict[str, Any]])
+@router.post("/bulk-upload", response_model=ApiResponse)
 async def bulk_upload_media(
     files: List[UploadFile] = File(...),
     current_user: User = Depends(get_current_active_user),

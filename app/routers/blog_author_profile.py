@@ -12,13 +12,14 @@ from app.models.blog_author_profile import BlogAuthorProfile
 from app.models.blog_follow import BlogFollow
 from app.models.blog_like import BlogLike
 from app.schemas.blog import BlogAuthorProfileCreate, BlogAuthorProfileUpdate, BlogAuthorProfileRead
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/author-profile", tags=["blog-author-profile"])
 
 
-@router.get("/", response_model=BlogAuthorProfileRead)
+@router.get("/", response_model=ApiResponse)
 async def get_my_author_profile(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -57,7 +58,7 @@ async def get_my_author_profile(
         )
 
 
-@router.put("/", response_model=BlogAuthorProfileRead)
+@router.put("/", response_model=ApiResponse)
 async def update_my_author_profile(
     profile_data: BlogAuthorProfileUpdate,
     current_user: User = Depends(get_current_active_user),
@@ -330,7 +331,7 @@ async def get_author_dashboard(
         )
 
 
-@router.get("/{user_id}", response_model=BlogAuthorProfileRead)
+@router.get("/{user_id}", response_model=ApiResponse)
 async def get_author_profile(
     user_id: int,
     db: AsyncSession = Depends(get_db_session)

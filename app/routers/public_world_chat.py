@@ -13,6 +13,7 @@ from app.models.user import User
 from app.models.chat_session import ChatSession
 from app.models.chat_message import ChatMessage
 from app.schemas.world import WorldRead
+from app.schemas.base import ApiResponse
 from app.schemas.chat import ChatSessionCreate, ChatMessageCreate, ChatSessionRead, ChatMessageRead
 from app.services.anonymous_user_service import anonymous_user_service
 from app.services.billing_service import billing_service
@@ -151,7 +152,7 @@ async def get_chat_samples(db: AsyncSession = Depends(get_db_session)):
             detail="Error retrieving chat samples"
         )
 
-@router.get("/worlds", response_model=List[WorldRead])
+@router.get("/worlds", response_model=ApiResponse)
 async def get_public_worlds(
     db: AsyncSession = Depends(get_db_session),
     blob_service_client: BlobServiceClient = Depends(get_blob_service_client)

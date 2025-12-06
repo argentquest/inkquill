@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session, get_current_user, get_current_active_user
 from app.models.user import User
 from app.services.blog_comment_service import blog_comment_service
+from app.schemas.base import ApiResponse
 from app.schemas.blog import (
     BlogCommentCreate, BlogCommentUpdate, BlogCommentRead,
     CommentStatus, BlogCommentWithReplies
@@ -249,7 +250,7 @@ async def delete_comment(
         )
 
 
-@router.post("/comments/{comment_id}/like", response_model=dict)
+@router.post("/comments/{comment_id}/like", response_model=ApiResponse)
 async def like_comment(
     comment_id: int,
     current_user: User = Depends(get_current_active_user),

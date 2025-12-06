@@ -8,13 +8,14 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.services.blog_category_service import blog_category_service
 from app.schemas.blog import BlogCategoryCreate, BlogCategoryUpdate, BlogCategoryRead
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/categories", tags=["blog-categories"])
 
 
-@router.get("/", response_model=List[BlogCategoryRead])
+@router.get("/", response_model=ApiResponse)
 async def get_blog_categories(
     active_only: bool = True,
     db: AsyncSession = Depends(get_db_session)
@@ -31,7 +32,7 @@ async def get_blog_categories(
         )
 
 
-@router.get("/{category_id}", response_model=BlogCategoryRead)
+@router.get("/{category_id}", response_model=ApiResponse)
 async def get_blog_category(
     category_id: int,
     db: AsyncSession = Depends(get_db_session)
@@ -55,7 +56,7 @@ async def get_blog_category(
         )
 
 
-@router.post("/", response_model=BlogCategoryRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_blog_category(
     category_data: BlogCategoryCreate,
     current_user: User = Depends(get_current_active_user),
@@ -79,7 +80,7 @@ async def create_blog_category(
         )
 
 
-@router.put("/{category_id}", response_model=BlogCategoryRead)
+@router.put("/{category_id}", response_model=ApiResponse)
 async def update_blog_category(
     category_id: int,
     category_data: BlogCategoryUpdate,

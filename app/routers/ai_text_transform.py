@@ -14,6 +14,7 @@ from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettin
 from app.core.deps import get_db_session, get_current_active_user, get_current_user
 from app.models.user import User
 from app.models.prompt import Prompt, PromptTypeEnum
+from app.schemas.base import ApiResponse
 from app.schemas.ai_text_transform import (
     AITextTransformRequest,
     AITextTransformResponse,
@@ -36,7 +37,7 @@ router = APIRouter(
     tags=["ai-text-transform"]
 )
 
-@router.get("/operations", response_model=QuickAIOperationsResponse)
+@router.get("/operations", response_model=ApiResponse)
 async def get_quick_ai_operations(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session)
@@ -93,7 +94,7 @@ async def get_quick_ai_operations(
             detail="Failed to fetch available operations"
         )
 
-@router.post("/estimate-cost", response_model=AITextCostEstimateResponse)
+@router.post("/estimate-cost", response_model=ApiResponse)
 async def estimate_transformation_cost(
     request: AITextCostEstimateRequest,
     current_user: User = Depends(get_current_user),
@@ -165,7 +166,7 @@ async def estimate_transformation_cost(
             detail="Failed to estimate cost"
         )
 
-@router.post("/transform", response_model=AITextTransformResponse)
+@router.post("/transform", response_model=ApiResponse)
 async def transform_text(
     request: AITextTransformRequest,
     current_user: User = Depends(get_current_user),

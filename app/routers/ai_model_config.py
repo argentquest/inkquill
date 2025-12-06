@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.schemas.ai_model_config import AIModelConfigurationRead
+from app.schemas.base import ApiResponse
 from app.crud import ai_model_config as crud_ai_model_config
 from app.models.ai_cost_log import AICallLog
 from sqlalchemy import select, desc, func
@@ -19,7 +20,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-@router.get("/", response_model=List[AIModelConfigurationRead])
+@router.get("/", response_model=ApiResponse)
 async def list_ai_model_configurations(
     db: AsyncSession = Depends(get_db_session)
 ):
@@ -34,7 +35,7 @@ async def list_ai_model_configurations(
         # The frontend should handle the "No presets found" message.
     return configs
 
-@router.get("/user-available", response_model=List[AIModelConfigurationRead])
+@router.get("/user-available", response_model=ApiResponse)
 async def get_user_available_models(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)

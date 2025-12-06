@@ -6,6 +6,7 @@ from typing import Optional
 
 from app.core.deps import get_db_session, get_current_user
 from app.schemas.llm_models import LLMModelsResponse, LLMModelRead
+from app.schemas.base import ApiResponse
 from app.crud import llm_models as crud_llm_models
 from app.models.user import User
 
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/llm-models", tags=["LLM Models"])
 
 
-@router.get("/", response_model=LLMModelsResponse)
+@router.get("/", response_model=ApiResponse)
 async def get_llm_models(
     db: AsyncSession = Depends(get_db_session),
     current_user: Optional[User] = Depends(get_current_user)

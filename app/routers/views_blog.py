@@ -15,6 +15,7 @@ from app.models.blog_category import BlogCategory
 from app.models.blog_tag import BlogTag
 from app.services.blog_service import blog_service
 from app.schemas.blog import BlogPostCreate, BlogPostUpdate
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 

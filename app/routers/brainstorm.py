@@ -13,6 +13,7 @@ from app.models.user import User
 from app.models.brainstorm_session import BrainstormSession, BrainstormFavorite, BrainstormStory
 from app.models.user_interview_response import UserInterviewResponse
 from app.services.story_brainstorm_service import StoryBrainstormService
+from app.schemas.base import ApiResponse
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -136,7 +137,7 @@ async def brainstorm_page(
     )
 
 
-@router.get("/api/sessions", response_model=List[dict])
+@router.get("/api/sessions", response_model=ApiResponse)
 async def get_brainstorm_sessions(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -162,7 +163,7 @@ async def get_brainstorm_sessions(
     ]
 
 
-@router.get("/api/favorites", response_model=List[dict])
+@router.get("/api/favorites", response_model=ApiResponse)
 async def get_brainstorm_favorites(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)

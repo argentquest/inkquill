@@ -20,6 +20,7 @@ from app.models.scene import Scene
 from app.models.prompt import PromptTypeEnum, Prompt as ModelPrompt
 from app.models.world import World as ModelWorld
 from app.schemas.story import StoryRead
+from app.schemas.base import ApiResponse
 from app.schemas.character import CharacterInStoryRead
 from app.schemas.location import LocationInStoryRead
 from app.schemas.lore_item import LoreItemInStoryRead

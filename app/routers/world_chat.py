@@ -15,6 +15,7 @@ from app.crud import chat_session as chat_session_crud
 from app.crud import chat_message as chat_message_crud
 from app.crud import world as world_crud
 from app.crud import chat_sample as chat_sample_crud
+from app.schemas.base import ApiResponse
 from app.schemas.chat import (
     ChatSessionRead,
     ChatSessionListResponse,
@@ -60,7 +61,7 @@ async def get_chat_samples(
         )
 
 
-@router.post("/sessions/{world_id}", response_model=ChatSessionRead)
+@router.post("/sessions/{world_id}", response_model=ApiResponse)
 async def create_chat_session(
     world_id: int,
     current_user: User = Depends(get_current_active_user),
@@ -95,7 +96,7 @@ async def create_chat_session(
         )
 
 
-@router.get("/sessions/{world_id}", response_model=ChatSessionListResponse)
+@router.get("/sessions/{world_id}", response_model=ApiResponse)
 async def list_chat_sessions(
     world_id: int,
     skip: int = 0,
@@ -136,7 +137,7 @@ async def list_chat_sessions(
         )
 
 
-@router.get("/sessions/{world_id}/{session_id}", response_model=ChatSessionWithMessages)
+@router.get("/sessions/{world_id}/{session_id}", response_model=ApiResponse)
 async def get_chat_session(
     world_id: int,
     session_id: int,
@@ -173,7 +174,7 @@ async def get_chat_session(
         )
 
 
-@router.post("/sessions/{world_id}/{session_id}/messages", response_model=SendMessageResponse)
+@router.post("/sessions/{world_id}/{session_id}/messages", response_model=ApiResponse)
 async def send_message(
     world_id: int,
     session_id: int,
@@ -245,7 +246,7 @@ async def delete_chat_session(
         )
 
 
-@router.get("/world-context/{world_id}", response_model=WorldContextData)
+@router.get("/world-context/{world_id}", response_model=ApiResponse)
 async def get_world_context(
     world_id: int,
     current_user: User = Depends(get_current_active_user),

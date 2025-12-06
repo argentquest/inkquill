@@ -17,6 +17,7 @@ from app.models.lore_item import LoreItem as ModelLoreItem, LoreItemCategoryEnum
 from app.models.story import Story as ModelStory
 from app.models.uploaded_document import UploadedDocument, SourceElementTypeEnum
 from app.schemas.image import GeneratedImageRead
+from app.schemas.base import ApiResponse
 from app.crud import generated_image as crud_generated_image
 from app.schemas.lore_item import (
     LoreItemCreate, LoreItemRead, LoreItemUpdate,
@@ -69,7 +70,7 @@ async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_
 
 # ... (create, get_single, update, delete endpoints remain the same) ...
 
-@router_world_lore_items.post("/", response_model=LoreItemRead, status_code=status.HTTP_201_CREATED, name="create_new_lore_item_for_world")
+@router_world_lore_items.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_lore_item_for_world")
 async def create_new_lore_item_for_world(
     world_id: int,
     lore_item_in: LoreItemCreate,
@@ -95,7 +96,7 @@ async def create_new_lore_item_for_world(
         logger.error(f"Error creating lore item '{lore_item_in.title}': {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Could not create lore item.")
 
-@router_world_lore_items.get("/", response_model=List[LoreItemRead])
+@router_world_lore_items.get("/", response_model=ApiResponse)
 async def list_lore_items_in_world(
     world_id: int,
     category: Optional[LoreItemCategoryEnum] = Query(None, description="Filter by lore item category"),
@@ -123,7 +124,7 @@ async def list_lore_items_in_world(
     
     return response_items
 
-@router_lore_items.get("/{lore_item_id}", response_model=LoreItemRead, name="get_single_lore_item")
+@router_lore_items.get("/{lore_item_id}", response_model=ApiResponse, name="get_single_lore_item")
 async def get_single_lore_item(
     db_lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
     blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
@@ -133,7 +134,7 @@ async def get_single_lore_item(
     item_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     return item_read
 
-@router_lore_items.put("/{lore_item_id}", response_model=LoreItemRead, name="update_existing_lore_item")
+@router_lore_items.put("/{lore_item_id}", response_model=ApiResponse, name="update_existing_lore_item")
 async def update_existing_lore_item(
     lore_item_in: LoreItemUpdate,
     background_tasks: BackgroundTasks,
@@ -181,7 +182,7 @@ async def delete_existing_lore_item(
         logger.error(f"Error deleting lore item ID {db_lore_item.id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Could not delete lore item.")
 
-@router_lore_items.get("/{lore_item_id}/images", response_model=List[GeneratedImageRead])
+@router_lore_items.get("/{lore_item_id}/images", response_model=ApiResponse)
 async def list_images_for_lore_item(
     lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
@@ -191,7 +192,7 @@ async def list_images_for_lore_item(
     )
     return images
 
-@router_lore_items.post("/{lore_item_id}/set-current-image/{image_id}", response_model=LoreItemRead)
+@router_lore_items.post("/{lore_item_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_lore_item(
     lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
@@ -246,7 +247,7 @@ async def unlink_lore_item_from_story_endpoint(
     await db.commit()
     return
 
-@router_story_lore_items.get("/", response_model=List[LoreItemInStoryRead], name="list_lore_items_for_story")
+@router_story_lore_items.get("/", response_model=ApiResponse, name="list_lore_items_for_story")
 async def list_lore_items_for_story_endpoint(
     story_id: int,
     db_story: ModelStory = Depends(get_story_and_verify_ownership),
@@ -272,7 +273,7 @@ async def list_lore_items_for_story_endpoint(
     return response_items
     # --- END FIX ---
 
-@router_lore_items.get("/{lore_item_id}/generated-rag-content", response_model=RAGContentResponse, name="get_lore_item_generated_rag_content")
+@router_lore_items.get("/{lore_item_id}/generated-rag-content", response_model=ApiResponse, name="get_lore_item_generated_rag_content")
 async def get_lore_item_generated_rag_content_endpoint(
     db_lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session),

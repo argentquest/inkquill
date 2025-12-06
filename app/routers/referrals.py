@@ -12,6 +12,7 @@ from app.core.deps import get_db_session, get_current_active_user, get_current_u
 from app.models.user import User
 from app.models.referral import Referral, ReferralReward
 from app.services.referral_service import referral_service
+from app.schemas.base import ApiResponse
 from app.schemas.referral import (
     ReferralStats, ReferralHistory, ReferralRewardResponse,
     ReferralTrackingRequest, ReferralTrackingResponse
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/referrals", tags=["referrals"])
 
 
-@router.get("/stats", response_model=ReferralStats)
+@router.get("/stats", response_model=ApiResponse)
 async def get_referral_stats(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -135,7 +136,7 @@ async def get_referral_rewards(
         )
 
 
-@router.post("/track", response_model=ReferralTrackingResponse)
+@router.post("/track", response_model=ApiResponse)
 async def track_referral_visit(
     request: Request,
     tracking_data: ReferralTrackingRequest,

@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db_session, get_current_user
 from app.models.user import User
+from app.schemas.base import ApiResponse
 from app.schemas.forum import (
     ForumCategoryCreate,
     ForumCategoryUpdate,
@@ -15,7 +16,7 @@ from app.crud import forum_category as crud_category
 router = APIRouter(prefix="/api/forum/categories", tags=["forum_categories"])
 
 
-@router.get("/", response_model=List[ForumCategoryResponse])
+@router.get("/", response_model=ApiResponse)
 async def get_categories(
     skip: int = 0,
     limit: int = 100,
@@ -47,7 +48,7 @@ async def get_categories(
     return response_categories
 
 
-@router.get("/{category_id}", response_model=ForumCategoryResponse)
+@router.get("/{category_id}", response_model=ApiResponse)
 async def get_category(
     category_id: int,
     db: AsyncSession = Depends(get_db_session)
@@ -74,7 +75,7 @@ async def get_category(
     )
 
 
-@router.get("/slug/{slug}", response_model=ForumCategoryResponse)
+@router.get("/slug/{slug}", response_model=ApiResponse)
 async def get_category_by_slug(
     slug: str,
     db: AsyncSession = Depends(get_db_session)
@@ -101,7 +102,7 @@ async def get_category_by_slug(
     )
 
 
-@router.post("/", response_model=ForumCategoryResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_category(
     category: ForumCategoryCreate,
     current_user: User = Depends(get_current_user),
@@ -135,7 +136,7 @@ async def create_category(
         )
 
 
-@router.put("/{category_id}", response_model=ForumCategoryResponse)
+@router.put("/{category_id}", response_model=ApiResponse)
 async def update_category(
     category_id: int,
     category_update: ForumCategoryUpdate,

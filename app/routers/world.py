@@ -9,17 +9,18 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.core.dependencies_shared import get_world_and_verify_ownership
 from app.core.azure_deps import get_blob_service_client
 from azure.storage.blob.aio import BlobServiceClient
-from app.models.user import User 
-from app.models.world import World as ModelWorld 
+from app.models.user import User
+from app.models.world import World as ModelWorld
 from app.schemas.world import WorldCreate, WorldRead, WorldUpdate
-from app.schemas.story import StoryRead 
+from app.schemas.base import ApiResponse, ApiMeta
+from app.schemas.story import StoryRead
 # --- FIX: Import image-related schemas and crud ---
 from app.schemas.image import GeneratedImageRead
 from app.crud import generated_image as crud_generated_image
 # --- END FIX ---
 from app.crud import world as crud_world
 from app.crud import story as crud_story
-from app.schemas.story_generation import StoryGenerationRequest, StoryGenerationResponse 
+from app.schemas.story_generation import StoryGenerationRequest, StoryGenerationResponse
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_
     return None
 # --- END FIX ---
 
-@router.post("/", response_model=WorldRead, status_code=status.HTTP_201_CREATED, name="create_new_world")
+@router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_world")
 async def create_new_world(
     world_in: WorldCreate,
     db: AsyncSession = Depends(get_db_session),
@@ -55,13 +56,13 @@ async def create_new_world(
         created_world = await crud_world.create_world(db=db, world_in=world_in, user_id=current_user.id)
         await db.commit()
         await db.refresh(created_world)
-        return created_world
+        return ApiResponse.success_response(data=WorldRead.from_orm(created_world))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating world '{world_in.name}' for user '{current_user.username}': {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not create world.")
 
-@router.get("/", response_model=List[WorldRead], name="list_my_worlds")
+@router.get("/", response_model=ApiResponse, name="list_my_worlds")
 async def list_my_worlds(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=200),
@@ -70,7 +71,10 @@ async def list_my_worlds(
 ):
     logger.info(f"User '{current_user.username}' listing their worlds (skip: {skip}, limit: {limit}).")
     worlds = await crud_world.get_worlds_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
-    return worlds
+    return ApiResponse.success_response(
+        data=[WorldRead.from_orm(w) for w in worlds],
+        meta=ApiMeta(page=skip // limit + 1 if limit > 0 else 1, limit=limit, total=len(worlds))
+    )
 
 @router.get("/has-non-shadow-worlds", name="check_user_has_non_shadow_worlds")
 async def check_user_has_non_shadow_worlds(
@@ -88,7 +92,7 @@ async def check_user_has_non_shadow_worlds(
             detail="Error checking user worlds"
         )
 
-@router.get("/{world_id}", response_model=WorldRead, name="get_single_world")
+@router.get("/{world_id}", response_model=ApiResponse, name="get_single_world")
 async def get_single_world(
     db_world: ModelWorld = Depends(get_world_and_verify_ownership),
     blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
@@ -96,9 +100,9 @@ async def get_single_world(
     logger.info(f"User (from dependency context) viewing world ID: {db_world.id} ('{db_world.name}')")
     world_read = WorldRead.from_orm(db_world)
     world_read.image_url = await _check_and_get_image_url(blob_service_client, db_world.image_blob_path)
-    return world_read
+    return ApiResponse.success_response(data=world_read)
 
-@router.put("/{world_id}", response_model=WorldRead, name="update_existing_world")
+@router.put("/{world_id}", response_model=ApiResponse, name="update_existing_world")
 async def update_existing_world(
     world_in: WorldUpdate,
     db_world: ModelWorld = Depends(get_world_and_verify_ownership),
@@ -110,7 +114,7 @@ async def update_existing_world(
         updated_world = await crud_world.update_world(db=db, db_world=db_world, world_in=world_in)
         await db.commit()
         await db.refresh(updated_world)
-        return updated_world
+        return ApiResponse.success_response(data=WorldRead.from_orm(updated_world))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error updating world ID {db_world.id} by user '{current_user.username}': {e}", exc_info=True)
@@ -140,7 +144,7 @@ async def delete_existing_world(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Could not delete world.")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.get("/{world_id}/stories", response_model=List[StoryRead], name="list_stories_for_world")
+@router.get("/{world_id}/stories", response_model=ApiResponse, name="list_stories_for_world")
 async def list_stories_for_world(
     db_world: ModelWorld = Depends(get_world_and_verify_ownership),
     skip: int = Query(0, ge=0),
@@ -152,10 +156,10 @@ async def list_stories_for_world(
     stories = await crud_story.get_stories_by_world_id(
         db, world_id=db_world.id, user_id=current_user.id, skip=skip, limit=limit
     )
-    return stories
+    return ApiResponse.success_response(data=[StoryRead.from_orm(s) for s in stories])
 
 # --- FIX: Add image management endpoints for Worlds ---
-@router.get("/{world_id}/images", response_model=List[GeneratedImageRead])
+@router.get("/{world_id}/images", response_model=ApiResponse)
 async def list_images_for_world(
     world: ModelWorld = Depends(get_world_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
@@ -163,9 +167,9 @@ async def list_images_for_world(
     images = await crud_generated_image.get_images_for_element(
         db, element_type="world", element_id=world.id
     )
-    return images
+    return ApiResponse.success_response(data=[GeneratedImageRead.from_orm(img) for img in images])
 
-@router.post("/{world_id}/set-current-image/{image_id}", response_model=WorldRead)
+@router.post("/{world_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_world(
     world: ModelWorld = Depends(get_world_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
@@ -178,18 +182,18 @@ async def set_current_image_for_world(
     
     world.current_image_id = image_to_set.id
     world.image_blob_path = image_to_set.blob_path
-    
+
     db.add(world)
     await db.commit()
     await db.refresh(world)
-    
+
     world_read = WorldRead.from_orm(world)
     world_read.image_url = await _check_and_get_image_url(blob_service_client, world.image_blob_path)
-    return world_read
+    return ApiResponse.success_response(data=world_read)
 # --- END FIX ---
 
 
-@router.post("/{world_id}/stories/generate", response_model=StoryGenerationResponse, name="generate_story_from_world")
+@router.post("/{world_id}/stories/generate", response_model=ApiResponse, name="generate_story_from_world")
 async def generate_story_from_world(
     request: StoryGenerationRequest,
     world: ModelWorld = Depends(get_world_and_verify_ownership),
@@ -222,9 +226,9 @@ async def generate_story_from_world(
         
         # Generate the story
         result = await service.generate_story_from_world(world, request)
-        
+
         logger.info(f"Story generation completed for user '{username}', world '{world_name}': success={result.success}")
-        return result
+        return ApiResponse.success_response(data=result)
         
     except Exception as e:
         # Use pre-captured IDs to avoid SQLAlchemy greenlet issues

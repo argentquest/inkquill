@@ -7,13 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_db_session
 from app.services.blog_tag_service import blog_tag_service
 from app.schemas.blog import BlogTagRead
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/tags", tags=["blog-tags"])
 
 
-@router.get("/", response_model=List[BlogTagRead])
+@router.get("/", response_model=ApiResponse)
 async def get_blog_tags(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
@@ -31,7 +32,7 @@ async def get_blog_tags(
         )
 
 
-@router.get("/popular", response_model=List[BlogTagRead])
+@router.get("/popular", response_model=ApiResponse)
 async def get_popular_blog_tags(
     limit: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db_session)
@@ -48,7 +49,7 @@ async def get_popular_blog_tags(
         )
 
 
-@router.get("/search", response_model=List[BlogTagRead])
+@router.get("/search", response_model=ApiResponse)
 async def search_blog_tags(
     q: str = Query(..., min_length=1, description="Search query"),
     limit: int = Query(10, ge=1, le=50),
@@ -66,7 +67,7 @@ async def search_blog_tags(
         )
 
 
-@router.get("/{slug}", response_model=BlogTagRead)
+@router.get("/{slug}", response_model=ApiResponse)
 async def get_blog_tag_by_slug(
     slug: str,
     db: AsyncSession = Depends(get_db_session)
