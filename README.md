@@ -115,8 +115,9 @@ The application features secure user authentication, comprehensive project manag
 1.  **Activate your virtual environment.**
 2.  **Start the FastAPI Server** from the project root directory:
     ```bash
-    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     ```
+    Using the project interpreter matters on Windows. If you start `uvicorn` from a global Python install instead of `.venv`, imports like `sqlalchemy` can fail even when they are present in `requirements.txt`.
 3.  **Monitor the Startup Logs:** Watch the terminal for logs from `app.main` and `app.core.config`. They will confirm that your settings have been loaded correctly.
 4.  **Access the Application:**
     *   **UI:** Open your browser to `http://localhost:8000/`.

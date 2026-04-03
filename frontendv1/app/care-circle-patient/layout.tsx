@@ -1,7 +1,7 @@
 import { AppShellResolver } from "@/components/platform/app-shell-resolver";
 import { PlatformAppGate } from "@/components/platform/platform-app-gate";
 
-export default function StorytellingLayout({ children }: { children: React.ReactNode }) {
+export default function CareCirclePatientLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppShellResolver>
       <PlatformAppGate>{children}</PlatformAppGate>

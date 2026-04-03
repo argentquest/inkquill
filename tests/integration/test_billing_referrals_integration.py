@@ -308,3 +308,97 @@ def test_admin_billing_endpoints_can_inspect_and_adjust_accounts(client, registe
     state = run_db(fetch_admin_adjustment_state)
     assert state["balance"] == Decimal("2125.0000")
     assert state["has_admin_adjustment"] is True
+
+def test_shared_conversation_cost_logging_records_ai_log_and_billing_transaction(client, register_and_login, run_db):
+    credentials, _ = register_and_login("conversationcost")
+
+    def seed_and_log_turn(session):
+        async def _inner():
+            from app.models.ai_model_config import AIModelConfiguration, AIModelTypeEnum, AIProviderEnum
+            from app.models.user import User
+            from app.models.user_account import UserAccount
+            from app.models.user_transaction import UserTransaction, TransactionType
+            from app.services.cost_tracker_service import log_conversation_turn
+
+            user = (
+                await session.execute(select(User).where(User.username == credentials["username"]))
+            ).scalar_one()
+
+            model = AIModelConfiguration(
+                display_name="Conversation Cost Model",
+                model_name="gpt-conversation-cost",
+                description="Shared conversation billing coverage",
+                provider=AIProviderEnum.OPENAI,
+                model_type=AIModelTypeEnum.GENERATION,
+                is_active=True,
+                is_public_chat_default=False,
+                max_tokens=4096,
+                temperature=0.4,
+                top_p=1.0,
+                presence_penalty=0.0,
+                frequency_penalty=0.0,
+                is_json_mode=False,
+                provider_cost_input_usd_pm=1.0,
+                provider_cost_output_usd_pm=2.0,
+                user_price_input_usd_pm=3.5,
+                user_price_output_usd_pm=4.5,
+            )
+            session.add(model)
+            await session.commit()
+            await session.refresh(model)
+
+            log_id = await log_conversation_turn(
+                user_id=user.id,
+                model_config=model,
+                prompt_tokens=1200,
+                completion_tokens=300,
+                call_type="chatbot_turn",
+                input_prompt="user: hello\nassistant:",
+                duration_ms=275,
+                db=session,
+            )
+
+            ai_log = (
+                await session.execute(select(AICallLog).where(AICallLog.id == log_id))
+            ).scalar_one()
+            account = (
+                await session.execute(select(UserAccount).where(UserAccount.user_id == user.id))
+            ).scalar_one()
+            transaction = (
+                await session.execute(
+                    select(UserTransaction)
+                    .where(UserTransaction.ai_cost_log_id == log_id)
+                    .where(UserTransaction.transaction_type == TransactionType.AI_COST_DEDUCTION)
+                )
+            ).scalar_one()
+
+            return {
+                "log_id": log_id,
+                "prompt_tokens": ai_log.prompt_tokens,
+                "completion_tokens": ai_log.completion_tokens,
+                "total_tokens": ai_log.total_tokens,
+                "cost_usd": str(ai_log.calculated_cost_usd),
+                "account_balance": str(account.current_balance),
+                "transaction_amount": str(transaction.amount),
+                "transaction_balance_after": str(transaction.balance_after),
+                "transaction_description": transaction.description,
+                "transaction_metadata": transaction.transaction_metadata,
+            }
+
+        return _inner()
+
+    state = run_db(seed_and_log_turn)
+    assert state["prompt_tokens"] == 1200
+    assert state["completion_tokens"] == 300
+    assert state["total_tokens"] == 1500
+    assert state["cost_usd"] == "0.00555000"
+    assert state["account_balance"] == "1944.5000"
+    assert state["transaction_amount"] == "-55.5000"
+    assert state["transaction_balance_after"] == "1944.5000"
+    assert "1200 input / 300 output / 1500 total tokens" in state["transaction_description"]
+    assert state["transaction_metadata"]["call_type"] == "chatbot_turn"
+    assert state["transaction_metadata"]["prompt_tokens"] == 1200
+    assert state["transaction_metadata"]["completion_tokens"] == 300
+    assert state["transaction_metadata"]["total_tokens"] == 1500
+    assert state["transaction_metadata"]["cost_usd"] == "0.00555000"
+    assert state["transaction_metadata"]["coins_charged"] == "55.5000"

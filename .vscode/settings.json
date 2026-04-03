@@ -19,7 +19,7 @@
         "Documentation{,/**}",
         "tests{,/**}"
     ],
-    "python.defaultInterpreterPath": "./venv/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     "appService.preDeployTask": "",
     "appService.postDeployTask": "",
     "git.ignoreLimitWarning": true,
@@ -30,5 +30,5 @@
         "-v",
         "--asyncio-mode=auto"
     ],
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:venv"
 }

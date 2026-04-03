@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from decimal import Decimal
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from app.models.user_transaction import TransactionType
 
 # User schema for nested responses
@@ -60,6 +60,7 @@ class UserTransactionCreate(UserTransactionBase):
     ai_cost_log_id: Optional[int] = None
     credit_package_id: Optional[int] = None
     payment_reference: Optional[str] = None
+    transaction_metadata: Optional[Dict[str, Any]] = None
 
 class UserTransactionResponse(UserTransactionBase):
     """Pydantic schema for user transaction response."""
@@ -69,6 +70,7 @@ class UserTransactionResponse(UserTransactionBase):
     user_account_id: int
     balance_after: Decimal
     created_at: datetime
+    transaction_metadata: Optional[Dict[str, Any]] = None
     user_account: Optional[UserAccountBillingInfo] = None
 
 class CreditPackageBase(BaseModel):

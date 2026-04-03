@@ -57,8 +57,20 @@ class BillingService:
                 transaction_type=TransactionType.AI_COST_DEDUCTION,
                 amount=-amount,  # Negative for deduction
                 balance_after=new_balance,
-                description=f"AI Usage: {model_name} ({ai_cost_log.total_tokens} tokens)",
-                ai_cost_log_id=ai_cost_log_id
+                description=(
+                    f"AI Usage: {model_name} "
+                    f"({ai_cost_log.prompt_tokens} input / {ai_cost_log.completion_tokens} output / {ai_cost_log.total_tokens} total tokens)"
+                ),
+                ai_cost_log_id=ai_cost_log_id,
+                transaction_metadata={
+                    "model_name": model_name,
+                    "call_type": ai_cost_log.call_type,
+                    "prompt_tokens": ai_cost_log.prompt_tokens,
+                    "completion_tokens": ai_cost_log.completion_tokens,
+                    "total_tokens": ai_cost_log.total_tokens,
+                    "cost_usd": str(ai_cost_log.calculated_cost_usd),
+                    "coins_charged": str(amount)
+                }
             )
             
             await billing_crud.create_transaction(db, transaction_data)
@@ -268,3 +280,4 @@ class BillingService:
             return False
 
 billing_service = BillingService()
+

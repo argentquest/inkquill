@@ -412,15 +412,13 @@ async def log_ai_streaming_call(
     Returns the log ID if successful.
     """
     try:
-        # Estimate token usage using tiktoken
         estimated_usage = estimate_tokens_for_streaming_call(
             input_text=input_prompt,
             output_text=output_text,
             model_name=model_config.model_name
         )
-        
-        # Log the call with estimated usage
-        log_id = await log_ai_call(
+
+        return await log_ai_call(
             user_id=user_id,
             model_config=model_config,
             usage=estimated_usage,
@@ -429,57 +427,10 @@ async def log_ai_streaming_call(
             duration_ms=duration_ms,
             job_id=job_id,
             object_id=object_id,
-            db=db
+            db=db,
         )
-        
-        logger.info(f"Logged streaming AI call for '{call_type}' with estimated tokens: {estimated_usage}")
-        return log_id
-        
     except Exception as e:
-        logger.error(f"CRITICAL: Failed to log streaming AI call for user {user_id}. Error: {e}", exc_info=True)
+        logger.error(f"Error in log_ai_streaming_call: {e}", exc_info=True)
         return None
 
-
-class CostTrackerService:
-    """Service class for tracking AI call costs"""
-    
-    def __init__(self, db: AsyncSession):
-        self.db = db
-    
-    async def log_ai_call(
-        self,
-        user_id: int,
-        model_config: AIModelConfiguration,
-        input_tokens: int,
-        output_tokens: int,
-        operation_type: str,
-        input_prompt: Optional[str] = None,
-        duration_ms: Optional[int] = None,
-        job_id: Optional[str] = None,
-        object_id: Optional[int] = None
-    ) -> Optional[int]:
-        """Log an AI call and return the log ID"""
-        try:
-            usage = {
-                "prompt_tokens": input_tokens,
-                "completion_tokens": output_tokens,
-                "total_tokens": input_tokens + output_tokens
-            }
-            
-            log_id = await log_ai_call(
-                user_id=user_id,
-                model_config=model_config,
-                usage=usage,
-                call_type=operation_type,
-                input_prompt=input_prompt,
-                duration_ms=duration_ms,
-                job_id=job_id,
-                object_id=object_id
-            )
-            
-            return log_id
-            
-        except Exception as e:
-            logger.error(f"Error in CostTrackerService.log_ai_call: {e}")
-            return None
 

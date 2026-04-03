@@ -53,9 +53,13 @@ Each sprint file follows this structure:
 
 ## Parallel Track Planning
 
-The current repo also has app-split planning documents for the shared-platform plus dual-app direction:
+The current repo also has app-split planning documents for the shared-platform plus multi-app direction:
 
 - [frontendPlatformBlueprint.md](/C:/code2025a/inbkandquill2/frontendPlatformBlueprint.md)
-- [frontendSprintCommonPlatform.md](/C:/code2025a/inbkandquill2/frontendSprintCommonPlatform.md)
+- [frontendSprintCommonPlatform.md](/C:/code2025a/inbkandquill2/frontendSprintCommonPlatform.md) - active replacement for Sprint 1 to 3 shared-platform planning
 - [frontendSprintStorytellingApp.md](/C:/code2025a/inbkandquill2/frontendSprintStorytellingApp.md)
 - [frontendSprintCareCircleApp.md](/C:/code2025a/inbkandquill2/frontendSprintCareCircleApp.md)
+- [frontendSprintChat.md](/C:/code2025a/inbkandquill2/frontendSprintChat.md)
+
+
+
