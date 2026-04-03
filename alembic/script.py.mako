@@ -1,4 +1,4 @@
-# /ai_rag_story_app/alembic/script.py.mako
+# /story_app/alembic/script.py.mako
 """${message}
 
 Revision ID: ${up_revision}

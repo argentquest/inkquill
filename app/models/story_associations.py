@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story_associations.py
+"""SQLAlchemy models for story associations."""
+
+# /story_app/app/models/story_associations.py
 
 from sqlalchemy import Integer, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
     from .lore_item import LoreItem
 
 class StoryCharacterAssociation(Base):
+    """SQLAlchemy model for story character association."""
     __tablename__ = "story_character_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -51,6 +54,7 @@ class StoryCharacterAssociation(Base):
 
 
 class StoryLocationAssociation(Base):
+    """SQLAlchemy model for story location association."""
     __tablename__ = "story_location_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -85,6 +89,7 @@ class StoryLocationAssociation(Base):
 
 
 class StoryLoreItemAssociation(Base):
+    """SQLAlchemy model for story lore item association."""
     __tablename__ = "story_lore_item_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

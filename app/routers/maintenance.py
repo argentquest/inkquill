@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/maintenance.py
+"""API routes for maintenance."""
+
+# /story_app/app/routers/maintenance.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Dict, Any
@@ -7,6 +9,7 @@ import logging
 from app.core.maintenance import MaintenanceManager
 from app.core.deps import get_current_active_user
 from app.models.user import User
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
@@ -16,25 +19,25 @@ router = APIRouter(
 )
 
 @router.get("/status", name="get_maintenance_status")
-async def get_maintenance_status() -> Dict[str, Any]:
+async def get_maintenance_status() -> ApiResponse:
     """Get current maintenance status - public endpoint for all users"""
     try:
         status = MaintenanceManager.get_maintenance_status()
-        return {
+        return ApiResponse.success_response({
             "enabled": status.get("enabled", False),
             "message": status.get("message"),
             "estimated_end_time": status.get("estimated_end_time")
-        }
+        })
     except Exception as e:
         logger.error(f"Error getting maintenance status: {e}")
-        return {"enabled": False, "message": None}
+        return ApiResponse.success_response({"enabled": False, "message": None})
 
 @router.post("/enable", name="enable_maintenance_mode")
 async def enable_maintenance_mode(
     message: str = "The application is getting an update and will be back in about 5 minutes.",
     duration_minutes: int = 5,
     current_user: User = Depends(get_current_active_user)
-) -> Dict[str, str]:
+) -> ApiResponse:
     """Enable maintenance mode - admin only"""
     
     # Check if user is admin
@@ -51,7 +54,7 @@ async def enable_maintenance_mode(
             duration_minutes=duration_minutes
         )
         logger.info(f"Maintenance mode enabled by user {current_user.username} for {duration_minutes} minutes")
-        return {"status": "Maintenance mode enabled", "message": message}
+        return ApiResponse.success_response({"status": "Maintenance mode enabled", "message": message})
     except Exception as e:
         logger.error(f"Failed to enable maintenance mode: {e}")
         raise HTTPException(
@@ -62,7 +65,7 @@ async def enable_maintenance_mode(
 @router.post("/disable", name="disable_maintenance_mode")
 async def disable_maintenance_mode(
     current_user: User = Depends(get_current_active_user)
-) -> Dict[str, str]:
+) -> ApiResponse:
     """Disable maintenance mode - admin only"""
     
     # Check if user is admin
@@ -75,7 +78,7 @@ async def disable_maintenance_mode(
     try:
         MaintenanceManager.set_maintenance_mode(enabled=False)
         logger.info(f"Maintenance mode disabled by user {current_user.username}")
-        return {"status": "Maintenance mode disabled"}
+        return ApiResponse.success_response({"status": "Maintenance mode disabled"})
     except Exception as e:
         logger.error(f"Failed to disable maintenance mode: {e}")
         raise HTTPException(

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_document.py
+"""API routes for views document."""
+
+# /story_app/app/routers/views_document.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse
@@ -64,6 +66,7 @@ async def _document_manager_core(
     db: AsyncSession,
     current_user: User
 ):
+    """Provide internal router support for document manager core."""
     logger.info(f"User {current_user.username} accessing document management page. World ID: {world_id}")
     documents_from_db = []
     available_worlds = []

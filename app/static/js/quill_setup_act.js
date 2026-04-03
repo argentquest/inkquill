@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/quill_setup_act.js
+// /story_app/app/static/js/quill_setup_act.js
 "use strict";
 
 const ActQuillManager = (() => {

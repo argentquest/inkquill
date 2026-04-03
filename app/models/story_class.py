@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story_class.py
+"""SQLAlchemy models for story class."""
+
+# /story_app/app/models/story_class.py
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.sql import func
@@ -7,6 +9,7 @@ from app.db.database import Base
 
 
 class StoryClass(Base):
+    """SQLAlchemy model for story class."""
     __tablename__ = "story_classes"
 
     id = Column(Integer, primary_key=True, index=True)

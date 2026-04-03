@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/story_associations_handler.js
+// /story_app/app/static/js/story_associations_handler.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {

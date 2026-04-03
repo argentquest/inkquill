@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/story_wizard_api.py
+"""API routes for story wizard api."""
+
+# /story_app/app/routers/story_wizard_api.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +16,7 @@ from app.services.ai_model_cache import model_cache
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from app.crud import user as crud_user
 from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 from semantic_kernel.prompt_template.input_variable import InputVariable
 import semantic_kernel as sk
@@ -367,8 +369,8 @@ async def _ensure_story_wizard_functions():
     if not kernel.plugins.get("StoryWizard"):
         try:
             # Register Chat Response function
-            chat_exec_settings = AzureChatPromptExecutionSettings(
-                service_id="azure_openai_chat_service",
+            chat_exec_settings = OpenAIChatPromptExecutionSettings(
+                service_id="chat_service",
                 max_tokens=300,
                 temperature=0.7,
                 top_p=0.9
@@ -387,7 +389,7 @@ async def _ensure_story_wizard_functions():
                     InputVariable(name="user_message", description="User's message"),
                     InputVariable(name="conversation_history", description="Conversation history")
                 ],
-                execution_settings={"azure_openai_chat_service": chat_exec_settings}
+                execution_settings={"chat_service": chat_exec_settings}
             )
             
             kernel.add_function(
@@ -397,8 +399,8 @@ async def _ensure_story_wizard_functions():
             )
             
             # Register Data Extraction function
-            extract_exec_settings = AzureChatPromptExecutionSettings(
-                service_id="azure_openai_chat_service",
+            extract_exec_settings = OpenAIChatPromptExecutionSettings(
+                service_id="chat_service",
                 max_tokens=500,
                 temperature=0.3,
                 top_p=0.9,
@@ -416,7 +418,7 @@ async def _ensure_story_wizard_functions():
                     InputVariable(name="user_response", description="User's response"),
                     InputVariable(name="extraction_schema", description="Extraction schema")
                 ],
-                execution_settings={"azure_openai_chat_service": extract_exec_settings}
+                execution_settings={"chat_service": extract_exec_settings}
             )
             
             kernel.add_function(
@@ -711,3 +713,4 @@ def _calculate_next_step(current_phase: int, current_step: int) -> tuple[int, in
         return current_phase, current_step + 1
     else:
         return current_phase + 1, 1
+

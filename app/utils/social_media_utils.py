@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/utils/social_media_utils.py
+"""Utility helpers for social media utils."""
+
+# /story_app/app/utils/social_media_utils.py
 
 from typing import Optional, Dict, Any
 from urllib.parse import urljoin

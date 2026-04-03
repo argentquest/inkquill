@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/location_connection.py
+"""Database CRUD helpers for location connection."""
+
+# /story_app/app/crud/location_connection.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select

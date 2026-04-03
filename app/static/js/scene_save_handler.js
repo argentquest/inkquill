@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_save_handler.js
+// /story_app/app/static/js/scene_save_handler.js
 "use strict";
 
 const SceneSaveHandler = (() => {

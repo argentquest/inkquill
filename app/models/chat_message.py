@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/chat_message.py
+"""SQLAlchemy models for chat message."""
+
+# /story_app/app/models/chat_message.py
 
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import relationship, Mapped, mapped_column

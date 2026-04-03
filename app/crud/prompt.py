@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/prompt.py
+"""Database CRUD helpers for prompt."""
+
+# /story_app/app/crud/prompt.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload 
@@ -11,6 +13,7 @@ from app.schemas.prompt import PromptCreate, PromptUpdate
 logger = logging.getLogger(__name__)
 
 async def create_prompt(db: AsyncSession, prompt_in: PromptCreate, creator_user_id: int) -> Prompt:
+    """Create prompt."""
     prompt_data = prompt_in.model_dump()
     logger.info(f"Creating prompt '{prompt_data.get('title')}' by user_id: {creator_user_id}")
     db_prompt = Prompt(**prompt_data, user_id=creator_user_id, last_updated_by_user_id=creator_user_id)
@@ -21,6 +24,7 @@ async def create_prompt(db: AsyncSession, prompt_in: PromptCreate, creator_user_
     return db_prompt
 
 async def get_prompt(db: AsyncSession, prompt_id: int) -> Optional[Prompt]:
+    """Return prompt."""
     logger.debug(f"Fetching prompt with ID: {prompt_id}")
     result = await db.execute(
         select(Prompt).filter(Prompt.id == prompt_id).options(selectinload(Prompt.owner), selectinload(Prompt.last_updated_by))
@@ -32,6 +36,7 @@ async def get_prompts_by_user(
     age_target: Optional[AgeTargetEnum] = None, is_active: Optional[bool] = None, 
     skip: int = 0, limit: int = 100
 ) -> List[Prompt]:
+    """Return prompts by user."""
     query = select(Prompt).filter(Prompt.user_id == user_id)
     if prompt_type is not None: query = query.filter(Prompt.prompt_type == prompt_type)
     if age_target is not None: query = query.filter(Prompt.age_target == age_target)
@@ -45,6 +50,7 @@ async def get_shared_prompts(
     age_target: Optional[AgeTargetEnum] = None, is_active: Optional[bool] = None, 
     skip: int = 0, limit: int = 100
 ) -> List[Prompt]:
+    """Return shared prompts."""
     query = select(Prompt)
     if prompt_type is not None: query = query.filter(Prompt.prompt_type == prompt_type)
     if age_target is not None: query = query.filter(Prompt.age_target == age_target)
@@ -54,6 +60,7 @@ async def get_shared_prompts(
     return result.scalars().all()
 
 async def update_prompt(db: AsyncSession, db_prompt: Prompt, prompt_in: PromptUpdate, updater_user_id: int) -> Prompt:
+    """Update prompt."""
     update_data = prompt_in.model_dump(exclude_unset=True)
     logger.info(f"Updating prompt ID: {db_prompt.id} by user_id: {updater_user_id}")
     if update_data:
@@ -68,6 +75,7 @@ async def update_prompt(db: AsyncSession, db_prompt: Prompt, prompt_in: PromptUp
     return db_prompt
 
 async def delete_prompt(db: AsyncSession, db_prompt: Prompt) -> Prompt:
+    """Delete prompt."""
     logger.info(f"Deleting prompt ID: {db_prompt.id}")
     await db.delete(db_prompt)
     await db.flush()

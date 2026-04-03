@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story_chat_message.py
+"""SQLAlchemy models for story chat message."""
+
+# /story_app/app/models/story_chat_message.py
 
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -46,7 +48,7 @@ class StoryChatMessage(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # --- Relationships ---
-    # session: Mapped["StoryChatSession"] = relationship("StoryChatSession", back_populates="messages")
+    session: Mapped["StoryChatSession"] = relationship("StoryChatSession", back_populates="messages")
     cost_log: Mapped[Optional["AICallLog"]] = relationship("AICallLog")
 
     def __repr__(self):

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story_chat_session.py
+"""SQLAlchemy models for story chat session."""
+
+# /story_app/app/models/story_chat_session.py
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -41,9 +43,11 @@ class StoryChatSession(Base):
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     # --- Relationships ---
-    # story: Mapped["Story"] = relationship("Story", back_populates="chat_sessions")
-    # user: Mapped["User"] = relationship("User", back_populates="story_chat_sessions")
-    # messages: Mapped[List["StoryChatMessage"]] = relationship("StoryChatMessage", back_populates="session", cascade="all, delete-orphan")
+    messages: Mapped[List["StoryChatMessage"]] = relationship(
+        "StoryChatMessage",
+        back_populates="session",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self):
         return f"<StoryChatSession(id={self.id}, title='{self.title}', story_id={self.story_id}, user_id={self.user_id})>"

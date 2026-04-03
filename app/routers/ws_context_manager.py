@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/ws_context_manager.py
+"""API routes for ws context manager."""
+
+# /story_app/app/routers/ws_context_manager.py
 import logging
 from typing import Dict, Any, Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession

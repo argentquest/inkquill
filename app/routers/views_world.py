@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_world.py
+"""API routes for views world."""
+
+# /story_app/app/routers/views_world.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Query, BackgroundTasks
 from fastapi.responses import HTMLResponse
@@ -11,8 +13,8 @@ import asyncio
 from app.core.deps import get_db_session, get_current_active_user, get_current_user_with_anonymous_support
 from app.core import security as core_security 
 from app.crud import user as crud_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
+from app.core.storage_deps import LocalStorageClient
 from app.models.user import User
 from app.models.world import World as ModelWorld
 from app.models.story import Story as ModelStory
@@ -44,13 +46,12 @@ templates = Jinja2Templates(directory="app/templates")
 # --- HELPER FUNCTIONS ---
 
 
-async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_path: Optional[str]) -> Optional[str]:
+async def _check_and_get_image_url(blob_service_client: LocalStorageClient, blob_path: Optional[str]) -> Optional[str]:
     """Safely constructs a public URL for a blob if it exists."""
     if not blob_path:
         return None
     try:
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_path)
+        blob_client = blob_service_client.get_blob_client(container="generated-images", blob=blob_path)
         if await blob_client.exists():
             return blob_client.url
     except Exception as e:
@@ -75,7 +76,7 @@ async def get_world_for_ui_and_verify_ownership(
 async def _enrich_elements_with_image_urls(
     elements: List[Union[ModelWorld, ModelCharacter, ModelLocation, ModelLoreItem]],
     schema: Type[Union[WorldRead, CharacterRead, LocationRead, LoreItemRead]],
-    blob_service_client: BlobServiceClient
+    blob_service_client: LocalStorageClient
 ) -> List[Union[WorldRead, CharacterRead, LocationRead, LoreItemRead]]:
     """
     Takes a list of ORM elements, converts them to Pydantic schemas,
@@ -102,8 +103,9 @@ async def list_worlds_ui(
     request: Request, 
     db: AsyncSession = Depends(get_db_session), 
     current_user: Optional[User] = Depends(get_current_user_with_anonymous_support),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /."""
     if current_user:
         logger.info(f"User '{current_user.username}' accessing list of their worlds.")
         worlds_db = await crud_world.get_worlds_by_user(db, user_id=current_user.id)
@@ -145,6 +147,7 @@ async def list_worlds_ui(
 
 @router.get("/new", response_class=HTMLResponse, name="ui_create_world_form")
 async def create_world_ui_form(request: Request):
+    """Handle GET /new."""
     return templates.TemplateResponse(
         "pages/world_form.html", 
         {"request": request, "world": None, "form_action_url": request.url_for('create_new_world')}
@@ -152,10 +155,12 @@ async def create_world_ui_form(request: Request):
 
 @router.get("/import-from-book", response_class=HTMLResponse, name="ui_import_world_from_book_form")
 async def import_world_from_book_ui_form(request: Request):
+    """Handle GET /import-from-book."""
     return templates.TemplateResponse("pages/import_from_book.html", {"request": request})
 
 @router.get("/create-from-document", response_class=HTMLResponse, name="ui_create_world_from_document_form")
 async def create_world_from_document_ui_form(request: Request):
+    """Handle GET /create-from-document."""
     return templates.TemplateResponse("pages/create_from_document.html", {"request": request})
 
 @router.get("/generator/world", response_class=HTMLResponse, name="ui_world_builder_wizard")
@@ -169,8 +174,9 @@ async def world_detail_ui(
     db_world: ModelWorld = Depends(get_world_for_ui_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /{world_id}."""
     characters_db, locations_db, lore_items_db, documents_db, stories_in_world = await asyncio.gather(
         crud_character.get_characters_by_world(db, world_id=db_world.id, limit=settings.MAX_ELEMENTS_PER_TYPE_FROM_BOOK_IMPORT),
         crud_location.get_locations_by_world(db, world_id=db_world.id, limit=settings.MAX_ELEMENTS_PER_TYPE_FROM_BOOK_IMPORT),
@@ -203,8 +209,9 @@ async def world_detail_ui(
 async def edit_world_ui_form(
     request: Request, 
     db_world: ModelWorld = Depends(get_world_for_ui_and_verify_ownership),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /{world_id}/edit."""
     path_to_check = db_world.current_image.blob_path if db_world.current_image else db_world.image_blob_path
     image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     
@@ -227,6 +234,7 @@ async def list_characters_for_world_ui(
     current_user: User = Depends(get_current_active_user),
     blob_service_client=Depends(get_blob_service_client)
 ):
+    """Handle GET /{world_id}/characters."""
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
     characters_db = await crud_character.get_characters_by_world(db, world_id=db_world.id, limit=100)
     world_characters = await _enrich_elements_with_image_urls(characters_db, CharacterRead, blob_service_client)
@@ -242,6 +250,7 @@ async def create_character_for_world_ui_form(
     db: AsyncSession = Depends(get_db_session), 
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /{world_id}/characters/new."""
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
     return templates.TemplateResponse(
         "pages/character_form.html", 
@@ -255,7 +264,7 @@ async def view_character_ui(
     character_id: int,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """View a specific character details."""
     db_character = await crud_character.get_character(db, character_id=character_id)
@@ -286,6 +295,7 @@ async def edit_character_ui_form(
     current_user: User = Depends(get_current_active_user),
     blob_service_client=Depends(get_blob_service_client)
 ):
+    """Handle GET /characters/{character_id}/edit."""
     db_character = await crud_character.get_character(db, character_id=character_id)
     if not db_character: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Character not found")
@@ -315,6 +325,7 @@ async def list_locations_for_world_ui(
     current_user: User = Depends(get_current_active_user),
     blob_service_client=Depends(get_blob_service_client)
 ):
+    """Handle GET /{world_id}/locations."""
     from app.crud import location_connection as crud_location_connection
     
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
@@ -346,6 +357,7 @@ async def create_location_for_world_ui_form(
     db: AsyncSession = Depends(get_db_session), 
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /{world_id}/locations/new."""
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
     return templates.TemplateResponse(
         "pages/location_form.html", 
@@ -359,7 +371,7 @@ async def view_location_ui(
     location_id: int,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """View a specific location details."""
     db_location = await crud_location.get_location(db, location_id=location_id)
@@ -390,6 +402,7 @@ async def edit_location_ui_form(
     current_user: User = Depends(get_current_active_user),
     blob_service_client=Depends(get_blob_service_client)
 ):
+    """Handle GET /locations/{location_id}/edit."""
     db_location = await crud_location.get_location(db, location_id=location_id)
     if not db_location: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Location not found")
@@ -414,6 +427,7 @@ async def world_map_ui(
     db: AsyncSession = Depends(get_db_session), 
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /{world_id}/map."""
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
     return templates.TemplateResponse("pages/world_map.html", {"request": request, "world": db_world})
 
@@ -427,6 +441,7 @@ async def list_lore_items_for_world_ui(
     current_user: User = Depends(get_current_active_user),
     blob_service_client=Depends(get_blob_service_client)
 ):
+    """Handle GET /{world_id}/lore-items."""
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
     lore_items_db = await crud_lore_item.get_lore_items_by_world(db, world_id=db_world.id, limit=100)
     world_lore_items = await _enrich_elements_with_image_urls(lore_items_db, LoreItemRead, blob_service_client)
@@ -443,6 +458,7 @@ async def create_lore_item_for_world_ui_form(
     db: AsyncSession = Depends(get_db_session), 
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /{world_id}/lore-items/new."""
     db_world = await get_world_for_ui_and_verify_ownership(world_id, db, current_user)
     categories = [cat for cat in LoreItemCategoryEnum]
     return templates.TemplateResponse(
@@ -457,7 +473,7 @@ async def view_lore_item_ui(
     lore_item_id: int,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """View a specific lore item details."""
     db_lore_item = await crud_lore_item.get_lore_item(db, lore_item_id=lore_item_id)
@@ -488,6 +504,7 @@ async def edit_lore_item_ui_form(
     current_user: User = Depends(get_current_active_user),
     blob_service_client=Depends(get_blob_service_client)
 ):
+    """Handle GET /lore-items/{lore_item_id}/edit."""
     db_lore_item = await crud_lore_item.get_lore_item(db, lore_item_id=lore_item_id)
     if not db_lore_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lore item not found")
@@ -777,3 +794,4 @@ async def get_age_categories(
     
     age_categories = character_generator_service.get_age_categories()
     return {"age_categories": age_categories}
+

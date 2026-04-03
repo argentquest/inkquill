@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/__init__.py
+"""Package exports for schemas."""
+
+# /story_app/app/schemas/__init__.py
 
 # This file marks the 'schemas' directory as a Python package.
 # It allows you to import modules from this directory using dot notation

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/user_activity.py
+"""Database CRUD helpers for user activity."""
+
+# /story_app/app/crud/user_activity.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_, distinct
 from app.models.user_activity import UserActivity

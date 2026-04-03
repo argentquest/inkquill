@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_crud.js
+// /story_app/app/static/js/act_crud.js
 
 /**
  * act_crud.js

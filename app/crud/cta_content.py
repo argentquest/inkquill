@@ -1,8 +1,10 @@
+"""Database CRUD helpers for cta content."""
+
 # CRUD operations for CTA Content
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
-from app.models.cta_content import CTAContent, CTAPosition
+from app.models.cta_content import CTAContent, CTAPosition, CTAStyle
 from app.models.user import User
 import json
 
@@ -33,13 +35,14 @@ async def create_cta_content(
     sort_order: int = 0
 ) -> CTAContent:
     """Create a new CTA content entry"""
+    style_enum = CTAStyle(style) if isinstance(style, str) else style
     
     cta = CTAContent(
         title=title,
         subtitle=subtitle,
         content=content,
         position=position,
-        style=style,
+        style=style_enum,
         background_color=background_color,
         text_color=text_color,
         icon_class=icon_class,
@@ -121,6 +124,8 @@ async def update_cta_content(
         if hasattr(cta, key):
             if key == 'features' and value is not None:
                 value = json.dumps(value) if isinstance(value, list) else value
+            elif key == "style" and isinstance(value, str):
+                value = CTAStyle(value)
             setattr(cta, key, value)
     
     await db.commit()

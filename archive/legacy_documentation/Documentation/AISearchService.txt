@@ -1,0 +1,110 @@
+Azure AI Search: Index Schema for Context Content
+Objective:
+Defines the schema for the Azure AI Search index storing processed document chunks and vector embeddings for the Context system.
+
+1. Index Naming:
+
+Proposed Index Name: rag-app-content-index
+
+2. Fields Definition:
+
+id
+Data Type (Edm): Edm.String
+Attributes: Key, Retrievable, Filterable
+Description: Primary Key. Unique identifier for each chunk (e.g., doc<DB_DOCUMENT_ID>_chunk<CHUNK_NUMBER>). Must be URL-safe.
+
+document_id
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Sortable, Facetable
+Description: ID of the original document from PostgreSQL UploadedDocument table.
+
+user_id
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Facetable
+Description: ID of the user who uploaded the document or owns the world element.
+
+source_filename
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Sortable, Searchable (standard.lucene analyzer)
+Description: Original filename (e.g., "project_brief.pdf") or generated name for world element Context text.
+
+chunk_text
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Searchable (standard.lucene analyzer)
+Description: Actual text content of the chunk. Used for keyword search.
+
+chunk_text_vector
+Data Type (Edm): Collection(Edm.Single)
+Attributes: Retrievable, Searchable
+Description: Vector Embedding. Stores the numerical vector representation of chunk_text. Used for vector search.
+Dimensions: 3072 (Matches text-embedding-3-large)
+Vector Search Profile: default-hnsw-cosine-profile
+
+page_number (Optional)
+Data Type (Edm): Edm.Int32
+Attributes: Retrievable, Filterable, Sortable, Facetable, Stored
+Description: Original page number where the chunk originated (useful for PDFs). Nullable.
+
+uploaded_at
+Data Type (Edm): Edm.DateTimeOffset
+Attributes: Retrievable, Filterable, Sortable
+Description: Timestamp (UTC) when the original document/Context text was created/uploaded.
+
+tags (Optional)
+Data Type (Edm): Collection(Edm.String)
+Attributes: Retrievable, Filterable, Searchable, Facetable
+Description: List of keywords/tags associated with the document/chunk. Nullable.
+
+processing_status (Optional)
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Sortable, Facetable, Stored
+Description: Status of the document chunk in a processing pipeline (e.g., "Processed"). Nullable.
+
+world_id (Optional)
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Facetable, Stored
+Description: ID of the World associated with this document chunk. Nullable.
+
+element_type (Optional)
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Facetable, Stored
+Description: Type of source element (e.g., "USER_UPLOADED", "CHARACTER_LORE", "LOCATION_LORE", "LORE_ITEM_LORE"). Nullable.
+
+source_element_id (Optional)
+Data Type (Edm): Edm.String
+Attributes: Retrievable, Filterable, Sortable, Facetable, Stored
+Description: ID of the specific Character, Location, or LoreItem if element_type indicates generated lore. For USER_UPLOADED, this could be the document_id itself. Nullable.
+
+3. Vector Search Profile / Configuration:
+
+Defines how chunk_text_vector is searched.
+
+Profile Name: default-hnsw-cosine-profile
+Algorithm Configuration Name: default-hnsw-config
+Kind: hnsw (Hierarchical Navigable Small Worlds)
+HNSW Parameters:
+  m: 4
+  efConstruction: 400
+  efSearch: 500
+  metric: cosine
+Dimensions: 3072 (Must match your embedding model's dimensions, e.g., text-embedding-3-large)
+
+4. Analyzers:
+
+For searchable text fields like `chunk_text` and `source_filename`, `standard.lucene` is used.
+
+5. Semantic Search Configuration:
+
+Enhances hybrid search relevance.
+
+Semantic Configuration Name: default-semantic-configuration
+Title Field: source_filename
+Prioritized Content Fields: chunk_text
+Prioritized Keyword Fields: tags
+Use `queryType: "semantic"` when querying to enable semantic ranking.
+
+6. Implementation Steps:
+
+Provision Azure AI Search Service: Create an instance in Azure.
+Create/Update the Index: Define/update the index using this schema via the application's startup logic (`azure_ai_search_service.py`), Azure portal, SDK, or REST API.
+Configure Semantic Search: Enable and configure in the Azure portal if desired (the Python SDK also sets this up).

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/job_status.py
+"""Database CRUD helpers for job status."""
+
+# /story_app/app/crud/job_status.py
 
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +12,7 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 async def create_job(db: AsyncSession, job_id: str, user_id: int, job_type: JobTypeEnum, status_message: str) -> JobStatus:
+    """Create job."""
     db_job = JobStatus(
         job_id=job_id,
         user_id=user_id,
@@ -23,12 +26,14 @@ async def create_job(db: AsyncSession, job_id: str, user_id: int, job_type: JobT
     return db_job
 
 async def get_job_by_job_id(db: AsyncSession, job_id: str, user_id: int) -> Optional[JobStatus]:
+    """Return job by job id."""
     result = await db.execute(
         select(JobStatus).filter(JobStatus.job_id == job_id, JobStatus.user_id == user_id)
     )
     return result.scalars().first()
 
 async def update_job_status(db: AsyncSession, job_id: str, state: JobStateEnum, status_message: Optional[str] = None, result_message: Optional[str] = None, world_id: Optional[int] = None) -> Optional[JobStatus]:
+    """Update job status."""
     result = await db.execute(select(JobStatus).filter(JobStatus.job_id == job_id))
     db_job = result.scalars().first()
 

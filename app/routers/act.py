@@ -1,12 +1,14 @@
-# /ai_rag_story_app/app/routers/act.py
+"""API routes for act."""
+
+# /story_app/app/routers/act.py
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Query, Path, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 import logging
 
 from app.core.deps import get_db_session, get_current_active_user, get_current_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
+
 from app.core.dependencies_shared import verify_story_owner_for_act_operations, get_act_and_verify_ownership
 from app.models.user import User as ModelUser
 from app.models.story import Story as ModelStory
@@ -38,6 +40,7 @@ acts_router = APIRouter(
 
 @story_acts_router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_act_for_story")
 async def create_new_act_for_story(act_in: ActCreate, story_owner_verified: ModelStory = Depends(verify_story_owner_for_act_operations), db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)):
+    """Handle POST /."""
     story_id_for_creation = story_owner_verified.id
     username = current_user.username  # Capture username to avoid lazy loading issues
     logger.info(f"User {username} creating new act '{act_in.title}' for story ID {story_id_for_creation}")
@@ -45,7 +48,7 @@ async def create_new_act_for_story(act_in: ActCreate, story_owner_verified: Mode
         created_act = await crud_act.create_act(db=db, act_in=act_in, story_id=story_id_for_creation)
         await db.commit()
         await db.refresh(created_act)
-        return created_act
+        return ApiResponse.success_response(data=ActRead.model_validate(created_act))
     except Exception as e:
         await db.rollback()
         logger.error(f"Failed to create act for story ID {story_id_for_creation} by user {username}: {e}", exc_info=True)
@@ -55,13 +58,15 @@ async def create_new_act_for_story(act_in: ActCreate, story_owner_verified: Mode
 
 @story_acts_router.get("/", response_model=ApiResponse, name="list_acts_for_story")
 async def list_acts_for_story(story_owner_verified: ModelStory = Depends(verify_story_owner_for_act_operations), skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=200), db: AsyncSession = Depends(get_db_session)):
+    """Handle GET /."""
     story_id_for_listing = story_owner_verified.id
     acts = await crud_act.get_acts_by_story(db, story_id=story_id_for_listing, skip=skip, limit=limit)
-    return acts
+    return ApiResponse.success_response(data=[ActRead.model_validate(act) for act in acts])
 
 @acts_router.get("/{act_id}", response_model=ApiResponse, name="get_single_act")
 async def get_single_act(db_act: ModelAct = Depends(get_act_and_verify_ownership)):
-    return db_act
+    """Handle GET /{act_id}."""
+    return ApiResponse.success_response(data=ActRead.model_validate(db_act))
 
 @acts_router.put("/{act_id}", response_model=ApiResponse, name="update_existing_act")
 async def update_existing_act(
@@ -72,6 +77,7 @@ async def update_existing_act(
     current_user: Optional[ModelUser] = Depends(get_current_user)
 ):
     # Handle anonymous users
+    """Handle PUT /{act_id}."""
     if current_user is None:
         # Get anonymous user from cookies
         from app.services.anonymous_user_service import anonymous_user_service
@@ -123,7 +129,7 @@ async def update_existing_act(
             await db.commit()
             await db.refresh(updated_act)
         
-        return updated_act
+        return ApiResponse.success_response(data=ActRead.model_validate(updated_act))
     except Exception as e:
         await db.rollback()
         logger.error(f"Failed to update act ID {db_act.id} for user {username}: {e}", exc_info=True)
@@ -133,6 +139,7 @@ async def update_existing_act(
 
 @acts_router.delete("/{act_id}", status_code=status.HTTP_204_NO_CONTENT, name="delete_existing_act")
 async def delete_existing_act(db_act: ModelAct = Depends(get_act_and_verify_ownership), db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)):
+    """Handle DELETE /{act_id}."""
     username = current_user.username  # Capture username to avoid lazy loading issues
     logger.info(f"User {username} deleting act ID: {db_act.id}")
     try:
@@ -146,6 +153,7 @@ async def delete_existing_act(db_act: ModelAct = Depends(get_act_and_verify_owne
 
 @acts_router.post("/{act_id}/compile-scenes", response_model=ApiResponse, name="compile_scenes_to_act_content")
 async def compile_scenes_to_act_content(db_act: ModelAct = Depends(get_act_and_verify_ownership), db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)):
+    """Handle POST /{act_id}/compile-scenes."""
     logger.info(f"User {current_user.username} compiling scenes for Act ID: {db_act.id}")
     scenes: List[ModelScene] = await crud_scene.get_scenes_by_act(db, act_id=db_act.id, limit=1000)
     if not scenes:
@@ -173,27 +181,29 @@ async def compile_scenes_to_act_content(db_act: ModelAct = Depends(get_act_and_v
     await db.refresh(updated_act)
     
     logger.info(f"Act ID: {db_act.id} description updated from compiled scenes by user {current_user.username}.")
-    return updated_act
+    return ApiResponse.success_response(data=ActRead.model_validate(updated_act))
 
 @acts_router.get("/{act_id}/images", response_model=ApiResponse)
 async def list_images_for_act(
     db_act: ModelAct = Depends(get_act_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle GET /{act_id}/images."""
     logger.info(f"API: Fetching images for act ID: {db_act.id}, Type: 'act'")
     images = await crud_generated_image.get_images_for_element(
         db, element_type="act", element_id=db_act.id
     )
     logger.info(f"API: Found {len(images)} images for act ID: {db_act.id}")
-    return images
+    return ApiResponse.success_response(data=[GeneratedImageRead.model_validate(image) for image in images])
 
 @acts_router.post("/{act_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_act(
     db_act: ModelAct = Depends(get_act_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle POST /{act_id}/set-current-image/{image_id}."""
     image_to_set = await crud_generated_image.get_image(db, image_id=image_id)
     if not image_to_set or image_to_set.element_type != 'act' or image_to_set.associated_element_id != db_act.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found or does not belong to this act.")
@@ -204,9 +214,10 @@ async def set_current_image_for_act(
     await db.commit()
     await db.refresh(db_act)
     
-    return db_act
+    return ApiResponse.success_response(data=ActRead.model_validate(db_act))
 
 class ActImageGenerationRequest(BaseModel):
+    """Response or helper model for act image generation request."""
     custom_prompt: Optional[str] = None
     image_style: Optional[str] = None
 
@@ -307,7 +318,7 @@ async def generate_summary_for_act(
         else:
             logger.warning(f"AI summary generation returned None for Act ID: {db_act.id}")
         
-        return db_act
+        return ApiResponse.success_response(data=ActRead.model_validate(db_act))
     except Exception as e:
         await db.rollback()
         logger.error(f"Failed to generate summary for Act ID: {db_act.id}: {e}", exc_info=True)
@@ -315,3 +326,4 @@ async def generate_summary_for_act(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate AI summary. Please try again."
         )
+

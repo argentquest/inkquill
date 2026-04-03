@@ -1,4 +1,4 @@
-{# /ai_rag_story_app/app/templates/pages/scene_editor_ui.html #}
+{# /story_app/app/templates/pages/scene_editor_ui.html #}
 {% extends "layouts/base.html" %}
 
 {% block title %}
@@ -902,7 +902,7 @@
                         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Debug</a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#scene-ai-prompt-debug-pane" type="button" role="tab">View AI Gen Prompt</button></li>
-                                <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#rag-details-pane" type="button" role="tab">RAG Details</button></li>
+                                <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#context-details-pane" type="button" role="tab">Context Details</button></li>
                                 <li><button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#raw-ai-output-pane" type="button" role="tab">Raw AI Output</button></li>
                             </ul>
                         </li>
@@ -1118,7 +1118,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade p-3" id="scene-ai-prompt-debug-pane" role="tabpanel"><pre id="scene-ai-full-prompt-preview-area">No AI generation request made yet.</pre></div>
-                    <div class="tab-pane fade p-3" id="rag-details-pane" role="tabpanel"><pre id="scene-ai-rag-context-full-details-area">No RAG context retrieved yet.</pre></div>
+                    <div class="tab-pane fade p-3" id="context-details-pane" role="tabpanel"><pre id="scene-ai-context-full-details-area">No document context retrieved yet.</pre></div>
                     <div class="tab-pane fade p-3" id="raw-ai-output-pane" role="tabpanel"><pre id="scene-ai-full-response-display-area">No AI generation completed yet.</pre></div>
                 </div>
             </div>
@@ -1647,3 +1647,4 @@
         }
     </script>
 {% endblock %}
+

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/prompts/story_chat/advanced_story_chat.py
+"""Prompt helpers for advanced story chat."""
+
+# /story_app/app/prompts/story_chat/advanced_story_chat.py
 
 ADVANCED_STORY_CHAT_PROMPT = """You are an AI writing assistant specialized in helping authors with Advanced Stories - comprehensive storytelling with rich world-building and complex narrative elements.
 

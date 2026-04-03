@@ -784,8 +784,8 @@ async function loadChatMessages() {
                 data.messages.forEach(message => {
                     // Extract sources from full_context if available
                     let sources = [];
-                    if (message.full_context && message.full_context.rag_sources) {
-                        sources = message.full_context.rag_sources;
+                    if (message.full_context && message.full_context.context_sources) {
+                        sources = message.full_context.context_sources;
                     }
                     displayMessage(message.content, message.sender, new Date(message.created_at), sources);
                 });
@@ -971,16 +971,16 @@ function displayMessage(content, sender, timestamp = new Date(), sources = []) {
                         let typeIcon = '';
                         switch(source.type) {
                             case 'character':
-                                typeIcon = '<i class="fas fa-user text-info me-1" title="Character RAG Document"></i>';
+                                typeIcon = '<i class="fas fa-user text-info me-1" title="Character Context Document"></i>';
                                 break;
                             case 'location':
-                                typeIcon = '<i class="fas fa-map-marker-alt text-success me-1" title="Location RAG Document"></i>';
+                                typeIcon = '<i class="fas fa-map-marker-alt text-success me-1" title="Location Context Document"></i>';
                                 break;
                             case 'lore':
-                                typeIcon = '<i class="fas fa-book text-warning me-1" title="Lore RAG Document"></i>';
+                                typeIcon = '<i class="fas fa-book text-warning me-1" title="Lore Context Document"></i>';
                                 break;
                             case 'element':
-                                typeIcon = '<i class="fas fa-cog text-primary me-1" title="World Element RAG Document"></i>';
+                                typeIcon = '<i class="fas fa-cog text-primary me-1" title="World Element Context Document"></i>';
                                 break;
                             case 'document':
                                 typeIcon = '<i class="fas fa-file-alt text-secondary me-1" title="Uploaded Document"></i>';

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/lore_item.py
+"""SQLAlchemy models for lore item."""
+
+# /story_app/app/models/lore_item.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum as SQLAlchemyEnum
@@ -22,6 +24,7 @@ if TYPE_CHECKING:
 
 # --- Enum for LoreItem Category ---
 class LoreItemCategoryEnum(str, enum.Enum):
+    """SQLAlchemy model for lore item category enum."""
     MAGIC_SYSTEM = "MAGIC_SYSTEM"
     HISTORICAL_EVENT = "HISTORICAL_EVENT"
     ARTIFACT = "ARTIFACT"

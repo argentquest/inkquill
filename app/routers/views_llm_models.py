@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_llm_models.py
+"""API routes for views llm models."""
+
+# /story_app/app/routers/views_llm_models.py
 import logging
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse

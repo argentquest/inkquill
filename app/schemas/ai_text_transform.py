@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/ai_text_transform.py
+"""Pydantic schemas for ai text transform."""
+
+# /story_app/app/schemas/ai_text_transform.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List

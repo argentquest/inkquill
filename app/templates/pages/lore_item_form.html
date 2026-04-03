@@ -1,4 +1,4 @@
-{# /ai_rag_story_app/app/templates/pages/lore_item_form.html #}
+{# /story_app/app/templates/pages/lore_item_form.html #}
 
 {% extends "layouts/base.html" %}
 
@@ -330,7 +330,7 @@
                                   placeholder="Describe this lore item in detail..."
                                   style="border: 2px solid var(--tblr-border-color); border-radius: var(--tblr-border-radius-lg); padding: 0.75rem 1rem;">{{ lore_item.description | e if lore_item and lore_item.description else '' }}</textarea>
                     </div>
-                    {% if lore_item and lore_item.id %}<div class="mb-3"><label class="form-label">AI-Generated RAG Context:</label><div id="generated-rag-content-display-lore" class="form-control-plaintext p-2 border bg-light">Loading...</div></div>{% endif %}
+                    {% if lore_item and lore_item.id %}<div class="mb-3"><label class="form-label">AI-Generated Context Summary:</label><div id="generated-context-display-lore" class="form-control-plaintext p-2 border bg-light">Loading...</div></div>{% endif %}
                     
                     <!-- AI Import Fields -->
                     <h4 class="mt-4 mb-4">AI Import Data <small class="text-muted">(Optional)</small></h4>
@@ -482,3 +482,4 @@
     <script src="{{ url_for('static', path='/js/location_form_resize.js') }}"></script>
     <script src="{{ url_for('static', path='/js/image_generator.js') }}"></script>
 {% endblock %}
+

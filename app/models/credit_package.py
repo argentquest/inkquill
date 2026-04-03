@@ -1,3 +1,5 @@
+"""SQLAlchemy models for credit package."""
+
 from sqlalchemy import Column, Integer, String, DECIMAL, Text, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
@@ -6,6 +8,7 @@ from typing import Optional
 from app.db.database import Base
 
 class CreditPackage(Base):
+    """SQLAlchemy model for credit package."""
     __tablename__ = "credit_packages"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

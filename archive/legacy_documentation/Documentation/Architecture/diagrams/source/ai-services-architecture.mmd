@@ -1,0 +1,105 @@
+%% AI Services Architecture Diagram
+%% Title: AI Services Layer Architecture
+%% Description: Complete AI services architecture showing all components and integrations
+%% Last Updated: 2025-07-14
+%% Version: 1.0.0
+
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#388e3c',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#2e7d32',
+    'lineColor': '#424242',
+    'secondaryColor': '#1976d2',
+    'tertiaryColor': '#fff'
+  }
+}}%%
+
+graph TB
+    subgraph "Application Layer"
+        APP[FastAPI Application]
+        ROUTERS[API Routers]
+    end
+    
+    subgraph "AI Services Layer"
+        SK[Semantic Kernel<br/>- Plugin orchestration<br/>- Service management<br/>- Function exports]
+        EMBEDDING[Embedding Service<br/>- Vector generation<br/>- Async client<br/>- Cost tracking]
+        SEARCH[AI Search Service<br/>- Vector search<br/>- Document management<br/>- Context operations]
+        MODEL_CACHE[AI Model Cache<br/>- Configuration cache<br/>- Provider mapping<br/>- Default selection]
+        CLIENT_FACTORY[AI Client Factory<br/>- Multi-provider support<br/>- Client creation<br/>- Configuration management]
+        COST_TRACKER[Cost Tracker Service<br/>- Usage monitoring<br/>- Token calculation<br/>- Billing integration]
+    end
+    
+    subgraph "Semantic Kernel Plugins"
+        STORY_ANALYSIS[Story Analysis Plugin<br/>- Content review<br/>- Metadata generation<br/>- Quality assessment]
+        STORYTELLING[Storytelling Plugin<br/>- Narrative generation<br/>- Scene creation<br/>- Character dialogue]
+        STORY_STRUCTURE[Story Structure Plugin<br/>- Act organization<br/>- Scene extraction<br/>- Plot analysis]
+        WORLD_BUILDING[World Building Plugin<br/>- Character development<br/>- Location creation<br/>- Lore generation]
+        WORLD_GENERATION[World Generation Plugin<br/>- Automated world creation<br/>- Element extraction<br/>- Relationship mapping]
+        RETRIEVAL[Context Retrieval Plugin<br/>- Context retrieval<br/>- Document search<br/>- Relevance scoring]
+    end
+    
+    subgraph "AI Providers"
+        AZURE_OPENAI[Azure OpenAI<br/>- GPT models<br/>- Embeddings<br/>- Enterprise features]
+        OPENROUTER[OpenRouter<br/>- Multi-model access<br/>- Unified API<br/>- Cost optimization]
+        RUNPOD[RunPod<br/>- Custom models<br/>- Image generation<br/>- Specialized hosting]
+        OPENAI[OpenAI Direct<br/>- DALL-E<br/>- Latest models<br/>- Direct access]
+    end
+    
+    subgraph "Data Storage"
+        AI_SEARCH_INDEX[Azure AI Search Index<br/>- Vector storage<br/>- Full-text search<br/>- Metadata indexing]
+        POSTGRES[(PostgreSQL<br/>- Model configurations<br/>- Cost logs<br/>- Usage analytics)]
+        BLOB_STOContextE[Azure Blob Storage<br/>- Generated images<br/>- Document storage<br/>- Media files]
+        PROMPT_FILES[Prompt Files<br/>- System prompts<br/>- Template library<br/>- Version control]
+    end
+    
+    %% Application connections
+    APP --> ROUTERS
+    ROUTERS --> SK
+    ROUTERS --> EMBEDDING
+    ROUTERS --> SEARCH
+    ROUTERS --> COST_TRACKER
+    
+    %% AI Services connections
+    SK --> MODEL_CACHE
+    SK --> CLIENT_FACTORY
+    SK --> STORY_ANALYSIS
+    SK --> STORYTELLING
+    SK --> STORY_STRUCTURE
+    SK --> WORLD_BUILDING
+    SK --> WORLD_GENERATION
+    SK --> RETRIEVAL
+    
+    EMBEDDING --> CLIENT_FACTORY
+    SEARCH --> AI_SEARCH_INDEX
+    CLIENT_FACTORY --> AZURE_OPENAI
+    CLIENT_FACTORY --> OPENROUTER
+    CLIENT_FACTORY --> RUNPOD
+    CLIENT_FACTORY --> OPENAI
+    
+    %% Plugin connections
+    RETRIEVAL --> SEARCH
+    STORY_ANALYSIS --> PROMPT_FILES
+    STORYTELLING --> PROMPT_FILES
+    STORY_STRUCTURE --> PROMPT_FILES
+    WORLD_BUILDING --> PROMPT_FILES
+    WORLD_GENERATION --> PROMPT_FILES
+    
+    %% Data connections
+    MODEL_CACHE --> POSTGRES
+    COST_TRACKER --> POSTGRES
+    SEARCH --> BLOB_STOContextE
+    
+    %% Styling
+    classDef application fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef aiServices fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef plugins fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef providers fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    classDef storage fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    
+    class APP,ROUTERS application
+    class SK,EMBEDDING,SEARCH,MODEL_CACHE,CLIENT_FACTORY,COST_TRACKER aiServices
+    class STORY_ANALYSIS,STORYTELLING,STORY_STRUCTURE,WORLD_BUILDING,WORLD_GENERATION,RETRIEVAL plugins
+    class AZURE_OPENAI,OPENROUTER,RUNPOD,OPENAI providers
+    class AI_SEARCH_INDEX,POSTGRES,BLOB_STOContextE,PROMPT_FILES storage

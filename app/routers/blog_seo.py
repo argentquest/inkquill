@@ -1,6 +1,6 @@
 """Blog SEO and social sharing API endpoints."""
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
@@ -8,18 +8,19 @@ from sqlalchemy import select, and_
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.models.blog_post import BlogPost, BlogPostStatus
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/seo", tags=["blog-seo"])
 
 
-@router.get("/analyze/{post_id}")
+@router.get("/analyze/{post_id}", response_model=ApiResponse)
 async def analyze_seo(
     post_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Analyze SEO metrics for a blog post."""
     try:
         # Get post and verify ownership
@@ -52,7 +53,7 @@ async def analyze_seo(
         ]
         overall_score = sum(scores) / len(scores)
         
-        return {
+        return ApiResponse.success_response(data={
             "post": {
                 "id": post.id,
                 "title": post.title,
@@ -68,7 +69,7 @@ async def analyze_seo(
             "recommendations": generate_seo_recommendations(
                 content_analysis, meta_analysis, technical_analysis
             )
-        }
+        })
         
     except HTTPException:
         raise
@@ -80,12 +81,12 @@ async def analyze_seo(
         )
 
 
-@router.post("/generate-meta/{post_id}")
+@router.post("/generate-meta/{post_id}", response_model=ApiResponse)
 async def generate_meta_tags(
     post_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Generate optimized meta tags for a blog post."""
     try:
         # Get post and verify ownership
@@ -116,7 +117,7 @@ async def generate_meta_tags(
             "twitter_description": generate_twitter_description(post)
         }
         
-        return {
+        return ApiResponse.success_response(data={
             "post": {
                 "id": post.id,
                 "title": post.title
@@ -141,7 +142,7 @@ async def generate_meta_tags(
                 "og_title": "40-60 characters",
                 "og_description": "150-200 characters"
             }
-        }
+        })
         
     except HTTPException:
         raise
@@ -153,12 +154,12 @@ async def generate_meta_tags(
         )
 
 
-@router.get("/social-preview/{post_id}")
+@router.get("/social-preview/{post_id}", response_model=ApiResponse)
 async def get_social_preview(
     post_id: int,
-    platform: str = Query("facebook", regex="^(facebook|twitter|linkedin)$"),
+    platform: str = Query("facebook", pattern="^(facebook|twitter|linkedin)$"),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get social media preview for a blog post."""
     try:
         # Get published post
@@ -227,12 +228,12 @@ async def get_social_preview(
         if not preview["image"]:
             warnings.append(f"No image set for {platform} preview")
         
-        return {
+        return ApiResponse.success_response(data={
             "platform": platform,
             "preview": preview,
             "warnings": warnings,
             "optimization_score": calculate_social_score(preview, platform)
-        }
+        })
         
     except HTTPException:
         raise
@@ -244,12 +245,12 @@ async def get_social_preview(
         )
 
 
-@router.get("/sharing-stats/{post_id}")
+@router.get("/sharing-stats/{post_id}", response_model=ApiResponse)
 async def get_sharing_stats(
     post_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get social sharing statistics for a blog post."""
     try:
         # Get post and verify ownership
@@ -293,7 +294,7 @@ async def get_sharing_stats(
         
         total_shares = sum(stat["shares"] for stat in sharing_stats.values())
         
-        return {
+        return ApiResponse.success_response(data={
             "post": {
                 "id": post.id,
                 "title": post.title,
@@ -303,7 +304,7 @@ async def get_sharing_stats(
             "stats": sharing_stats,
             "total_shares": total_shares,
             "share_rate": round((total_shares / max(post.view_count, 1)) * 100, 2)
-        }
+        })
         
     except HTTPException:
         raise

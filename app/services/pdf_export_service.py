@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/pdf_export_service.py
+"""Service helpers for pdf export service."""
+
+# /story_app/app/services/pdf_export_service.py
 
 import io
 import re

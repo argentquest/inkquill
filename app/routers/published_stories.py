@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/published_stories.py
+"""API routes for published stories."""
+
+# /story_app/app/routers/published_stories.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,6 +33,63 @@ router = APIRouter(
     prefix="/published-stories",
     tags=["published-stories"]
 )
+
+
+def _build_published_story_read(story: PublishedStory) -> PublishedStoryRead:
+    """Provide internal router support for build published story read."""
+    story_read = PublishedStoryRead(
+        id=story.id,
+        story_id=story.story_id,
+        user_id=story.user_id,
+        published_url=story.published_url,
+        filename=story.filename,
+        title=story.title,
+        description=story.description,
+        word_count=story.word_count,
+        is_public=story.is_public,
+        is_featured=story.is_featured,
+        view_count=story.view_count,
+        like_count=story.like_count,
+        comment_count=story.comment_count,
+        average_rating=story.average_rating,
+        published_at=story.published_at,
+        updated_at=story.updated_at or story.published_at,
+    )
+    story_read.publisher_username = story.publisher.username if story.publisher else None
+    story_read.publisher_display_name = story.publisher.display_name if story.publisher else None
+    if story.story and story.story.world:
+        story_read.world_name = story.story.world.name
+    return story_read
+
+
+def _build_published_story_detail(story: PublishedStory) -> PublishedStoryDetail:
+    """Provide internal router support for build published story detail."""
+    story_detail = PublishedStoryDetail(
+        id=story.id,
+        story_id=story.story_id,
+        user_id=story.user_id,
+        published_url=story.published_url,
+        filename=story.filename,
+        title=story.title,
+        description=story.description,
+        word_count=story.word_count,
+        is_public=story.is_public,
+        is_featured=story.is_featured,
+        view_count=story.view_count,
+        like_count=story.like_count,
+        comment_count=story.comment_count,
+        average_rating=story.average_rating,
+        published_at=story.published_at,
+        updated_at=story.updated_at or story.published_at,
+    )
+    story_detail.publisher_username = story.publisher.username if story.publisher else None
+    story_detail.publisher_display_name = story.publisher.display_name if story.publisher else None
+    if story.story:
+        story_detail.story_title = story.story.title
+        story_detail.story_short_description = story.story.short_description
+        if story.story.world:
+            story_detail.world_name = story.story.world.name
+    return story_detail
 
 @router.get("/", response_model=ApiResponse, name="list_published_stories")
 async def list_published_stories(
@@ -92,19 +151,14 @@ async def list_published_stories(
     # Transform to response model
     story_reads = []
     for story in stories:
-        story_read = PublishedStoryRead.model_validate(story)
-        story_read.publisher_username = story.publisher.username
-        story_read.publisher_display_name = story.publisher.display_name
-        if story.story and story.story.world:
-            story_read.world_name = story.story.world.name
-        story_reads.append(story_read)
+        story_reads.append(_build_published_story_read(story))
     
-    return PublishedStoryList(
+    return ApiResponse.success_response(data=PublishedStoryList(
         stories=story_reads,
         total=total,
         page=page,
         per_page=per_page
-    )
+    ))
 
 @router.get("/{story_id}", response_model=ApiResponse, name="get_published_story")
 async def get_published_story(
@@ -136,15 +190,20 @@ async def get_published_story(
     story.view_count += 1
     await db.commit()
     
+    await db.refresh(story)
+
+    refreshed_result = await db.execute(
+        select(PublishedStory)
+        .where(PublishedStory.id == story_id)
+        .options(
+            selectinload(PublishedStory.publisher),
+            selectinload(PublishedStory.story).selectinload(Story.world)
+        )
+    )
+    refreshed_story = refreshed_result.scalar_one()
+
     # Create response
-    story_detail = PublishedStoryDetail.model_validate(story)
-    story_detail.publisher_username = story.publisher.username
-    story_detail.publisher_display_name = story.publisher.display_name
-    if story.story:
-        story_detail.story_title = story.story.title
-        story_detail.story_short_description = story.story.short_description
-        if story.story.world:
-            story_detail.world_name = story.story.world.name
+    story_detail = _build_published_story_detail(refreshed_story)
     
     # Check if user has rated
     if current_user:
@@ -158,7 +217,7 @@ async def get_published_story(
             story_detail.has_user_rated = True
             story_detail.user_rating = user_rating.rating
     
-    return story_detail
+    return ApiResponse.success_response(data=story_detail)
 
 @router.post("/{story_id}/rate", response_model=ApiResponse, name="rate_published_story")
 async def rate_published_story(
@@ -233,7 +292,7 @@ async def rate_published_story(
         updated_at=fresh_rating.updated_at
     )
     
-    return rating_read
+    return ApiResponse.success_response(data=rating_read)
 
 @router.get("/{story_id}/comments", response_model=ApiResponse, name="get_story_comments")
 async def get_story_comments(
@@ -273,7 +332,7 @@ async def get_story_comments(
         )
         comment_reads.append(comment_read)
     
-    return comment_reads
+    return ApiResponse.success_response(data=comment_reads)
 
 @router.post("/{story_id}/comments", response_model=ApiResponse, name="create_story_comment")
 async def create_story_comment(
@@ -343,7 +402,7 @@ async def create_story_comment(
         replies=[]  # New comments don't have replies yet
     )
     
-    return comment_read
+    return ApiResponse.success_response(data=comment_read)
 
 async def _update_story_rating_stats(db: AsyncSession, story_id: int):
     """Update the average rating and like count for a story"""
@@ -368,3 +427,4 @@ async def _update_story_rating_stats(db: AsyncSession, story_id: int):
     story.like_count = stats.count or 0
     
     db.add(story)
+    await db.commit()

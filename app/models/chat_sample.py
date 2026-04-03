@@ -1,3 +1,5 @@
+"""SQLAlchemy models for chat sample."""
+
 # /mnt/c/Code2025/rag/app/models/chat_sample.py
 
 from sqlalchemy import Column, Integer, String, Boolean, Text, DateTime
@@ -7,6 +9,7 @@ from app.db.database import Base
 
 
 class ChatSample(Base):
+    """SQLAlchemy model for chat sample."""
     __tablename__ = "chat_samples"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

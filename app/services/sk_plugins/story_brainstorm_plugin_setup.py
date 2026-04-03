@@ -39,7 +39,7 @@ def setup_story_brainstorm_plugin(kernel_instance, chat_service_id: str):
     try:
         concepts_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id,
-            ai_model_id=settings.AZURE_OPENAI_CHAT_DEPLOYMENT_NAME_DEFAULT,
+            ai_model_id=settings.DEFAULT_GENERATION_MODEL_NAME,
             max_tokens=4000,
             temperature=0.8,
             top_p=0.9
@@ -66,7 +66,7 @@ def setup_story_brainstorm_plugin(kernel_instance, chat_service_id: str):
     try:
         three_acts_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id,
-            ai_model_id=settings.AZURE_OPENAI_CHAT_DEPLOYMENT_NAME_DEFAULT,
+            ai_model_id=settings.DEFAULT_GENERATION_MODEL_NAME,
             max_tokens=2000,
             temperature=0.7,
             top_p=0.8

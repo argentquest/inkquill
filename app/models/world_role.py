@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/world_role.py
+"""SQLAlchemy models for world role."""
+
+# /story_app/app/models/world_role.py
 
 from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
     from .user import User
 
 class WorldRole(Base):
+    """SQLAlchemy model for world role."""
     __tablename__ = "world_roles"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

@@ -1,12 +1,10 @@
-// /ai_rag_story_app/app/static/js/act_ui_updater.js
+// /story_app/app/static/js/act_ui_updater.js
 "use strict";
 
 const ActUIUpdater = (() => {
     // IDs for Act Editor elements - ensure these match your act_editor_ui.html
     const actAIPromptTabId = 'act-ai-full-prompt-preview-area'; // For narrative prompt
-    const actRAGDetailsTabId = 'act-ai-rag-context-full-details-area';
-    // const actRAGSummaryDisplayAreaId = 'rag-context-display-area'; // Assuming this ID is unique to Act editor if used
-    // const actRAGSummaryContentId = 'rag-context-content';
+    const actContextDetailsTabId = 'act-ai-context-full-details-area';
     
     // For AI Assistant Tab in Act Editor
     const actRawAIStreamDisplayId = 'ai-full-response-display-act'; // Shows narrative stream, then metadata JSON
@@ -30,28 +28,17 @@ const ActUIUpdater = (() => {
         }
     }
 
-    function updateRAGDetailsTab(ragDetailsString) {
-        const element = document.getElementById(actRAGDetailsTabId);
+    function updateContextDetailsTab(contextDetailsString) {
+        const element = document.getElementById(actContextDetailsTabId);
         if (element) {
-            element.textContent = ragDetailsString || "No RAG details available for Act.";
+            element.textContent = contextDetailsString || "No context details available for Act.";
         } else {
-            console.warn("ActUIUpdater: Element for Act RAG Details Tab not found:", actRAGDetailsTabId);
+            console.warn("ActUIUpdater: Element for Act Context Details Tab not found:", actContextDetailsTabId);
         }
     }
 
-    function updateRAGSummaryDisplay(summaryString) {
-        // This was removed from Scene editor's AI tab. If you keep it for Act, ensure IDs are unique.
-        // For now, let's assume it's also removed or handled by the RAG Details tab for Acts.
-        console.warn("ActUIUpdater: updateRAGSummaryDisplay called. If used for Act, ensure HTML elements are present and uniquely ID'd.");
-        // Example:
-        // const displayArea = document.getElementById(actRAGSummaryDisplayAreaId);
-        // const contentElement = document.getElementById(actRAGSummaryContentId);
-        // if (displayArea && contentElement) { /* ... update logic ... */ }
-    }
-    
-    function clearRAGDisplays() {
-        // ActUIUpdater.updateRAGSummaryDisplay(""); // If summary display exists
-        ActUIUpdater.updateRAGDetailsTab("RAG context details will appear here for Act.");
+    function clearContextDisplays() {
+        ActUIUpdater.updateContextDetailsTab("Context details will appear here for Act.");
     }
 
     function setRawAIStreamDisplay(text, append = false) { // Will show narrative stream, then metadata JSON
@@ -199,7 +186,7 @@ const ActUIUpdater = (() => {
         setExtractedNarrativePreview(""); 
         setRawAIStreamDisplay(""); // Clears the combined narrative/metadata display area
         updateFollowupButton("");    
-        clearRAGDisplays();
+        clearContextDisplays();
         clearActMetadataSuggestions(); // Clear Act-specific metadata
 
         const aiPromptInput = document.getElementById('ai-prompt-input'); // Assuming unique ID for Act editor
@@ -218,9 +205,8 @@ const ActUIUpdater = (() => {
 
     return {
         updateAIPromptTab,
-        updateRAGDetailsTab,
-        updateRAGSummaryDisplay, // If still used for Act
-        clearRAGDisplays,
+        updateContextDetailsTab,
+        clearContextDisplays,
         setRawAIStreamDisplay,
         setExtractedNarrativePreview,
         updateFollowupButton,
@@ -230,3 +216,4 @@ const ActUIUpdater = (() => {
         resetAIInteractionAreas
     };
 })();
+

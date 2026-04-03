@@ -124,7 +124,7 @@ class WorldBuilderService:
             # Import semantic kernel components
             from app.services.sk_kernel_instance import kernel
             from semantic_kernel.functions.kernel_arguments import KernelArguments
-            from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+            from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
             from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
             from app.core.config import settings
             
@@ -150,10 +150,10 @@ LONG: [longer description here]
 VISUAL: [visual prompt here]"""
 
             # Use the correct service ID that's registered in the kernel
-            chat_service_id = "azure_openai_chat_service"
+            chat_service_id = "chat_service"
             
             # Create execution settings
-            exec_settings = AzureChatPromptExecutionSettings(
+            exec_settings = OpenAIChatPromptExecutionSettings(
                 service_id=chat_service_id,
                 max_tokens=settings.AI_MAX_TOKEN_SETTINGS.get("general", 2000),
                 temperature=settings.AI_TEMPERATURE_SETTINGS.get("general", 0.7),
@@ -384,7 +384,7 @@ VISUAL: [visual prompt here]"""
         )
         
         # Update the world
-        world = await crud_world.update_world(db, world_id, update_data)
+        world = await crud_world.update_world(db, world, update_data)
         
         logger.info(f"Updated world '{world.name}' (ID: {world.id}) from world builder")
         

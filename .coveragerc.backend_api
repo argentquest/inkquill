@@ -1,0 +1,13 @@
+[run]
+source =
+    app/routers
+
+[report]
+omit =
+    app/routers/views_*.py
+    app/routers/ws_context_manager.py
+    app/routers/ai_assisted_writing.py
+    app/routers/ai_scene_writing.py
+    app/routers/story_wizard_api.py
+    app/routers/image_generation.py
+    app/routers/admin_news.py

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/basic_story_ai_service.py
+"""Service helpers for basic story ai service."""
+
+# /story_app/app/services/basic_story_ai_service.py
 
 import time
 import logging
@@ -82,7 +84,7 @@ class BasicStoryAIService:
             # Get Semantic Kernel
             kernel = await self.get_semantic_kernel()
             
-            # Prepare prompt variables (context-free - NO RAG QUERIES for Basic Stories)
+            # Prepare prompt variables without external document retrieval for Basic Stories
             prompt_variables = story_service.get_basic_story_prompt_variables(
                 story=story,
                 content=story_content,
@@ -221,3 +223,4 @@ class BasicStoryAIService:
 
 # Global service instance
 basic_story_ai_service = BasicStoryAIService()
+

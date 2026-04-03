@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/story_generation_service.py
+"""Service helpers for story generation service."""
+
+# /story_app/app/services/story_generation_service.py
 
 import json
 import logging
@@ -695,61 +697,23 @@ class StoryGenerationService:
         logger.info(f"Configuring kernel for model: {ai_model_config.display_name} ({ai_model_config.model_name})")
         
         # Store original service for restoration
-        chat_service_id = "azure_openai_chat_service"
+        chat_service_id = "chat_service"
         original_service = kernel.get_service(chat_service_id)
         
         try:
-            if ai_model_config.provider.value == "AZURE":
-                # For Azure models, we need to create a service with the specific deployment name
-                from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-                from app.core.config import settings
-                
-                # Map model names to deployment names (this should ideally be in the database)
-                azure_deployment_map = {
-                    "gpt-4o-mini": "gpt-4o-mini",
-                    "gpt-4.1-mini": "gpt-4o-mini",  # Fallback to available deployment
-                    "gpt-4o": "gpt-4o-mini",  # Fallback to available deployment  
-                    "DeepSeek-V3-0324": "gpt-4o-mini",  # Fallback to available deployment
-                    "mistral-medium-2505": "gpt-4o-mini",  # Fallback to available deployment
-                    "Meta-Llama-4-Scout-17B-16E-Instruct": "gpt-4o-mini"  # Fallback to available deployment
-                }
-                
-                deployment_name = azure_deployment_map.get(ai_model_config.model_name, "gpt-4o-mini")
-                logger.info(f"Using Azure deployment: {deployment_name} for model: {ai_model_config.model_name}")
-                
-                # Create new Azure service with the specific deployment
-                new_service = AzureChatCompletion(
-                    service_id=chat_service_id,
-                    deployment_name=deployment_name,
-                    endpoint=str(settings.AZURE_OPENAI_ENDPOINT),
-                    api_key=settings.AZURE_OPENAI_API_KEY,
-                    api_version=settings.AZURE_OPENAI_API_VERSION
-                )
-                
-                # Replace the service in the kernel
-                kernel.remove_service(chat_service_id)
-                kernel.add_service(new_service)
-                
-            elif ai_model_config.provider.value == "OPENROUTER":
-                # For OpenRouter, we need to create an OpenAI-compatible service
+            if ai_model_config.provider.value in {"OPENROUTER", "OPENAI"}:
                 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
                 
-                logger.info(f"Using OpenRouter model: {ai_model_config.model_name}")
-                
-                # Create OpenRouter service (uses OpenAI SDK with custom base URL)
                 new_service = OpenAIChatCompletion(
                     service_id=chat_service_id,
                     ai_model_id=ai_model_config.model_name,
-                    api_key=settings.OPENROUTER_API_KEY if hasattr(settings, 'OPENROUTER_API_KEY') else "your-openrouter-key",
-                    base_url="https://openrouter.ai/api/v1"
+                    api_key=settings.OPENROUTER_API_KEY if ai_model_config.provider.value == "OPENROUTER" else settings.OPENAI_API_KEY,
+                    base_url=settings.OPENROUTER_BASE_URL if ai_model_config.provider.value == "OPENROUTER" else None
                 )
-                
-                # Replace the service in the kernel
                 kernel.remove_service(chat_service_id)
                 kernel.add_service(new_service)
-                
             else:
-                logger.warning(f"Unsupported provider: {ai_model_config.provider.value}. Using default Azure model.")
+                logger.warning(f"Unsupported provider: {ai_model_config.provider.value}. Keeping existing kernel service.")
                 return original_service
                 
             return original_service
@@ -868,3 +832,4 @@ class StoryGenerationService:
         """Restore the original service configuration."""
         # Placeholder for when we implement dynamic service switching
         pass
+

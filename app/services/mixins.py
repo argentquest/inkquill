@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/mixins.py
+"""Service helpers for mixins."""
+
+# /story_app/app/services/mixins.py
 
 from typing import Optional
 from sqlalchemy.orm import Session

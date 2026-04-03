@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, update, delete
+from sqlalchemy import select, and_, or_, update, delete, func
 from sqlalchemy.orm import selectinload
 
 from app.models.blog_subscription import (

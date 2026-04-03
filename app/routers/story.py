@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/story.py
+"""API routes for story."""
+
+# /story_app/app/routers/story.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,15 +13,8 @@ import uuid
 from pydantic import BaseModel
 from html import escape 
 
-# --- Azure SDK Imports ---
-from azure.storage.blob.aio import BlobServiceClient
-from azure.storage.blob import ContentSettings 
-from azure.core.exceptions import AzureError, ResourceNotFoundError as AzureResourceNotFoundError
-from azure.identity.aio import DefaultAzureCredential
-
 # --- Core Application Imports ---
 from app.core.deps import get_db_session, get_current_active_user
-from app.core.azure_deps import get_blob_service_client 
 from app.services.email_service import get_email_service
 from app.models.user import User
 from app.models.story import Story 
@@ -33,6 +28,7 @@ from app.crud import character as crud_character
 from app.crud import location as crud_location
 from app.crud import lore_item as crud_lore_item 
 from app.core.config import settings 
+from app.core.storage_deps import build_storage_url
 
 logger = logging.getLogger(__name__)
 
@@ -102,10 +98,12 @@ def sanitize_filename(name: str) -> str:
 
 # --- Pydantic Response Model for the Publish Endpoint ---
 class StoryPublishRequest(BaseModel):
+    """Response or helper model for story publish request."""
     visibility: str = "public"  # "public" or "private"
     description: Optional[str] = None
 
 class StoryPublishResponse(BaseModel): 
+    """Response or helper model for story publish response."""
     message: str
     published_url: Optional[str] = None
     filename: Optional[str] = None
@@ -119,6 +117,7 @@ async def create_new_story(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle POST /."""
     logger.info(f"User '{current_user.username}' (ID: {current_user.id}) creating new story: '{story.title}' (type: {story.story_type})")
     try:
         from app.crud import world as crud_world
@@ -172,6 +171,7 @@ async def list_user_stories(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /."""
     logger.info(f"User '{current_user.username}' listing their stories (skip: {skip}, limit: {limit}).")
     stories = await crud_story.get_stories_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
     logger.info(f"Found {len(stories)} stories for user '{current_user.username}'.")
@@ -186,6 +186,7 @@ async def get_single_story(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /{story_id}."""
     logger.info(f"User '{current_user.username}' requesting story ID: {story_id}")
     db_story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if db_story is None:
@@ -205,6 +206,7 @@ async def update_existing_story(
     email_service = Depends(get_email_service)
 ):
     # Capture username before try block to avoid lazy loading issues in exception handler
+    """Handle PUT /{story_id}."""
     username = current_user.username
     logger.info(f"User '{username}' attempting to update story ID: {story_id} with data: {story_update.model_dump(exclude_unset=True)}")
     try:
@@ -261,6 +263,7 @@ async def delete_existing_story(
     current_user: User = Depends(get_current_active_user)
 ):
     # Capture username before try block to avoid lazy loading issues in exception handler
+    """Handle DELETE /{story_id}."""
     username = current_user.username
     logger.info(f"User '{username}' attempting to delete story ID: {story_id}")
     try:
@@ -289,6 +292,7 @@ async def publish_story_to_html(
     current_user: User = Depends(get_current_active_user),
     email_service = Depends(get_email_service)
 ):
+    """Handle POST /{story_id}/publish."""
     logger.info(f"User '{current_user.username}' attempting to publish story ID: {story_id}")
     logger.info(f"Publish request data: visibility={request.visibility}, description={request.description}")
 
@@ -584,46 +588,20 @@ async def publish_story_to_html(
     sanitized_title = sanitize_filename(story.title if story.title else "story")
     # Use a deterministic filename based on story ID to allow overwriting
     html_filename = f"story_{story.id}_{sanitized_title}.html"
-    
+
     logger.info(f"Generated filename for published story: {html_filename}")
 
-    blob_service_client = None
-    credential_for_storage = None
-    published_blob_url = None
-    container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_PUBLISHED_STORIES
-
     try:
-        if settings.AZURE_STORAGE_CONNECTION_STRING:
-            blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-        elif settings.AZURE_STORAGE_ACCOUNT_NAME:
-            account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-            credential_for_storage = DefaultAzureCredential()
-            blob_service_client = BlobServiceClient(account_url=account_url, credential=credential_for_storage)
-        else:
-            raise HTTPException(status_code=500, detail="Azure Storage not configured for publishing.")
-
-        async with blob_service_client:
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=html_filename)
-            blob_content_settings = ContentSettings(content_type='text/html; charset=utf-8') 
-            await blob_client.upload_blob(full_html_content.encode('utf-8'), content_settings=blob_content_settings, overwrite=True)
-            published_blob_url = blob_client.url
-            logger.info(f"Story ID {story_id} published successfully. URL: {published_blob_url}")
-            
-    except AzureResourceNotFoundError: 
-        logger.error(f"Azure Storage container '{container_name}' not found for publishing.", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Publishing container '{container_name}' not found.")
-    except AzureError as azure_ex:
-        logger.error(f"AzureError during publishing story ID {story_id}: {azure_ex}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to publish due to an Azure storage error.")
+        from pathlib import Path
+        publish_dir = Path(settings.LOCAL_STORAGE_BASE_PATH) / settings.LOCAL_STORAGE_PUBLISHED_STORIES_PATH
+        publish_dir.mkdir(parents=True, exist_ok=True)
+        dest = publish_dir / html_filename
+        dest.write_text(full_html_content, encoding="utf-8")
+        published_url = f"/published/stories/{html_filename}"
+        logger.info(f"Story ID {story_id} published successfully to {dest}")
     except Exception as e:
         logger.error(f"Unexpected error publishing story ID {story_id}: {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred during publishing.")
-    finally:
-        if credential_for_storage:
-            await credential_for_storage.close()
-            
-    if not published_blob_url: 
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to obtain published URL after upload.")
 
     # Save or update published story metadata in database
     try:
@@ -654,7 +632,7 @@ async def publish_story_to_html(
         
         if existing:
             # Update existing published story
-            existing.published_url = published_blob_url
+            existing.published_url = published_url
             existing.filename = html_filename
             existing.title = story.title or "Untitled Story"
             existing.description = request.description or story.short_description
@@ -667,7 +645,7 @@ async def publish_story_to_html(
             published_story = PublishedStory(
                 story_id=story_id,
                 user_id=current_user.id,
-                published_url=published_blob_url,
+                published_url=published_url,
                 filename=html_filename,
                 title=story.title or "Untitled Story",
                 description=request.description or story.short_description,
@@ -714,11 +692,13 @@ async def publish_story_to_html(
         logger.error(f"Failed to save published story metadata: {e}")
         # Don't fail the whole publish operation if metadata save fails
         
-    return StoryPublishResponse(
-        message="Story published successfully!",
-        published_url=published_blob_url,
-        filename=html_filename,
-        status="published"
+    return ApiResponse.success_response(
+        data=StoryPublishResponse(
+            message="Story published successfully!",
+            published_url=published_url,
+            filename=html_filename,
+            status="published"
+        )
     )
 
 
@@ -729,7 +709,6 @@ async def list_story_images(
     story_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
 ):
     """Get all generated images for a story"""
     
@@ -761,10 +740,7 @@ async def list_story_images(
     for image in images:
         image_url = None
         if image.blob_path:
-            # Construct Azure blob URL
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            if settings.AZURE_STORAGE_ACCOUNT_NAME:
-                image_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{image.blob_path}"
+            image_url = build_storage_url("generated-images", image.blob_path)
         
         image_list.append({
             "id": image.id,
@@ -822,9 +798,7 @@ async def set_current_story_image(
     # Build image URL for response
     image_url = None
     if image.blob_path:
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        if settings.AZURE_STORAGE_ACCOUNT_NAME:
-            image_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{image.blob_path}"
+        image_url = build_storage_url("generated-images", image.blob_path)
     
     return {
         "message": "Current image updated successfully",
@@ -877,3 +851,4 @@ async def upgrade_story_to_advanced(
             status_code=500,
             detail="Failed to upgrade story"
         )
+

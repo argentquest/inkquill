@@ -1,10 +1,12 @@
-# /ai_rag_story_app/app/models/refresh_token.py
+"""SQLAlchemy models for refresh token."""
+
+# /story_app/app/models/refresh_token.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, TYPE_CHECKING
 import uuid
 
@@ -44,10 +46,16 @@ class RefreshToken(Base):
         back_populates="refresh_tokens"
     )
 
+    @property
     def is_expired(self) -> bool:
         """Check if the token has expired."""
-        return self.expires_at < func.now()
+        now = datetime.now(timezone.utc)
+        expires_at = self.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        return expires_at < now
 
+    @property
     def is_revoked(self) -> bool:
         """Check if the token has been explicitly revoked."""
         return self.revoked_at is not None
@@ -55,7 +63,13 @@ class RefreshToken(Base):
     @property
     def is_valid(self) -> bool:
         """Check if the token is both not expired and not revoked."""
-        return not self.is_expired() and not self.is_revoked()
+        return not self.is_expired and not self.is_revoked
+
+    @property
+    def is_active(self) -> bool:
+        """Compatibility property for auth routes."""
+        return self.is_valid
 
     def __repr__(self):
         return f"<RefreshToken(id={self.id}, user_id={self.user_id}, expires_at='{self.expires_at}')>"
+

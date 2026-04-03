@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/auth_forms.js
+// /story_app/app/static/js/auth_forms.js
 
 /**
  * auth_forms.js

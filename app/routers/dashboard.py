@@ -1,9 +1,11 @@
-# /ai_rag_story_app/app/routers/dashboard.py
+"""API routes for dashboard."""
+
+# /story_app/app/routers/dashboard.py
 
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
-from typing import Optional
+from pydantic import BaseModel
 import logging
 
 # --- Core Application Imports ---
@@ -25,8 +27,8 @@ router = APIRouter(
 )
 
 # --- Dashboard Response Schemas ---
-class DashboardSummary:
-    """Dashboard summary statistics"""
+class DashboardSummary(BaseModel):
+    """Dashboard summary statistics."""
     total_worlds: int = 0
     total_stories: int = 0
     total_characters: int = 0
@@ -35,8 +37,8 @@ class DashboardSummary:
     recent_activity_count: int = 0
     system_status: str = "healthy"
 
-class DashboardResponse:
-    """Dashboard API response"""
+class DashboardResponse(BaseModel):
+    """Dashboard API response."""
     summary: DashboardSummary
 
 @router.get("/summary", response_model=ApiResponse)
@@ -53,23 +55,35 @@ async def get_dashboard_summary(
         # Get counts for user's content
         worlds_count_query = select(func.count(World.id)).where(World.user_id == current_user.id)
         worlds_result = await db.execute(worlds_count_query)
-        worlds_count = worlds_result.scalar_one_or_zero()
+        worlds_count = worlds_result.scalar() or 0
 
         stories_count_query = select(func.count(Story.id)).where(Story.user_id == current_user.id)
         stories_result = await db.execute(stories_count_query)
-        stories_count = stories_result.scalar_one_or_zero()
+        stories_count = stories_result.scalar() or 0
 
-        characters_count_query = select(func.count(Character.id)).where(Character.user_id == current_user.id)
+        characters_count_query = (
+            select(func.count(Character.id))
+            .join(World, Character.world_id == World.id)
+            .where(World.user_id == current_user.id)
+        )
         characters_result = await db.execute(characters_count_query)
-        characters_count = characters_result.scalar_one_or_zero()
+        characters_count = characters_result.scalar() or 0
 
-        locations_count_query = select(func.count(Location.id)).where(Location.user_id == current_user.id)
+        locations_count_query = (
+            select(func.count(Location.id))
+            .join(World, Location.world_id == World.id)
+            .where(World.user_id == current_user.id)
+        )
         locations_result = await db.execute(locations_count_query)
-        locations_count = locations_result.scalar_one_or_zero()
+        locations_count = locations_result.scalar() or 0
 
-        lore_items_count_query = select(func.count(LoreItem.id)).where(LoreItem.user_id == current_user.id)
+        lore_items_count_query = (
+            select(func.count(LoreItem.id))
+            .join(World, LoreItem.world_id == World.id)
+            .where(World.user_id == current_user.id)
+        )
         lore_items_result = await db.execute(lore_items_count_query)
-        lore_items_count = lore_items_result.scalar_one_or_zero()
+        lore_items_count = lore_items_result.scalar() or 0
 
         # Create summary
         summary = DashboardSummary(

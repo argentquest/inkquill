@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/dependencies_shared.py
+"""Core application helpers for dependencies shared."""
+
+# /story_app/app/core/dependencies_shared.py
 from fastapi import Depends, HTTPException, status, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
@@ -25,6 +27,7 @@ async def get_world_and_verify_ownership(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ) -> ModelWorld:
+    """Return world and verify ownership."""
     db_world = await crud_world.get_world_for_user(db, world_id=world_id, user_id=current_user.id)
     if not db_world:
         raise HTTPException(
@@ -38,6 +41,7 @@ async def get_character_and_verify_ownership(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ) -> ModelCharacter:
+    """Return character and verify ownership."""
     db_character = await crud_character.get_character(db, character_id=character_id)
     if not db_character:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Character not found")
@@ -51,6 +55,7 @@ async def get_location_and_verify_ownership(
     db: AsyncSession = Depends(get_db_session), 
     current_user: User = Depends(get_current_active_user)
 ) -> ModelLocation:
+    """Return location and verify ownership."""
     db_location = await crud_location.get_location(db, location_id=location_id)
     if not db_location or not db_location.world or db_location.world.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Location not found or not accessible.")
@@ -61,6 +66,7 @@ async def get_lore_item_and_verify_ownership(
     db: AsyncSession = Depends(get_db_session), 
     current_user: User = Depends(get_current_active_user)
 ) -> ModelLoreItem:
+    """Return lore item and verify ownership."""
     db_lore_item = await crud_lore_item.get_lore_item(db, lore_item_id=lore_item_id)
     if not db_lore_item or not db_lore_item.world or db_lore_item.world.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Lore item not found or not accessible.")
@@ -71,6 +77,7 @@ async def get_story_and_verify_ownership(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ) -> ModelStory:
+    """Return story and verify ownership."""
     db_story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not db_story:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Story not found or not accessible.")
@@ -81,6 +88,7 @@ async def verify_story_owner_for_act_operations(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ) -> ModelStory:
+    """Provide dependency and core support for verify story owner for act operations."""
     story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not story:
         raise HTTPException(

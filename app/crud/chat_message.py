@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/chat_message.py
+"""Database CRUD helpers for chat message."""
+
+# /story_app/app/crud/chat_message.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -131,6 +133,7 @@ async def get_element_specific_messages(
 
 # Create CRUD class for consistency
 class ChatMessageCRUD:
+    """Class for chat message c r u d."""
     async def create_chat_message(self, db: AsyncSession, message_data: ChatMessageCreate, 
                                  session_id: int = None, cost_log_id: Optional[int] = None) -> ChatMessage:
         if session_id is None:
@@ -139,7 +142,7 @@ class ChatMessageCRUD:
     
     async def get_messages_by_session(self, db: AsyncSession, session_id: int, 
                                      limit: int = 50, offset: int = 0) -> List[ChatMessage]:
-        return await get_chat_messages_by_session(db, session_id, limit, offset)
+        return await get_chat_messages_by_session(db, session_id, offset, limit)
     
     async def get_chat_message(self, db: AsyncSession, message_id: int) -> Optional[ChatMessage]:
         return await get_chat_message(db, message_id)

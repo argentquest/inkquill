@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/story_chat.js
+// /story_app/app/static/js/story_chat.js
 
 class StoryChatInterface {
     constructor(storyId, containerId) {

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/deps_ws.py
+"""Core application helpers for deps ws."""
+
+# /story_app/app/core/deps_ws.py
 
 from fastapi import WebSocket, Depends, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +20,7 @@ logger.setLevel(logging.DEBUG)
 logger.propagate = True
 
 class WebSocketException(HTTPException): 
+    """Class for web socket exception."""
     def __init__(self, code: int, reason: Optional[str] = None):
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=reason) 
         self.code = code 
@@ -29,6 +32,7 @@ async def get_current_user_from_ws_ticket(
     db: AsyncSession = Depends(get_db_session) 
 ) -> User:
     
+    """Return current user from ws ticket."""
     logger.info(f"Attempting WebSocket authentication for path: {websocket.url.path}")
 
     if not ticket:

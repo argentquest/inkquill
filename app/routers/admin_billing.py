@@ -1,3 +1,5 @@
+"""API routes for admin billing."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
@@ -43,11 +45,11 @@ async def get_admin_billing_dashboard(
         # Get all user accounts with stats
         user_accounts = await billing_crud.get_all_user_accounts_with_stats(db, limit=50)
         
-        return AdminBillingDashboardResponse(
+        return ApiResponse.success_response(data=AdminBillingDashboardResponse(
             system_stats=stats,
             recent_transactions=recent_transactions,
             user_accounts=user_accounts
-        )
+        ))
         
     except Exception as e:
         logger.error(f"Error loading admin billing dashboard: {e}")
@@ -65,7 +67,9 @@ async def get_all_transactions(
 ):
     """Get all transactions across all users for admin monitoring"""
     transactions = await billing_crud.get_all_transactions_for_admin(db, limit, offset)
-    return transactions
+    return ApiResponse.success_response(
+        data=[UserTransactionResponse.model_validate(tx, from_attributes=True) for tx in transactions]
+    )
 
 @router.get("/users", response_model=ApiResponse)
 async def get_all_user_accounts(
@@ -76,7 +80,9 @@ async def get_all_user_accounts(
 ):
     """Get all user accounts with billing information"""
     accounts = await billing_crud.get_all_user_accounts_with_stats(db, limit, offset)
-    return accounts
+    return ApiResponse.success_response(
+        data=[UserAccountResponse.model_validate(account, from_attributes=True) for account in accounts]
+    )
 
 @router.post("/adjust-credits")
 async def manual_credit_adjustment(
@@ -96,11 +102,11 @@ async def manual_credit_adjustment(
         
         logger.info(f"Admin {current_admin.id} adjusted credits for user {request.user_id}: {request.amount} coins")
         
-        return {
+        return ApiResponse.success_response(data={
             "success": True,
             "message": f"Successfully adjusted {request.amount} coins for user {request.user_id}",
             "transaction_id": transaction.id
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error in manual credit adjustment: {e}")
@@ -116,4 +122,4 @@ async def get_system_statistics(
 ):
     """Get system-wide billing statistics"""
     stats = await billing_crud.get_system_statistics(db)
-    return stats
+    return ApiResponse.success_response(data=stats)

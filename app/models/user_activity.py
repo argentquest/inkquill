@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/user_activity.py
+"""SQLAlchemy models for user activity."""
+
+# /story_app/app/models/user_activity.py
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Text, JSON, Uuid
 from sqlalchemy.orm import relationship, Mapped, mapped_column

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/act_ai_review.py
+"""API routes for act ai review."""
+
+# /story_app/app/routers/act_ai_review.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Body
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +25,7 @@ from app.services.sk_kernel_instance import kernel
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from app.services.sk_constants import STORY_ANALYSIS_PLUGIN_NAME
 
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.functions.function_result import FunctionResult
 from openai import APIError
@@ -42,6 +44,7 @@ router = APIRouter(
 )
 
 class AIReviewRequestPayload(BaseModel):
+    """Response or helper model for a i review request payload."""
     act_content_to_analyze_override: Optional[str] = Field(None, description="If provided, this content will be used for AI review instead of the act's saved description.")
     # NEW: Allow frontend to request a specific config ID
     model_config_id: Optional[int] = Field(None, description="The ID of the AI Model Configuration to use for this review.")
@@ -101,6 +104,7 @@ async def trigger_ai_review_for_act_content_api(
     current_user: ModelUser = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle POST /review."""
     logger.info(f"User '{current_user.username}' triggering AI review for Act ID: {db_act.id}")
 
     # --- Dynamic Model Selection Logic ---
@@ -169,7 +173,7 @@ async def trigger_ai_review_for_act_content_api(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No act content available for review.")
 
     # --- Create execution settings ---
-    exec_settings = AzureChatPromptExecutionSettings(
+    exec_settings = OpenAIChatPromptExecutionSettings(
         service_id=model_config_to_use.model_name,
         max_tokens=model_config_to_use.max_tokens,
         temperature=model_config_to_use.temperature,
@@ -289,3 +293,4 @@ async def trigger_ai_review_for_act_content_api(
     except Exception as e_sk: 
         logger.error(f"Error invoking SK for AI review of Act {db_act.id}: {e_sk}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error processing AI review request.")
+

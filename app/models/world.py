@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/world.py
+"""SQLAlchemy models for world."""
+
+# /story_app/app/models/world.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean, JSON
@@ -21,6 +23,7 @@ if TYPE_CHECKING:
     from .chat_session import ChatSession
     from .forum import ForumThread
     from .world_role import WorldRole
+    from .world_collaborator import WorldCollaborator
 
 class World(Base):
     """
@@ -95,6 +98,12 @@ class World(Base):
         cascade="all, delete-orphan"
     )
 
+    collaborators: Mapped[List["WorldCollaborator"]] = relationship(
+        "WorldCollaborator",
+        back_populates="world",
+        cascade="all, delete-orphan"
+    )
+
     # Forum relationships
     forum_threads: Mapped[List["ForumThread"]] = relationship(
         "ForumThread",
@@ -105,14 +114,10 @@ class World(Base):
     def image_url(self) -> Optional[str]:
         """Return the image URL for this world if it has a current image."""
         if self.current_image and self.current_image.blob_path:
-            from app.core.config import settings
-            if settings.AZURE_STORAGE_ACCOUNT_NAME:
-                container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-                return f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{self.current_image.blob_path}"
-            else:
-                # Fallback: assume blob_path is already a full URL
-                return self.current_image.blob_path
+            from app.core.storage_deps import build_storage_url
+            return build_storage_url("generated-images", self.current_image.blob_path)
         return None
 
     def __repr__(self):
         return f"<World(id={self.id}, name='{self.name}', user_id={self.user_id})>"
+

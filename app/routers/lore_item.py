@@ -1,21 +1,21 @@
-# /ai_rag_story_app/app/routers/lore_item.py
+"""API routes for lore item."""
+
+# /story_app/app/routers/lore_item.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Path, Body, BackgroundTasks, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
 
 # --- Core Application Imports ---
 from app.core.deps import get_db_session, get_current_active_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
+from app.core.storage_deps import LocalStorageClient
 from app.models.user import User
 from app.models.world import World as ModelWorld
 from app.models.lore_item import LoreItem as ModelLoreItem, LoreItemCategoryEnum
 from app.models.story import Story as ModelStory
-from app.models.uploaded_document import UploadedDocument, SourceElementTypeEnum
 from app.schemas.image import GeneratedImageRead
 from app.schemas.base import ApiResponse
 from app.crud import generated_image as crud_generated_image
@@ -51,17 +51,30 @@ router_story_lore_items = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-class RAGContentResponse(BaseModel):
+class ContextContentResponse(BaseModel):
+    """Response or helper model for context content response."""
     content: Optional[str] = None
     error: Optional[str] = None
     filename: Optional[str] = None
 
-async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_path: Optional[str]) -> Optional[str]:
+
+def _build_lore_context(lore_item: ModelLoreItem) -> str:
+    """Provide internal router support for build lore context."""
+    parts = [
+        f"Title: {lore_item.title}",
+        f"Description: {lore_item.description or 'N/A'}",
+        f"Category: {lore_item.category.value if lore_item.category else 'N/A'}",
+        f"Related Elements: {lore_item.related_elements or 'N/A'}",
+        f"Placement Note: {lore_item.placement_note or 'N/A'}",
+    ]
+    return "\n".join(parts)
+
+async def _check_and_get_image_url(blob_service_client: LocalStorageClient, blob_path: Optional[str]) -> Optional[str]:
+    """Provide internal router support for check and get image url."""
     if not blob_path:
         return None
     try:
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_path)
+        blob_client = blob_service_client.get_blob_client(container="generated-images", blob=blob_path)
         if await blob_client.exists():
             return blob_client.url
     except Exception as e:
@@ -79,6 +92,7 @@ async def create_new_lore_item_for_world(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle POST /."""
     logger.info(f"User '{current_user.username}' API creating lore item '{lore_item_in.title}' in world ID {db_world.id}")
     try:
         created_item = await crud_lore_item.create_lore_item(
@@ -90,7 +104,7 @@ async def create_new_lore_item_for_world(
         )
         await db.commit()
         await db.refresh(created_item)
-        return created_item
+        return ApiResponse.success_response(data=LoreItemRead.from_orm(created_item))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating lore item '{lore_item_in.title}': {e}", exc_info=True)
@@ -104,8 +118,9 @@ async def list_lore_items_in_world(
     limit: int = Query(100, ge=1, le=200),
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /."""
     logger.info(f"User '{current_user.username}' API listing lore items in world ID {world_id}")
     db_world = await crud_world.get_world_for_user(db, world_id=world_id, user_id=current_user.id)
     if not db_world:
@@ -122,17 +137,18 @@ async def list_lore_items_in_world(
         item_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
         response_items.append(item_read)
     
-    return response_items
+    return ApiResponse.success_response(data=response_items)
 
 @router_lore_items.get("/{lore_item_id}", response_model=ApiResponse, name="get_single_lore_item")
 async def get_single_lore_item(
     db_lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /{lore_item_id}."""
     item_read = LoreItemRead.from_orm(db_lore_item)
     path_to_check = db_lore_item.current_image.blob_path if db_lore_item.current_image else db_lore_item.image_blob_path
     item_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
-    return item_read
+    return ApiResponse.success_response(data=item_read)
 
 @router_lore_items.put("/{lore_item_id}", response_model=ApiResponse, name="update_existing_lore_item")
 async def update_existing_lore_item(
@@ -142,6 +158,7 @@ async def update_existing_lore_item(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle PUT /{lore_item_id}."""
     logger.info(f"User '{current_user.username}' API updating lore item ID {db_lore_item.id}")
     try:
         updated_item = await crud_lore_item.update_lore_item(
@@ -153,7 +170,7 @@ async def update_existing_lore_item(
         )
         await db.commit()
         await db.refresh(updated_item)
-        return updated_item
+        return ApiResponse.success_response(data=LoreItemRead.from_orm(updated_item))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error updating lore item ID {db_lore_item.id}: {e}", exc_info=True)
@@ -166,6 +183,7 @@ async def delete_existing_lore_item(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle DELETE /{lore_item_id}."""
     logger.info(f"User '{current_user.username}' API deleting lore item ID {db_lore_item.id}")
     try:
         await crud_lore_item.delete_lore_item(
@@ -187,18 +205,20 @@ async def list_images_for_lore_item(
     lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle GET /{lore_item_id}/images."""
     images = await crud_generated_image.get_images_for_element(
         db, element_type="lore_item", element_id=lore_item.id
     )
-    return images
+    return ApiResponse.success_response(data=[GeneratedImageRead.from_orm(image) for image in images])
 
 @router_lore_items.post("/{lore_item_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_lore_item(
     lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle POST /{lore_item_id}/set-current-image/{image_id}."""
     image_to_set = await crud_generated_image.get_image(db, image_id=image_id)
     if not image_to_set or image_to_set.element_type != 'lore_item' or image_to_set.associated_element_id != lore_item.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found or does not belong to this lore item.")
@@ -213,7 +233,7 @@ async def set_current_image_for_lore_item(
     item_read = LoreItemRead.from_orm(lore_item)
     item_read.image_url = await _check_and_get_image_url(blob_service_client, lore_item.image_blob_path)
 
-    return item_read
+    return ApiResponse.success_response(data=item_read)
 
 
 @router_story_lore_items.post("/", status_code=status.HTTP_201_CREATED, name="link_lore_item_to_story")
@@ -224,6 +244,7 @@ async def link_lore_item_to_story_endpoint(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle POST /."""
     db_lore_item = await crud_lore_item.get_lore_item(db, lore_item_id=link_in.lore_item_id)
     if not db_lore_item or db_lore_item.world_id != db_story.world_id or db_lore_item.world.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Lore item not found or not accessible.")
@@ -232,7 +253,7 @@ async def link_lore_item_to_story_endpoint(
     if not success:
         raise HTTPException(status_code=500, detail="Failed to link lore item.")
     await db.commit()
-    return {"message": "Lore item successfully linked/updated in story."}
+    return ApiResponse.success_response(data={"message": "Lore item successfully linked/updated in story."})
 
 @router_story_lore_items.delete("/{lore_item_id}", status_code=status.HTTP_204_NO_CONTENT, name="unlink_lore_item_from_story")
 async def unlink_lore_item_from_story_endpoint(
@@ -241,6 +262,7 @@ async def unlink_lore_item_from_story_endpoint(
     db_story: ModelStory = Depends(get_story_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle DELETE /{lore_item_id}."""
     success = await crud_lore_item.unlink_lore_item_from_story(db, story_id=db_story.id, lore_item_id=lore_item_id)
     if not success:
         raise HTTPException(status_code=404, detail="Link not found.")
@@ -252,9 +274,10 @@ async def list_lore_items_for_story_endpoint(
     story_id: int,
     db_story: ModelStory = Depends(get_story_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     # --- FIX: Process the list of dicts from CRUD to create Pydantic models ---
+    """Handle GET /."""
     lore_items_data_raw = await crud_lore_item.get_lore_items_for_story(db, story_id=db_story.id)
     
     response_items = []
@@ -270,38 +293,19 @@ async def list_lore_items_for_story_endpoint(
 
         response_items.append(item_read)
 
-    return response_items
+    return ApiResponse.success_response(data=response_items)
     # --- END FIX ---
 
-@router_lore_items.get("/{lore_item_id}/generated-rag-content", response_model=ApiResponse, name="get_lore_item_generated_rag_content")
-async def get_lore_item_generated_rag_content_endpoint(
+@router_lore_items.get("/{lore_item_id}/generated-context", response_model=ApiResponse, name="get_lore_item_generated_context")
+async def get_lore_item_generated_context_endpoint(
     db_lore_item: ModelLoreItem = Depends(get_lore_item_and_verify_ownership),
-    db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
 ):
-    logger.info(f"User fetching generated RAG content for Lore Item ID: {db_lore_item.id}")
-    
-    stmt = select(UploadedDocument).where(
-        UploadedDocument.source_lore_item_id == db_lore_item.id,
-        UploadedDocument.source_element_type == SourceElementTypeEnum.LORE_ITEM_LORE,
-        UploadedDocument.world_id == db_lore_item.world_id
-    ).order_by(UploadedDocument.uploaded_at.desc())
-    
-    result = await db.execute(stmt)
-    rag_doc_record = result.scalars().first()
+    """Handle GET /{lore_item_id}/generated-context."""
+    logger.info(f"User fetching generated context for Lore Item ID: {db_lore_item.id}")
+    return ApiResponse.success_response(
+        data=ContextContentResponse(
+            content=_build_lore_context(db_lore_item),
+            filename=f"lore_item_{db_lore_item.id}_context.txt",
+        )
+    )
 
-    if not rag_doc_record or not rag_doc_record.blob_storage_path:
-        return RAGContentResponse(content=None, error="No AI-generated RAG context found for this lore item.", filename=None)
-
-    try:
-        container_name_for_rag = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS
-        blob_client = blob_service_client.get_blob_client(container=container_name_for_rag, blob=rag_doc_record.blob_storage_path)
-        if not await blob_client.exists():
-            return RAGContentResponse(content=None, error="RAG file not found in storage.", filename=rag_doc_record.filename)
-        
-        downloader = await blob_client.download_blob()
-        blob_content_bytes = await downloader.readall()
-        return RAGContentResponse(content=blob_content_bytes.decode('utf-8', errors='replace'), filename=rag_doc_record.filename)
-    except Exception as e_blob:
-        logger.error(f"Error fetching RAG content from blob for Lore Item ID {db_lore_item.id}: {e_blob}", exc_info=True)
-        return RAGContentResponse(error=f"Error retrieving RAG content from storage.", filename=rag_doc_record.filename)

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/processing/__init__.py
+"""Package exports for processing."""
+
+# /story_app/app/processing/__init__.py
 
 # This file makes the 'processing' directory a Python package.
 # It allows you to import modules from this directory using dot notation

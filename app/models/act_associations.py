@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/act_associations.py
+"""SQLAlchemy models for act associations."""
+
+# /story_app/app/models/act_associations.py
 
 from sqlalchemy import Integer, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
     from .lore_item import LoreItem
 
 class ActCharacterAssociation(Base):
+    """SQLAlchemy model for act character association."""
     __tablename__ = "act_character_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -51,6 +54,7 @@ class ActCharacterAssociation(Base):
 
 
 class ActLocationAssociation(Base):
+    """SQLAlchemy model for act location association."""
     __tablename__ = "act_location_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -85,6 +89,7 @@ class ActLocationAssociation(Base):
 
 
 class ActLoreItemAssociation(Base):
+    """SQLAlchemy model for act lore item association."""
     __tablename__ = "act_lore_item_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

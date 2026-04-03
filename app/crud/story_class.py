@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/story_class.py
+"""Database CRUD helpers for story class."""
+
+# /story_app/app/crud/story_class.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select

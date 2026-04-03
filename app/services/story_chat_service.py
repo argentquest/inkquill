@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/story_chat_service.py
+"""Service helpers for story chat service."""
+
+# /story_app/app/services/story_chat_service.py
 
 import logging
 from typing import List, Optional, Dict, Any, AsyncGenerator

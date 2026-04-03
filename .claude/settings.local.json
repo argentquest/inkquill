@@ -10,7 +10,13 @@
       "Bash(.venv/Scripts/pytest tests/ -v --tb=short)",
       "Bash(.venv/Scripts/python -m pytest tests/ -v --tb=short)",
       "Bash(.venv/Scripts/python -m pytest tests/ -v --tb=line -x)",
-      "Bash(.venv/Scripts/python -m pytest tests/ -v --tb=no -q)"
+      "Bash(.venv/Scripts/python -m pytest tests/ -v --tb=no -q)",
+      "Bash(git fetch:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []

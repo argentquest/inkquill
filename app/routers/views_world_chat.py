@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_world_chat.py
+"""API routes for views world chat."""
+
+# /story_app/app/routers/views_world_chat.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse

@@ -1,0 +1,1047 @@
+%% Auto-generated from SQLAlchemy models (Base.metadata)
+erDiagram
+  act_character_associations {
+    int id PK
+    int act_id FK
+    int character_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  act_location_associations {
+    int id PK
+    int act_id FK
+    int location_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  act_lore_item_associations {
+    int id PK
+    int act_id FK
+    int lore_item_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  acts {
+    int id PK
+    string title
+    string description
+    int act_number
+    string act_summary
+    string ai_summary
+    string writer_notes
+    string image_prompt_definition
+    int system_prompt_id FK
+    int story_class_id FK
+    int story_id FK
+    int current_image_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  ai_call_logs {
+    int id PK
+    string job_id FK
+    int user_id FK
+    int model_config_id FK
+    string input_prompt
+    string call_type
+    string model_name
+    int object_id
+    int prompt_tokens
+    int completion_tokens
+    int total_tokens
+    decimal calculated_cost_usd
+    int duration_ms
+    datetime created_at
+  }
+  ai_model_configurations {
+    int id PK
+    string display_name
+    string model_name
+    string description
+    enum provider
+    enum model_type
+    bool is_active
+    bool is_public_chat_default
+    int max_tokens
+    decimal temperature
+    decimal top_p
+    decimal presence_penalty
+    decimal frequency_penalty
+    bool is_json_mode
+    decimal provider_cost_input_usd_pm
+    decimal provider_cost_output_usd_pm
+    decimal user_price_input_usd_pm
+    decimal user_price_output_usd_pm
+  }
+  anonymous_user_sessions {
+    int id PK
+    int user_id FK
+    string session_token
+    string ip_address
+    string browser_fingerprint
+    string user_agent
+    datetime created_at
+    datetime last_seen_at
+    bool is_active
+  }
+  blog_analytics_summary {
+    int id PK
+    int post_id FK
+    string date
+    int unique_views
+    int total_views
+    int new_likes
+    int new_comments
+    int avg_read_time
+    decimal bounce_rate
+    int social_shares
+    datetime created_at
+    datetime updated_at
+  }
+  blog_author_profiles {
+    int id PK
+    int user_id FK
+    string bio
+    string profile_image_url
+    string website_url
+    string twitter_handle
+    string instagram_handle
+    string linkedin_url
+    bool allow_comments_default
+    bool auto_publish
+    bool email_notifications
+    int total_posts
+    int total_views
+    int total_likes
+    int follower_count
+    datetime created_at
+    datetime updated_at
+  }
+  blog_categories {
+    int id PK
+    string name
+    string slug
+    string description
+    string color
+    string icon
+    int post_count
+    int display_order
+    bool is_active
+    datetime created_at
+    datetime updated_at
+  }
+  blog_comments {
+    int id PK
+    int post_id FK
+    int author_id FK
+    int parent_comment_id FK
+    string content
+    enum status
+    int like_count
+    int reply_count
+    bool is_author_reply
+    datetime created_at
+    datetime updated_at
+    datetime deleted_at
+  }
+  blog_content_links {
+    int id PK
+    int post_id FK
+    enum link_type
+    int link_id
+    string link_text
+    string link_context
+    datetime created_at
+  }
+  blog_follows {
+    int id PK
+    int author_id FK
+    int follower_id FK
+    bool notification_enabled
+    datetime created_at
+  }
+  blog_likes {
+    int id PK
+    int post_id FK
+    int user_id FK
+    datetime created_at
+  }
+  blog_post_associations {
+    int id PK
+    int post_id FK
+    enum association_type
+    int association_id
+    string association_title
+    datetime created_at
+  }
+  blog_post_tags {
+    int id PK
+    int post_id FK
+    int tag_id FK
+    datetime created_at
+  }
+  blog_posts {
+    int id PK
+    string title
+    string slug
+    string content
+    string excerpt
+    string featured_image_url
+    enum status
+    int author_id FK
+    int category_id FK
+    int view_count
+    int like_count
+    int comment_count
+    string meta_title
+    string meta_description
+    string meta_keywords
+    string og_title
+    string og_description
+    string og_image_url
+    bool is_featured
+    bool allow_comments
+    bool is_ai_generated
+    datetime published_at
+    datetime last_viewed_at
+    datetime created_at
+    datetime updated_at
+    datetime deleted_at
+    string search_vector
+  }
+  blog_subscriptions {
+    int id PK
+    string email
+    int user_id FK
+    enum status
+    enum frequency
+    string include_categories
+    string include_tags
+    string confirmation_token
+    string unsubscribe_token
+    datetime last_sent_at
+    int total_emails_sent
+    datetime last_opened_at
+    int open_count
+    int click_count
+    int bounce_count
+    int complaint_count
+    datetime last_bounce_at
+    datetime last_complaint_at
+    string source
+    string ip_address
+    string user_agent
+    datetime confirmed_at
+    datetime unsubscribed_at
+    datetime created_at
+    datetime updated_at
+  }
+  blog_tags {
+    int id PK
+    string name
+    string slug
+    string description
+    int usage_count
+    datetime created_at
+  }
+  blog_views {
+    int id PK
+    int post_id FK
+    int user_id FK
+    string ip_address
+    string user_agent
+    string referrer_url
+    string session_id
+    int view_duration
+    datetime created_at
+  }
+  brainstorm_favorites {
+    int id PK
+    int user_id FK
+    int session_id FK
+    string concept_id
+    string concept_data
+    bool is_selected
+    datetime created_at
+  }
+  brainstorm_sessions {
+    int id PK
+    int user_id FK
+    int interview_response_id FK
+    string session_name
+    string generated_concepts
+    datetime created_at
+    datetime updated_at
+  }
+  brainstorm_stories {
+    int id PK
+    int user_id FK
+    int favorite_id FK
+    int story_id FK
+    string title
+    string three_act_structure
+    datetime created_at
+  }
+  characters {
+    int id PK
+    string name
+    string gender
+    string species
+    string description
+    string personality_traits
+    string backstory
+    string image_prompt_definition
+    string image_blob_path
+    int world_id FK
+    int current_location_id FK
+    string placement_note
+    int current_image_id FK
+    int importance_rating
+    string relationships
+    string core_motivation
+    string core_motivations
+    string physical_attributes
+    string key_relationships
+    string genre
+    string genre_specific_answers
+    string generated_narrative
+    bool is_ai_generated
+    string next_quest_scenario
+    string first_meeting_message
+    string age_category
+    string profession
+    string short_backstory
+    string visual_prompt
+    string narrative_filter_results
+    datetime created_at
+    datetime updated_at
+  }
+  chat_messages {
+    int id PK
+    int session_id FK
+    string role
+    string content
+    string full_context
+    string element_type
+    int element_id
+    int cost_log_id FK
+    datetime created_at
+  }
+  chat_samples {
+    int id PK
+    string title
+    string prompt_text
+    string category
+    bool is_active
+    int sort_order
+    datetime created_at
+    datetime updated_at
+  }
+  chat_sessions {
+    int id PK
+    int world_id FK
+    int user_id FK
+    string title
+    datetime created_at
+    datetime updated_at
+  }
+  credit_packages {
+    int id PK
+    string name
+    string description
+    decimal credit_amount
+    decimal price_usd
+    decimal bonus_percentage
+    bool is_active
+    int display_order
+    datetime created_at
+    datetime updated_at
+  }
+  cta_contents {
+    int id PK
+    string title
+    string subtitle
+    string content
+    enum position
+    int sort_order
+    enum style
+    string background_color
+    string text_color
+    string icon_class
+    string features
+    string primary_button_text
+    string primary_button_url
+    string primary_button_icon
+    string secondary_button_text
+    string secondary_button_url
+    string secondary_button_icon
+    bool show_for_anonymous
+    bool show_for_authenticated
+    bool show_for_admin
+    bool is_active
+    datetime created_at
+    datetime updated_at
+    string campaign_name
+    string utm_source
+    string utm_medium
+    string utm_campaign
+  }
+  forum_categories {
+    int id PK
+    string name
+    string description
+    string slug
+    int sort_order
+    bool is_active
+    string icon
+    datetime created_at
+    datetime updated_at
+  }
+  forum_posts {
+    int id PK
+    string content
+    string content_html
+    int thread_id FK
+    int user_id FK
+    int parent_post_id FK
+    int character_id FK
+    int location_id FK
+    int upvote_count
+    int downvote_count
+    int score
+    int edit_count
+    datetime edited_at
+    int edited_by_id FK
+    bool is_deleted
+    datetime deleted_at
+    int deleted_by_id FK
+    string deletion_reason
+    datetime created_at
+    datetime updated_at
+  }
+  forum_subscriptions {
+    int id PK
+    int thread_id FK
+    int user_id FK
+    bool notify_email
+    bool notify_in_app
+    datetime created_at
+    datetime updated_at
+  }
+  forum_threads {
+    int id PK
+    string title
+    string slug
+    enum status
+    int category_id FK
+    int user_id FK
+    int world_id FK
+    int story_id FK
+    int view_count
+    int post_count
+    datetime last_post_at
+    int last_post_by_id FK
+    bool is_pinned
+    bool is_locked
+    bool is_deleted
+    datetime deleted_at
+    int deleted_by_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  forum_votes {
+    int id PK
+    int post_id FK
+    int user_id FK
+    enum vote_type
+    datetime created_at
+    datetime updated_at
+  }
+  generated_images {
+    int id PK
+    uuid image_uuid
+    string blob_path
+    string prompt
+    string revised_prompt
+    string element_type
+    int associated_element_id
+    string aspect_ratio
+    int user_id FK
+    datetime created_at
+  }
+  job_statuses {
+    int id PK
+    string job_id
+    enum job_type
+    enum state
+    string status_message
+    string result_message
+    int user_id FK
+    int world_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  location_connections {
+    int from_location_id PK FK
+    int to_location_id PK FK
+    string path_description
+    string reverse_path_description
+    bool is_bidirectional
+    string dm_notes
+    datetime created_at
+    datetime updated_at
+  }
+  locations {
+    int id PK
+    string name
+    string description
+    string atmosphere
+    string significance
+    string image_prompt_definition
+    string image_blob_path
+    enum scale
+    int parent_location_id FK
+    decimal map_x
+    decimal map_y
+    decimal map_z
+    decimal dimension_x
+    decimal dimension_y
+    decimal dimension_z
+    string dimension_unit
+    int current_image_id FK
+    string geography
+    string cultural_context
+    int importance_rating
+    string connected_elements
+    int world_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  lore_items {
+    int id PK
+    string title
+    string description
+    enum category
+    string image_prompt_definition
+    string image_blob_path
+    int world_id FK
+    int current_location_id FK
+    string placement_note
+    int current_image_id FK
+    int importance_rating
+    string related_elements
+    datetime created_at
+    datetime updated_at
+  }
+  prompts {
+    int id PK
+    string title
+    string prompt_content
+    string reason_to_use
+    string comment
+    bool is_active
+    enum prompt_type
+    enum age_target
+    int user_id FK
+    int last_updated_by_user_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  published_stories {
+    int id PK
+    int story_id FK
+    int user_id FK
+    string published_url
+    string filename
+    string title
+    string description
+    int word_count
+    bool is_public
+    bool is_featured
+    int view_count
+    int like_count
+    int comment_count
+    decimal average_rating
+    datetime published_at
+    datetime updated_at
+    string search_vector
+  }
+  refresh_tokens {
+    int id PK
+    string token
+    int user_id FK
+    datetime issued_at
+    datetime expires_at
+    datetime revoked_at
+    string ip_address
+    string user_agent
+  }
+  scene_character_associations {
+    int id PK
+    int scene_id FK
+    int character_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  scene_location_associations {
+    int id PK
+    int scene_id FK
+    int location_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  scene_lore_item_associations {
+    int id PK
+    int scene_id FK
+    int lore_item_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  scenes {
+    int id PK
+    int scene_number
+    string title
+    string summary
+    string ai_summary
+    string content
+    string characters_present
+    string plot_points
+    string mood
+    string image_prompt_definition
+    int act_id FK
+    int story_class_id FK
+    int current_image_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  social_share_daily_summaries {
+    uuid id PK
+    int user_id FK
+    datetime date
+    int total_shares
+    int coins_earned
+    bool max_coins_reached
+    int facebook_shares
+    int twitter_shares
+    int linkedin_shares
+    int reddit_shares
+    int whatsapp_shares
+    int email_shares
+    int copy_link_shares
+    int pinterest_shares
+    int telegram_shares
+    int image_preview_shares
+    int published_story_shares
+    int ai_public_chat_shares
+    datetime created_at
+    datetime updated_at
+  }
+  social_shares {
+    uuid id PK
+    int user_id FK
+    string content_type
+    string content_id
+    string content_title
+    string content_url
+    string platform
+    string shared_text
+    string shared_hashtags
+    string ip_address
+    string user_agent
+    string referrer
+    bool coin_awarded
+    int coin_amount
+    datetime created_at
+  }
+  stories {
+    int id PK
+    string title
+    string short_description
+    string ai_summary
+    int user_id FK
+    int world_id FK
+    string story_type
+    string image_prompt_definition
+    string image_blob_path
+    int current_image_id FK
+    string story_genre
+    string story_tone
+    string primary_conflict_type
+    datetime created_at
+    datetime updated_at
+  }
+  story_character_association {
+    int story_id PK FK
+    int character_id PK FK
+    string role_in_story
+  }
+  story_character_associations {
+    int id PK
+    int story_id FK
+    int character_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  story_chat_messages {
+    int id PK
+    int session_id FK
+    string role
+    string content
+    string full_context
+    string story_context
+    string target_element
+    int target_element_id
+    int cost_log_id FK
+    datetime created_at
+  }
+  story_chat_sessions {
+    int id PK
+    int story_id FK
+    int user_id FK
+    string title
+    string description
+    string focus_area
+    datetime created_at
+    datetime updated_at
+  }
+  story_classes {
+    int id PK
+    string name
+    string description
+    string color
+    int world_id FK
+    datetime created_at
+    datetime updated_at
+  }
+  story_comments {
+    int id PK
+    int published_story_id FK
+    int user_id FK
+    int parent_comment_id FK
+    string content
+    bool is_approved
+    bool is_deleted
+    datetime created_at
+    datetime updated_at
+  }
+  story_location_association {
+    int story_id PK FK
+    int location_id PK FK
+    string significance_to_story
+  }
+  story_location_associations {
+    int id PK
+    int story_id FK
+    int location_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  story_lore_item_association {
+    int story_id PK FK
+    int lore_item_id PK FK
+    string relevance_to_story
+  }
+  story_lore_item_associations {
+    int id PK
+    int story_id FK
+    int lore_item_id FK
+    string roles
+    string notes
+    datetime created_at
+    datetime updated_at
+  }
+  story_ratings {
+    int id PK
+    int published_story_id FK
+    int user_id FK
+    int rating
+    datetime created_at
+    datetime updated_at
+  }
+  uploaded_documents {
+    int id PK
+    string filename
+    string content_type
+    string blob_storage_path
+    enum status
+    string error_message
+    datetime uploaded_at
+    datetime updated_at
+    datetime processed_at
+    int user_id FK
+    int world_id FK
+    enum source_element_type
+    int source_character_id FK
+    int source_location_id FK
+    int source_lore_item_id FK
+  }
+  user_accounts {
+    int id PK
+    int user_id FK
+    decimal current_balance
+    decimal total_spent
+    decimal total_credits_added
+    string currency
+    datetime created_at
+    datetime updated_at
+  }
+  user_activities {
+    uuid id PK
+    int user_id FK
+    string action_type
+    string action_category
+    string action_details
+    string endpoint
+    string method
+    int status_code
+    decimal duration_ms
+    string ip_address
+    string user_agent
+    string request_id
+    string request_data
+    string response_data
+    string extra_data
+    string error_message
+    string error_type
+    datetime created_at
+  }
+  user_interview_responses {
+    int id PK
+    int user_id FK
+    string interview_id
+    string json_response
+    datetime completed_at
+    datetime created_at
+    datetime updated_at
+  }
+  user_transactions {
+    int id PK
+    int user_account_id FK
+    string transaction_type
+    decimal amount
+    decimal balance_after
+    string description
+    int ai_cost_log_id FK
+    int credit_package_id FK
+    string payment_reference
+    string transaction_metadata
+    datetime created_at
+  }
+  users {
+    int id PK
+    string username
+    string email
+    string hashed_password
+    string display_name
+    string auth_provider
+    string provider_id
+    string provider_data
+    string profile_picture_url
+    bool is_active
+    bool is_admin
+    string interview_data
+    bool bonus1
+    bool bonus2
+    bool bonus3
+    bool bonus4
+    bool bonus5
+    bool bonus6
+    bool bonus7
+    bool bonus8
+    bool bonus9
+    bool bonus10
+    int referred_by_user_id FK
+    int referral_count
+    string reset_token
+    datetime reset_token_expires
+    datetime created_at
+    datetime updated_at
+  }
+  world_collaborators {
+    int id PK
+    int world_id FK
+    int user_id FK
+    string role
+    string status
+    int invited_by_user_id FK
+    datetime invited_at
+    datetime joined_at
+    string permissions
+    datetime created_at
+    datetime updated_at
+  }
+  world_roles {
+    int id PK
+    string name
+    string description
+    int world_id FK
+    int created_by_user_id FK
+    bool is_predefined
+    datetime created_at
+    datetime updated_at
+  }
+  worlds {
+    int id PK
+    string name
+    string description
+    string short_description
+    string world_builder_data
+    int user_id FK
+    string image_prompt_definition
+    string image_blob_path
+    int current_image_id FK
+    bool is_free_chat_enabled
+    bool is_shadow
+    datetime created_at
+    datetime updated_at
+  }
+  acts ||--o{ act_character_associations : "act_id"
+  acts ||--o{ act_location_associations : "act_id"
+  acts ||--o{ act_lore_item_associations : "act_id"
+  acts ||--o{ scenes : "act_id"
+  ai_call_logs ||--o{ chat_messages : "cost_log_id"
+  ai_call_logs ||--o{ story_chat_messages : "cost_log_id"
+  ai_call_logs ||--o{ user_transactions : "ai_cost_log_id"
+  ai_model_configurations ||--o{ ai_call_logs : "model_config_id"
+  blog_categories ||--o{ blog_posts : "category_id"
+  blog_comments ||--o{ blog_comments : "parent_comment_id"
+  blog_posts ||--o{ blog_analytics_summary : "post_id"
+  blog_posts ||--o{ blog_comments : "post_id"
+  blog_posts ||--o{ blog_content_links : "post_id"
+  blog_posts ||--o{ blog_likes : "post_id"
+  blog_posts ||--o{ blog_post_associations : "post_id"
+  blog_posts ||--o{ blog_post_tags : "post_id"
+  blog_posts ||--o{ blog_views : "post_id"
+  blog_tags ||--o{ blog_post_tags : "tag_id"
+  brainstorm_favorites ||--o{ brainstorm_stories : "favorite_id"
+  brainstorm_sessions ||--o{ brainstorm_favorites : "session_id"
+  characters ||--o{ act_character_associations : "character_id"
+  characters ||--o{ forum_posts : "character_id"
+  characters ||--o{ scene_character_associations : "character_id"
+  characters ||--o{ story_character_association : "character_id"
+  characters ||--o{ story_character_associations : "character_id"
+  characters ||--o{ uploaded_documents : "source_character_id"
+  chat_sessions ||--o{ chat_messages : "session_id"
+  credit_packages ||--o{ user_transactions : "credit_package_id"
+  forum_categories ||--o{ forum_threads : "category_id"
+  forum_posts ||--o{ forum_posts : "parent_post_id"
+  forum_posts ||--o{ forum_votes : "post_id"
+  forum_threads ||--o{ forum_posts : "thread_id"
+  forum_threads ||--o{ forum_subscriptions : "thread_id"
+  generated_images ||--o{ acts : "current_image_id"
+  generated_images ||--o{ characters : "current_image_id"
+  generated_images ||--o{ locations : "current_image_id"
+  generated_images ||--o{ lore_items : "current_image_id"
+  generated_images ||--o{ scenes : "current_image_id"
+  generated_images ||--o{ stories : "current_image_id"
+  generated_images ||--o{ worlds : "current_image_id"
+  job_statuses ||--o{ ai_call_logs : "job_id"
+  locations ||--o{ act_location_associations : "location_id"
+  locations ||--o{ characters : "current_location_id"
+  locations ||--o{ forum_posts : "location_id"
+  locations ||--o{ location_connections : "from_location_id"
+  locations ||--o{ location_connections : "to_location_id"
+  locations ||--o{ locations : "parent_location_id"
+  locations ||--o{ lore_items : "current_location_id"
+  locations ||--o{ scene_location_associations : "location_id"
+  locations ||--o{ story_location_association : "location_id"
+  locations ||--o{ story_location_associations : "location_id"
+  locations ||--o{ uploaded_documents : "source_location_id"
+  lore_items ||--o{ act_lore_item_associations : "lore_item_id"
+  lore_items ||--o{ scene_lore_item_associations : "lore_item_id"
+  lore_items ||--o{ story_lore_item_association : "lore_item_id"
+  lore_items ||--o{ story_lore_item_associations : "lore_item_id"
+  lore_items ||--o{ uploaded_documents : "source_lore_item_id"
+  prompts ||--o{ acts : "system_prompt_id"
+  published_stories ||--o{ story_comments : "published_story_id"
+  published_stories ||--o{ story_ratings : "published_story_id"
+  scenes ||--o{ scene_character_associations : "scene_id"
+  scenes ||--o{ scene_location_associations : "scene_id"
+  scenes ||--o{ scene_lore_item_associations : "scene_id"
+  stories ||--o{ acts : "story_id"
+  stories ||--o{ brainstorm_stories : "story_id"
+  stories ||--o{ forum_threads : "story_id"
+  stories ||--o{ published_stories : "story_id"
+  stories ||--o{ story_character_association : "story_id"
+  stories ||--o{ story_character_associations : "story_id"
+  stories ||--o{ story_chat_sessions : "story_id"
+  stories ||--o{ story_location_association : "story_id"
+  stories ||--o{ story_location_associations : "story_id"
+  stories ||--o{ story_lore_item_association : "story_id"
+  stories ||--o{ story_lore_item_associations : "story_id"
+  story_chat_sessions ||--o{ story_chat_messages : "session_id"
+  story_classes ||--o{ acts : "story_class_id"
+  story_classes ||--o{ scenes : "story_class_id"
+  story_comments ||--o{ story_comments : "parent_comment_id"
+  user_accounts ||--o{ user_transactions : "user_account_id"
+  user_interview_responses ||--o{ brainstorm_sessions : "interview_response_id"
+  users ||--o{ ai_call_logs : "user_id"
+  users ||--o{ anonymous_user_sessions : "user_id"
+  users ||--o{ blog_author_profiles : "user_id"
+  users ||--o{ blog_comments : "author_id"
+  users ||--o{ blog_follows : "author_id"
+  users ||--o{ blog_follows : "follower_id"
+  users ||--o{ blog_likes : "user_id"
+  users ||--o{ blog_posts : "author_id"
+  users ||--o{ blog_subscriptions : "user_id"
+  users ||--o{ blog_views : "user_id"
+  users ||--o{ brainstorm_favorites : "user_id"
+  users ||--o{ brainstorm_sessions : "user_id"
+  users ||--o{ brainstorm_stories : "user_id"
+  users ||--o{ chat_sessions : "user_id"
+  users ||--o{ forum_posts : "deleted_by_id"
+  users ||--o{ forum_posts : "edited_by_id"
+  users ||--o{ forum_posts : "user_id"
+  users ||--o{ forum_subscriptions : "user_id"
+  users ||--o{ forum_threads : "deleted_by_id"
+  users ||--o{ forum_threads : "last_post_by_id"
+  users ||--o{ forum_threads : "user_id"
+  users ||--o{ forum_votes : "user_id"
+  users ||--o{ generated_images : "user_id"
+  users ||--o{ job_statuses : "user_id"
+  users ||--o{ prompts : "last_updated_by_user_id"
+  users ||--o{ prompts : "user_id"
+  users ||--o{ published_stories : "user_id"
+  users ||--o{ refresh_tokens : "user_id"
+  users ||--o{ social_share_daily_summaries : "user_id"
+  users ||--o{ social_shares : "user_id"
+  users ||--o{ stories : "user_id"
+  users ||--o{ story_chat_sessions : "user_id"
+  users ||--o{ story_comments : "user_id"
+  users ||--o{ story_ratings : "user_id"
+  users ||--o{ uploaded_documents : "user_id"
+  users ||--o{ user_accounts : "user_id"
+  users ||--o{ user_activities : "user_id"
+  users ||--o{ user_interview_responses : "user_id"
+  users ||--o{ users : "referred_by_user_id"
+  users ||--o{ world_collaborators : "invited_by_user_id"
+  users ||--o{ world_collaborators : "user_id"
+  users ||--o{ world_roles : "created_by_user_id"
+  users ||--o{ worlds : "user_id"
+  worlds ||--o{ characters : "world_id"
+  worlds ||--o{ chat_sessions : "world_id"
+  worlds ||--o{ forum_threads : "world_id"
+  worlds ||--o{ job_statuses : "world_id"
+  worlds ||--o{ locations : "world_id"
+  worlds ||--o{ lore_items : "world_id"
+  worlds ||--o{ stories : "world_id"
+  worlds ||--o{ story_classes : "world_id"
+  worlds ||--o{ uploaded_documents : "world_id"
+  worlds ||--o{ world_collaborators : "world_id"
+  worlds ||--o{ world_roles : "world_id"

@@ -1,3 +1,5 @@
+"""Service helpers for anonymous user service."""
+
 import time
 import secrets
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class AnonymousUserService:
     
+    """Service class for anonymous user service."""
     def generate_anonymous_username(self, ip_address: str = None) -> str:
         """Generate unique anonymous username: anon_<timestamp>_<ip_hash>_<random>"""
         timestamp = int(time.time())

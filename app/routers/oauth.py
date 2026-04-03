@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/oauth.py
+"""API routes for oauth."""
+
+# /story_app/app/routers/oauth.py
 
 import logging
 from datetime import timedelta

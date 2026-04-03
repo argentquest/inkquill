@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story_comment.py
+"""SQLAlchemy models for story comment."""
+
+# /story_app/app/models/story_comment.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean

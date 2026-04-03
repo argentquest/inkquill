@@ -1,3 +1,5 @@
+"""SQLAlchemy models for cta content."""
+
 # CTA (Call to Action) Content Model
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, Enum
 from sqlalchemy.sql import func

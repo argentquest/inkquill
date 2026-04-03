@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/modules/ai_quill_toolbar.js
+// /story_app/app/static/js/modules/ai_quill_toolbar.js
 "use strict";
 
 /**

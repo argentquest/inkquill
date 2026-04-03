@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/token.py
+"""Pydantic schemas for token."""
+
+# /story_app/app/schemas/token.py
 
 from pydantic import BaseModel
 from typing import Optional

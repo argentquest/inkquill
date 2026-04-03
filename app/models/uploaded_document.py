@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/uploaded_document.py
+"""SQLAlchemy models for uploaded document."""
+
+# /story_app/app/models/uploaded_document.py
 
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy import Enum as SQLAlchemyEnum
@@ -19,22 +21,25 @@ if TYPE_CHECKING:
     from .lore_item import LoreItem
 
 class DocumentStatus(str, enum.Enum):
+    """SQLAlchemy model for document status."""
     UPLOADED = "UPLOADED"
     PENDING = "PENDING"
     PROCESSING_TEXT = "PROCESSING_TEXT"
     CHUNKING = "CHUNKING"
-    GENERATING_EMBEDDINGS = "GENERATING_EMBEDDINGS"
-    INDEXING = "INDEXING"
+    PREPARING_CONTEXT = "PREPARING_CONTEXT"
+    STORING_CONTEXT = "STORING_CONTEXT"
     COMPLETED = "COMPLETED"
     ERROR = "ERROR"
 
 class SourceElementTypeEnum(str, enum.Enum):
+    """SQLAlchemy model for source element type enum."""
     USER_UPLOADED = "USER_UPLOADED"
     CHARACTER_LORE = "CHARACTER_LORE"
     LOCATION_LORE = "LOCATION_LORE"
     LORE_ITEM_LORE = "LORE_ITEM_LORE"
 
 class UploadedDocument(Base):
+    """SQLAlchemy model for uploaded document."""
     __tablename__ = "uploaded_documents"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -84,3 +89,4 @@ class UploadedDocument(Base):
         source_type_val = self.source_element_type.value if self.source_element_type else SourceElementTypeEnum.USER_UPLOADED.value
         return (f"<UploadedDocument(id={self.id}, fn='{self.filename}', uid={self.user_id}, "
                 f"status='{status_value}', type='{source_type_val}', uploaded='{self.uploaded_at}')>")
+

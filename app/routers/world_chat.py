@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/world_chat.py
+"""API routes for world chat."""
+
+# /story_app/app/routers/world_chat.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,8 +9,7 @@ import logging
 
 # Core imports
 from app.core.deps import get_current_active_user, get_db_session
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
 from app.models.user import User
 from app.services.world_chat_service import WorldChatService
 from app.crud import chat_session as chat_session_crud
@@ -43,7 +44,7 @@ async def get_chat_samples(
         logger.info("Chat samples endpoint called for registered user")
         samples = await chat_sample_crud.get_active_chat_samples(db)
         logger.info(f"Retrieved {len(samples)} chat samples")
-        return [
+        return ApiResponse.success_response(data=[
             {
                 "id": sample.id,
                 "title": sample.title,
@@ -52,7 +53,7 @@ async def get_chat_samples(
                 "sort_order": sample.sort_order
             }
             for sample in samples
-        ]
+        ])
     except Exception as e:
         logger.error(f"Error getting chat samples: {e}", exc_info=True)
         raise HTTPException(
@@ -66,7 +67,7 @@ async def create_chat_session(
     world_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Create a new chat session for a world"""
     try:
@@ -84,7 +85,7 @@ async def create_chat_session(
         
         # Return the created session
         session = await chat_session_crud.get_chat_session(db, session_id, current_user.id)
-        return ChatSessionRead.model_validate(session)
+        return ApiResponse.success_response(data=ChatSessionRead.model_validate(session))
         
     except HTTPException:
         raise
@@ -122,10 +123,10 @@ async def list_chat_sessions(
             db, world_id, current_user.id
         )
         
-        return ChatSessionListResponse(
+        return ApiResponse.success_response(data=ChatSessionListResponse(
             sessions=[ChatSessionRead.model_validate(session) for session in sessions],
             total=total
-        )
+        ))
         
     except HTTPException:
         raise
@@ -159,10 +160,10 @@ async def get_chat_session(
         
         # Build response
         session_data = ChatSessionRead.model_validate(session)
-        return ChatSessionWithMessages(
+        return ApiResponse.success_response(data=ChatSessionWithMessages(
             **session_data.model_dump(),
             messages=[message for message in messages]
-        )
+        ))
         
     except HTTPException:
         raise
@@ -181,7 +182,7 @@ async def send_message(
     request: SendMessageRequest,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Send a message in a chat session"""
     try:
@@ -197,7 +198,7 @@ async def send_message(
         chat_service = WorldChatService(db, blob_service_client)
         response = await chat_service.send_message(session_id, current_user.id, request)
         
-        return response
+        return ApiResponse.success_response(data=response)
         
     except HTTPException:
         raise
@@ -234,7 +235,7 @@ async def delete_chat_session(
                 detail="Chat session not found"
             )
         
-        return {"message": "Chat session deleted successfully"}
+        return ApiResponse.success_response(data={"message": "Chat session deleted successfully"})
         
     except HTTPException:
         raise
@@ -251,7 +252,7 @@ async def get_world_context(
     world_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Get complete world context data (for debugging/testing)"""
     try:
@@ -274,7 +275,7 @@ async def get_world_context(
                 detail="Failed to load world context"
             )
         
-        return context
+        return ApiResponse.success_response(data=context)
         
     except HTTPException:
         raise
@@ -284,3 +285,4 @@ async def get_world_context(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get world context: {str(e)}"
         )
+

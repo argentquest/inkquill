@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_editor_main.js
+// /story_app/app/static/js/scene_editor_main.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleSceneWebSocketMessage(messageData) {
         switch (messageData.type) {
-            case "rag_context_info":
-                SceneUIUpdater.updateRAGDetailsTab(SceneAIProcessor.processRagContextMessage(messageData.data).details);
+            case "context_info":
+                SceneUIUpdater.updateContextDetailsTab(SceneAIProcessor.processContextMessage(messageData.data).details);
                 break;
             case "narrative_prompt_info":
                 SceneUIUpdater.updateAIPromptTab(SceneAIProcessor.processFullPromptMessage(messageData.data).details);
@@ -276,3 +276,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Final state setup
     SceneUIUpdater.setAIControlsState(!isEditMode, false, false);
 });
+

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Detail - Help</title>
+    <link rel="stylesheet" href="help-styles.css">
+</head>
+<body>
+    <div class="help-container">
+        <div class="help-header">
+            <h1 class="help-title">World Detail</h1>
+            <p class="help-subtitle">Deep dive into your creative universe</p>
+        </div>
+
+        <div class="help-search">
+            <span class="help-search-icon">🔍</span>
+            <input type="text" class="help-search-input" placeholder="Search help content...">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"overview\"]').click()">
+                <div class="quick-action-icon">🌍</div>
+                <div class="quick-action-text">World Overview</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"editing\"]').click()">
+                <div class="quick-action-icon">✏️</div>
+                <div class="quick-action-text">Editing Guide</div>
+            </div>
+            <div class="quick-action" onclick="document.querySelector('[data-tab=\"ai-features\"]').click()">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-text">AI Features</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <ul class="tab-list">
+                <li><button class="tab-button active" data-tab-group="main" data-tab="overview">Overview</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="editing">Editing</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="ai-features">AI Features</button></li>
+                <li><button class="tab-button" data-tab-group="main" data-tab="organization">Organization</button></li>
+            </ul>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="tab-content active" data-tab-group="main" data-tab="overview">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    Understanding Your World
+                </h2>
+                <p>The World Detail page is your command center for building rich, interconnected universes. Here you can manage all aspects of your world and see how everything connects.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">World Information</h3>
+                        <p class="feature-card-description">Basic details like name, description, and privacy settings. This is what others see when you share your world.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Element Counts</h3>
+                        <p class="feature-card-description">Quick stats showing how many characters, locations, lore items, and stories you've created.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Recent Activity</h3>
+                        <p class="feature-card-description">Timeline of recent changes and additions to help you track your progress.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-card-title">Quick Actions</h3>
+                        <p class="feature-card-description">Fast access to common tasks like adding new elements or starting stories.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Navigation Overview</h2>
+                <p>From the World Detail page, you can access:</p>
+                <ul>
+                    <li><strong>World Hierarchy:</strong> Visual tree view of all world elements</li>
+                    <li><strong>Element Lists:</strong> Dedicated pages for characters, locations, and lore</li>
+                    <li><strong>Story Manager:</strong> View and edit stories set in this world</li>
+                    <li><strong>World Map:</strong> Visual representation of locations and connections</li>
+                </ul>
+
+                <div class="recipe-card">
+                    <div class="recipe-card-header">
+                        <h3 class="recipe-card-title">Exploring Your World</h3>
+                        <span class="recipe-card-time">5 minutes</span>
+                    </div>
+                    <ol class="recipe-steps">
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">1</div>
+                            <div class="recipe-step-content">Review the world information panel for basic details</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">2</div>
+                            <div class="recipe-step-content">Check element counts to see what you've created</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">3</div>
+                            <div class="recipe-step-content">Use navigation buttons to explore different sections</div>
+                        </li>
+                        <li class="recipe-step">
+                            <div class="recipe-step-number">4</div>
+                            <div class="recipe-step-content">Review recent activity to see your progress</div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editing Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="editing">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Editing World Details
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Basic Information Editing</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Click the "Edit World" button to modify:</p>
+                        <ul>
+                            <li><strong>Name:</strong> The title of your world</li>
+                            <li><strong>Description:</strong> Summary of your world's concept</li>
+                            <li><strong>Privacy Settings:</strong> Who can view your world</li>
+                            <li><strong>Tags:</strong> Categories for better organization</li>
+                        </ul>
+                        
+                        <div class="alert alert-info">
+                            <span class="alert-icon">💡</span>
+                            <div>
+                                <strong>Tip:</strong> A good world description helps others understand your creative vision and helps you stay focused on your core concept.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Privacy Controls</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Setting</th>
+                                    <th>Who Can View</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Private</td>
+                                    <td>Only you</td>
+                                    <td>Personal projects, early development</td>
+                                </tr>
+                                <tr>
+                                    <td>Shared</td>
+                                    <td>Invited users</td>
+                                    <td>Collaboration with friends or co-writers</td>
+                                </tr>
+                                <tr>
+                                    <td>Public</td>
+                                    <td>Everyone</td>
+                                    <td>Showcasing work, community building</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Collaboration Features</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>When sharing worlds, you can:</p>
+                        <ul>
+                            <li>Invite specific users as collaborators</li>
+                            <li>Set different permission levels (view, comment, edit)</li>
+                            <li>Track changes made by different contributors</li>
+                            <li>Set up notification preferences for updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">World Statistics</h2>
+                <p>The statistics panel shows:</p>
+                <ul>
+                    <li><strong>Creation Date:</strong> When you first created this world</li>
+                    <li><strong>Last Modified:</strong> Most recent update to any element</li>
+                    <li><strong>Total Elements:</strong> Combined count of all world components</li>
+                    <li><strong>Word Count:</strong> Total text across all descriptions</li>
+                    <li><strong>Completeness Score:</strong> How well-developed your world is</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- AI Features Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="ai-features">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    AI-Powered World Building
+                </h2>
+                
+                <div class="ai-feature-box">
+                    <h3 class="ai-feature-title">🧠 Smart Content Generation</h3>
+                    <p class="ai-feature-description">AI can help expand your world by generating detailed descriptions, suggesting connections between elements, and creating rich backstories.</p>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>World Consistency Checking</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI analyzes your world for:</p>
+                        <ul>
+                            <li><strong>Contradictions:</strong> Conflicting information between elements</li>
+                            <li><strong>Plot Holes:</strong> Gaps in logic or continuity</li>
+                            <li><strong>Missing Connections:</strong> Elements that should be related but aren't</li>
+                            <li><strong>Tone Consistency:</strong> Ensuring all content matches your world's mood</li>
+                        </ul>
+                        
+                        <div class="credit-usage">
+                            💰 <strong>Cost:</strong> 5-15 credits per consistency check
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Automated Suggestions</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>AI can suggest:</p>
+                        <ul>
+                            <li><strong>New Characters:</strong> Based on your existing cast and story needs</li>
+                            <li><strong>Location Details:</strong> Expand basic locations with rich descriptions</li>
+                            <li><strong>Cultural Elements:</strong> Add depth with customs, languages, and traditions</li>
+                            <li><strong>Story Hooks:</strong> Plot ideas that fit naturally in your world</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <span class="alert-icon">✨</span>
+                            <div>
+                                <strong>Best Practice:</strong> Use AI suggestions as inspiration, not replacement for your creativity. Always review and personalize AI-generated content.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Context (direct context assembly)</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Context technology allows AI to:</p>
+                        <ul>
+                            <li>Access and reference your existing world content</li>
+                            <li>Maintain consistency with established lore</li>
+                            <li>Suggest connections based on similar themes</li>
+                            <li>Generate content that fits your world's tone</li>
+                        </ul>
+
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyToClipboard(this, 'When you add new content, AI automatically:\n1. Embeds the text into searchable vectors\n2. Indexes it for future retrieval\n3. Creates connections with existing elements\n4. Updates the knowledge graph')">Copy</button>
+                            <pre>When you add new content, AI automatically:
+1. Embeds the text into searchable vectors
+2. Indexes it for future retrieval
+3. Creates connections with existing elements
+4. Updates the knowledge graph</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Cost Management</h2>
+                <p>To manage AI costs effectively:</p>
+                <ul>
+                    <li><strong>Batch Operations:</strong> Process multiple elements at once</li>
+                    <li><strong>Selective Generation:</strong> Only use AI for complex or creative tasks</li>
+                    <li><strong>Review Before Processing:</strong> Ensure requests are clear and specific</li>
+                    <li><strong>Monitor Usage:</strong> Check credit balance regularly</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Organization Tab -->
+        <div class="tab-content" data-tab-group="main" data-tab="organization">
+            <div class="help-section">
+                <h2 class="help-section-title">
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    Organizing Your World
+                </h2>
+                
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Tags and Categories</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Use tags to organize elements by:</p>
+                        <ul>
+                            <li><strong>Story Arc:</strong> Group elements by narrative importance</li>
+                            <li><strong>Geography:</strong> Organize by regions or continents</li>
+                            <li><strong>Time Period:</strong> Separate historical from contemporary elements</li>
+                            <li><strong>Completion Status:</strong> Track which elements need more work</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Relationships and Connections</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>The association system lets you define:</p>
+                        <ul>
+                            <li><strong>Character Relationships:</strong> Family, friends, enemies, mentors</li>
+                            <li><strong>Location Hierarchies:</strong> Cities within regions, rooms within buildings</li>
+                            <li><strong>Story Connections:</strong> Which elements appear in which stories</li>
+                            <li><strong>Lore Dependencies:</strong> How different pieces of knowledge connect</li>
+                        </ul>
+
+                        <div class="recipe-card">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">Creating Meaningful Connections</h3>
+                                <span class="recipe-card-time">10 minutes</span>
+                            </div>
+                            <ol class="recipe-steps">
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">1</div>
+                                    <div class="recipe-step-content">Select an element you want to connect</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">2</div>
+                                    <div class="recipe-step-content">Click "Manage Associations" from the context menu</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">3</div>
+                                    <div class="recipe-step-content">Choose the type of connection and target element</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">4</div>
+                                    <div class="recipe-step-content">Define roles and add descriptive notes</div>
+                                </li>
+                                <li class="recipe-step">
+                                    <div class="recipe-step-number">5</div>
+                                    <div class="recipe-step-content">Save to create a bidirectional relationship</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible">
+                    <div class="collapsible-header">
+                        <span>Backup and Version Control</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <p>Protect your work with:</p>
+                        <ul>
+                            <li><strong>Automatic Backups:</strong> Daily snapshots of your world state</li>
+                            <li><strong>Version History:</strong> Track changes to individual elements</li>
+                            <li><strong>Export Options:</strong> Download your world data in various formats</li>
+                            <li><strong>Import Tools:</strong> Restore from backups or merge with other worlds</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 class="help-section-title">Keyboard Shortcuts</h2>
+                <table class="help-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + E</span></td>
+                            <td>Edit world details</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + H</span></td>
+                            <td>Open world hierarchy</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + M</span></td>
+                            <td>Open world map</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + C</span></td>
+                            <td>Add new character</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + L</span></td>
+                            <td>Add new location</td>
+                        </tr>
+                        <tr>
+                            <td><span class="keyboard-shortcut">Ctrl + Shift + S</span></td>
+                            <td>Add new story</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="help-common.js"></script>
+</body>
+</html>

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_published_stories.py
+"""API routes for views published stories."""
+
+# /story_app/app/routers/views_published_stories.py
 
 from fastapi import APIRouter, Request, Depends, Query
 from fastapi.responses import HTMLResponse

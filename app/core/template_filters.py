@@ -1,3 +1,5 @@
+"""Core application helpers for template filters."""
+
 # Custom Jinja2 template filters for content sanitization
 from jinja2 import Environment
 from fastapi.templating import Jinja2Templates

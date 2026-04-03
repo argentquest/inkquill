@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/location.py
+"""Pydantic schemas for location."""
+
+# /story_app/app/schemas/location.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -27,7 +29,7 @@ class LocationBase(BaseModel):
     atmosphere: Optional[str] = Field(None, max_length=255, description="The atmosphere or general feeling of the location (e.g., Eerie, Peaceful).")
     significance: Optional[str] = Field(None, description="The general significance or role of this location within the world.")
     image_prompt_definition: Optional[str] = Field(None, description="Text prompt for generating an image of this location.")
-    image_blob_path: Optional[str] = Field(None, max_length=1024, description="Path to the location's image in Azure Blob Storage.")
+    image_blob_path: Optional[str] = Field(None, max_length=1024, description="Path to the location's image in storage.")
     
     # AI import fields
     geography: Optional[str] = Field(None, description="Geographical features, terrain, or natural characteristics")
@@ -172,3 +174,4 @@ class LocationConnectionWithLocations(BaseModel):
 
     class Config:
         from_attributes = True
+

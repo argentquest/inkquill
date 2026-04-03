@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/prompt.py
+"""Pydantic schemas for prompt."""
+
+# /story_app/app/schemas/prompt.py
 
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -93,3 +95,4 @@ class PromptRead(BaseModel):
         # If using Python enums directly as field types, Pydantic v2 handles serialization
         # to their values by default if the enum inherits from str or int.
         # use_enum_values = True # This was more for Pydantic v1; v2 is smarter with str/int enums.
+

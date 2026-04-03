@@ -1,3 +1,5 @@
+"""API routes for brainstorm."""
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -59,13 +61,16 @@ async def get_optional_current_user_for_brainstorm_views(
 
 # Request/Response Models
 class GenerateConceptsRequest(BaseModel):
+    """Response or helper model for generate concepts request."""
     interview_response_id: int
 
 class SaveFavoriteRequest(BaseModel):
+    """Response or helper model for save favorite request."""
     session_id: int
     concept_id: str
 
 class CreateStoryRequest(BaseModel):
+    """Response or helper model for create story request."""
     favorite_id: int
 
 

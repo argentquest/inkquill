@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story_rating.py
+"""SQLAlchemy models for story rating."""
+
+# /story_app/app/models/story_rating.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, UniqueConstraint, CheckConstraint

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_review_components/ui_updater_review.js
+// /story_app/app/static/js/act_review_components/ui_updater_review.js
 "use strict";
 
 const UIUpdater_Review = (() => {

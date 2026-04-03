@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/processing/importer_jobs.py
+"""Background processing helpers for importer jobs."""
+
+# /app/processing/importer_jobs.py
 import logging
 import json
 import asyncio
@@ -19,13 +21,13 @@ from app.crud import world as crud_world, character as crud_character, location 
 from app.crud import job_status as crud_job_status
 from app.models.job_status import JobStateEnum
 from app.processing.text_extraction import extract_text_from_file_path
-from app.processing.world_element_processor import generate_and_index_world_element_rag_text_task
+from app.processing.world_element_processor import generate_world_element_context_task
 from app.core.config import settings
 
 # --- New imports for dynamic model handling ---
 from app.services.ai_model_cache import model_cache
 from app.services.sk_kernel_instance import kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.exceptions import KernelInvokeException, FunctionExecutionException, ServiceResponseException
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result, estimate_tokens_for_streaming_call
@@ -35,7 +37,7 @@ import openai
 from app.schemas.document import UploadedDocumentCreate
 from app.models.uploaded_document import SourceElementTypeEnum
 from app.crud import document as crud_document
-from app.processing.rag_ingestion import process_uploaded_document_task
+from app.processing.document_processing import process_uploaded_document_task
 import time
 
 logger = logging.getLogger(__name__)
@@ -59,7 +61,7 @@ def _load_extraction_prompt() -> str:
 
 async def _call_ai_for_world_extraction(model_config, prompt_text, input_text, job_id):
     """
-    Call AI for world extraction using either Semantic Kernel (Azure) or direct API (OpenRouter).
+    Call AI for world extraction using Semantic Kernel or direct OpenAI-compatible APIs.
     Forces JSON mode for structured extraction.
     
     Args:
@@ -73,16 +75,13 @@ async def _call_ai_for_world_extraction(model_config, prompt_text, input_text, j
     """
     start_time = time.perf_counter()
     
-    if model_config.provider == AIProviderEnum.AZURE:
-        # Use Semantic Kernel for Azure OpenAI
-        logger.info(f"JOB_ID: {job_id} - Using Semantic Kernel approach for Azure model: {model_config.display_name}")
-        
+    if model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI]:
         extract_world_elements_from_text_function = kernel.plugins.get("WorldGenerationPlugin", {}).get("ExtractWorldElementsFromText")
         if not extract_world_elements_from_text_function:
             raise RuntimeError("ExtractWorldElementsFromText function not available in Semantic Kernel")
         
-        exec_settings = AzureChatPromptExecutionSettings(
-            service_id="azure_openai_chat_service",
+        exec_settings = OpenAIChatPromptExecutionSettings(
+            service_id="chat_service",
             max_tokens=model_config.max_tokens,
             temperature=model_config.temperature,
             response_format={"type": "json_object"}
@@ -97,7 +96,6 @@ async def _call_ai_for_world_extraction(model_config, prompt_text, input_text, j
         return str(sk_result), usage_data, duration_ms
         
     elif model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI]:
-        # Use direct API call for OpenRouter/OpenAI
         logger.info(f"JOB_ID: {job_id} - Using direct API approach for {model_config.provider} model: {model_config.display_name}")
         
         try:
@@ -139,7 +137,7 @@ async def _call_ai_for_world_extraction(model_config, prompt_text, input_text, j
 
 async def _call_ai_for_text_generation(model_config, prompt_text, input_text, job_id):
     """
-    Call AI for narrative text generation using either Semantic Kernel (Azure) or direct API (OpenRouter).
+    Call AI for narrative text generation using direct OpenAI-compatible APIs.
     Does NOT force JSON mode - used for generating narrative descriptions.
     
     Args:
@@ -153,15 +151,7 @@ async def _call_ai_for_text_generation(model_config, prompt_text, input_text, jo
     """
     start_time = time.perf_counter()
     
-    if model_config.provider == AIProviderEnum.AZURE:
-        # Use Semantic Kernel for Azure OpenAI
-        logger.info(f"JOB_ID: {job_id} - Using Semantic Kernel approach for Azure text generation: {model_config.display_name}")
-        
-        # Note: We'll use direct API instead of SK for text generation to avoid JSON mode enforcement
-        # Fall through to the OpenRouter/OpenAI path which works for Azure too
-        pass
-        
-    if model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI, AIProviderEnum.AZURE]:
+    if model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI]:
         # Use direct API call for text generation (no JSON mode)
         logger.info(f"JOB_ID: {job_id} - Using direct API approach for {model_config.provider} text generation: {model_config.display_name}")
         
@@ -223,6 +213,7 @@ def _find_best_json_model(preferred_model_config=None):
     return next((c for c in model_cache.generation_models.values() if c.is_json_mode), None)
 
 async def import_world_from_book_task(job_id: str, book_title: str, user_id: int, model_config_id: Optional[int] = None):
+    """Handle import world from book task."""
     logger.info(f"JOB_ID: {job_id} - Starting world import for book: '{book_title}'")
     created_world_id: Optional[int] = None
     created_world_name: Optional[str] = None
@@ -259,8 +250,8 @@ async def import_world_from_book_task(job_id: str, book_title: str, user_id: int
             await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, status_msg)
 
             # --- Dynamically create execution settings ---
-            exec_settings = AzureChatPromptExecutionSettings(
-                service_id="azure_openai_chat_service",  # Use the static service ID from kernel
+            exec_settings = OpenAIChatPromptExecutionSettings(
+                service_id="chat_service",
                 max_tokens=world_gen_model_config.max_tokens,
                 temperature=world_gen_model_config.temperature,
                 response_format={"type": "json_object"}
@@ -273,7 +264,7 @@ async def import_world_from_book_task(job_id: str, book_title: str, user_id: int
 
             # Execute AI call with retry logic for rate limiting
             max_retries = 3
-            base_delay = 60  # Start with 60 seconds as suggested by Azure error message
+            base_delay = 60  # Start with 60 seconds when the provider requests backoff
             
             for attempt in range(max_retries + 1):
                 try:
@@ -427,70 +418,70 @@ async def import_world_from_book_task(job_id: str, book_title: str, user_id: int
                 await db.rollback()
                 raise
 
-        # Phase 2: Run RAG indexing tasks concurrently
+        # Phase 2: Run background context preparation tasks
         if created_world_id:
             async with async_session_local() as db:
-                await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, "Loading world elements for indexing...")
+                await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, "Loading world elements for context preparation...")
                 all_elements_db = await asyncio.gather(
                     crud_character.get_characters_by_world(db, created_world_id, limit=500),
                     crud_location.get_locations_by_world(db, created_world_id, limit=500),
                     crud_lore_item.get_lore_items_by_world(db, created_world_id, limit=500)
                 )
 
-            rag_tasks = []
-            dummy_bg_tasks_for_rag = BackgroundTasks()
-            # Pass the same model configuration used for world generation to RAG tasks
+            context_tasks = []
+            dummy_bg_tasks_for_context = BackgroundTasks()
+            # Pass the same model configuration used for world generation to context tasks
             selected_model_id = world_gen_model_config.id if world_gen_model_config else None
-            logger.info(f"JOB_ID {job_id}: Using model ID {selected_model_id} for RAG text generation (same as world generation)")
-            for char in all_elements_db[0]: rag_tasks.append(generate_and_index_world_element_rag_text_task("character", char.id, user_id, created_world_id, dummy_bg_tasks_for_rag, selected_model_id))
-            for loc in all_elements_db[1]: rag_tasks.append(generate_and_index_world_element_rag_text_task("location", loc.id, user_id, created_world_id, dummy_bg_tasks_for_rag, selected_model_id))
-            for lore in all_elements_db[2]: rag_tasks.append(generate_and_index_world_element_rag_text_task("lore_item", lore.id, user_id, created_world_id, dummy_bg_tasks_for_rag, selected_model_id))
+            logger.info(f"JOB_ID {job_id}: Using model ID {selected_model_id} for background context preparation (same as world generation)")
+            for char in all_elements_db[0]: context_tasks.append(generate_world_element_context_task("character", char.id, user_id, created_world_id, dummy_bg_tasks_for_context, selected_model_id))
+            for loc in all_elements_db[1]: context_tasks.append(generate_world_element_context_task("location", loc.id, user_id, created_world_id, dummy_bg_tasks_for_context, selected_model_id))
+            for lore in all_elements_db[2]: context_tasks.append(generate_world_element_context_task("lore_item", lore.id, user_id, created_world_id, dummy_bg_tasks_for_context, selected_model_id))
 
-            if rag_tasks:
-                # Update status with the actual number of elements to index
+            if context_tasks:
+                # Update status with the actual number of elements to prepare
                 async with async_session_local() as status_db:
-                    await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Indexing {len(rag_tasks)} elements for search (processing sequentially to avoid rate limits)...")
-                logger.info(f"JOB_ID {job_id}: Starting sequential RAG indexing for {len(rag_tasks)} elements to avoid rate limits.")
+                    await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Preparing {len(context_tasks)} elements for direct context use...")
+                logger.info(f"JOB_ID {job_id}: Starting sequential context preparation for {len(context_tasks)} elements.")
                 successful_tasks = 0
                 failed_tasks = 0
                 
-                # Process tasks sequentially with delay to avoid Azure rate limits
-                for i, task in enumerate(rag_tasks):
+                # Process tasks sequentially with delay to avoid provider rate limits
+                for i, task in enumerate(context_tasks):
                     try:
                         # Update status every 5 elements
                         if i % 5 == 0:
                             async with async_session_local() as status_db:
-                                await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Indexing element {i+1}/{len(rag_tasks)} for search...")
+                                await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Preparing element {i+1}/{len(context_tasks)} for direct context...")
                         
                         # Add timeout to prevent hanging
                         await asyncio.wait_for(task, timeout=120.0)  # 2 minute timeout per task
                         successful_tasks += 1
-                        logger.info(f"JOB_ID {job_id}: Completed RAG task {i+1}/{len(rag_tasks)}")
+                        logger.info(f"JOB_ID {job_id}: Completed context task {i+1}/{len(context_tasks)}")
                         
                         # Add delay between AI calls to respect rate limits
-                        if i < len(rag_tasks) - 1:  # Don't delay after the last task
+                        if i < len(context_tasks) - 1:  # Don't delay after the last task
                             await asyncio.sleep(5)  # 5 second delay between calls to be more conservative
                     except asyncio.TimeoutError:
                         failed_tasks += 1
-                        logger.error(f"JOB_ID {job_id}: RAG task {i+1} timed out after 2 minutes")
+                        logger.error(f"JOB_ID {job_id}: Context task {i+1} timed out after 2 minutes")
                         # Continue with next task
                     except Exception as task_error:
                         failed_tasks += 1
-                        logger.error(f"JOB_ID {job_id}: RAG task {i+1} failed: {task_error}", exc_info=True)
+                        logger.error(f"JOB_ID {job_id}: Context task {i+1} failed: {task_error}", exc_info=True)
                         # Continue with next task even if one fails
                 
-                logger.info(f"JOB_ID {job_id}: Finished sequential RAG indexing. Success: {successful_tasks}, Failed: {failed_tasks}")
+                logger.info(f"JOB_ID {job_id}: Finished sequential context preparation. Success: {successful_tasks}, Failed: {failed_tasks}")
                 
                 # Update final status with results
                 if failed_tasks > 0:
                     async with async_session_local() as status_db:
-                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"RAG indexing completed with some failures: {successful_tasks} successful, {failed_tasks} failed")
+                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Context preparation completed with some failures: {successful_tasks} successful, {failed_tasks} failed")
 
             async with async_session_local() as db:
                 result_msg = f"Successfully imported world '{created_world_name}' (ID: {created_world_id}) and its elements."
                 await crud_job_status.update_job_status(db, job_id, JobStateEnum.COMPLETED, "Import complete!", result_message=result_msg, world_id=created_world_id)
         else:
-            raise ValueError("World was not created, cannot proceed to RAG indexing.")
+            raise ValueError("World was not created, cannot proceed to context preparation.")
 
     except Exception as e:
         error_message = f"Failed to import world: {str(e)[:400]}"
@@ -511,6 +502,7 @@ async def create_world_and_extract_elements_from_document_task(
     original_filename: str,
     model_config_id: Optional[int] = None
 ):
+    """Create world and extract elements from document task."""
     logger.info(f"JOB_ID: {job_id} - Starting entity extraction from '{original_filename}' for new world '{world_name}' by User ID: {user_id}")
     created_world_id = None
     document_record = None
@@ -573,7 +565,7 @@ async def create_world_and_extract_elements_from_document_task(
                 full_text = truncated_text
                 logger.info(f"JOB_ID: {job_id} - Truncated document to {len(full_text)} characters")
 
-            # Create document record for document library and RAG processing
+            # Create document record for the document library and direct-context processing
             await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, "Adding document to library...")
             
             # Generate blob storage path
@@ -604,7 +596,7 @@ async def create_world_and_extract_elements_from_document_task(
             
             # Execute AI call with retry logic for rate limiting
             max_retries = 3
-            base_delay = 60  # Start with 60 seconds as suggested by Azure error message
+            base_delay = 60  # Start with 60 seconds when the provider requests backoff
             
             for attempt in range(max_retries + 1):
                 try:
@@ -799,98 +791,98 @@ Respond with ONLY the world description text, no JSON or formatting."""
                 logger.warning(f"JOB_ID {job_id}: World description generation failed: {world_desc_error}")
                 # Don't fail the entire job if world description generation fails
             
-        # Phase 2: Run RAG indexing
+        # Phase 2: Run background context preparation
         if created_world_id:
             async with async_session_local() as db:
-                await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, "Loading world elements for indexing...")
+                await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, "Loading world elements for context preparation...")
                 all_elements_db = await asyncio.gather(crud_character.get_characters_by_world(db, created_world_id, limit=500), crud_location.get_locations_by_world(db, created_world_id, limit=500), crud_lore_item.get_lore_items_by_world(db, created_world_id, limit=500))
 
-            rag_tasks = []
-            dummy_bg_tasks_for_rag = BackgroundTasks()
-            # Pass the same model configuration used for element extraction to RAG tasks
+            context_tasks = []
+            dummy_bg_tasks_for_context = BackgroundTasks()
+            # Pass the same model configuration used for element extraction to context tasks
             selected_model_id = extraction_model_config.id if extraction_model_config else None
-            logger.info(f"JOB_ID {job_id}: Using model ID {selected_model_id} for RAG text generation from document (same as extraction)")
-            for char in all_elements_db[0]: rag_tasks.append(generate_and_index_world_element_rag_text_task("character", char.id, user_id, created_world_id, dummy_bg_tasks_for_rag, selected_model_id))
-            for loc in all_elements_db[1]: rag_tasks.append(generate_and_index_world_element_rag_text_task("location", loc.id, user_id, created_world_id, dummy_bg_tasks_for_rag, selected_model_id))
-            for lore in all_elements_db[2]: rag_tasks.append(generate_and_index_world_element_rag_text_task("lore_item", lore.id, user_id, created_world_id, dummy_bg_tasks_for_rag, selected_model_id))
+            logger.info(f"JOB_ID {job_id}: Using model ID {selected_model_id} for background context preparation from document extraction")
+            for char in all_elements_db[0]: context_tasks.append(generate_world_element_context_task("character", char.id, user_id, created_world_id, dummy_bg_tasks_for_context, selected_model_id))
+            for loc in all_elements_db[1]: context_tasks.append(generate_world_element_context_task("location", loc.id, user_id, created_world_id, dummy_bg_tasks_for_context, selected_model_id))
+            for lore in all_elements_db[2]: context_tasks.append(generate_world_element_context_task("lore_item", lore.id, user_id, created_world_id, dummy_bg_tasks_for_context, selected_model_id))
             
-            if rag_tasks:
-                # Update status with the actual number of elements to index
+            if context_tasks:
+                # Update status with the actual number of elements to prepare
                 async with async_session_local() as status_db:
-                    await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Indexing {len(rag_tasks)} elements for search (processing sequentially to avoid rate limits)...")
-                logger.info(f"JOB_ID {job_id}: Starting sequential RAG indexing for {len(rag_tasks)} elements from document to avoid rate limits.")
+                    await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Preparing {len(context_tasks)} elements for direct context use...")
+                logger.info(f"JOB_ID {job_id}: Starting sequential context preparation for {len(context_tasks)} elements from document.")
                 successful_tasks = 0
                 failed_tasks = 0
                 
-                # Process tasks sequentially with delay to avoid Azure rate limits
-                for i, task in enumerate(rag_tasks):
+                # Process tasks sequentially with delay to avoid provider rate limits
+                for i, task in enumerate(context_tasks):
                     try:
                         # Update status every 5 elements
                         if i % 5 == 0:
                             async with async_session_local() as status_db:
-                                await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Indexing element {i+1}/{len(rag_tasks)} for search...")
+                                await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Preparing element {i+1}/{len(context_tasks)} for direct context...")
                         
                         # Add timeout to prevent hanging
                         await asyncio.wait_for(task, timeout=120.0)  # 2 minute timeout per task
                         successful_tasks += 1
-                        logger.info(f"JOB_ID {job_id}: Completed RAG task {i+1}/{len(rag_tasks)}")
+                        logger.info(f"JOB_ID {job_id}: Completed context task {i+1}/{len(context_tasks)}")
                         
                         # Add delay between AI calls to respect rate limits
-                        if i < len(rag_tasks) - 1:  # Don't delay after the last task
+                        if i < len(context_tasks) - 1:  # Don't delay after the last task
                             await asyncio.sleep(5)  # 5 second delay between calls to be more conservative
                     except asyncio.TimeoutError:
                         failed_tasks += 1
-                        logger.error(f"JOB_ID {job_id}: RAG task {i+1} timed out after 2 minutes")
+                        logger.error(f"JOB_ID {job_id}: Context task {i+1} timed out after 2 minutes")
                         # Continue with next task
                     except Exception as task_error:
                         failed_tasks += 1
-                        logger.error(f"JOB_ID {job_id}: RAG task {i+1} failed: {task_error}", exc_info=True)
+                        logger.error(f"JOB_ID {job_id}: Context task {i+1} failed: {task_error}", exc_info=True)
                         # Continue with next task even if one fails
                 
-                logger.info(f"JOB_ID {job_id}: Finished sequential RAG indexing from document. Success: {successful_tasks}, Failed: {failed_tasks}")
+                logger.info(f"JOB_ID {job_id}: Finished sequential context preparation from document. Success: {successful_tasks}, Failed: {failed_tasks}")
                 
                 # Update final status with results
                 if failed_tasks > 0:
                     async with async_session_local() as status_db:
-                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"RAG indexing completed with some failures: {successful_tasks} successful, {failed_tasks} failed")
+                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, f"Context preparation completed with some failures: {successful_tasks} successful, {failed_tasks} failed")
 
-            # Process the uploaded document for RAG indexing
+            # Process the uploaded document for direct-context use
             if document_record:
                 try:
                     async with async_session_local() as status_db:
-                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, "Processing document for search indexing...")
+                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, "Processing document for direct context use...")
                     
-                    # Create a new job ID for document RAG processing
+                    # Create a new job ID for document processing
                     doc_job_id = str(uuid.uuid4())
                     
-                    logger.info(f"JOB_ID {job_id}: Starting document RAG processing with job ID: {doc_job_id}")
+                    logger.info(f"JOB_ID {job_id}: Starting document processing with job ID: {doc_job_id}")
                     
-                    # Process document for RAG (this handles chunking, embedding, and indexing)
+                    # Process document for direct context (text extraction and storage)
                     await process_uploaded_document_task(
                         job_id=doc_job_id,
                         db_document_id=document_record.id,
                         file_path_on_disk=temp_file_path
                     )
                     
-                    logger.info(f"JOB_ID {job_id}: Document RAG processing completed successfully")
+                    logger.info(f"JOB_ID {job_id}: Document processing completed successfully")
                     
-                except Exception as doc_rag_error:
-                    logger.error(f"JOB_ID {job_id}: Failed to process document for RAG indexing: {doc_rag_error}", exc_info=True)
-                    # Don't fail the entire job if document RAG processing fails
+                except Exception as doc_processing_error:
+                    logger.error(f"JOB_ID {job_id}: Failed to process document for direct context use: {doc_processing_error}", exc_info=True)
+                    # Don't fail the entire job if document processing fails
                     async with async_session_local() as status_db:
-                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, "Document RAG processing failed, but world creation was successful")
+                        await crud_job_status.update_job_status(status_db, job_id, JobStateEnum.RUNNING, "Document processing failed, but world creation was successful")
             else:
-                logger.warning(f"JOB_ID {job_id}: No document record created, skipping document RAG processing")
+                logger.warning(f"JOB_ID {job_id}: No document record created, skipping document processing")
 
             # Complete the job successfully
             async with async_session_local() as db:
                 if document_record:
-                    result_msg = f"Successfully created world '{world_name}' (ID: {created_world_id}) with AI-generated description and imported elements from document '{original_filename}'. Document added to library and indexed for search."
+                    result_msg = f"Successfully created world '{world_name}' (ID: {created_world_id}) with AI-generated description and imported elements from document '{original_filename}'. Document added to the library for direct context use."
                 else:
                     result_msg = f"Successfully created world '{world_name}' (ID: {created_world_id}) with AI-generated description and imported elements from document '{original_filename}'."
                 await crud_job_status.update_job_status(db, job_id, JobStateEnum.COMPLETED, "Processing complete!", result_message=result_msg, world_id=created_world_id)
         else:
-            raise ValueError("World was not created, cannot proceed to RAG indexing.")
+            raise ValueError("World was not created, cannot proceed to context preparation.")
 
     except Exception as e:
         error_message = f"Failed to create world from document '{original_filename}': {str(e)[:400]}"

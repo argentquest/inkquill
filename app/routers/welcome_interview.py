@@ -1,3 +1,5 @@
+"""API routes for welcome interview."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -20,7 +22,7 @@ from app.schemas.billing import UserTransactionCreate
 from app.schemas.base import ApiResponse
 from app.services.semantic_kernel_setup import kernel
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 from semantic_kernel.functions import KernelArguments
 
@@ -30,10 +32,12 @@ router = APIRouter(prefix="/ui/welcome-interview/api", tags=["welcome-interview-
 
 
 class AnalysisRequest(BaseModel):
+    """Response or helper model for analysis request."""
     interview_response_id: int = Field(..., description="ID of the interview response to analyze")
 
 
 class AnalysisResponse(BaseModel):
+    """Response or helper model for analysis response."""
     writer_score: int = Field(..., ge=1, le=10, description="Writer skill level from 1-10")
     recommendations: list[str] = Field(..., description="Personalized recommendations")
     book_suggestions: list[Dict[str, str]] = Field(..., description="Recommended books")
@@ -43,10 +47,12 @@ class AnalysisResponse(BaseModel):
 
 
 class BonusRequest(BaseModel):
+    """Response or helper model for bonus request."""
     bonus_number: int = Field(..., ge=1, le=10, description="Bonus number (1-10)")
 
 
 class BonusResponse(BaseModel):
+    """Response or helper model for bonus response."""
     success: bool = Field(..., description="Whether the bonus was awarded")
     message: str = Field(..., description="Response message")
     coins_awarded: int = Field(..., description="Number of coins awarded")
@@ -179,8 +185,8 @@ async def analyze_interview(
         
         # Create prompt execution settings
         logger.info("Creating execution settings...")
-        execution_settings = AzureChatPromptExecutionSettings(
-            service_id="azure_openai_chat_service",
+        execution_settings = OpenAIChatPromptExecutionSettings(
+            service_id="chat_service",
             max_tokens=2000,
             temperature=0.3
             # Note: Removed response_format to avoid the validation error
@@ -200,7 +206,7 @@ async def analyze_interview(
                     "is_required": True
                 }
             ],
-            execution_settings={"azure_openai_chat_service": execution_settings}
+            execution_settings={"chat_service": execution_settings}
         )
         
         # Create the function and invoke it
@@ -363,7 +369,7 @@ async def get_bonus_status(
         }
         
         logger.info(f"Retrieved bonus status for user {current_user.id}: {bonus_status}")
-        return bonus_status
+        return ApiResponse.success_response(data=bonus_status)
         
     except Exception as e:
         logger.error(f"Error getting bonus status for user {current_user.id}: {e}", exc_info=True)
@@ -412,11 +418,13 @@ async def claim_bonus(
         
         if already_claimed:
             logger.info(f"User {current_user.id} attempted to claim bonus {bonus_number} again")
-            return BonusResponse(
-                success=False,
-                message=f"Bonus {bonus_number} already claimed",
-                coins_awarded=0,
-                already_claimed=True
+            return ApiResponse.success_response(
+                data=BonusResponse(
+                    success=False,
+                    message=f"Bonus {bonus_number} already claimed",
+                    coins_awarded=0,
+                    already_claimed=True
+                )
             )
         
         # Award the bonus
@@ -459,11 +467,13 @@ async def claim_bonus(
         
         logger.info(f"User {current_user.id} claimed bonus {bonus_number} for {coins_to_award} coins")
         
-        return BonusResponse(
-            success=True,
-            message=f"Bonus {bonus_number} claimed successfully!",
-            coins_awarded=int(coins_to_award),
-            already_claimed=False
+        return ApiResponse.success_response(
+            data=BonusResponse(
+                success=True,
+                message=f"Bonus {bonus_number} claimed successfully!",
+                coins_awarded=int(coins_to_award),
+                already_claimed=False
+            )
         )
         
     except HTTPException:

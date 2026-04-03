@@ -1,6 +1,5 @@
 """Blog search API endpoints."""
 import logging
-from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +11,11 @@ from app.schemas.base import ApiResponse
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/search", tags=["blog-search"])
+
+
+def _serialize_post(post):
+    """Provide internal router support for serialize post."""
+    return BlogPostRead.model_validate(post, from_attributes=True)
 
 
 @router.get("/", response_model=ApiResponse)
@@ -46,7 +50,7 @@ async def search_blog_posts(
             tag_ids=tag_id_list,
             author_id=author_id
         )
-        return posts
+        return ApiResponse.success_response(data=[_serialize_post(post) for post in posts])
     except HTTPException:
         raise
     except Exception as e:
@@ -57,16 +61,16 @@ async def search_blog_posts(
         )
 
 
-@router.get("/suggestions")
+@router.get("/suggestions", response_model=ApiResponse)
 async def get_search_suggestions(
     q: str = Query(..., min_length=1, description="Search query"),
     limit: int = Query(5, ge=1, le=20),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, List[str]]:
+) -> ApiResponse:
     """Get search suggestions for auto-completion."""
     try:
         suggestions = await blog_search_service.get_search_suggestions(db, q, limit)
-        return suggestions
+        return ApiResponse.success_response(data=suggestions)
     except Exception as e:
         logger.error(f"Error getting search suggestions: {e}")
         raise HTTPException(
@@ -84,7 +88,7 @@ async def get_related_posts(
     """Get related posts based on tags and category."""
     try:
         posts = await blog_search_service.get_related_posts(db, post_id, limit)
-        return posts
+        return ApiResponse.success_response(data=[_serialize_post(post) for post in posts])
     except Exception as e:
         logger.error(f"Error getting related posts: {e}")
         raise HTTPException(
@@ -102,7 +106,7 @@ async def get_trending_posts(
     """Get trending posts based on recent engagement."""
     try:
         posts = await blog_search_service.get_trending_posts(db, days, limit)
-        return posts
+        return ApiResponse.success_response(data=[_serialize_post(post) for post in posts])
     except Exception as e:
         logger.error(f"Error getting trending posts: {e}")
         raise HTTPException(

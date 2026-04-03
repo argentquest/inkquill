@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/generated_image.py
+"""SQLAlchemy models for generated image."""
+
+# /story_app/app/models/generated_image.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Uuid
@@ -45,19 +47,11 @@ class GeneratedImage(Base):
 
     @property
     def blob_url(self) -> str:
-        """Convert blob_path to full URL"""
-        from app.core.config import settings
-        
-        if not self.blob_path:
-            return ""
-            
-        # Handle different storage configurations
-        if settings.AZURE_STORAGE_ACCOUNT_NAME:
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            return f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{self.blob_path}"
-        else:
-            # Fallback for local development or other configurations
-            return f"/images/{self.blob_path}"
+        """Convert blob_path to a public URL."""
+        from app.core.storage_deps import build_storage_url
+
+        return build_storage_url("generated-images", self.blob_path) or ""
 
     def __repr__(self):
         return f"<GeneratedImage(id={self.id}, uuid='{self.image_uuid}', element='{self.element_type}:{self.associated_element_id}')>"
+

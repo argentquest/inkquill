@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_editor_main.js
+// /story_app/app/static/js/act_editor_main.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -80,8 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleActWebSocketMessage(messageData) {
         switch (messageData.type) {
-            case "rag_context_info_act":
-                ActUIUpdater.updateRAGDetailsTab(ActAIProcessor.processRagContextMessage(messageData.data).details);
+            case "context_info_act":
+                ActUIUpdater.updateContextDetailsTab(ActAIProcessor.processContextMessage(messageData.data).details);
                 break;
             case "narrative_prompt_info_act":
                 ActUIUpdater.updateAIPromptTab(ActAIProcessor.processFullPromptMessage(messageData.data).details);
@@ -299,3 +299,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ActUIUpdater.setAIControlsState(true, false, false);
 });
+

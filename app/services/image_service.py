@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/image_service.py
+"""Service helpers for image service."""
+
+# /story_app/app/services/image_service.py
 
 import logging
 from typing import Optional

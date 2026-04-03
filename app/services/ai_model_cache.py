@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/ai_model_cache.py
+"""Service helpers for ai model cache."""
+
+# /app/services/ai_model_cache.py
 import logging
 from sqlalchemy.future import select
 from app.db.database import async_session_local
@@ -17,8 +19,6 @@ class AIModelCache:
         self.configurations = {} 
         # Stores only generative models for quick filtering
         self.generation_models = {} 
-        # Stores only embedding models (likely just one)
-        self.embedding_models = {}
         # Stores a reference to the default generative model object
         self.default_generation_model = None
 
@@ -34,8 +34,6 @@ class AIModelCache:
             self.configurations[model.id] = model
             if model.model_type == AIModelTypeEnum.GENERATION:
                 self.generation_models[model.id] = model
-            elif model.model_type == AIModelTypeEnum.EMBEDDING:
-                self.embedding_models[model.id] = model
         
         # Identify the default generation model based on the name in settings
         default_name = settings.DEFAULT_GENERATION_MODEL_NAME
@@ -51,7 +49,7 @@ class AIModelCache:
         elif not self.generation_models:
              logger.error("No active generative models found in the database!")
 
-        logger.info(f"AI Model Cache loaded: {len(self.generation_models)} generation models, {len(self.embedding_models)} embedding models.")
+        logger.info(f"AI Model Cache loaded: {len(self.generation_models)} generation models.")
         if self.default_generation_model:
             logger.info(f"Default generation model set to: '{self.default_generation_model.display_name}'")
         
@@ -79,9 +77,6 @@ class AIModelCache:
         source_dict = self.configurations
         if model_type == AIModelTypeEnum.GENERATION:
             source_dict = self.generation_models
-        elif model_type == AIModelTypeEnum.EMBEDDING:
-            source_dict = self.embedding_models
-        
         for model_id, model in source_dict.items():
             if model.provider == provider:
                 filtered_models[model_id] = model
@@ -115,12 +110,9 @@ class AIModelCache:
         if not provider_models:
             return None
         
-        # For Azure, try to match the configured default
-        if provider == AIProviderEnum.AZURE and self.default_generation_model:
-            if self.default_generation_model.provider == AIProviderEnum.AZURE:
-                return self.default_generation_model
-        
-        # For other providers or if Azure default not found, return first available
+        if self.default_generation_model and self.default_generation_model.provider == provider:
+            return self.default_generation_model
+
         return next(iter(provider_models.values()))
 
     def is_provider_available(self, provider: AIProviderEnum) -> bool:

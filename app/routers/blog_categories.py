@@ -1,6 +1,5 @@
 """Blog category API endpoints."""
 import logging
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,7 +22,9 @@ async def get_blog_categories(
     """Get all blog categories."""
     try:
         categories = await blog_category_service.get_categories(db, active_only=active_only)
-        return categories
+        return ApiResponse.success_response(
+            data=[BlogCategoryRead.model_validate(category, from_attributes=True) for category in categories]
+        )
     except Exception as e:
         logger.error(f"Error getting blog categories: {e}")
         raise HTTPException(
@@ -45,7 +46,9 @@ async def get_blog_category(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Blog category not found"
             )
-        return category
+        return ApiResponse.success_response(
+            data=BlogCategoryRead.model_validate(category, from_attributes=True)
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -71,7 +74,9 @@ async def create_blog_category(
     
     try:
         category = await blog_category_service.create_category(db, category_data)
-        return category
+        return ApiResponse.success_response(
+            data=BlogCategoryRead.model_validate(category, from_attributes=True)
+        )
     except Exception as e:
         logger.error(f"Error creating blog category: {e}")
         raise HTTPException(
@@ -101,7 +106,9 @@ async def update_blog_category(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Blog category not found"
             )
-        return category
+        return ApiResponse.success_response(
+            data=BlogCategoryRead.model_validate(category, from_attributes=True)
+        )
     except HTTPException:
         raise
     except Exception as e:

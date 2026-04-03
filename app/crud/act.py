@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/act.py
+"""Database CRUD helpers for act."""
+
+# /story_app/app/crud/act.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload

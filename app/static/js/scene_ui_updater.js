@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_ui_updater.js
+// /story_app/app/static/js/scene_ui_updater.js
 "use strict";
 
 const SceneUIUpdater = (() => {
@@ -12,45 +12,18 @@ const SceneUIUpdater = (() => {
         }
     }
 
-    function updateRAGDetailsTab(ragDetailsString) {
-        const element = document.getElementById('scene-ai-rag-context-full-details-area');
+    function updateContextDetailsTab(contextDetailsString) {
+        const element = document.getElementById('scene-ai-context-full-details-area');
         if (element) {
-            element.textContent = ragDetailsString || "No RAG details available to display for Scene.";
+            element.textContent = contextDetailsString || "No context details available to display for Scene.";
         } else {
-            console.warn("SceneUIUpdater: Element 'scene-ai-rag-context-full-details-area' not found.");
+            console.warn("SceneUIUpdater: Element 'scene-ai-context-full-details-area' not found.");
         }
     }
 
-    function updateRAGSummaryDisplay(summaryString) {
-        // This function is now effectively OBSOLETE for the AI Assistant tab, as the RAG summary
-        // display area was removed from scene_editor_ui.html's AI Assistant tab.
-        // If you need to display a RAG summary elsewhere, this function can be reused.
-        // For now, we'll log a warning if it's called, as it implies an old call path.
-        console.warn("SceneUIUpdater: updateRAGSummaryDisplay called, but RAG summary area was removed from AI Assistant tab in scene editor. Check JS calls.");
-        const displayArea = document.getElementById('scene-rag-context-display-area'); // This ID might be gone
-        const contentElement = document.getElementById('scene-rag-context-content'); // This ID might be gone
-        if (displayArea && contentElement) {
-            if (summaryString && summaryString.trim() !== "") {
-                contentElement.textContent = summaryString;
-                displayArea.style.display = 'block';
-            } else {
-                contentElement.textContent = "No RAG summary to display for Scene.";
-                displayArea.style.display = 'none';
-            }
-        } else {
-            // console.warn("SceneUIUpdater: Scene RAG summary display elements not found (as expected if removed).");
-        }
-    }
-    
-    function clearRAGDisplays() {
-        // The summary display is gone from the AI assistant tab.
-        // const summaryDisplayArea = document.getElementById('scene-rag-context-display-area');
-        // const summaryContentElement = document.getElementById('scene-rag-context-content');
-        const detailsArea = document.getElementById('rag-context-full-details-area');
-
-        // if (summaryContentElement) summaryContentElement.textContent = "";
-        // if (summaryDisplayArea) summaryDisplayArea.style.display = 'none';
-        if (detailsArea) detailsArea.textContent = "RAG context details will appear here.";
+    function clearContextDisplays() {
+        const detailsArea = document.getElementById('scene-ai-context-full-details-area');
+        if (detailsArea) detailsArea.textContent = "Context details will appear here.";
     }
 
     function setRawAIJsonResponse(jsonString, append = false) { 
@@ -225,7 +198,7 @@ const SceneUIUpdater = (() => {
         setExtractedNarrativePreview(""); 
         setRawAIJsonResponse("");       
         updateFollowupButton(""); // This will also clear the commentary display
-        clearRAGDisplays();
+        clearContextDisplays();
         clearMetadataSuggestions();
 
         const aiPromptInputElement = document.getElementById('scene-ai-instruction');
@@ -246,9 +219,8 @@ const SceneUIUpdater = (() => {
 
     return {
         updateAIPromptTab: updateAIPromptTab,
-        updateRAGDetailsTab: updateRAGDetailsTab,
-        updateRAGSummaryDisplay: updateRAGSummaryDisplay, // Kept for now, but logs warning
-        clearRAGDisplays: clearRAGDisplays,
+        updateContextDetailsTab: updateContextDetailsTab,
+        clearContextDisplays: clearContextDisplays,
         setRawAIJsonResponse: setRawAIJsonResponse, 
         setExtractedNarrativePreview: setExtractedNarrativePreview, 
         updateFollowupButton: updateFollowupButton,
@@ -258,3 +230,4 @@ const SceneUIUpdater = (() => {
         resetAIInteractionAreas: resetAIInteractionAreas
     };
 })();
+

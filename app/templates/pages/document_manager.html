@@ -1,8 +1,8 @@
-{# /ai_rag_story_app/app/templates/pages/document_manager.html #}
+{# /story_app/app/templates/pages/document_manager.html #}
 
 {% extends "layouts/base.html" %}
 
-{% block title %}Manage RAG Documents - {{ project_name | default('AI App') }}{% endblock %}
+{% block title %}Manage Documents - {{ project_name | default('AI App') }}{% endblock %}
 
 {% block page_header %}
 <!-- Enhanced Tabler Premium Hero Header with Gradient -->
@@ -29,7 +29,7 @@
                     Document Manager
                 </h1>
                 <div class="page-subtitle text-white mb-4" style="font-size: 1.1rem; opacity: 0.9;">
-                    Upload and manage documents for RAG (Retrieval-Augmented Generation)
+                    Upload and manage documents for direct AI context
                 </div>
                 <div class="mt-3">
                     <span class="badge bg-light text-dark me-2 px-3 py-2">
@@ -102,7 +102,7 @@
                         </div>
                     </div>
                 {% else %}
-                <form id="document-upload-form" action="{{ url_for('upload_document_for_rag') }}" method="post" enctype="multipart/form-data">
+                <form id="document-upload-form" action="{{ url_for('upload_document') }}" method="post" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-lg-8">
                         <label for="document-file-input" class="form-label fw-medium">Choose File</label>
@@ -156,7 +156,7 @@
                 <div class="mt-4">
                     <button type="submit" id="upload-button" class="btn btn-primary btn-lg"
                             data-bs-toggle="tooltip" data-bs-placement="bottom" 
-                            title="Upload the selected document for processing and RAG indexing">
+                            title="Upload the selected document for processing and direct context use">
                         <i class="fas fa-upload me-1"></i>Upload Document
                     </button>
                 </div>
@@ -203,8 +203,8 @@
                                                 <div class="text-secondary small">
                                                     <span class="badge bg-{% if file_ext == 'PDF' %}red{% elif file_ext == 'DOCX' %}blue{% elif file_ext == 'TXT' %}secondary{% else %}light text-dark{% endif %} me-1">{{ file_ext }}</span>
                                                     {% if doc.source_element_type and doc.source_element_type != 'USER_UPLOADED' %}
-                                                        <span class="badge bg-secondary" title="System-generated RAG document for a world element">
-                                                            {{ doc.source_element_type.replace('_LORE','').replace('_',' ') | title }} RAG
+                                                        <span class="badge bg-secondary" title="System-generated world element context document">
+                                                            {{ doc.source_element_type.replace('_LORE','').replace('_',' ') | title }} Context
                                                         </span>
                                                     {% endif %}
                                                 </div>
@@ -228,7 +228,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span class="badge bg-{% if doc.status == 'COMPLETED' %}success{% elif doc.status == 'ERROR' %}danger{% elif doc.status in ['PROCESSING_TEXT', 'CHUNKING', 'GENERATING_EMBEDDINGS', 'INDEXING', 'PENDING', 'UPLOADED'] %}primary{% else %}secondary{% endif %}">
+                                        <span class="badge bg-{% if doc.status == 'COMPLETED' %}success{% elif doc.status == 'ERROR' %}danger{% elif doc.status in ['PROCESSING_TEXT', 'PREPARING_CONTEXT', 'STORING_CONTEXT', 'PENDING', 'UPLOADED'] %}primary{% else %}secondary{% endif %}">
                                             {{ doc.status.replace('_', ' ') | title if doc.status else 'N/A' }}
                                         </span>
                                         {% if doc.status == 'ERROR' and doc.error_message %}
@@ -254,7 +254,7 @@
                                                 </a>
                                             {% endif %}
                                             <button class="delete-document-btn btn btn-sm btn-outline-danger" data-document-id="{{ doc.id }}"
-                                                    data-bs-toggle="tooltip" title="Permanently delete this document and its RAG data">
+                                                    data-bs-toggle="tooltip" title="Permanently delete this document and its stored context data">
                                                 <i class="fas fa-trash-alt me-1"></i>Delete
                                             </button>
                                         </div>
@@ -419,3 +419,4 @@
     <script src="{{ url_for('static', path='/js/document_upload.js') }}"></script>
     <script src="{{ url_for('static', path='/js/document_crud.js') }}"></script> 
 {% endblock %}
+

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/location.py
+"""SQLAlchemy models for location."""
+
+# /story_app/app/models/location.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Float, Boolean, Enum
@@ -137,13 +139,8 @@ class Location(Base):
     def image_url(self) -> Optional[str]:
         """Return the image URL for this location if it has a current image."""
         if self.current_image and self.current_image.blob_path:
-            from app.core.config import settings
-            if settings.AZURE_STORAGE_ACCOUNT_NAME:
-                container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-                return f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{self.current_image.blob_path}"
-            else:
-                # Fallback: assume blob_path is already a full URL
-                return self.current_image.blob_path
+            from app.core.storage_deps import build_storage_url
+            return build_storage_url("generated-images", self.current_image.blob_path)
         return None
 
     def __repr__(self):
@@ -171,3 +168,4 @@ class LocationConnection(Base):
 
     def __repr__(self):
         return f"<LocationConnection(from={self.from_location_id}, to={self.to_location_id}, bidirectional={self.is_bidirectional})>"
+

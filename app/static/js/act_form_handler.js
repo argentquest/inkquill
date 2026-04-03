@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_form_handler.js
+// /story_app/app/static/js/act_form_handler.js
 
 /**
  * act_form_handler.js

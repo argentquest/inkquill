@@ -1,3 +1,5 @@
+"""SQLAlchemy models for anonymous user session."""
+
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
@@ -10,6 +12,7 @@ if TYPE_CHECKING:
     from .user import User
 
 class AnonymousUserSession(Base):
+    """SQLAlchemy model for anonymous user session."""
     __tablename__ = "anonymous_user_sessions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

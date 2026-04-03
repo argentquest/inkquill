@@ -1,4 +1,8 @@
-# /ai_rag_story_app/app/routers/bot_analytics.py
+"""API routes for bot analytics."""
+
+# /story_app/app/routers/bot_analytics.py
+
+from collections import Counter
 
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +11,7 @@ from app.core.deps import get_db_session, get_current_user
 from app.models.user_activity import UserActivity
 from app.utils.bot_detection import is_bot_request, get_bot_info
 from app.core.config import settings
+from app.schemas.base import ApiResponse
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 import logging
@@ -15,19 +20,30 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/analytics", tags=["Bot Analytics"])
 
+BOT_FRAGMENTS = [
+    "bot",
+    "crawler",
+    "spider",
+    "facebook",
+    "twitter",
+    "linkedin",
+    "discord",
+    "whatsapp",
+]
+
 @router.get("/bot-detection-test")
 async def test_bot_detection(request: Request):
     """Test endpoint to check if current request is detected as a bot"""
     is_bot = is_bot_request(request)
     bot_info = get_bot_info(request) if is_bot else None
     
-    return {
+    return ApiResponse.success_response({
         "is_bot": is_bot,
         "bot_info": bot_info,
         "user_agent": request.headers.get("user-agent", ""),
         "ip": request.client.host if request.client else None,
         "filter_enabled": settings.FILTER_BOT_ANALYTICS
-    }
+    })
 
 @router.get("/activity-stats")
 async def get_activity_stats(
@@ -80,22 +96,23 @@ async def get_activity_stats(
     endpoint_result = await db.execute(endpoint_query)
     top_endpoints = endpoint_result.fetchall()
     
-    # Get referrer statistics
-    referrer_query = select(
-        func.coalesce(UserActivity.request_data['referrer'].astext, 'Direct').label('referrer'),
-        func.count(UserActivity.id).label('count')
-    ).where(
+    referrer_query = select(UserActivity.request_data).where(
         UserActivity.created_at >= since
-    ).group_by('referrer').order_by(desc('count')).limit(10)
-    
+    )
     try:
         referrer_result = await db.execute(referrer_query)
-        top_referrers = referrer_result.fetchall()
+        referrer_counter = Counter()
+        for request_data in referrer_result.scalars():
+            referrer = "Direct"
+            if isinstance(request_data, dict):
+                referrer = request_data.get("referrer") or "Direct"
+            referrer_counter[referrer] += 1
+        top_referrers = referrer_counter.most_common(10)
     except Exception as e:
         logger.warning(f"Could not get referrer stats: {e}")
         top_referrers = []
     
-    return {
+    return ApiResponse.success_response({
         "time_window_hours": hours,
         "since": since.isoformat(),
         "total_activity_count": total_count,
@@ -114,7 +131,7 @@ async def get_activity_stats(
         ],
         "note": "If bot filtering is enabled, bot requests should not appear in user_activity logs",
         "configured_bot_patterns": settings.BOT_USER_AGENTS
-    }
+    })
 
 @router.get("/recent-activity")
 async def get_recent_activity(
@@ -141,9 +158,9 @@ async def get_recent_activity(
         user_agent = activity.user_agent or ""
         
         # Simple bot detection on stored data
-        likely_bot = any(
-            pattern.lower() in user_agent.lower() 
-            for pattern in settings.BOT_USER_AGENTS
+        lowered_user_agent = user_agent.lower()
+        likely_bot = any(pattern.lower() in lowered_user_agent for pattern in settings.BOT_USER_AGENTS) or any(
+            fragment in lowered_user_agent for fragment in BOT_FRAGMENTS
         )
         
         analyzed_activities.append({
@@ -156,8 +173,8 @@ async def get_recent_activity(
             "likely_bot": likely_bot
         })
     
-    return {
+    return ApiResponse.success_response({
         "activities": analyzed_activities,
         "total_returned": len(analyzed_activities),
         "note": "likely_bot is based on user agent analysis of stored data"
-    }
+    })

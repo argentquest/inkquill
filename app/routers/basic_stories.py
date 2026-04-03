@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/basic_stories.py
+"""API routes for basic stories."""
+
+# /story_app/app/routers/basic_stories.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -187,7 +189,7 @@ async def create_basic_story(
         response_dict = response_data.model_dump()
         response_dict["editor_url"] = f"/ui/basic-story-editor?story_id={story.id}&act_id={first_act.id}"
         
-        return response_dict
+        return ApiResponse.success_response(data=response_dict)
         
     except Exception as e:
         await db.rollback()
@@ -199,7 +201,7 @@ async def create_basic_story(
 
 
 
-@router.get("/{story_id}", response_model=ApiResponse)
+@router.get("/{story_id:int}", response_model=ApiResponse)
 async def get_basic_story(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -223,7 +225,7 @@ async def get_basic_story(
                 detail="Story is not a Basic Story"
             )
         
-        return StoryResponse(
+        return ApiResponse.success_response(data=StoryResponse(
             id=story.id,
             title=story.title,
             short_description=story.short_description,
@@ -236,7 +238,7 @@ async def get_basic_story(
             created_at=story.created_at,
             updated_at=story.updated_at,
             user_id=story.user_id
-        )
+        ))
         
     except HTTPException:
         raise
@@ -248,7 +250,7 @@ async def get_basic_story(
         )
 
 
-@router.put("/{story_id}", response_model=ApiResponse)
+@router.put("/{story_id:int}", response_model=ApiResponse)
 async def update_basic_story(
     story_id: int,
     request_data: dict,  # Using dict for now
@@ -320,7 +322,7 @@ async def update_basic_story(
         await db.commit()
         await db.refresh(story)
         
-        return StoryResponse(
+        return ApiResponse.success_response(data=StoryResponse(
             id=story.id,
             title=story.title,
             short_description=story.short_description,
@@ -333,7 +335,7 @@ async def update_basic_story(
             created_at=story.created_at,
             updated_at=story.updated_at,
             user_id=story.user_id
-        )
+        ))
         
     except HTTPException:
         raise
@@ -346,7 +348,7 @@ async def update_basic_story(
         )
 
 
-@router.post("/{story_id}/publish")
+@router.post("/{story_id:int}/publish")
 async def publish_basic_story(
     story_id: int,
     request_data: dict,  # Will contain title, description, content, visibility
@@ -369,7 +371,6 @@ async def publish_basic_story(
         import uuid
         import os
         import tempfile
-        from azure.storage.blob import BlobServiceClient
         from app.core.config import settings
         
         # Get and validate story
@@ -706,7 +707,7 @@ async def publish_basic_story(
             # Upload updated content to blob storage
             published_url = existing_published.published_url
             
-            # TODO: Upload to Azure Blob Storage
+            # TODO: Move published assets into managed storage if needed
             # For now, use a placeholder URL
             if not published_url:
                 published_url = f"https://yourdomain.com/published/{filename}"
@@ -718,7 +719,7 @@ async def publish_basic_story(
             # Create new published story
             published_url = f"https://yourdomain.com/published/{filename}"
             
-            # TODO: Upload to Azure Blob Storage
+            # TODO: Move published assets into managed storage if needed
             # For now, we'll create the database record
             
             published_story = PublishedStory(
@@ -763,7 +764,7 @@ async def publish_basic_story(
         )
 
 
-@router.post("/{story_id}/upgrade", response_model=ApiResponse)
+@router.post("/{story_id:int}/upgrade", response_model=ApiResponse)
 async def upgrade_story_to_advanced(
     story_id: int,
     request: dict,  # Using dict for now
@@ -786,7 +787,7 @@ async def upgrade_story_to_advanced(
         
         await db.commit()
         
-        return StoryResponse(
+        return ApiResponse.success_response(data=StoryResponse(
             id=story.id,
             title=story.title,
             short_description=story.short_description,
@@ -799,7 +800,7 @@ async def upgrade_story_to_advanced(
             created_at=story.created_at,
             updated_at=story.updated_at,
             user_id=story.user_id
-        )
+        ))
         
     except ValueError as e:
         raise HTTPException(
@@ -832,7 +833,7 @@ async def list_basic_stories(
             limit=limit
         )
         
-        return [
+        return ApiResponse.success_response(data=[
             StoryResponse(
                 id=story.id,
                 title=story.title,
@@ -848,7 +849,7 @@ async def list_basic_stories(
                 user_id=story.user_id
             )
             for story in stories
-        ]
+        ])
         
     except Exception as e:
         logger.error(f"Failed to list Basic Stories: {e}")
@@ -858,7 +859,7 @@ async def list_basic_stories(
         )
 
 
-@router.get("/{story_id}/features")
+@router.get("/{story_id:int}/features")
 async def get_story_features(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
@@ -877,11 +878,13 @@ async def get_story_features(
         
         features = story_service.get_available_features(story)
         
-        return {
-            "story_id": story_id,
-            "story_type": story.story_type,
-            "features": features
-        }
+        return ApiResponse.success_response(
+            data={
+                "story_id": story_id,
+                "story_type": story.story_type,
+                "features": features
+            }
+        )
         
     except HTTPException:
         raise
@@ -893,7 +896,7 @@ async def get_story_features(
         )
 
 
-@router.post("/{story_id}/ai-assist")
+@router.post("/{story_id:int}/ai-assist")
 async def get_ai_assistance(
     story_id: int,
     request: dict,  # Using dict for now
@@ -965,7 +968,7 @@ async def get_ai_assistance(
         )
 
 
-@router.post("/{story_id}/export-pdf")
+@router.post("/{story_id:int}/export-pdf")
 async def export_story_to_pdf(
     story_id: int,
     request_data: dict,  # Will contain title and content
@@ -1048,3 +1051,4 @@ async def export_story_to_pdf(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to export PDF: {str(e)}"
         )
+

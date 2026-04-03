@@ -1,4 +1,4 @@
-# /ai_rag_story_app/Dockerfile
+# /story_app/Dockerfile
 
 # --- Stage 1: Build Dependencies ---
 # Use an official Python runtime as a parent image. Choose a specific version

@@ -392,7 +392,7 @@ class HelpModalManager {
         <ul>
           <li><strong>World Chat:</strong> Chat with AI about your world to develop ideas</li>
           <li><strong>Hierarchy View:</strong> Visualize relationships between world elements</li>
-          <li><strong>RAG Integration:</strong> AI pulls context from your uploaded documents</li>
+          <li><strong>Context Integration:</strong> AI pulls context from your uploaded documents</li>
           <li><strong>Publishing:</strong> Share completed worlds and stories with the community</li>
           <li><strong>Version Control:</strong> Track changes and updates to your world</li>
         </ul>

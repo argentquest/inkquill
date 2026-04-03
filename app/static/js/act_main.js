@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_editor_main.js
+// /story_app/app/static/js/act_editor_main.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,10 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("ActEditorMain: Orchestrator received message from ActWebSocketHandler:", messageData.type);
 
         switch (messageData.type) {
-            case "rag_context_info":
-                const ragDisplayData = ActAIProcessor.processRagContextMessage(messageData.data);
-                ActUIUpdater.updateRAGSummaryDisplay(ragDisplayData.summary);
-                ActUIUpdater.updateRAGDetailsTab(ragDisplayData.details);
+            case "context_info":
+                const contextDisplayData = ActAIProcessor.processContextMessage(messageData.data);
+                ActUIUpdater.updateContextDetailsTab(contextDisplayData.details);
                 break;
             case "full_prompt_info":
                 const promptDisplayData = ActAIProcessor.processFullPromptMessage(messageData.data);
@@ -162,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             ActUIUpdater.setRawAIStreamDisplay("Sending request to AI...", false);
             ActUIUpdater.setExtractedNarrativePreview("");
-            ActUIUpdater.clearRAGDisplays();
+            ActUIUpdater.clearContextDisplays();
             ActUIUpdater.updateAIPromptTab("Waiting for AI prompt data from server...");
             
             const success = ActWebSocketHandler.sendMessage({ 
@@ -221,3 +220,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log("ActEditorMain: Orchestrator initialization complete.");
 });
+

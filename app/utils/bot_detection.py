@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/utils/bot_detection.py
+"""Utility helpers for bot detection."""
+
+# /story_app/app/utils/bot_detection.py
 
 import re
 import logging

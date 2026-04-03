@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/ai_model_config.py
+"""Pydantic schemas for ai model config."""
+
+# /story_app/app/schemas/ai_model_config.py
 from pydantic import BaseModel
 from typing import Optional
 

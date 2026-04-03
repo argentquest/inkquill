@@ -1,0 +1,238 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Search Header -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-search me-2"></i>
+                        {% if search_query %}
+                            Search Results for "{{ search_query }}"
+                        {% else %}
+                            Global Search
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Search Form -->
+                    <form method="get" action="{{ url_for('ui_global_search') }}">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="q" class="form-control" 
+                                   placeholder="Search across stories, worlds, blog posts..." 
+                                   value="{{ search_query or '' }}" autofocus>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if search_query %}
+                <!-- Search Results -->
+                {% set total_results = search_results.stories|length + search_results.worlds|length + search_results.blog_posts|length %}
+                
+                {% if total_results > 0 %}
+                    <div class="row">
+                        <!-- Stories Results -->
+                        {% if search_results.stories %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <i class="fas fa-book text-primary me-2"></i>
+                                        Stories ({{ search_results.stories|length }})
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    {% for story in search_results.stories %}
+                                    <div class="list-group-item">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <a href="{{ url_for('ui_story_detail', story_id=story.id) }}" 
+                                                   class="text-decoration-none">
+                                                    <strong>{{ story.title }}</strong>
+                                                </a>
+                                                {% if story.description %}
+                                                    <div class="text-muted small mt-1">
+                                                        {{ story.description[:100] }}{% if story.description|length > 100 %}...{% endif %}
+                                                    </div>
+                                                {% endif %}
+                                                {% if story.world %}
+                                                    <div class="text-muted small">
+                                                        <i class="fas fa-globe me-1"></i>{{ story.world.name }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if not loop.last %}<hr class="my-2">{% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Worlds Results -->
+                        {% if search_results.worlds %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <i class="fas fa-globe text-success me-2"></i>
+                                        Worlds ({{ search_results.worlds|length }})
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    {% for world in search_results.worlds %}
+                                    <div class="list-group-item">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <a href="{{ url_for('ui_world_detail', world_id=world.id) }}" 
+                                                   class="text-decoration-none">
+                                                    <strong>{{ world.name }}</strong>
+                                                </a>
+                                                {% if world.description %}
+                                                    <div class="text-muted small mt-1">
+                                                        {{ world.description[:100] }}{% if world.description|length > 100 %}...{% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if not loop.last %}<hr class="my-2">{% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Blog Posts Results -->
+                        {% if search_results.blog_posts %}
+                        <div class="col-lg-12 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <i class="fas fa-edit text-info me-2"></i>
+                                        Blog Posts ({{ search_results.blog_posts|length }})
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for post in search_results.blog_posts %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card card-sm">
+                                                <div class="card-body">
+                                                    <a href="{{ url_for('blog_post_detail', slug=post.slug) }}" 
+                                                       class="text-decoration-none">
+                                                        <h5 class="card-title">{{ post.title }}</h5>
+                                                    </a>
+                                                    {% if post.excerpt %}
+                                                        <p class="text-muted small">
+                                                            {{ post.excerpt[:120] }}{% if post.excerpt|length > 120 %}...{% endif %}
+                                                        </p>
+                                                    {% endif %}
+                                                    <div class="d-flex align-items-center text-muted small">
+                                                        <span class="avatar avatar-xs me-2">
+                                                            {{ (post.author.display_name or post.author.username)[0].upper() }}
+                                                        </span>
+                                                        <span>{{ post.author.display_name or post.author.username }}</span>
+                                                        <span class="ms-auto">
+                                                            {{ post.published_at.strftime('%b %d, %Y') if post.published_at }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <!-- No Results -->
+                    <div class="empty">
+                        <div class="empty-img">
+                            <img src="/static/tabler/static/illustrations/undraw_quitting_time_dm8t.svg" height="128" alt="No results">
+                        </div>
+                        <p class="empty-title">No results found</p>
+                        <p class="empty-subtitle text-muted">
+                            Try adjusting your search terms or searching for something else.
+                        </p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- Search Tips -->
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <i class="fas fa-search fa-3x text-muted"></i>
+                                </div>
+                                <h3>Search Everything</h3>
+                                <p class="text-muted">
+                                    Search across your stories, worlds, characters, locations, and public blog posts all in one place.
+                                </p>
+                                <div class="row mt-4">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="text-center">
+                                            <i class="fas fa-book fa-2x text-primary mb-2"></i>
+                                            <h6>Stories</h6>
+                                            <small class="text-muted">Your personal stories and narratives</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="text-center">
+                                            <i class="fas fa-globe fa-2x text-success mb-2"></i>
+                                            <h6>Worlds</h6>
+                                            <small class="text-muted">Your created worlds and settings</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="text-center">
+                                            <i class="fas fa-edit fa-2x text-info mb-2"></i>
+                                            <h6>Blog Posts</h6>
+                                            <small class="text-muted">Published blog content</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar {
+        background: var(--tblr-primary);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .list-group-item {
+        border: none;
+        padding: 0.5rem 0;
+    }
+    
+    .card-sm {
+        transition: all 0.2s ease;
+    }
+    
+    .card-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/main.js
+// /story_app/app/static/js/main.js
 
 /**
  * main.js
@@ -148,7 +148,7 @@ window.refreshCoinBalance = refreshCoinBalance;
 // Cookie warning functionality
 function checkAndShowCookieWarning() {
     // Check if user has visited before (localStorage persists even if cookies are cleared)
-    const hasVisitedBefore = localStorage.getItem('rag_app_visited');
+    const hasVisitedBefore = localStorage.getItem('app_visited');
     const warningShownToday = localStorage.getItem('cookie_warning_shown_today');
     const today = new Date().toDateString();
     
@@ -168,7 +168,7 @@ function checkAndShowCookieWarning() {
     
     // Mark that user has visited (for future sessions)
     if (!hasVisitedBefore) {
-        localStorage.setItem('rag_app_visited', 'true');
+        localStorage.setItem('app_visited', 'true');
     }
 }
 
@@ -252,11 +252,18 @@ function formatCallType(callType) {
         'scene_metadata_generation': 'Scene Metadata',
         'world_import_from_book': 'World Import',
         'world_import_from_document': 'Document Import',
-        'rag_text_generation_character': 'Character RAG',
-        'rag_text_generation_location': 'Location RAG',
-        'rag_text_generation_lore_item': 'Lore RAG',
         'world_chat': 'World Chat'
     };
+
+    if (callType && callType.endsWith('_character') && callType.includes('text_generation')) {
+        return 'Character Context';
+    }
+    if (callType && callType.endsWith('_location') && callType.includes('text_generation')) {
+        return 'Location Context';
+    }
+    if (callType && callType.endsWith('_lore_item') && callType.includes('text_generation')) {
+        return 'Lore Context';
+    }
     
     return typeMap[callType] || callType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
@@ -1064,3 +1071,4 @@ window.showCookiePreferences = showCookiePreferences;
 window.resetCookieConsent = resetCookieConsent;
 window.getCookieConsentStatus = getCookieConsentStatus;
 window.setupPageEngagementTracking = setupPageEngagementTracking;
+

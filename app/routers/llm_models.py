@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/llm_models.py
+"""API routes for llm models."""
+
+# /story_app/app/routers/llm_models.py
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,11 +40,13 @@ async def get_llm_models(
             LLMModelRead.model_validate(model) for model in models
         ]
         
-        return LLMModelsResponse(
-            models=model_reads,
-            total_count=stats["total_count"],
-            active_count=stats["active_count"],
-            providers=stats["providers"]
+        return ApiResponse.success_response(
+            data=LLMModelsResponse(
+                models=model_reads,
+                total_count=stats["total_count"],
+                active_count=stats["active_count"],
+                providers=stats["providers"]
+            )
         )
         
     except Exception as e:

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/story_service.py
+"""Service helpers for story service."""
+
+# /story_app/app/services/story_service.py
 
 from typing import List, Optional
 from sqlalchemy.orm import Session

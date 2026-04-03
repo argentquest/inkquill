@@ -33,7 +33,8 @@ async def get_forum_thread(
     if thread and increment_view:
         thread.view_count += 1
         await db.commit()
-    
+        await db.refresh(thread)
+
     return thread
 
 

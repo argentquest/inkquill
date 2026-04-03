@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/ai_review.py
+"""Pydantic schemas for ai review."""
+
+# /story_app/app/schemas/ai_review.py
 from pydantic import BaseModel, Field
 from typing import List, Optional
 

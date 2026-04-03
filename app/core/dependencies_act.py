@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/dependencies_act.py
+"""Core application helpers for dependencies act."""
+
+# /story_app/app/core/dependencies_act.py
 from fastapi import Depends, HTTPException, status, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/deps.py
+"""Core application helpers for deps."""
+
+# /story_app/app/core/deps.py
 
 from typing import Optional, AsyncGenerator, Dict, Any 
 from fastapi import Depends, HTTPException, status, Request
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 oauth2_bearer_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Return db session."""
     async with async_session_local() as session:
         logger.debug(f"Database session {id(session)} created for request.")
         try:
@@ -86,6 +89,7 @@ async def get_current_user(
 async def get_current_active_user(
     current_user_optional: Optional[User] = Depends(get_current_user) 
 ) -> User:
+    """Return current active user."""
     if current_user_optional is None:
         logger.warning("Attempt to access protected route without authentication (get_current_user returned None).")
         raise HTTPException(

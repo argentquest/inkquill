@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_prompt_selector.js
+// /story_app/app/static/js/scene_prompt_selector.js
 "use strict";
 
 const ScenePromptSelector = (() => {

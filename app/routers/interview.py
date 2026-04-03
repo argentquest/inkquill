@@ -1,3 +1,5 @@
+"""API routes for interview."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -22,6 +24,7 @@ router = APIRouter(prefix="/api/v1/interview", tags=["interview"])
 
 
 class InterviewSubmissionRequest(BaseModel):
+    """Response or helper model for interview submission request."""
     interview_id: str = Field(..., description="ID of the interview being completed")
     responses: Dict[str, Any] = Field(..., description="User responses to all questions")
     navigation: Dict[str, Any] = Field(..., description="Navigation result from responses")
@@ -29,6 +32,7 @@ class InterviewSubmissionRequest(BaseModel):
 
 
 class InterviewSubmissionResponse(BaseModel):
+    """Response or helper model for interview submission response."""
     success: bool
     interview_id: int
     message: str
@@ -195,10 +199,12 @@ async def submit_interview(
         
         logger.info(f"Interview {submission.interview_id} successfully {action} for user {current_user.id} with ID {interview_response.id}")
         
-        return InterviewSubmissionResponse(
-            success=True,
-            interview_id=interview_response.id,
-            message=f"Interview {'retaken' if action == 'updated' else 'submitted'} successfully"
+        return ApiResponse.success_response(
+            data=InterviewSubmissionResponse(
+                success=True,
+                interview_id=interview_response.id,
+                message=f"Interview {'retaken' if action == 'updated' else 'submitted'} successfully"
+            )
         )
         
     except Exception as e:

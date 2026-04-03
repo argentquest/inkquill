@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/location_form_handler.js
+// /story_app/app/static/js/location_form_handler.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationFormErrorMessage = document.getElementById('location-form-error-message');
     const saveLocationButton = document.getElementById('save-location-button');
 
-    const generatedRagContentDisplayLoc = document.getElementById('generated-rag-content-display-loc');
-    const locationIdForRag = locationForm ? locationForm.dataset.locationId : null;
+    const generatedContextDisplayLoc = document.getElementById('generated-context-display-loc');
+    const locationIdForContext = locationForm ? locationForm.dataset.locationId : null;
     const isEditModeLoc = locationForm ? locationForm.dataset.pageAction === "Edit" : false;
     
     const parentLocationSelect = document.getElementById('parent_location_id');
@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Location Form Handler Initial State:", {
         locationFormExists: !!locationForm,
-        generatedRagContentDisplayLocExists: !!generatedRagContentDisplayLoc,
-        locationIdForRag: locationIdForRag,
+        generatedContextDisplayLocExists: !!generatedContextDisplayLoc,
+        locationIdForContext: locationIdForContext,
         isEditModeLoc: isEditModeLoc
     });
 
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 parentLocationSelect.removeChild(parentLocationSelect.lastChild);
             }
 
-            const currentLocationId = parseInt(locationIdForRag);
+            const currentLocationId = parseInt(locationIdForContext);
             locations.forEach(location => {
                 if (location.id !== currentLocationId) {
                     const option = document.createElement('option');
@@ -104,18 +104,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // --- END FIX ---
 
-    async function fetchAndDisplayGeneratedRagContent(elementId, displayElement, apiUrl) {
+    async function fetchAndDisplayGeneratedContext(elementId, displayElement, apiUrl) {
         if (!displayElement) return;
         if (!elementId) {
-            displayElement.textContent = "N/A (Save location first to generate RAG content)";
+            displayElement.textContent = "N/A (Save location first to generate context)";
             return;
         }
-        displayElement.textContent = "Loading AI-generated RAG context...";
+        displayElement.textContent = "Loading AI-generated context...";
         try {
             const response = await fetch(apiUrl, { credentials: 'include' });
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                displayElement.textContent = errData.error || `Failed to load RAG context: ${response.statusText}`;
+                displayElement.textContent = errData.error || `Failed to load context: ${response.statusText}`;
                 return;
             }
             const data = await response.json();
@@ -124,20 +124,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.content !== null && data.content !== undefined) {
                 displayElement.textContent = data.content;
             } else {
-                displayElement.textContent = "No AI-generated RAG context found for this location.";
+                displayElement.textContent = "No AI-generated context found for this location.";
             }
         } catch (error) {
-            console.error("Network error fetching RAG content:", error);
-            displayElement.textContent = "Failed to load RAG content due to a network error.";
+            console.error("Network error fetching generated context:", error);
+            displayElement.textContent = "Failed to load context due to a network error.";
         }
     }
 
     if (locationForm && saveLocationButton) {
-        if (isEditModeLoc && locationIdForRag && generatedRagContentDisplayLoc) {
-            const apiUrl = `${API_BASE_URL}/locations/${locationIdForRag}/generated-rag-content`;
-            fetchAndDisplayGeneratedRagContent(locationIdForRag, generatedRagContentDisplayLoc, apiUrl);
-        } else if (generatedRagContentDisplayLoc && !isEditModeLoc) {
-            generatedRagContentDisplayLoc.textContent = "AI-generated RAG context will appear here after the location is first saved and processed.";
+        if (isEditModeLoc && locationIdForContext && generatedContextDisplayLoc) {
+            const apiUrl = `${API_BASE_URL}/locations/${locationIdForContext}/generated-context`;
+            fetchAndDisplayGeneratedContext(locationIdForContext, generatedContextDisplayLoc, apiUrl);
+        } else if (generatedContextDisplayLoc && !isEditModeLoc) {
+            generatedContextDisplayLoc.textContent = "AI-generated context will appear here after the location is first saved.";
         }
         
         loadParentLocations();
@@ -217,9 +217,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (!isEditModeLoc && result.id) {
                         window.location.href = `/ui/worlds/locations/${result.id}/edit`;
-                    } else if (isEditModeLoc && result.id && generatedRagContentDisplayLoc) {
+                    } else if (isEditModeLoc && result.id && generatedContextDisplayLoc) {
                         setTimeout(() => {
-                            fetchAndDisplayGeneratedRagContent(result.id, generatedRagContentDisplayLoc, `${API_BASE_URL}/locations/${result.id}/generated-rag-content`);
+                            fetchAndDisplayGeneratedContext(result.id, generatedContextDisplayLoc, `${API_BASE_URL}/locations/${result.id}/generated-context`);
                         }, 2000);
                     }
                 } else {
@@ -251,3 +251,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Location form elements not found. Handler not attached.");
     }
 });
+

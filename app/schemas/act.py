@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/act.py
+"""Pydantic schemas for act."""
+
+# /story_app/app/schemas/act.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, TYPE_CHECKING
@@ -98,3 +100,4 @@ class ActRead(BaseModel):
     class Config:
         # Enable ORM mode for compatibility with SQLAlchemy models.
         from_attributes = True # Replaces orm_mode = True in Pydantic v1
+

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_crud.js
+// /story_app/app/static/js/scene_crud.js
 
 /**
  * scene_crud.js
@@ -126,3 +126,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     console.log("Scene CRUD JS: Initialization complete.");
 });
+

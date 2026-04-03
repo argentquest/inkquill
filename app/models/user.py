@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/user.py
+"""SQLAlchemy models for user."""
+
+# /story_app/app/models/user.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON, ForeignKey
@@ -34,8 +36,10 @@ if TYPE_CHECKING:
     from .blog_author_profile import BlogAuthorProfile
     from .blog_subscription import BlogSubscription 
     from .refresh_token import RefreshToken
+    from .world_collaborator import WorldCollaborator
 
 class User(Base):
+    """SQLAlchemy model for user."""
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -291,6 +295,19 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    world_collaborations: Mapped[List["WorldCollaborator"]] = relationship(
+        "WorldCollaborator",
+        foreign_keys="[WorldCollaborator.user_id]",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    collaboration_invitations_sent: Mapped[List["WorldCollaborator"]] = relationship(
+        "WorldCollaborator",
+        foreign_keys="[WorldCollaborator.invited_by_user_id]",
+        back_populates="invited_by"
+    )
+
     @property
     def is_oauth_user(self) -> bool:
         """Check if this is an OAuth user"""
@@ -303,3 +320,4 @@ class User(Base):
     
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', provider='{self.auth_provider}')>"
+

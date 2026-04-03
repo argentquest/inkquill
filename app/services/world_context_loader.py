@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/world_context_loader.py
+"""Service helpers for world context loader."""
+
+# /story_app/app/services/world_context_loader.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -6,8 +8,7 @@ from sqlalchemy.orm import selectinload
 from typing import Dict, List, Any, Optional
 import logging
 
-from azure.storage.blob.aio import BlobServiceClient
-from app.core.config import settings
+from app.core.storage_deps import LocalStorageClient
 from app.models.world import World
 from app.models.character import Character
 from app.models.location import Location
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 class WorldContextLoader:
     """Service for loading complete world context data for chat interactions"""
     
-    def __init__(self, db: AsyncSession, blob_service_client: Optional[BlobServiceClient] = None):
+    def __init__(self, db: AsyncSession, blob_service_client: Optional[LocalStorageClient] = None):
         self.db = db
         self.blob_service_client = blob_service_client
     
@@ -306,10 +307,10 @@ class WorldContextLoader:
         if not blob_path or not self.blob_service_client:
             return None
         try:
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            blob_client = self.blob_service_client.get_blob_client(container=container_name, blob=blob_path)
+            blob_client = self.blob_service_client.get_blob_client(container="generated-images", blob=blob_path)
             if await blob_client.exists():
                 return blob_client.url
         except Exception as e:
             logger.warning(f"Could not check for blob '{blob_path}' due to error: {e}")
         return None
+

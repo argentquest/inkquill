@@ -40,7 +40,7 @@ async def generate_share_url(
     """Generate a share URL for the specified platform."""
     try:
         user_id = current_user.id if current_user else None
-        return await service.generate_share_url(
+        response = await service.generate_share_url(
             request,
             user_id=user_id,
             url=url,
@@ -49,6 +49,7 @@ async def generate_share_url(
             image=image or "",
             hashtags=hashtags or ""
         )
+        return ApiResponse.success_response(response.model_dump())
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -73,7 +74,8 @@ async def track_share(
     user_id = current_user.id if current_user else None
     
     try:
-        return await service.track_share(share_data, user_id)
+        response = await service.track_share(share_data, user_id)
+        return ApiResponse.success_response(response.model_dump())
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,7 +101,9 @@ async def get_daily_stats(
         if target_date:
             parsed_date = datetime.strptime(target_date, "%Y-%m-%d").date()
         
-        return await service.get_user_daily_stats(current_user.id, parsed_date)
+        return ApiResponse.success_response(
+            await service.get_user_daily_stats(current_user.id, parsed_date)
+        )
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -133,17 +137,20 @@ async def get_sharing_analytics(
     
     user_id = current_user.id if current_user else None
     
-    return await service.get_analytics(
+    analytics = await service.get_analytics(
         user_id=user_id,
         start_date=parsed_start_date,
         end_date=parsed_end_date
     )
+    if hasattr(analytics, "model_dump"):
+        analytics = analytics.model_dump()
+    return ApiResponse.success_response(analytics)
 
 
 @router.get("/share/platforms")
 async def get_supported_platforms():
     """Get list of supported social media platforms."""
-    return {
+    return ApiResponse.success_response({
         "platforms": [
             {
                 "id": "facebook",
@@ -200,13 +207,13 @@ async def get_supported_platforms():
                 "color": "#0088cc"
             }
         ]
-    }
+    })
 
 
 @router.get("/share/config")
 async def get_sharing_config():
     """Get sharing configuration and limits."""
-    return {
+    return ApiResponse.success_response({
         "max_daily_coins": SocialSharingService.MAX_DAILY_COINS,
         "coins_per_share": SocialSharingService.COINS_PER_SHARE,
         "supported_content_types": [
@@ -214,4 +221,4 @@ async def get_sharing_config():
             "published_story", 
             "ai_public_chat"
         ]
-    }
+    })

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/maintenance.py
+"""Core application helpers for maintenance."""
+
+# /story_app/app/core/maintenance.py
 
 import json
 import logging

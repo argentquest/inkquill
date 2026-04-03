@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/story.py
+"""Database CRUD helpers for story."""
+
+# /story_app/app/crud/story.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -12,6 +14,7 @@ from app.schemas import story as schema_story
 logger = logging.getLogger(__name__)
 
 async def create_story(db: AsyncSession, story: schema_story.StoryCreate, user_id: int) -> model_story.Story:
+    """Create story."""
     logger.info(f"User ID {user_id} creating new story: '{story.title}', linking to world_id: {story.world_id}")
     db_story = model_story.Story(**story.model_dump(), user_id=user_id)
     db.add(db_story)
@@ -21,6 +24,7 @@ async def create_story(db: AsyncSession, story: schema_story.StoryCreate, user_i
     return db_story
 
 async def get_story(db: AsyncSession, story_id: int) -> Optional[model_story.Story]:
+    """Return story."""
     logger.debug(f"Fetching story with ID: {story_id}")
     result = await db.execute(
         select(model_story.Story)
@@ -34,6 +38,7 @@ async def get_story(db: AsyncSession, story_id: int) -> Optional[model_story.Sto
     return result.scalars().first()
 
 async def get_story_for_user(db: AsyncSession, story_id: int, user_id: int) -> Optional[model_story.Story]:
+    """Return story for user."""
     logger.debug(f"Fetching story ID: {story_id} for user ID: {user_id}")
     result = await db.execute(
         select(model_story.Story)
@@ -50,6 +55,7 @@ async def get_story_for_user(db: AsyncSession, story_id: int, user_id: int) -> O
 async def get_stories_by_user(
     db: AsyncSession, user_id: int, skip: int = 0, limit: int = 100
 ) -> List[model_story.Story]:
+    """Return stories by user."""
     logger.debug(f"Fetching stories for user ID: {user_id}, skip: {skip}, limit: {limit}")
     result = await db.execute(
         select(model_story.Story)
@@ -69,6 +75,7 @@ async def get_stories_by_user(
 async def get_stories_by_world_id(
     db: AsyncSession, world_id: int, user_id: Optional[int] = None, skip: int = 0, limit: int = 100
 ) -> List[model_story.Story]:
+    """Return stories by world id."""
     logger.debug(f"Fetching stories for world ID: {world_id}, user ID filter: {user_id}, skip: {skip}, limit: {limit}")
     query = select(model_story.Story).filter(model_story.Story.world_id == world_id)
     if user_id is not None:
@@ -87,6 +94,7 @@ async def get_stories_by_world_id(
 async def get_all_stories(
     db: AsyncSession, skip: int = 0, limit: int = 100
 ) -> List[model_story.Story]:
+    """Return all stories."""
     logger.debug(f"Fetching all stories, skip: {skip}, limit: {limit}")
     result = await db.execute(
         select(model_story.Story)
@@ -104,6 +112,7 @@ async def get_all_stories(
 async def update_story(
     db: AsyncSession, story_id: int, story_update: schema_story.StoryUpdate, user_id: int
 ) -> Optional[model_story.Story]:
+    """Update story."""
     db_story = await get_story_for_user(db, story_id=story_id, user_id=user_id)
     if not db_story:
         return None
@@ -122,6 +131,7 @@ async def update_story(
     return db_story
 
 async def delete_story(db: AsyncSession, story_id: int, user_id: int) -> Optional[model_story.Story]:
+    """Delete story."""
     db_story = await get_story_for_user(db, story_id=story_id, user_id=user_id)
     if not db_story:
         return None

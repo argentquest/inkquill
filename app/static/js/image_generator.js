@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/image_generator.js
+// /story_app/app/static/js/image_generator.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {

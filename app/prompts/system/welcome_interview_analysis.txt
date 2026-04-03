@@ -5,7 +5,7 @@ authors: AI Story Assistant
 model:
   api: chat
   configuration:
-    type: azure_openai
+    type: completion
     max_tokens: 2000
     temperature: 0.3
 input_variables:
@@ -13,7 +13,7 @@ input_variables:
   description: Complete interview responses from the user
   is_required: true
 execution_settings:
-  azure_openai:
+  default:
     max_tokens: 2000
     temperature: 0.3
 ---
@@ -29,7 +29,7 @@ Available App Features & Capabilities:
 - Basic Story Editor: Simple writing interface for quick story creation
 - Advanced Story Editor: Full-featured editor with acts, scenes, and chapter organization
 - AI Writing Assistant: Real-time help while writing scenes and acts
-- RAG (Retrieval Augmented Generation): AI remembers your world elements and suggests relevant content
+- Direct Context Assembly: AI uses your world elements and uploaded documents as prompt context
 - Image Generation: AI-created visuals for characters, locations, and story elements
 - Story Review & Analysis: AI feedback on completed drafts
 - Community Features: Share stories and get feedback from other writers

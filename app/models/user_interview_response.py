@@ -1,3 +1,5 @@
+"""SQLAlchemy models for user interview response."""
+
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.db.database import Base
@@ -7,6 +9,7 @@ from typing import Dict, Any, Optional, List
 
 
 class UserInterviewResponse(Base):
+    """SQLAlchemy model for user interview response."""
     __tablename__ = "user_interview_responses"
     
     id = Column(Integer, primary_key=True, index=True)

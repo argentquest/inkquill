@@ -1,6 +1,8 @@
+"""Service helpers for world generation plugin setup."""
+
 # app/services/sk_plugins/world_generation_plugin_setup.py
 import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 import logging
 
@@ -10,12 +12,13 @@ from app.services.sk_constants import WORLD_GENERATION_PLUGIN_NAME
 logger = logging.getLogger(__name__)
 
 def register_world_generation_functions(kernel_instance: sk.Kernel, chat_service_id: str, prompt_loader: callable):
+    """Provide service support for register world generation functions."""
     logger.info(f"SK_PLUGIN_SETUP ({WORLD_GENERATION_PLUGIN_NAME}): Registering functions...")
 
     # Function: GenerateWorldFromBookTitle (Existing)
     try:
         generate_world_from_book_prompt_text = prompt_loader("generate_world_from_book.txt")
-        world_gen_exec_settings = AzureChatPromptExecutionSettings(
+        world_gen_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["world_generation"], 
             temperature=settings.AI_TEMPERATURE_SETTINGS["world_generation"],
@@ -38,7 +41,7 @@ def register_world_generation_functions(kernel_instance: sk.Kernel, chat_service
     # --- NEW FUNCTION: ExtractWorldElementsFromText ---
     try:
         extract_elements_prompt_text = prompt_loader("extract_world_elements_from_text.txt")
-        extract_elements_exec_settings = AzureChatPromptExecutionSettings(
+        extract_elements_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["world_elements_extraction"], 
             temperature=settings.AI_TEMPERATURE_SETTINGS["world_elements_extraction"],

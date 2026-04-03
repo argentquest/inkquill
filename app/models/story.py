@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/story.py
+"""SQLAlchemy models for story."""
+
+# /story_app/app/models/story.py
 
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -27,6 +29,7 @@ from .location import story_location_association_table
 from .lore_item import story_lore_item_association_table
 
 class Story(Base):
+    """SQLAlchemy model for story."""
     __tablename__ = "stories"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

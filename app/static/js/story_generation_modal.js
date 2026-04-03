@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/story_generation_modal.js
+// /story_app/app/static/js/story_generation_modal.js
 "use strict";
 
 class StoryGenerationModal {

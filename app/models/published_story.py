@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/published_story.py
+"""SQLAlchemy models for published story."""
+
+# /story_app/app/models/published_story.py
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean, Float

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/scene.py
+"""API routes for scene."""
+
+# /story_app/app/routers/scene.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, BackgroundTasks, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,8 +9,8 @@ import logging
 
 # --- Core Application Imports ---
 from app.core.deps import get_db_session, get_current_active_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
+
 from app.models.user import User
 from app.models.act import Act
 from app.models.story import Story
@@ -45,6 +47,7 @@ async def get_scene_and_verify_ownership(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ) -> Scene:
+    """Return scene and verify ownership."""
     db_scene = await crud_scene.get_scene(db, scene_id=scene_id)
     if not db_scene:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scene not found")
@@ -58,6 +61,7 @@ async def trigger_generate_scenes_for_act(
     db_act: Act = Depends(get_act_and_verify_ownership), 
     current_user: User = Depends(get_current_active_user) 
 ):
+    """Handle POST /generate-scenes."""
     if not db_act.description or not db_act.description.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -82,7 +86,9 @@ async def list_scenes_for_act(
     limit: int = Query(100, ge=1, le=500),
     db: AsyncSession = Depends(get_db_session)
 ):
-    return await crud_scene.get_scenes_by_act(db, act_id=db_act.id, skip=skip, limit=limit)
+    """Handle GET /."""
+    scenes = await crud_scene.get_scenes_by_act(db, act_id=db_act.id, skip=skip, limit=limit)
+    return ApiResponse.success_response(data=[SceneRead.model_validate(scene) for scene in scenes])
 
 @router_act_scenes.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_scene_for_act")
 async def create_new_scene_for_act(
@@ -90,13 +96,14 @@ async def create_new_scene_for_act(
     db_act: Act = Depends(get_act_and_verify_ownership), 
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle POST /."""
     if scene_in.scene_number is None: 
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Scene number is required.")
     try:
         created_scene = await crud_scene.create_scene(db=db, scene_in=scene_in, act_id=db_act.id)
         await db.commit()
         await db.refresh(created_scene)
-        return created_scene
+        return ApiResponse.success_response(data=SceneRead.model_validate(created_scene))
     except Exception as e: 
         await db.rollback()
         if "UniqueViolation" in str(e) or "_act_scene_number_uc" in str(e):
@@ -106,7 +113,8 @@ async def create_new_scene_for_act(
 
 @router_scenes.get("/{scene_id}", response_model=ApiResponse, name="get_single_scene")
 async def get_single_scene(db_scene: Scene = Depends(get_scene_and_verify_ownership)):
-    return db_scene
+    """Handle GET /{scene_id}."""
+    return ApiResponse.success_response(data=SceneRead.model_validate(db_scene))
 
 @router_scenes.put("/{scene_id}", response_model=ApiResponse, name="update_existing_scene")
 async def update_existing_scene(
@@ -115,6 +123,7 @@ async def update_existing_scene(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle PUT /{scene_id}."""
     try:
         updated_scene = await crud_scene.update_scene(db=db, db_scene=db_scene, scene_in=scene_in)
         await db.commit()
@@ -127,7 +136,7 @@ async def update_existing_scene(
             await db.commit()
             await db.refresh(updated_scene)
         
-        return updated_scene
+        return ApiResponse.success_response(data=SceneRead.model_validate(updated_scene))
     except Exception as e:
         await db.rollback()
         if "UniqueViolation" in str(e) or "_act_scene_number_uc" in str(e):
@@ -139,6 +148,7 @@ async def delete_existing_scene(
     db_scene: Scene = Depends(get_scene_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle DELETE /{scene_id}."""
     try:
         await crud_scene.delete_scene(db=db, db_scene=db_scene)
         await db.commit()
@@ -152,20 +162,22 @@ async def list_images_for_scene(
     db_scene: Scene = Depends(get_scene_and_verify_ownership),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle GET /{scene_id}/images."""
     logger.info(f"API: Fetching images for scene ID: {db_scene.id}, Type: 'scene'")
     images = await crud_generated_image.get_images_for_element(
         db, element_type="scene", element_id=db_scene.id
     )
     logger.info(f"API: Found {len(images)} images for scene ID: {db_scene.id}")
-    return images
+    return ApiResponse.success_response(data=[GeneratedImageRead.model_validate(image) for image in images])
 
 @router_scenes.post("/{scene_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_scene(
     db_scene: Scene = Depends(get_scene_and_verify_ownership),
     image_id: int = Path(..., description="The ID of the GeneratedImage to set as current."),
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle POST /{scene_id}/set-current-image/{image_id}."""
     image_to_set = await crud_generated_image.get_image(db, image_id=image_id)
     if not image_to_set or image_to_set.element_type != 'scene' or image_to_set.associated_element_id != db_scene.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found or does not belong to this scene.")
@@ -176,4 +188,5 @@ async def set_current_image_for_scene(
     await db.commit()
     await db.refresh(db_scene)
     
-    return db_scene
+    return ApiResponse.success_response(data=SceneRead.model_validate(db_scene))
+

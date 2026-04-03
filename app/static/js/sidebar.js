@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/sidebar.js
+// /story_app/app/static/js/sidebar.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');

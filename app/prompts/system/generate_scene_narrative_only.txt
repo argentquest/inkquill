@@ -46,8 +46,8 @@ Accurately use character names, maintain their personalities, and reference key 
    **C. LORE ITEMS LINKED TO THIS STORY:**
    {{$linked_lore_items_context}}
 
-   **D. RETRIEVED BACKGROUND INFO (FROM DOCUMENTS):**
-   {{$rag_context_for_scene}}
+   **D. BACKGROUND INFO FROM UPLOADED DOCUMENTS:**
+   {{$document_context_for_scene}}
 
 **STYLE CONSISTENCY REQUIREMENTS:**
 - If a Scene-Specific System Prompt is provided above, follow its style, tone, and voice instructions precisely.

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/character_form_handler.js
+// /story_app/app/static/js/character_form_handler.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const characterFormErrorMessage = document.getElementById('character-form-error-message');
     const saveCharacterButton = document.getElementById('save-character-button');
     
-    const generatedRagContentDisplay = document.getElementById('generated-rag-content-display');
-    const characterIdForRag = characterForm ? characterForm.dataset.characterId : null;
+    const generatedContextDisplay = document.getElementById('generated-context-display');
+    const characterIdForContext = characterForm ? characterForm.dataset.characterId : null;
     const isEditMode = characterForm ? characterForm.dataset.pageAction === "Edit" : false;
     const worldId = characterForm ? characterForm.dataset.worldId : null;
     
@@ -90,19 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function fetchAndDisplayGeneratedRagContent(elementId, displayElement, apiUrl) {
+    async function fetchAndDisplayGeneratedContext(elementId, displayElement, apiUrl) {
         if (!displayElement) return;
         if (!elementId) {
-            displayElement.textContent = "N/A (Save character first to generate RAG content)";
+            displayElement.textContent = "N/A (Save character first to generate context)";
             return;
         }
-        displayElement.textContent = "Loading AI-generated RAG context...";
+        displayElement.textContent = "Loading AI-generated context...";
 
         try {
             const response = await fetch(apiUrl, { credentials: 'include' });
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                displayElement.textContent = errData.error || `Failed to load RAG context: ${response.statusText}`;
+                displayElement.textContent = errData.error || `Failed to load context: ${response.statusText}`;
                 return;
             }
             const data = await response.json();
@@ -111,20 +111,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.content !== null && data.content !== undefined) {
                 displayElement.textContent = data.content;
             } else {
-                displayElement.textContent = "No AI-generated RAG context found for this character.";
+                displayElement.textContent = "No AI-generated context found for this character.";
             }
         } catch (error) {
-            console.error("Network error fetching RAG content:", error);
-            displayElement.textContent = "Failed to load RAG content due to a network error.";
+            console.error("Network error fetching generated context:", error);
+            displayElement.textContent = "Failed to load context due to a network error.";
         }
     }
 
     if (characterForm && saveCharacterButton) {
-        if (isEditMode && characterIdForRag && generatedRagContentDisplay) {
-            const apiUrl = `${API_BASE_URL}/characters/${characterIdForRag}/generated-rag-content`;
-            fetchAndDisplayGeneratedRagContent(characterIdForRag, generatedRagContentDisplay, apiUrl);
-        } else if (generatedRagContentDisplay && !isEditMode) {
-            generatedRagContentDisplay.textContent = "AI-generated RAG context will appear here after the character is first saved.";
+        if (isEditMode && characterIdForContext && generatedContextDisplay) {
+            const apiUrl = `${API_BASE_URL}/characters/${characterIdForContext}/generated-context`;
+            fetchAndDisplayGeneratedContext(characterIdForContext, generatedContextDisplay, apiUrl);
+        } else if (generatedContextDisplay && !isEditMode) {
+            generatedContextDisplay.textContent = "AI-generated context will appear here after the character is first saved.";
         }
         
         loadLocationsForDropdown();
@@ -226,3 +226,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Character form elements not found. Handler not attached.");
     }
 });
+

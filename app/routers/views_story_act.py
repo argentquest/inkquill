@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_story_act.py
+"""API routes for views story act."""
+
+# /story_app/app/routers/views_story_act.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -11,8 +13,8 @@ from typing import Optional, List, Dict, Any
 from app.core.deps import get_db_session, get_current_active_user
 from app.core import security as core_security 
 from app.crud import user as crud_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
+from app.core.storage_deps import LocalStorageClient
 from app.models.user import User
 from app.models.story import Story
 from app.models.act import Act
@@ -80,12 +82,12 @@ async def get_optional_current_user_for_story_views(
         return None
     logger.debug(f"User '{user.username}' successfully retrieved for story views.")
     return user
-async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_path: Optional[str]) -> Optional[str]:
+async def _check_and_get_image_url(blob_service_client: LocalStorageClient, blob_path: Optional[str]) -> Optional[str]:
+    """Provide internal router support for check and get image url."""
     if not blob_path:
         return None
     try:
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_path)
+        blob_client = blob_service_client.get_blob_client(container="generated-images", blob=blob_path)
         if await blob_client.exists():
             return blob_client.url
     except Exception as e:
@@ -98,8 +100,9 @@ async def list_stories_ui(
     request: Request,
     db: AsyncSession = Depends(get_db_session),
     current_user: Optional[User] = Depends(get_optional_current_user_for_story_views),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /stories."""
     if current_user:
         logger.info(f"User {current_user.username} accessing their stories list.")
         stories_db = await crud_story.get_stories_by_user(db, user_id=current_user.id)
@@ -160,6 +163,7 @@ async def create_story_ui_form_generic(
     current_user: Optional[User] = Depends(get_optional_current_user_for_story_views)
 ):
     # Redirect anonymous users to register page
+    """Handle GET /stories/new."""
     if current_user is None:
         register_url = str(request.url_for('ui_register_form'))
         return RedirectResponse(url=register_url, status_code=status.HTTP_302_FOUND)
@@ -289,6 +293,7 @@ async def create_story_for_world_ui_form(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /worlds/{world_id}/stories/new."""
     logger.info(f"User {current_user.username} accessing create new story form FOR world ID: {world_id}")
     db_world = await crud_world.get_world_for_user(db, world_id=world_id, user_id=current_user.id)
     if not db_world:
@@ -311,8 +316,9 @@ async def story_detail_ui(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /stories/{story_id}."""
     logger.info(f"User {current_user.username} viewing details for story ID: {story_id}")
     story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not story:
@@ -411,8 +417,9 @@ async def edit_story_ui_form(
     story_id: int,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
+    """Handle GET /stories/{story_id}/edit."""
     logger.info(f"User {current_user.username} accessing edit form for story ID: {story_id}")
     story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not story:
@@ -539,6 +546,7 @@ async def create_act_ui_form(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /stories/{story_id}/acts/new."""
     story_check = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not story_check:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Story not found or not accessible to create an act for.")
@@ -568,6 +576,7 @@ async def edit_act_ui_form(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /acts/{act_id}/edit."""
     act = await crud_act.get_act(db, act_id=act_id) 
     if not act:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Act not found")
@@ -601,6 +610,7 @@ async def act_editor_ui(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /stories/{story_id}/acts/{act_id}/edit-content."""
     story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not story:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Story not found or not accessible.")
@@ -652,6 +662,7 @@ async def act_ai_review_ui(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /stories/{story_id}/acts/{act_id}/ai-review."""
     logger.info(f"User '{current_user.username}' accessing AI Review page for Story ID: {story_id}, Act ID: {act_id}")
 
     story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
@@ -687,6 +698,7 @@ async def create_scene_ui_form(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /stories/{story_id}/acts/{act_id}/scenes/new."""
     story = await crud_story.get_story_for_user(db, story_id=story_id, user_id=current_user.id)
     if not story:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Story not found or not accessible.")
@@ -721,6 +733,7 @@ async def edit_scene_ui_form(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /scenes/{scene_id}/edit."""
     logger.info(f"User {current_user.username} accessing edit form for Scene ID: {scene_id}")
 
     scene = await crud_scene.get_scene(db, scene_id=scene_id)
@@ -759,3 +772,4 @@ async def edit_scene_ui_form(
             "suggested_scene_number": scene.scene_number 
         }
     )
+

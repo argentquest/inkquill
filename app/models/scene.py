@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/scene.py
+"""SQLAlchemy models for scene."""
+
+# /story_app/app/models/scene.py
 
 from sqlalchemy import (
     Column, Integer, String, Text, ForeignKey, DateTime, UniqueConstraint
@@ -93,11 +95,10 @@ class Scene(Base):
     def image_url(self) -> Optional[str]:
         """Return the image URL for this scene if it has a current image."""
         if self.current_image and self.current_image.blob_path:
-            from app.core.config import settings
-            if settings.AZURE_STORAGE_ACCOUNT_NAME:
-                container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-                return f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{self.current_image.blob_path}"
+            from app.core.storage_deps import build_storage_url
+            return build_storage_url("generated-images", self.current_image.blob_path)
         return None
 
     def __repr__(self):
         return f"<Scene(id={self.id}, title='{self.title}', act_id={self.act_id}, scene_number={self.scene_number})>"
+

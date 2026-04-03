@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/world_chat_service.py
+"""Service helpers for world chat service."""
+
+# /story_app/app/services/world_chat_service.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, Any, Optional, Tuple
@@ -7,9 +9,9 @@ from datetime import datetime
 import json
 
 # Core imports
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, build_storage_url
 from app.services.world_context_loader import WorldContextLoader
-from app.services.rag_retrieval import RetrievalPlugin
+from app.services.direct_context import build_document_context, build_structured_world_context
 from app.services.cost_tracker_service import CostTrackerService
 from app.services.ai_client_factory import AIClientFactory
 from app.services.temperature_optimizer import TemperatureOptimizer, TaskType
@@ -19,7 +21,6 @@ from app.crud import chat_session as chat_session_crud
 from app.crud import chat_message as chat_message_crud
 from app.crud import ai_model_config as ai_model_crud
 from app.services.ai_model_cache import model_cache
-from app.crud import document as crud_document
 from app.schemas.chat import (
     ChatSessionCreate, 
     SendMessageRequest, 
@@ -38,11 +39,10 @@ logger = logging.getLogger(__name__)
 class WorldChatService:
     """Service for handling chat interactions with world context"""
     
-    def __init__(self, db: AsyncSession, blob_service_client: Optional[BlobServiceClient] = None):
+    def __init__(self, db: AsyncSession, blob_service_client: Optional[LocalStorageClient] = None):
         self.db = db
         self.blob_service_client = blob_service_client
         self.context_loader = WorldContextLoader(db, blob_service_client)
-        self.rag_service = RetrievalPlugin()
         self.cost_tracker = CostTrackerService(db)
         # Use the global kernel from semantic_kernel_setup
     
@@ -115,9 +115,16 @@ class WorldChatService:
                         self.db, hardcoded_model_id
                     )
                     if not ai_model_config:
-                        logger.error(f"HARDCODED model GPT-4.1 Mini (ID {hardcoded_model_id}) not found for public chat")
-                        raise ValueError(f"Required model (ID {hardcoded_model_id}) not available for public chat")
-                    logger.info(f"Using HARDCODED GPT-4.1 Mini (model ID {hardcoded_model_id}) from database for public chat")
+                        logger.warning(
+                            "HARDCODED public chat model ID %s not found; falling back to default model",
+                            hardcoded_model_id,
+                        )
+                        ai_model_config = await ai_model_crud.get_default_model_config(self.db)
+                    else:
+                        logger.info(
+                            "Using HARDCODED GPT-4.1 Mini (model ID %s) from database for public chat",
+                            hardcoded_model_id,
+                        )
             elif request.ai_model_config_id:
                 ai_model_config = await ai_model_crud.get_model_config_by_id(
                     self.db, request.ai_model_config_id
@@ -193,10 +200,9 @@ class WorldChatService:
         world_id: int,
         public_chat: bool = False
     ) -> Tuple[str, Optional[int], Dict[str, Any], Dict[str, Any]]:
-        """Generate AI response using Semantic Kernel and RAG"""
+        """Generate AI response using direct structured context."""
         try:
-            # Get RAG context and sources
-            rag_context, rag_sources = await self._get_rag_context(
+            document_context, context_sources = await self._get_document_context(
                 user_message, world_context, element_type, element_id
             )
             
@@ -221,8 +227,8 @@ class WorldChatService:
             full_context = {
                 "user_message": user_message,
                 "world_summary": world_summary,
-                "rag_context": rag_context,
-                "rag_sources": rag_sources,  # Include source attribution
+                "document_context": document_context,
+                "context_sources": context_sources,
                 "conversation_history": conversation_context,
                 "element_context": element_context,
                 "timestamp": datetime.utcnow().isoformat()
@@ -231,13 +237,13 @@ class WorldChatService:
             # Debug: Log context sizes
             logger.info(f"[AI GENERATION DEBUG] Context sizes:")
             logger.info(f"[AI GENERATION DEBUG]   - World summary: {len(world_summary)} chars")
-            logger.info(f"[AI GENERATION DEBUG]   - RAG context: {len(rag_context)} chars")
+            logger.info(f"[AI GENERATION DEBUG]   - Document context: {len(document_context)} chars")
             logger.info(f"[AI GENERATION DEBUG]   - Conversation history: {len(conversation_context)} chars")
             logger.info(f"[AI GENERATION DEBUG]   - Element context: {len(element_context)} chars")
             
             # Build system prompt
             system_prompt = self._build_system_prompt(
-                world_summary, rag_context, element_context
+                world_summary, document_context, element_context
             )
             
             logger.info(f"[AI GENERATION DEBUG] System prompt length: {len(system_prompt)} chars")
@@ -266,7 +272,7 @@ class WorldChatService:
                 start_time = time.perf_counter()
                 
                 # Use the model configuration from database with provider-aware name resolution
-                model_name = AIClientFactory.resolve_model_name(ai_model_config) if ai_model_config else settings.AZURE_OPENAI_CHAT_DEPLOYMENT_NAME_DEFAULT
+                model_name = AIClientFactory.resolve_model_name(ai_model_config) if ai_model_config else settings.DEFAULT_GENERATION_MODEL_NAME
                 max_tokens = ai_model_config.max_tokens if ai_model_config else 1000
                 base_temperature = ai_model_config.temperature if ai_model_config else 0.7
                 
@@ -363,16 +369,15 @@ class WorldChatService:
             logger.error(f"Error generating AI response: {str(e)}")
             raise
     
-    async def _get_rag_context(
+    async def _get_document_context(
         self, 
         user_message: str, 
         world_context: Any, 
         element_type: Optional[str], 
         element_id: Optional[int]
     ) -> Tuple[str, List[Dict[str, Any]]]:
-        """Get relevant context from RAG system"""
+        """Build relevant context directly from uploaded documents."""
         try:
-            # Build search query
             search_query = user_message
             if element_type and element_id:
                 element_data = await self.context_loader.get_element_by_id(
@@ -380,136 +385,21 @@ class WorldChatService:
                 )
                 if element_data:
                     search_query += f" {element_data.get('name', '')} {element_data.get('title', '')}"
-            
-            # Debug: Log search parameters
-            logger.info(f"[RAG DEBUG] Starting RAG search:")
-            logger.info(f"[RAG DEBUG] - Query: '{search_query[:100]}...'")
-            logger.info(f"[RAG DEBUG] - World ID: {world_context.world['id']}")
-            logger.info(f"[RAG DEBUG] - User ID: {world_context.world['user_id']}")
-            logger.info(f"[RAG DEBUG] - Element Type/ID: {element_type}/{element_id}")
-            logger.info(f"[RAG DEBUG] - Top K: {settings.RAG_CHAT_TOP_K}")
-            logger.info(f"[RAG DEBUG] - Min Relevance Score: 0.01")
-            logger.info(f"[RAG DEBUG] - Max Total Tokens: 3000")
-            
-            # Retrieve relevant documents with enhanced settings
-            rag_results = await self.rag_service.retrieve_rag_context(
-                query=search_query,
-                user_id=world_context.world["user_id"],
-                top_k=settings.RAG_CHAT_TOP_K,
-                user_id_filter=str(world_context.world["user_id"]),
-                world_id_filter=str(world_context.world["id"]),
-                min_relevance_score=0.01,  # Lower threshold to allow more results (vector scores are often low)
-                max_total_tokens=3000      # Reasonable limit for chat context
+
+            context_text, sources = await build_document_context(
+                self.db,
+                world_context.world["id"],
+                search_query,
+                max_documents=3,
+                max_chars_per_document=1200,
             )
-            
-            # Debug: Log search results
-            logger.info(f"[RAG DEBUG] Retrieved {len(rag_results) if rag_results else 0} documents")
-            
-            if rag_results and len(rag_results) > 0:
-                context_texts = []
-                source_info = []
-                
-                for i, result in enumerate(rag_results):
-                    # Debug: Log each result
-                    logger.info(f"[RAG DEBUG] Result {i+1}:")
-                    logger.info(f"[RAG DEBUG]   - Source: {result.get('source_filename', 'Unknown')}")
-                    logger.info(f"[RAG DEBUG]   - Document ID: {result.get('document_id', 'N/A')}")
-                    logger.info(f"[RAG DEBUG]   - Score: {result.get('score', 0.0):.4f}")
-                    logger.info(f"[RAG DEBUG]   - Tokens: {result.get('token_count', 0)}")
-                    logger.info(f"[RAG DEBUG]   - Preview: '{result.get('text', '')[:100]}...'")
-                    
-                    context_texts.append(f"- {result.get('text', '')[:500]}...")
-                    
-                    # Store source information for attribution
-                    source_filename = result.get('source_filename', 'Unknown Source')
-                    document_id = result.get('document_id', 'N/A')
-                    
-                    # Determine source type and generate appropriate link
-                    source_link = None
-                    source_type = 'document'
-                    
-                    if '_rag_gen.txt' in source_filename:
-                        # This is a RAG-generated file from a world element
-                        # Find the corresponding document record in the database
-                        try:
-                            # Query for the document with this source filename
-                            from app.models.uploaded_document import UploadedDocument
-                            from sqlalchemy import select
-                            db_result = await self.db.execute(
-                                select(UploadedDocument).where(
-                                    UploadedDocument.filename == source_filename
-                                )
-                            )
-                            rag_document = db_result.scalar_one_or_none()
-                            
-                            if rag_document and rag_document.blob_storage_path:
-                                # Create direct Azure Blob Storage URL for the RAG document
-                                if settings.AZURE_STORAGE_ACCOUNT_NAME:
-                                    container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS
-                                    source_link = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{rag_document.blob_storage_path}"
-                                else:
-                                    # Fallback to download endpoint
-                                    source_link = f"/api/v1/documents/download/{rag_document.id}"
-                                
-                                # Determine element type from filename
-                                if source_filename.startswith('character_'):
-                                    source_type = 'character'
-                                elif source_filename.startswith('location_'):
-                                    source_type = 'location'
-                                elif source_filename.startswith('lore_'):
-                                    source_type = 'lore'
-                                else:
-                                    source_type = 'element'
-                            else:
-                                logger.warning(f"Could not find RAG document record for filename: {source_filename}")
-                                source_type = 'element'
-                                # No link if we can't find the document
-                        except Exception as e:
-                            logger.warning(f"Error querying RAG document for {source_filename}: {e}")
-                            source_type = 'element'
-                            # No link if query fails
-                    else:
-                        # This is an uploaded document - create direct blob URL
-                        source_type = 'document'
-                        if document_id and document_id != 'N/A' and str(document_id).isdigit():
-                            try:
-                                # Query the database to get the blob_storage_path
-                                document_record = await crud_document.get_document_record(self.db, int(document_id))
-                                if document_record and document_record.blob_storage_path:
-                                    # Create direct Azure Blob Storage URL
-                                    if settings.AZURE_STORAGE_ACCOUNT_NAME:
-                                        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS
-                                        source_link = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{document_record.blob_storage_path}"
-                                    else:
-                                        # Fallback to download endpoint
-                                        source_link = f"/api/v1/documents/download/{document_id}"
-                                else:
-                                    # Fallback to download endpoint if document not found
-                                    source_link = f"/api/v1/documents/download/{document_id}"
-                            except Exception as e:
-                                logger.warning(f"Could not get blob path for document {document_id}: {e}")
-                                # Fallback to download endpoint
-                                source_link = f"/api/v1/documents/download/{document_id}"
-                    
-                    source_info.append({
-                        "filename": source_filename,
-                        "document_id": document_id,
-                        "score": result.get('score', 0.0),
-                        "preview": result.get('text', '')[:100] + "...",
-                        "link": source_link,
-                        "type": source_type
-                    })
-                
-                final_context = "\n".join(context_texts)
-                logger.info(f"[RAG DEBUG] Final context length: {len(final_context)} characters")
-                return final_context, source_info
-            
-            logger.info("[RAG DEBUG] No relevant documents found")
-            return "No specific RAG context found.", []
+
+            logger.info("[DIRECT CONTEXT] Prepared %s document sources", len(sources))
+            return context_text, sources
             
         except Exception as e:
-            logger.error(f"[RAG DEBUG] Error retrieving RAG context: {str(e)}", exc_info=True)
-            return "RAG context unavailable.", []
+            logger.error("[DIRECT CONTEXT] Error building document context: %s", str(e), exc_info=True)
+            return "Document context unavailable.", []
     
     def _build_conversation_context(
         self, 
@@ -528,31 +418,12 @@ class WorldChatService:
         return "\n".join(context_parts)
     
     def _build_world_summary(self, world_context: Any) -> str:
-        """Build a comprehensive world summary"""
-        world = world_context.world
-        
-        summary_parts = [
-            f"WORLD: {world.get('name', 'Unknown')}",
-            f"Description: {world.get('description', 'No description')}",
-        ]
-        
-        # Add counts
-        summary_parts.extend([
-            f"\nWORLD ELEMENTS:",
-            f"- {len(world_context.characters)} Characters",
-            f"- {len(world_context.locations)} Locations", 
-            f"- {len(world_context.lore_items)} Lore Items",
-            f"- {len(world_context.stories)} Stories",
-            f"- {len(world_context.acts)} Acts",
-            f"- {len(world_context.scenes)} Scenes"
-        ])
-        
-        return "\n".join(summary_parts)
+        return build_structured_world_context(world_context)
     
     def _build_system_prompt(
         self, 
         world_summary: str, 
-        rag_context: str, 
+        document_context: str, 
         element_context: str
     ) -> str:
         """Build the system prompt for the AI"""
@@ -561,8 +432,8 @@ class WorldChatService:
 WORLD CONTEXT:
 {world_summary}
 
-RELEVANT CONTEXT:
-{rag_context}
+UPLOADED DOCUMENT CONTEXT:
+{document_context}
 {element_context}
 
 INSTRUCTIONS:
@@ -602,3 +473,4 @@ Remember: You can suggest new characters, locations, lore items, or story develo
         except Exception as e:
             logger.error(f"Error registering world chat plugin: {str(e)}")
             raise
+

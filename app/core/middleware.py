@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/middleware.py
+"""Core application helpers for middleware."""
+
+# /story_app/app/core/middleware.py
 import uuid
 import time
 import json
@@ -22,6 +24,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class LoggingContextMiddleware(BaseHTTPMiddleware):
+    """Class for logging context middleware."""
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]] # <<< MODIFIED type hint for call_next
     ) -> Response:

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/world_importer_from_doc_handler.js
+// /story_app/app/static/js/world_importer_from_doc_handler.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {

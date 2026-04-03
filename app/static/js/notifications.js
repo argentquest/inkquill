@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/notifications.js
+// /story_app/app/static/js/notifications.js
 
 /**
  * notifications.js
@@ -73,3 +73,4 @@ function showToast(message, type = 'info', delay = 5000) {
         console.error(`Failed to find toast element with ID ${toastId} after insertion.`);
     }
 }
+

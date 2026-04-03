@@ -28,7 +28,7 @@ async def scan_and_clean_database():
             port=int(os.getenv('DATABASE_PORT', 5432)),
             user=os.getenv('DATABASE_USER', 'postgres'),
             password=os.getenv('DATABASE_PASSWORD', ''),
-            database=os.getenv('DATABASE_NAME', 'ai_rag_story_app')
+            database=os.getenv('DATABASE_NAME', 'story_app')
         )
         
         logger.info("Connected to database successfully")

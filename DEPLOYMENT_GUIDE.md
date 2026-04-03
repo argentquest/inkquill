@@ -1,6 +1,6 @@
-# Deployment Guide for RAG Story Application
+# Deployment Guide for Context Story Application
 
-This guide provides instructions for deploying the RAG Story Application to Azure App Service using various methods.
+This guide provides instructions for deploying the Context Story Application to Azure App Service using various methods.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -162,7 +162,7 @@ AZURE_TENANT_ID=your-tenant-id
 AZURE_CLIENT_ID=your-client-id
 AZURE_CLIENT_SECRET=your-client-secret
 AZURE_KEY_VAULT_URL=https://your-vault.vault.azure.net/
-AZURE_STORAGE_ACCOUNT_NAME=yourstorageaccount
+AZURE_STOContextE_ACCOUNT_NAME=yourstorageaccount
 AZURE_SEARCH_ENDPOINT=https://your-search.search.windows.net
 
 # OpenAI

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/chat.py
+"""Pydantic schemas for chat."""
+
+# /story_app/app/schemas/chat.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -56,16 +58,16 @@ class ChatMessageRead(ChatMessageBase):
     full_context: Optional[Dict[str, Any]]
     cost_log_id: Optional[int]
     created_at: datetime
-    rag_sources: Optional[List[Dict[str, Any]]] = Field(None, description="RAG sources used for this response")
+    context_sources: Optional[List[Dict[str, Any]]] = Field(None, description="Context sources used for this response")
     
     class Config:
         from_attributes = True
     
     @property
     def sources(self) -> List[Dict[str, Any]]:
-        """Extract RAG sources from full_context if available"""
-        if self.full_context and 'rag_sources' in self.full_context:
-            return self.full_context['rag_sources']
+        """Extract context sources from full_context if available."""
+        if self.full_context and 'context_sources' in self.full_context:
+            return self.full_context['context_sources']
         return []
 
 
@@ -118,3 +120,4 @@ class ChatSessionListResponse(BaseModel):
     """Response schema for listing chat sessions"""
     sessions: List[ChatSessionRead]
     total: int
+

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/world_chat_session_manager.js
+// /story_app/app/static/js/world_chat_session_manager.js
 "use strict";
 
 const WorldChatSessionManager = (() => {

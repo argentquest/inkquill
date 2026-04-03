@@ -93,7 +93,9 @@ async def get_world_builder_questions(
             for q in questions
         ]
         
-        return WorldBuilderQuestionsResponse(questions=question_objects)
+        return ApiResponse.success_response(
+            data=WorldBuilderQuestionsResponse(questions=question_objects)
+        )
         
     except Exception as e:
         logger.error(f"Failed to get world builder questions: {e}")
@@ -123,12 +125,12 @@ async def get_world_builder_question(
             detail=f"Question {question_id} not found"
         )
     
-    return WorldBuilderQuestion(
+    return ApiResponse.success_response(data=WorldBuilderQuestion(
         id=question["id"],
         short_label=question["short_label"],
         full_question=question["full_question"],
         answers=question["answers"]
-    )
+    ))
 
 
 @router.post(
@@ -144,11 +146,11 @@ async def validate_world_builder_answers(
     """
     is_valid, errors = world_builder_service.validate_answers(request.answers)
     
-    return {
+    return ApiResponse.success_response(data={
         "valid": is_valid,
         "errors": errors,
         "answer_count": len(request.answers)
-    }
+    })
 
 
 @router.post(
@@ -183,12 +185,12 @@ async def generate_world_description(
         # Get answer summary for preview
         answer_summary = world_builder_service.get_answer_summary(request.answers)
         
-        return WorldBuilderGenerationResponse(
+        return ApiResponse.success_response(data=WorldBuilderGenerationResponse(
             short_description=generated_content["short_description"],
             description=generated_content["description"],
             visual_prompt=generated_content["visual_prompt"],
             answer_summary=answer_summary
-        )
+        ))
         
     except HTTPException:
         raise
@@ -239,8 +241,8 @@ async def create_world_from_builder(
         )
         
         # Convert to response format
-        world_response = WorldRead.from_orm(world)
-        return world_response
+        world_response = WorldRead.model_validate(world, from_attributes=True)
+        return ApiResponse.success_response(data=world_response)
         
     except HTTPException:
         raise
@@ -306,8 +308,8 @@ async def update_world_from_builder(
         )
         
         # Convert to response format
-        world_response = WorldRead.from_orm(updated_world)
-        return world_response
+        world_response = WorldRead.model_validate(updated_world, from_attributes=True)
+        return ApiResponse.success_response(data=world_response)
         
     except HTTPException:
         raise

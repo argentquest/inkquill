@@ -1,4 +1,4 @@
-# /ai_rag_story_app/app/services/sk_constants.py
+# /story_app/app/services/sk_constants.py
 
 """
 This module defines constants for Semantic Kernel plugin names used throughout the application.
@@ -21,7 +21,5 @@ WORLD_BUILDING_PLUGIN_NAME: str = "WorldBuildingPlugin"
 # Plugin name for functions that generate entire world structures (e.g., from a book title).
 WORLD_GENERATION_PLUGIN_NAME: str = "WorldGenerationPlugin"
 
-# Plugin name for the native RAG retrieval plugin.
-RETRIEVAL_PLUGIN_NAME: str = "Retrieval"
-
 # You can add more constants here if other plugin types emerge.
+

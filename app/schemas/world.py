@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/world.py
+"""Pydantic schemas for world."""
+
+# /story_app/app/schemas/world.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any

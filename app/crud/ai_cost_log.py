@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/ai_cost_log.py
+"""Database CRUD helpers for ai cost log."""
+
+# /story_app/app/crud/ai_cost_log.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
 from app.models.ai_cost_log import AICallLog

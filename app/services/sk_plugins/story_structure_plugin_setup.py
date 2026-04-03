@@ -1,6 +1,8 @@
+"""Service helpers for story structure plugin setup."""
+
 # app/services/sk_plugins/story_structure_plugin_setup.py
 import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 from semantic_kernel.prompt_template.input_variable import InputVariable
 import logging
@@ -13,13 +15,14 @@ logger = logging.getLogger(__name__)
 # Plugin Name Constant is now imported.
 
 def register_story_structure_functions(kernel_instance: sk.Kernel, chat_service_id: str, prompt_loader: callable):
+    """Provide service support for register story structure functions."""
     logger.info(f"SK_PLUGIN_SETUP ({STORY_STRUCTURE_PLUGIN_NAME}): Registering functions...")
 
     # Function: ExtractScenesFromAct
     try:
         scene_extraction_prompt_text = prompt_loader("scene_extraction.txt")
         
-        scene_extraction_exec_settings = AzureChatPromptExecutionSettings(
+        scene_extraction_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.SCENE_EXTRACTION_MAX_TOKENS, 
             temperature=settings.SCENE_EXTRACTION_TEMPERATURE, 
@@ -52,7 +55,7 @@ def register_story_structure_functions(kernel_instance: sk.Kernel, chat_service_
         story_generation_prompt_text = prompt_loader("story_generation.txt")
         logger.info(f"SK_PLUGIN_SETUP ({STORY_STRUCTURE_PLUGIN_NAME}): Loaded prompt text (length: {len(story_generation_prompt_text)})")
         
-        story_generation_exec_settings = AzureChatPromptExecutionSettings(
+        story_generation_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.STORY_GENERATION_MAX_TOKENS, 
             temperature=settings.STORY_GENERATION_TEMPERATURE, 

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/scene.py
+"""Pydantic schemas for scene."""
+
+# /story_app/app/schemas/scene.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -96,3 +98,4 @@ class SceneRead(SceneBase):
         # Enables compatibility with ORM models (SQLAlchemy).
         # Allows Pydantic to automatically map data from ORM object attributes.
         from_attributes = True # Replaces orm_mode = True in Pydantic v1
+

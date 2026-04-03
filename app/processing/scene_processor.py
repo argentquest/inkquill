@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/processing/scene_processor.py
+"""Background processing helpers for scene processor."""
+
+# /story_app/app/processing/scene_processor.py
 
 import asyncio # Not strictly used in this version but often useful in processing tasks
 import json

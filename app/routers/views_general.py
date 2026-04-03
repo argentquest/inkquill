@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_general.py
+"""API routes for views general."""
+
+# /story_app/app/routers/views_general.py
 
 from fastapi import APIRouter, Request, Depends, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -40,6 +42,7 @@ async def home_page(
     current_user: Optional[User] = Depends(get_current_user_with_anonymous_support),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle GET /."""
     logger.info(f"Serving home page. User: {current_user.username if current_user else 'Anonymous'}")
     
     # Get latest news articles
@@ -450,6 +453,7 @@ async def login_form(
     db: AsyncSession = Depends(get_db_session),
     user: Optional[User] = Depends(get_current_user_with_anonymous_support)
 ): 
+    """Handle GET /login."""
     if user:
         logger.info(f"User {user.username} already logged in, redirecting to stories from login page.")
         try:
@@ -463,16 +467,19 @@ async def login_form(
 
 @router.get("/register", response_class=HTMLResponse, name="ui_register_form") 
 async def register_form(request: Request, next: Optional[str] = Query(None)):
+    """Handle GET /register."""
     logger.info("Serving registration page.")
     return templates.TemplateResponse("pages/register.html", {"request": request, "next_step": next})
 
 @router.get("/forgot-password", response_class=HTMLResponse, name="ui_forgot_password_form") 
 async def forgot_password_form(request: Request):
+    """Handle GET /forgot-password."""
     logger.info("Serving forgot password page.")
     return templates.TemplateResponse("pages/forgot_password.html", {"request": request})
 
 @router.get("/reset-password", response_class=HTMLResponse, name="ui_reset_password_form") 
 async def reset_password_form(request: Request, token: str = Query(...)):
+    """Handle GET /reset-password."""
     logger.info(f"Serving reset password page for token: {token[:8]}...")
     return templates.TemplateResponse("pages/reset_password.html", {"request": request, "token": token})
 
@@ -481,6 +488,7 @@ async def user_guide_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_with_anonymous_support)
 ):
+    """Handle GET /user-guide."""
     logger.info(f"User '{current_user.username if current_user else 'Anonymous'}' accessing user guide - redirecting to help popup.")
     
     # Return a page that automatically opens the help popup with the introduction topic
@@ -498,6 +506,7 @@ async def terms_of_service_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_with_anonymous_support)
 ):
+    """Handle GET /terms-of-service."""
     logger.info(f"User '{current_user.username if current_user else 'Anonymous'}' accessing terms of service.")
     return templates.TemplateResponse(
         "pages/terms_of_service.html",
@@ -825,6 +834,7 @@ async def edit_user_page(
 # --- FIX: Moved logout endpoint here from auth.py ---
 @router.post("/logout", name="logout", summary="Logout user by clearing the access token cookie.")
 async def logout(request: Request): 
+    """Handle POST /logout."""
     logger.info("User logging out via UI router.")
     try: 
         home_url = str(request.url_for('ui_home')) + "?logged_out=true"

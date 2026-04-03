@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/oauth_service.py
+"""Service helpers for oauth service."""
+
+# /story_app/app/services/oauth_service.py
 
 import logging
 from typing import Optional, Dict, Any

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/lore_item_form_handler.js
+// /story_app/app/static/js/lore_item_form_handler.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loreItemFormErrorMessage = document.getElementById('lore-item-form-error-message');
     const saveLoreItemButton = document.getElementById('save-lore-item-button');
 
-    const generatedRagContentDisplay = document.getElementById('generated-rag-content-display-lore');
+    const generatedContextDisplay = document.getElementById('generated-context-display-lore');
     const loreItemId = loreItemForm ? loreItemForm.dataset.loreItemId : null;
     const isEditMode = !!loreItemId;
     const worldId = loreItemForm ? loreItemForm.dataset.worldId : null;
@@ -70,18 +70,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function fetchAndDisplayGeneratedRagContent(elementId, displayElement, apiUrl) {
+    async function fetchAndDisplayGeneratedContext(elementId, displayElement, apiUrl) {
         if (!displayElement) return;
         if (!elementId) {
-            displayElement.textContent = "N/A (Save lore item first to generate RAG content)";
+            displayElement.textContent = "N/A (Save lore item first to generate context)";
             return;
         }
-        displayElement.textContent = "Loading AI-generated RAG context...";
+        displayElement.textContent = "Loading AI-generated context...";
         try {
             const response = await fetch(apiUrl, { credentials: 'include' });
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                displayElement.textContent = errData.error || `Failed to load RAG content: ${response.statusText}`;
+                displayElement.textContent = errData.error || `Failed to load context: ${response.statusText}`;
                 return;
             }
             const data = await response.json();
@@ -90,20 +90,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.content !== null && data.content !== undefined) {
                 displayElement.textContent = data.content;
             } else {
-                displayElement.textContent = "No AI-generated RAG context found for this lore item.";
+                displayElement.textContent = "No AI-generated context found for this lore item.";
             }
         } catch (error) {
-            console.error("Network error fetching RAG content for lore item:", error);
-            displayElement.textContent = "Failed to load RAG content due to a network error.";
+            console.error("Network error fetching generated context for lore item:", error);
+            displayElement.textContent = "Failed to load context due to a network error.";
         }
     }
 
     if (loreItemForm && saveLoreItemButton) {
-        if (isEditMode && generatedRagContentDisplay) {
-            const apiUrl = `${API_BASE_URL}/lore-items/${loreItemId}/generated-rag-content`;
-            fetchAndDisplayGeneratedRagContent(loreItemId, generatedRagContentDisplay, apiUrl);
-        } else if (generatedRagContentDisplay) {
-            generatedRagContentDisplay.textContent = "AI-generated RAG context will appear here after the lore item is first saved.";
+        if (isEditMode && generatedContextDisplay) {
+            const apiUrl = `${API_BASE_URL}/lore-items/${loreItemId}/generated-context`;
+            fetchAndDisplayGeneratedContext(loreItemId, generatedContextDisplay, apiUrl);
+        } else if (generatedContextDisplay) {
+            generatedContextDisplay.textContent = "AI-generated context will appear here after the lore item is first saved.";
         }
 
         loadLocationsForDropdown();
@@ -175,9 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast(`Lore Item ${isEditMode ? 'updated' : 'created'} successfully!`, "success");
                     if (!isEditMode && result.id) {
                         window.location.href = `/ui/worlds/lore-items/${result.id}/edit`;
-                    } else if (isEditMode && generatedRagContentDisplay) {
+                    } else if (isEditMode && generatedContextDisplay) {
                         setTimeout(() => {
-                           fetchAndDisplayGeneratedRagContent(result.id, generatedRagContentDisplay, `${API_BASE_URL}/lore-items/${result.id}/generated-rag-content`);
+                           fetchAndDisplayGeneratedContext(result.id, generatedContextDisplay, `${API_BASE_URL}/lore-items/${result.id}/generated-context`);
                         }, 2000);
                     }
                 } else {
@@ -209,3 +209,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Lore Item form elements not found. Handler not attached.");
     }
 });
+

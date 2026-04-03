@@ -1,6 +1,8 @@
+"""Service helpers for story analysis plugin setup."""
+
 # app/services/sk_plugins/story_analysis_plugin_setup.py
 import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 import logging
 
@@ -12,12 +14,13 @@ logger = logging.getLogger(__name__)
 # Plugin Name Constant is now imported, no local definition needed.
 
 def register_story_analysis_functions(kernel_instance: sk.Kernel, chat_service_id: str, prompt_loader: callable):
+    """Provide service support for register story analysis functions."""
     logger.info(f"SK_PLUGIN_SETUP ({STORY_ANALYSIS_PLUGIN_NAME}): Registering functions...")
 
     # Function: ReviewActContentEnhanced
     try:
         enhanced_act_review_prompt_text = prompt_loader("enhanced_act_review_prompt.txt")
-        act_review_exec_settings = AzureChatPromptExecutionSettings(
+        act_review_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["act_review"], 
             temperature=settings.AI_TEMPERATURE_SETTINGS["act_review"], 
@@ -36,7 +39,7 @@ def register_story_analysis_functions(kernel_instance: sk.Kernel, chat_service_i
     # Function: GenerateActMetadata
     try:
         act_metadata_generation_prompt_text = prompt_loader("generate_act_metadata.txt")
-        act_metadata_exec_settings = AzureChatPromptExecutionSettings(
+        act_metadata_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["act_metadata"], 
             temperature=settings.AI_TEMPERATURE_SETTINGS["act_metadata"], 
@@ -55,7 +58,7 @@ def register_story_analysis_functions(kernel_instance: sk.Kernel, chat_service_i
     # Function: GenerateSceneMetadata
     try:
         scene_metadata_generation_prompt_text = prompt_loader("generate_scene_metadata.txt")
-        scene_metadata_exec_settings = AzureChatPromptExecutionSettings(
+        scene_metadata_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["scene_metadata"], 
             temperature=settings.AI_TEMPERATURE_SETTINGS["scene_metadata"], 
@@ -74,7 +77,7 @@ def register_story_analysis_functions(kernel_instance: sk.Kernel, chat_service_i
     # Function: GenerateTextSummary
     try:
         text_summary_prompt_text = prompt_loader("generate_text_summary.txt")
-        text_summary_exec_settings = AzureChatPromptExecutionSettings(
+        text_summary_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS.get("text_summary", 300), 
             temperature=settings.AI_TEMPERATURE_SETTINGS.get("text_summary", 0.3), 

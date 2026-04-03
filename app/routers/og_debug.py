@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/og_debug.py
+"""API routes for og debug."""
+
+# /story_app/app/routers/og_debug.py
 
 from fastapi import APIRouter, Depends, Request, HTTPException
 from fastapi.responses import HTMLResponse

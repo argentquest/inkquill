@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/__init__.py
+"""Package exports for crud."""
+
+# /story_app/app/crud/__init__.py
 
 # This file marks the 'crud' directory as a Python package.
 # It allows you to import modules from this directory using dot notation

@@ -1,6 +1,8 @@
+"""Service helpers for storytelling plugin setup."""
+
 # app/services/sk_plugins/storytelling_plugin_setup.py
 import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 import logging
 
@@ -12,12 +14,13 @@ logger = logging.getLogger(__name__)
 # Plugin Name Constant is now imported.
 
 def register_storytelling_functions(kernel_instance: sk.Kernel, chat_service_id: str, prompt_loader: callable):
+    """Provide service support for register storytelling functions."""
     logger.info(f"SK_PLUGIN_SETUP ({STORYTELLING_PLUGIN_NAME}): Registering functions...")
 
     # Function: GenerateActNarrativeOnly
     try:
         act_narrative_only_prompt_text = prompt_loader("generate_act_narrative_only.txt")
-        act_narrative_exec_settings = AzureChatPromptExecutionSettings(
+        act_narrative_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["act_narrative"],
             temperature=settings.AI_TEMPERATURE_SETTINGS["act_narrative"], 
@@ -43,7 +46,7 @@ def register_storytelling_functions(kernel_instance: sk.Kernel, chat_service_id:
     # Function: GenerateSceneNarrativeOnly
     try:
         scene_narrative_only_prompt_text = prompt_loader("generate_scene_narrative_only.txt")
-        scene_narrative_exec_settings = AzureChatPromptExecutionSettings(
+        scene_narrative_exec_settings = OpenAIChatPromptExecutionSettings(
             service_id=chat_service_id, 
             max_tokens=settings.AI_MAX_TOKEN_SETTINGS["scene_narrative"],
             temperature=settings.AI_TEMPERATURE_SETTINGS["scene_narrative"], 

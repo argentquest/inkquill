@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/world.py
+"""Database CRUD helpers for world."""
+
+# /story_app/app/crud/world.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -12,6 +14,7 @@ from app.schemas.world import WorldCreate, WorldUpdate
 logger = logging.getLogger(__name__)
 
 async def create_world(db: AsyncSession, world_in: WorldCreate, user_id: int) -> World:
+    """Create world."""
     logger.info(f"User ID {user_id} creating new world: '{world_in.name}'")
     db_world = World(**world_in.model_dump(), user_id=user_id)
     db.add(db_world)
@@ -22,6 +25,7 @@ async def create_world(db: AsyncSession, world_in: WorldCreate, user_id: int) ->
     return db_world
 
 async def get_world(db: AsyncSession, world_id: int) -> Optional[World]:
+    """Return world."""
     logger.debug(f"Fetching world with ID: {world_id}")
     result = await db.execute(
         select(World).filter(World.id == world_id).options(selectinload(World.owner))
@@ -29,6 +33,7 @@ async def get_world(db: AsyncSession, world_id: int) -> Optional[World]:
     return result.scalars().first()
 
 async def get_world_for_user(db: AsyncSession, world_id: int, user_id: int) -> Optional[World]:
+    """Return world for user."""
     logger.debug(f"Fetching world ID: {world_id} for user ID: {user_id}")
     result = await db.execute(
         select(World).filter(World.id == world_id, World.user_id == user_id)
@@ -39,6 +44,7 @@ async def get_world_for_user(db: AsyncSession, world_id: int, user_id: int) -> O
 async def get_worlds_by_user(
     db: AsyncSession, user_id: int, skip: int = 0, limit: int = 100
 ) -> List[World]:
+    """Return worlds by user."""
     logger.debug(f"Fetching worlds for user ID: {user_id}, skip: {skip}, limit: {limit}")
     result = await db.execute(
         select(World).filter(World.user_id == user_id).order_by(World.name).offset(skip).limit(limit)
@@ -47,6 +53,7 @@ async def get_worlds_by_user(
     return result.scalars().all()
 
 async def update_world(db: AsyncSession, db_world: World, world_in: WorldUpdate) -> World:
+    """Update world."""
     update_data = world_in.model_dump(exclude_unset=True)
     logger.info(f"Updating world ID: {db_world.id} with data: {update_data}")
     for key, value in update_data.items():
@@ -59,6 +66,7 @@ async def update_world(db: AsyncSession, db_world: World, world_in: WorldUpdate)
     return db_world
 
 async def delete_world(db: AsyncSession, db_world: World) -> World:
+    """Delete world."""
     logger.info(f"Deleting world ID: {db_world.id}. Cascades will apply.")
     # This function expects a world object that is attached to the current session 'db'.
     await db.delete(db_world)

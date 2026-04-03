@@ -29,5 +29,6 @@
         "tests",
         "-v",
         "--asyncio-mode=auto"
-    ]
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

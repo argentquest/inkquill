@@ -10,6 +10,7 @@ from app.models.blog_comment import CommentStatus
 
 # Blog Category Schemas
 class BlogCategoryBase(BaseModel):
+    """Pydantic schema for blog category base."""
     name: str = Field(..., min_length=1, max_length=100)
     slug: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = None
@@ -20,10 +21,12 @@ class BlogCategoryBase(BaseModel):
 
 
 class BlogCategoryCreate(BlogCategoryBase):
+    """Pydantic schema for blog category create."""
     pass
 
 
 class BlogCategoryUpdate(BaseModel):
+    """Pydantic schema for blog category update."""
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     description: Optional[str] = None
     color: Optional[str] = Field(None, pattern=r'^#[0-9A-Fa-f]{6}$')
@@ -33,6 +36,7 @@ class BlogCategoryUpdate(BaseModel):
 
 
 class BlogCategoryRead(BlogCategoryBase):
+    """Pydantic schema for blog category read."""
     id: int
     post_count: int
     created_at: datetime
@@ -44,16 +48,19 @@ class BlogCategoryRead(BlogCategoryBase):
 
 # Blog Tag Schemas
 class BlogTagBase(BaseModel):
+    """Pydantic schema for blog tag base."""
     name: str = Field(..., min_length=1, max_length=50)
     slug: str = Field(..., min_length=1, max_length=50)
     description: Optional[str] = None
 
 
 class BlogTagCreate(BlogTagBase):
+    """Pydantic schema for blog tag create."""
     pass
 
 
 class BlogTagRead(BlogTagBase):
+    """Pydantic schema for blog tag read."""
     id: int
     usage_count: int
     created_at: datetime
@@ -64,6 +71,7 @@ class BlogTagRead(BlogTagBase):
 
 # Blog Post Schemas
 class BlogPostBase(BaseModel):
+    """Pydantic schema for blog post base."""
     title: str = Field(..., min_length=1, max_length=255)
     content: str = Field(..., min_length=1)
     excerpt: Optional[str] = Field(None, max_length=500)
@@ -78,6 +86,7 @@ class BlogPostBase(BaseModel):
 
 
 class BlogPostCreate(BlogPostBase):
+    """Pydantic schema for blog post create."""
     tags: Optional[List[str]] = Field(None, max_items=10)
     
     @validator('tags')
@@ -90,6 +99,7 @@ class BlogPostCreate(BlogPostBase):
 
 
 class BlogPostUpdate(BaseModel):
+    """Pydantic schema for blog post update."""
     title: Optional[str] = Field(None, min_length=1, max_length=255)
     content: Optional[str] = Field(None, min_length=1)
     excerpt: Optional[str] = Field(None, max_length=500)
@@ -113,6 +123,7 @@ class BlogPostUpdate(BaseModel):
 
 
 class BlogPostRead(BlogPostBase):
+    """Pydantic schema for blog post read."""
     id: int
     slug: str
     status: BlogPostStatus
@@ -156,18 +167,22 @@ class BlogPostSummary(BaseModel):
 
 # Blog Comment Schemas
 class BlogCommentBase(BaseModel):
+    """Pydantic schema for blog comment base."""
     content: str = Field(..., min_length=1)
 
 
 class BlogCommentCreate(BlogCommentBase):
+    """Pydantic schema for blog comment create."""
     parent_comment_id: Optional[int] = None
 
 
 class BlogCommentUpdate(BaseModel):
+    """Pydantic schema for blog comment update."""
     content: Optional[str] = Field(None, min_length=1)
 
 
 class BlogCommentRead(BlogCommentBase):
+    """Pydantic schema for blog comment read."""
     id: int
     post_id: int
     author_id: int
@@ -197,6 +212,7 @@ class BlogCommentWithReplies(BlogCommentRead):
 
 # Blog Analytics Schemas
 class BlogAnalyticsRead(BaseModel):
+    """Pydantic schema for blog analytics read."""
     post_id: int
     date: date
     unique_views: int
@@ -212,6 +228,7 @@ class BlogAnalyticsRead(BaseModel):
 
 
 class BlogAuthorStatsRead(BaseModel):
+    """Pydantic schema for blog author stats read."""
     total_posts: int
     total_views: int
     total_likes: int
@@ -221,6 +238,7 @@ class BlogAuthorStatsRead(BaseModel):
 
 # Blog Author Profile Schemas
 class BlogAuthorProfileBase(BaseModel):
+    """Pydantic schema for blog author profile base."""
     bio: Optional[str] = None
     profile_image_url: Optional[str] = Field(None, max_length=500)
     website_url: Optional[str] = Field(None, max_length=255)
@@ -233,14 +251,17 @@ class BlogAuthorProfileBase(BaseModel):
 
 
 class BlogAuthorProfileCreate(BlogAuthorProfileBase):
+    """Pydantic schema for blog author profile create."""
     pass
 
 
 class BlogAuthorProfileUpdate(BlogAuthorProfileBase):
+    """Pydantic schema for blog author profile update."""
     pass
 
 
 class BlogAuthorProfileRead(BlogAuthorProfileBase):
+    """Pydantic schema for blog author profile read."""
     id: int
     user_id: int
     total_posts: int

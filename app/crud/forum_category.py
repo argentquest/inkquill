@@ -115,7 +115,10 @@ async def delete_forum_category(db: AsyncSession, category_id: int) -> bool:
     db_category = await get_forum_category(db, category_id)
     if not db_category:
         return False
-    
+
+    for thread in list(db_category.threads):
+        await db.delete(thread)
+
     await db.delete(db_category)
     await db.commit()
     return True

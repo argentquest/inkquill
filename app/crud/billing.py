@@ -1,3 +1,5 @@
+"""Database CRUD helpers for billing."""
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, desc
 from sqlalchemy.orm import selectinload
@@ -13,6 +15,7 @@ from app.schemas.billing import UserAccountCreate, UserTransactionCreate, Credit
 class BillingCRUD:
     
     # Admin Operations
+    """Class for billing c r u d."""
     async def get_all_user_accounts_with_stats(self, db: AsyncSession, limit: int = 100, offset: int = 0) -> List[UserAccount]:
         """Get all user accounts with their transaction stats for admin dashboard"""
         result = await db.execute(

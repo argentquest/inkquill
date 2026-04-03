@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/image_providers/runpod_provider.py
+"""Service helpers for runpod provider."""
+
+# /story_app/app/services/image_providers/runpod_provider.py
 
 import logging
 import base64

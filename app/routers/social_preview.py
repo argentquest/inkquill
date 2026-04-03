@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/social_preview.py
+"""API routes for social preview."""
+
+# /story_app/app/routers/social_preview.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response
@@ -38,7 +40,12 @@ async def generate_social_preview(
             if story:
                 content_data = story
                 title = story.title or "Untitled Story"
-                description = story.summary or story.description or "An AI-generated story"
+                description = (
+                    getattr(story, "summary", None)
+                    or getattr(story, "short_description", None)
+                    or getattr(story, "description", None)
+                    or "An AI-generated story"
+                )
         
         elif content_type == "world":
             world = await crud_world.get_world(db, world_id=content_id)

@@ -1,4 +1,4 @@
-# /ai_rag_story_app/app/services/sk_plugins/__init__.py
+# /story_app/app/services/sk_plugins/__init__.py
 
 """
 This package contains modules for setting up various Semantic Kernel plugins.
@@ -12,7 +12,6 @@ its functions with the main kernel instance.
 from . import story_analysis_plugin_setup
 from . import storytelling_plugin_setup
 from . import story_structure_plugin_setup
-from . import world_building_plugin_setup
 from . import world_generation_plugin_setup
 
 # Optional: Define __all__ if you want to control what 'from .sk_plugins import *' imports.
@@ -21,6 +20,6 @@ __all__ = [
     "story_analysis_plugin_setup",
     "storytelling_plugin_setup",
     "story_structure_plugin_setup",
-    "world_building_plugin_setup",
     "world_generation_plugin_setup",
 ]
+

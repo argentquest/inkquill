@@ -1,5 +1,6 @@
 """Blog analytics API endpoints."""
 import logging
+import ipaddress
 from datetime import datetime, date, timedelta
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -14,21 +15,31 @@ from app.models.blog_view import BlogView
 from app.models.blog_like import BlogLike
 from app.models.blog_comment import BlogComment
 from app.models.blog_analytics_summary import BlogAnalyticsSummary
-from app.services.blog_service import blog_service
 from app.services.blog_analytics_summary import blog_analytics_summary_service
+from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/analytics", tags=["blog-analytics"])
 
 
-@router.post("/track-view/{post_id}")
+def _normalize_client_ip(raw_host: Optional[str]) -> str:
+    """Provide internal router support for normalize client ip."""
+    if not raw_host:
+        return "127.0.0.1"
+    try:
+        return str(ipaddress.ip_address(raw_host))
+    except ValueError:
+        return "127.0.0.1"
+
+
+@router.post("/track-view/{post_id}", response_model=ApiResponse)
 async def track_view(
     post_id: int,
     request: Request,
     current_user: Optional[User] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Track a blog post view."""
     try:
         # Check if post exists and is published
@@ -50,7 +61,7 @@ async def track_view(
             )
         
         # Get client info
-        client_ip = request.client.host
+        client_ip = _normalize_client_ip(request.client.host if request.client else None)
         user_agent = request.headers.get("user-agent", "")
         referrer = request.headers.get("referer", "")
         
@@ -69,11 +80,11 @@ async def track_view(
         existing_view = duplicate_check.scalar_one_or_none()
         
         if existing_view:
-            return {
+            return ApiResponse.success_response(data={
                 "tracked": False,
                 "message": "View already tracked recently",
                 "view_count": post.view_count
-            }
+            })
         
         # Create new view record
         view = BlogView(
@@ -91,11 +102,11 @@ async def track_view(
         
         await db.commit()
         
-        return {
+        return ApiResponse.success_response(data={
             "tracked": True,
             "message": "View tracked successfully",
             "view_count": post.view_count
-        }
+        })
         
     except HTTPException:
         raise
@@ -108,17 +119,17 @@ async def track_view(
         )
 
 
-@router.put("/track-read-time/{post_id}")
+@router.put("/track-read-time/{post_id}", response_model=ApiResponse)
 async def track_read_time(
     post_id: int,
     request: Request,
     read_time: int = Query(..., description="Reading time in seconds"),
     current_user: Optional[User] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Update reading time for a view."""
     try:
-        client_ip = request.client.host
+        client_ip = _normalize_client_ip(request.client.host if request.client else None)
         
         # Find recent view to update
         view_result = await db.execute(
@@ -139,16 +150,16 @@ async def track_read_time(
             view.view_duration = read_time
             await db.commit()
             
-            return {
+            return ApiResponse.success_response(data={
                 "updated": True,
                 "message": "Reading time updated",
                 "read_time": read_time
-            }
+            })
         else:
-            return {
+            return ApiResponse.success_response(data={
                 "updated": False,
                 "message": "No recent view found to update"
-            }
+            })
         
     except Exception as e:
         logger.error(f"Error updating read time for post {post_id}: {e}")
@@ -159,13 +170,13 @@ async def track_read_time(
         )
 
 
-@router.get("/post/{post_id}")
+@router.get("/post/{post_id}", response_model=ApiResponse)
 async def get_post_analytics(
     post_id: int,
     days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get analytics for a specific post."""
     try:
         # Check if user owns the post
@@ -260,7 +271,7 @@ async def get_post_analytics(
                 "unique_views": stat.unique_views
             })
         
-        return {
+        return ApiResponse.success_response(data={
             "post": {
                 "id": post.id,
                 "title": post.title,
@@ -292,7 +303,7 @@ async def get_post_analytics(
                 }
                 for ref in referrers
             ]
-        }
+        })
         
     except HTTPException:
         raise
@@ -304,12 +315,12 @@ async def get_post_analytics(
         )
 
 
-@router.get("/author-overview")
+@router.get("/author-overview", response_model=ApiResponse)
 async def get_author_analytics_overview(
     days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get analytics overview for the current author."""
     try:
         # Date range
@@ -330,7 +341,7 @@ async def get_author_analytics_overview(
         post_ids = [row[0] for row in posts_result.fetchall()]
         
         if not post_ids:
-            return {
+            return ApiResponse.success_response(data={
                 "period": {
                     "start_date": start_date.isoformat(),
                     "end_date": end_date.isoformat(),
@@ -344,7 +355,7 @@ async def get_author_analytics_overview(
                 },
                 "daily_stats": [],
                 "top_posts": []
-            }
+            })
         
         # Get overall stats
         total_views = await db.execute(
@@ -402,7 +413,7 @@ async def get_author_analytics_overview(
                 "unique_views": stat.unique_views
             })
         
-        return {
+        return ApiResponse.success_response(data={
             "period": {
                 "start_date": start_date.isoformat(),
                 "end_date": end_date.isoformat(),
@@ -426,7 +437,7 @@ async def get_author_analytics_overview(
                 }
                 for post in top_posts_data
             ]
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error getting author analytics overview: {e}")
@@ -436,12 +447,12 @@ async def get_author_analytics_overview(
         )
 
 
-@router.get("/trending")
+@router.get("/trending", response_model=ApiResponse)
 async def get_trending_analytics(
     days: int = Query(7, ge=1, le=30, description="Number of days to analyze"),
     limit: int = Query(10, ge=1, le=50, description="Number of posts to return"),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get trending posts analytics."""
     try:
         # Date range for trending calculation
@@ -455,6 +466,7 @@ async def get_trending_analytics(
                 func.count(BlogView.id).label('recent_views'),
                 func.count(BlogLike.id).label('recent_likes')
             )
+            .options(selectinload(BlogPost.author))
             .outerjoin(
                 BlogView,
                 and_(
@@ -483,7 +495,7 @@ async def get_trending_analytics(
         )
         trending_data = trending_posts.fetchall()
         
-        return {
+        return ApiResponse.success_response(data={
             "period": {
                 "start_date": start_date.date().isoformat(),
                 "end_date": end_date.date().isoformat(),
@@ -507,7 +519,7 @@ async def get_trending_analytics(
                 }
                 for row in trending_data
             ]
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error getting trending analytics: {e}")
@@ -517,13 +529,13 @@ async def get_trending_analytics(
         )
 
 
-@router.post("/generate-summary/{post_id}")
+@router.post("/generate-summary/{post_id}", response_model=ApiResponse)
 async def generate_daily_summary(
     post_id: int,
     target_date: date = Query(default_factory=lambda: date.today() - timedelta(days=1)),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Generate daily analytics summary for a post."""
     try:
         # Check if user owns the post
@@ -637,7 +649,7 @@ async def generate_daily_summary(
         
         await db.commit()
         
-        return {
+        return ApiResponse.success_response(data={
             "summary_generated": True,
             "date": target_date.isoformat(),
             "metrics": {
@@ -648,7 +660,7 @@ async def generate_daily_summary(
                 "avg_read_time": summary.avg_read_time,
                 "bounce_rate": float(summary.bounce_rate)
             }
-        }
+        })
         
     except HTTPException:
         raise
@@ -661,12 +673,12 @@ async def generate_daily_summary(
         )
 
 
-@router.get("/dashboard")
+@router.get("/dashboard", response_model=ApiResponse)
 async def get_dashboard_summary(
     days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get comprehensive analytics dashboard summary."""
     try:
         summary = await blog_analytics_summary_service.get_dashboard_summary(
@@ -674,7 +686,7 @@ async def get_dashboard_summary(
             user_id=current_user.id,
             days=days
         )
-        return summary
+        return ApiResponse.success_response(data=summary)
         
     except Exception as e:
         logger.error(f"Error getting dashboard summary for user {current_user.id}: {e}")
@@ -684,12 +696,12 @@ async def get_dashboard_summary(
         )
 
 
-@router.get("/engagement")
+@router.get("/engagement", response_model=ApiResponse)
 async def get_engagement_metrics(
     days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get detailed engagement metrics."""
     try:
         metrics = await blog_analytics_summary_service.get_engagement_metrics(
@@ -697,7 +709,7 @@ async def get_engagement_metrics(
             user_id=current_user.id,
             days=days
         )
-        return metrics
+        return ApiResponse.success_response(data=metrics)
         
     except Exception as e:
         logger.error(f"Error getting engagement metrics for user {current_user.id}: {e}")
@@ -707,15 +719,15 @@ async def get_engagement_metrics(
         )
 
 
-@router.get("/admin/site-summary")
+@router.get("/admin/site-summary", response_model=ApiResponse)
 async def get_site_analytics_summary(
     days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+) -> ApiResponse:
     """Get site-wide analytics summary (admin only)."""
     try:
-        if not current_user.is_superuser:
+        if not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Only administrators can view site-wide analytics"
@@ -726,7 +738,7 @@ async def get_site_analytics_summary(
             user_id=None,  # Site-wide
             days=days
         )
-        return summary
+        return ApiResponse.success_response(data=summary)
         
     except HTTPException:
         raise

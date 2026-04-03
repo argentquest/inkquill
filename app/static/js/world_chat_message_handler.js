@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/world_chat_message_handler.js
+// /story_app/app/static/js/world_chat_message_handler.js
 "use strict";
 
 const WorldChatMessageHandler = (() => {

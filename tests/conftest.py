@@ -157,13 +157,17 @@ def assert_api_response_format(response_data: dict, expected_success: bool = Tru
 
 
 @pytest.fixture(autouse=True)
-def mock_external_dependencies():
+def mock_external_dependencies(request):
     """Mock external dependencies to avoid network calls during testing."""
+    if request.node.get_closest_marker("integration"):
+        yield
+        return
+
     with pytest.MonkeyPatch().context() as m:
-        # Mock Azure services
-        m.setattr("app.core.azure_deps.get_blob_service_client", MagicMock())
+        # Mock storage client lookup for non-integration tests
+        m.setattr("app.core.storage_deps.get_blob_service_client", MagicMock(), raising=False)
 
         # Mock Semantic Kernel
-        m.setattr("app.services.semantic_kernel_setup.get_kernel", MagicMock())
+        m.setattr("app.services.semantic_kernel_setup.get_kernel", MagicMock(), raising=False)
 
         yield m

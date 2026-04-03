@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/image_providers/base_provider.py
+"""Service helpers for base provider."""
+
+# /story_app/app/services/image_providers/base_provider.py
 
 from abc import ABC, abstractmethod
 from pydantic import BaseModel

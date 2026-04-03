@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/document.py
+"""Database CRUD helpers for document."""
+
+# /story_app/app/crud/document.py
 
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,14 +14,13 @@ from fastapi import BackgroundTasks
 
 from app.models.uploaded_document import UploadedDocument, DocumentStatus, SourceElementTypeEnum
 from app.schemas.document import UploadedDocumentCreate, UploadedDocumentUpdate 
-from app.core.config import settings 
-
 logger = logging.getLogger(__name__)
 
 async def create_document_record_from_schema(
     db: AsyncSession, 
     document_in: UploadedDocumentCreate
 ) -> UploadedDocument:
+    """Create document record from schema."""
     logger.info(f"Creating document record from schema for filename: '{document_in.filename}', "
                 f"type: {document_in.source_element_type.value if document_in.source_element_type else 'N/A'}, "
                 f"world_id: {document_in.world_id}")
@@ -54,6 +55,7 @@ async def create_document_record_from_schema(
         raise
 
 async def get_document_record(db: AsyncSession, document_id: int) -> Optional[UploadedDocument]:
+    """Return document record."""
     logger.debug(f"Fetching document record with ID: {document_id}")
     result = await db.execute(
         select(UploadedDocument)
@@ -65,6 +67,7 @@ async def get_document_record(db: AsyncSession, document_id: int) -> Optional[Up
 async def get_document_record_for_user(
     db: AsyncSession, document_id: int, user_id: int
 ) -> Optional[UploadedDocument]:
+    """Return document record for user."""
     logger.debug(f"Fetching document record ID: {document_id} for user ID: {user_id}")
     result = await db.execute(
         select(UploadedDocument)
@@ -76,6 +79,7 @@ async def get_document_record_for_user(
 async def get_documents_by_user(
     db: AsyncSession, user_id: int, skip: int = 0, limit: int = 100
 ) -> List[UploadedDocument]:
+    """Return documents by user."""
     logger.debug(f"Fetching document records for user ID: {user_id}, skip: {skip}, limit: {limit}")
     result = await db.execute(
         select(UploadedDocument)
@@ -116,6 +120,7 @@ async def update_document_status(
     new_status: DocumentStatus,
     error_message: Optional[str] = None
 ) -> Optional[UploadedDocument]:
+    """Update document status."""
     logger.info(f"Updating status for document ID {document_id} to {new_status.value}. Error: '{error_message if error_message else 'None'}'")
     db_document = await get_document_record(db, document_id=document_id)
     if not db_document:
@@ -127,9 +132,9 @@ async def update_document_status(
     if new_status == DocumentStatus.COMPLETED or new_status == DocumentStatus.ERROR:
         db_document.processed_at = datetime.now(timezone.utc) 
     elif db_document.processed_at and new_status not in [DocumentStatus.COMPLETED, DocumentStatus.ERROR]:
-         if db_document.status not in [
+        if db_document.status not in [
             DocumentStatus.PROCESSING_TEXT, DocumentStatus.CHUNKING, 
-            DocumentStatus.GENERATING_EMBEDDINGS, DocumentStatus.INDEXING, 
+            DocumentStatus.PREPARING_CONTEXT, DocumentStatus.STORING_CONTEXT, 
             DocumentStatus.PENDING, DocumentStatus.UPLOADED
         ]:
              db_document.processed_at = None
@@ -150,6 +155,7 @@ async def delete_document_record_and_blob(
     user_id: int,
     background_tasks: Optional[BackgroundTasks] = None 
 ) -> Optional[UploadedDocument]:
+    """Delete document record and blob."""
     logger.info(f"User ID {user_id} attempting delete of doc record ID: {document_id} and its blob.")
     db_document = await get_document_record_for_user(db, document_id=document_id, user_id=user_id)
     if not db_document: 
@@ -160,9 +166,14 @@ async def delete_document_record_and_blob(
         await db.commit()
         logger.info(f"Document record ID {document_id} deleted from database.")
         if background_tasks and blob_path_to_delete:
-            from app.services.azure_blob_service import delete_blob
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS
+            from app.services.storage_service import delete_blob
+            container_name = "documents"
             background_tasks.add_task(delete_blob, container_name=container_name, blob_name=blob_path_to_delete)
+            background_tasks.add_task(
+                delete_blob,
+                container_name=container_name,
+                blob_name=f"{blob_path_to_delete}.extracted.txt",
+            )
             logger.info(f"Scheduled blob deletion for: {blob_path_to_delete} in container {container_name}")
         elif blob_path_to_delete:
             logger.warning(f"BackgroundTasks not provided for doc ID {document_id}. Blob '{blob_path_to_delete}' not scheduled for deletion by this func.")
@@ -178,6 +189,7 @@ async def delete_generated_document_records(
     user_id: int,
     background_tasks: Optional[BackgroundTasks] = None
 ) -> int:
+    """Delete generated document records."""
     logger.info(f"Deleting generated doc records for {source_element_type.value} ID: {source_element_id}, World: {world_id}, User: {user_id}")
     query_conditions = [UploadedDocument.source_element_type == source_element_type, UploadedDocument.world_id == world_id, UploadedDocument.user_id == user_id]
     if source_element_type == SourceElementTypeEnum.CHARACTER_LORE: query_conditions.append(UploadedDocument.source_character_id == source_element_id)
@@ -193,10 +205,11 @@ async def delete_generated_document_records(
         result_delete = await db.execute(stmt_delete); await db.commit(); deleted_db_count = result_delete.rowcount
         logger.info(f"Deleted {deleted_db_count} generated doc DB records for {source_element_type.value} ID: {source_element_id}.")
         if background_tasks and blob_paths_to_delete:
-            from app.services.azure_blob_service import delete_blob
-            container_for_generated = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS
+            from app.services.storage_service import delete_blob
+            container_for_generated = "documents"
             for blob_path in blob_paths_to_delete: background_tasks.add_task(delete_blob, container_name=container_for_generated, blob_name=blob_path)
             logger.info(f"Scheduled deletion for {len(blob_paths_to_delete)} blobs.")
         elif blob_paths_to_delete: logger.warning(f"BackgroundTasks not provided. {len(blob_paths_to_delete)} blobs not scheduled for deletion here.")
         return deleted_db_count
     except Exception as e: await db.rollback(); logger.error(f"Error deleting generated doc records for {source_element_type.value} ID: {source_element_id}: {e}", exc_info=True); raise
+

@@ -30,7 +30,7 @@ async def get_referral_stats(
     """Get referral statistics for the current user."""
     try:
         stats = await referral_service.get_user_referral_stats(db, current_user.id)
-        return ReferralStats(**stats)
+        return ApiResponse.success_response(data=ReferralStats(**stats))
     except Exception as e:
         logger.error(f"Error getting referral stats: {e}")
         raise HTTPException(
@@ -75,12 +75,12 @@ async def get_referral_history(
                 'created_at': ref.created_at
             })
         
-        return {
+        return ApiResponse.success_response(data={
             'referrals': history,
             'total': len(history),
             'limit': limit,
             'offset': offset
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error getting referral history: {e}")
@@ -121,12 +121,12 @@ async def get_referral_rewards(
                 'awarded_at': reward.awarded_at
             })
         
-        return {
+        return ApiResponse.success_response(data={
             'rewards': history,
             'total': len(history),
             'limit': limit,
             'offset': offset
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error getting referral rewards: {e}")
@@ -153,10 +153,10 @@ async def track_referral_visit(
             logger.info(f"🔍 REFERRAL DEBUG: Parsed referrer_user_id: {referrer_user_id}")
         except ValueError:
             logger.error(f"🔍 REFERRAL DEBUG: Invalid referral code: {tracking_data.referral_code}")
-            return ReferralTrackingResponse(
+            return ApiResponse.success_response(data=ReferralTrackingResponse(
                 success=False,
                 message="Invalid referral code"
-            )
+            ))
         
         # Get user info
         user_id = current_user.id if current_user else None
@@ -180,10 +180,10 @@ async def track_referral_visit(
         # Don't allow self-referrals
         if user_id and user_id == referrer_user_id:
             logger.warning(f"🔍 REFERRAL DEBUG: Self-referral blocked - user {user_id} referring themselves")
-            return ReferralTrackingResponse(
+            return ApiResponse.success_response(data=ReferralTrackingResponse(
                 success=False,
                 message="Self-referrals are not allowed"
-            )
+            ))
         
         # Get IP address
         ip_address = request.client.host
@@ -224,30 +224,34 @@ async def track_referral_visit(
             reward_given = False
             reward_amount = 0
             
-            # Get the latest reward for this referral
-            if result.rewards:
-                latest_reward = max(result.rewards, key=lambda r: r.created_at)
+            reward_result = await db.execute(
+                select(ReferralReward)
+                .where(ReferralReward.referral_id == result.id)
+                .order_by(ReferralReward.awarded_at.desc())
+            )
+            latest_reward = reward_result.scalars().first()
+            if latest_reward:
                 reward_given = True
                 reward_amount = latest_reward.coin_amount
             
-            return ReferralTrackingResponse(
+            return ApiResponse.success_response(data=ReferralTrackingResponse(
                 success=True,
                 message="Referral tracked successfully",
                 reward_given=reward_given,
                 reward_amount=reward_amount,
                 referral_id=result.id
-            )
+            ))
         else:
-            return ReferralTrackingResponse(
+            return ApiResponse.success_response(data=ReferralTrackingResponse(
                 success=True,
                 message="Referral already tracked",
                 reward_given=False,
                 reward_amount=0
-            )
+            ))
             
     except Exception as e:
         logger.error(f"Error tracking referral: {e}")
-        return ReferralTrackingResponse(
+        return ApiResponse.success_response(data=ReferralTrackingResponse(
             success=False,
             message="Error tracking referral"
-        )
+        ))

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/job_status.py
+"""SQLAlchemy models for job status."""
+
+# /story_app/app/models/job_status.py
 
 import enum
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum as SQLAlchemyEnum
@@ -13,12 +15,14 @@ if TYPE_CHECKING:
     from .world import World
 
 class JobTypeEnum(str, enum.Enum):
+    """SQLAlchemy model for job type enum."""
     WORLD_EXTRACTION_FROM_DOC = "WORLD_EXTRACTION_FROM_DOC"
-    DOCUMENT_RAG_PROCESSING = "DOCUMENT_RAG_PROCESSING"
+    DOCUMENT_CONTEXT_PROCESSING = "DOCUMENT_CONTEXT_PROCESSING"
     WORLD_IMPORT_FROM_TITLE = "WORLD_IMPORT_FROM_TITLE"
     IMAGE_GENERATION = "IMAGE_GENERATION"
 
 class JobStateEnum(str, enum.Enum):
+    """SQLAlchemy model for job state enum."""
     PENDING = "PENDING"
     RUNNING = "RUNNING"
     COMPLETED = "COMPLETED"
@@ -53,3 +57,4 @@ class JobStatus(Base):
 
     def __repr__(self):
         return f"<JobStatus(id={self.id}, job_id='{self.job_id}', type='{self.job_type.value}', state='{self.state.value}')>"
+

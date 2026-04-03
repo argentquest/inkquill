@@ -1,4 +1,4 @@
-{# /ai_rag_story_app/app/templates/pages/index.html #}
+{# /story_app/app/templates/pages/index.html #}
 
 {% extends "layouts/base.html" %}
 
@@ -1747,7 +1747,7 @@
                 </a>
             </div>
             
-            <!-- 9. Manage RAG Documents: HIDDEN PER USER REQUEST -->
+            <!-- 9. Manage Documents: HIDDEN PER USER REQUEST -->
             <div id="manage-documents-btn" style="display: none;">
                 <a href="{{ url_for('ui_document_manager') }}" class="quick-action-nav-btn"
                    data-bs-toggle="tooltip" data-bs-placement="bottom" 
@@ -3335,3 +3335,4 @@
         }
     </script>
 {% endblock %}
+

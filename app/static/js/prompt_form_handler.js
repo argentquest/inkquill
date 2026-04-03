@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/prompt_form_handler.js
+// /story_app/app/static/js/prompt_form_handler.js
 
 /**
  * prompt_form_handler.js

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/__init__.py
+"""Package exports for routers."""
+
+# /story_app/app/routers/__init__.py
 
 # This file marks the 'routers' directory as a Python package.
 # It allows you to import modules from this directory using dot notation
@@ -15,4 +17,5 @@
 # ... etc.
 #
 # For now, keeping it empty is standard.
+
 

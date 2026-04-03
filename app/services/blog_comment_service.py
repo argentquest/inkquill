@@ -265,7 +265,8 @@ class BlogCommentService:
         db: AsyncSession,
         comment_id: int,
         status: CommentStatus,
-        moderator_id: int
+        moderator_id: int,
+        reason: Optional[str] = None
     ) -> Optional[BlogComment]:
         """Moderate comment (admin only)."""
         try:

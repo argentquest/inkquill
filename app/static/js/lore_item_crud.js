@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/lore_item_crud.js
+// /story_app/app/static/js/lore_item_crud.js
 
 /**
  * lore_item_crud.js

@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/document_crud.js
+// /story_app/app/static/js/document_crud.js
 
 /**
  * document_crud.js
@@ -109,3 +109,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     console.log("Document CRUD JS: Initialization complete.");
 });
+

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/logging_config.py
+"""Core application helpers for logging config."""
+
+# /story_app/app/core/logging_config.py
 import logging
 import logging.handlers
 import sys
@@ -23,6 +25,7 @@ def setup_logging(
     log_level_file_str: str = "DEBUG",
     clear_existing_handlers: bool = True
 ):
+    """Provide dependency and core support for setup logging."""
     print(f"--- ENTERING setup_logging ---", file=sys.stderr, flush=True)
     print(f"Requested console level string: {log_level_console_str}, file level string: {log_level_file_str}, clear handlers: {clear_existing_handlers}", file=sys.stderr, flush=True)
 
@@ -102,12 +105,6 @@ def setup_logging(
     # or INFO to see them.
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     
-    # Control Azure SDK HTTP logging to reduce verbosity
-    logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
-    logging.getLogger("azure.core.pipeline").setLevel(logging.WARNING)
-    logging.getLogger("azure.storage").setLevel(logging.WARNING)
-    logging.getLogger("azure.ai.search").setLevel(logging.WARNING)
-    
     # Allow Semantic Kernel to be verbose for debugging purposes
     logging.getLogger("semantic_kernel").setLevel(logging.INFO)
     # --- END MODIFICATION ---
@@ -119,3 +116,4 @@ def setup_logging(
         f"{log_file_path_str}"
     )
     root_logger.info(final_log_message) 
+

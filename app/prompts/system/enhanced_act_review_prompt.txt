@@ -68,8 +68,8 @@ This main JSON object MUST contain exactly three top-level keys:
    * `"category"`: A string from a relevant area (e.g., "Pacing", "Plot Coherence", "Character Motivation", "Dialogue", "Show vs Tell", "World Integration", "Clarity", "Engagement", "Opening Hook", "Emotional Impact", "Theme", "Grammar", "Spelling", "Punctuation", "Technical Consistency"). **IMPORTANT: You may and should provide multiple suggestions for the same category if multiple issues exist - each should have a unique ID.**
    * `"suggestion_text"`: Your specific, actionable feedback. If quoting from the user's text, keep quotes brief and focus on the suggestion.
    * `"proposed_solution"`: (Required) A concrete, specific solution or rewrite suggestion. For grammar issues, provide the corrected sentence. For structure issues, provide specific alternative approaches. For dialogue issues, suggest improved dialogue. For pacing issues, suggest specific cuts or additions.
-   * `"context_start_snippet"`: (Optional but STRONGLY ENCOURAGED) A string containing the first 7-10 words (or one complete phrase) of the text segment that your suggestion pertains to. If the suggestion is general, this can be null.
-   * `"context_end_snippet"`: (Optional but STRONGLY ENCOURAGED) A string containing the last 7-10 words (or one complete phrase) of the text segment that your suggestion pertains to. If the suggestion is general or the segment is very short, this can be null.
+   * `"context_start_snippet"`: (Optional but STRONGLY ENCOUContextED) A string containing the first 7-10 words (or one complete phrase) of the text segment that your suggestion pertains to. If the suggestion is general, this can be null.
+   * `"context_end_snippet"`: (Optional but STRONGLY ENCOUContextED) A string containing the last 7-10 words (or one complete phrase) of the text segment that your suggestion pertains to. If the suggestion is general or the segment is very short, this can be null.
    * `"explanation"`: (Optional) Brief reasoning for your suggestion.
    * `"severity"`: (Required) "High", "Medium", or "Low" based on the severity guidelines above.
    * `"priority"`: (Required) Integer 1-10, where 1 is highest priority for the author to address.
@@ -181,3 +181,4 @@ Key World Elements Linked to This Story (for consistency and depth):
 ACT CONTENT TO ANALYZE:
 {{$act_content_to_analyze}}
 </message>
+

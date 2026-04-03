@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_ai_processor.js
+// /story_app/app/static/js/act_ai_processor.js
 "use strict";
 
 const ActAIProcessor = (() => {
@@ -154,26 +154,25 @@ const ActAIProcessor = (() => {
         };
     }
 
-    // RAG and Full Prompt processing can be similar to Scene's if the data structure is the same
-    function processRagContextMessage(ragData) {
+    // Context and Full Prompt processing can be similar to Scene's if the data structure is the same
+    function processContextMessage(contextData) {
         let summary = "No relevant background information found for Act.";
-        let details = "No RAG context details available for this Act generation.";
-        // ... (identical logic to SceneAIProcessor.processRagContextMessageForScene)
-        if (ragData) {
-            if (Array.isArray(ragData) && ragData.length > 0) {
-                summary = ragData.map(doc => `Source: ${doc.source_filename || 'N/A'}\nSnippet: ${(doc.text || '').substring(0,100)}...`).join('\n---\n');
-                try { details = JSON.stringify(ragData, null, 2); } 
-                catch (e) { details = "Error formatting RAG details."; }
-            } else if (typeof ragData === 'string' && ragData.trim() !== "") {
-                summary = ragData.substring(0, 300) + (ragData.length > 300 ? "..." : "");
-                details = ragData; 
-            } else if (typeof ragData === 'object' && Object.keys(ragData).length > 0) {
-                summary = `Received RAG data object (Act). See details tab.`; 
-                try { details = JSON.stringify(ragData, null, 2); } 
-                catch (e) { details = "Error formatting RAG object (Act)."; }
-            } else if (typeof ragData === 'string' && ragData.trim() === "") {
-                summary = "RAG system returned an empty string for Act.";
-                details = "RAG system returned an empty string for Act.";
+        let details = "No context details available for this Act generation.";
+        if (contextData) {
+            if (Array.isArray(contextData) && contextData.length > 0) {
+                summary = contextData.map(doc => `Source: ${doc.source_filename || 'N/A'}\nSnippet: ${(doc.text || '').substring(0,100)}...`).join('\n---\n');
+                try { details = JSON.stringify(contextData, null, 2); } 
+                catch (e) { details = "Error formatting context details."; }
+            } else if (typeof contextData === 'string' && contextData.trim() !== "") {
+                summary = contextData.substring(0, 300) + (contextData.length > 300 ? "..." : "");
+                details = contextData; 
+            } else if (typeof contextData === 'object' && Object.keys(contextData).length > 0) {
+                summary = "Received context data object (Act). See details tab."; 
+                try { details = JSON.stringify(contextData, null, 2); } 
+                catch (e) { details = "Error formatting context object (Act)."; }
+            } else if (typeof contextData === 'string' && contextData.trim() === "") {
+                summary = "Context assembly returned an empty string for Act.";
+                details = "Context assembly returned an empty string for Act.";
             }
         }
         return { summary, details };
@@ -194,7 +193,8 @@ const ActAIProcessor = (() => {
     return {
         // processStreamForDelimiters is removed
         processActMetadataJsonResponse: processActMetadataJsonResponse,
-        processRagContextMessage: processRagContextMessage, // Reused
+        processContextMessage: processContextMessage,
         processFullPromptMessage: processFullPromptMessage  // Reused
     };
 })();
+

@@ -1,3 +1,5 @@
+"""Pydantic schemas for chat sample."""
+
 # /mnt/c/Code2025/rag/app/schemas/chat_sample.py
 
 from pydantic import BaseModel

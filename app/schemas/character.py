@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/character.py
+"""Pydantic schemas for character."""
+
+# /story_app/app/schemas/character.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -18,7 +20,7 @@ class CharacterBase(BaseModel):
     personality_traits: Optional[str] = Field(None, description="Key personality traits of the character (e.g., comma-separated or free text).")
     backstory: Optional[str] = Field(None, description="A summary of the character's backstory.")
     image_prompt_definition: Optional[str] = Field(None, description="Text prompt for generating an image of this character.")
-    image_blob_path: Optional[str] = Field(None, max_length=1024, description="Path to the character's image in Azure Blob Storage.")
+    image_blob_path: Optional[str] = Field(None, max_length=1024, description="Path to the character's image in storage.")
     
     current_location_id: Optional[int] = Field(None, description="ID of the location where this character is currently placed")
     placement_note: Optional[str] = Field(None, description="Description of how/where the character is placed at the location")
@@ -159,3 +161,4 @@ class CharacterGeneratorResult(BaseModel):
     redirect_url: Optional[str] = Field(None, description="URL to redirect to after creation")
     error: Optional[str] = Field(None, description="Error message if generation failed")
     generation_metadata: Optional[Dict[str, Any]] = Field(None, description="Metadata about the generation process")
+

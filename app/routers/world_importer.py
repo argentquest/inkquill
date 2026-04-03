@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/world_importer.py
+"""API routes for world importer."""
+
+# /story_app/app/routers/world_importer.py
 
 import logging
 import tempfile
@@ -30,10 +32,12 @@ router = APIRouter(
 )
 
 class BookTitleImportRequest(BaseModel):
+    """Response or helper model for book title import request."""
     book_title: str
     model_config_id: Optional[int] = None
 
 class WorldImportResponse(BaseModel):
+    """Response or helper model for world import response."""
     message: str
     world_id: Optional[int] = None
     world_name: Optional[str] = None
@@ -51,6 +55,7 @@ async def import_world_from_book_api(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle POST /import-from-book-title."""
     book_title = request_data.book_title
     logger.info(f"User '{current_user.username}' submitted request to import world from book: '{book_title}'")
 
@@ -73,9 +78,11 @@ async def import_world_from_book_api(
         )
 
         # --- BEGIN FIX: Updated user-facing message ---
-        return JobSubmissionResponse(
-            message=f"Import job for '{book_title}' has been started. This process typically takes 5-10 minutes depending on the complexity of the book and current system load. Please keep this browser tab open until the import completes. You can check the progress below or visit the 'My Worlds' page to see your newly generated world when finished.",
-            job_id=job_id
+        return ApiResponse.success_response(
+            data=JobSubmissionResponse(
+                message=f"Import job for '{book_title}' has been started. This process typically takes 5-10 minutes depending on the complexity of the book and current system load. Please keep this browser tab open until the import completes. You can check the progress below or visit the 'My Worlds' page to see your newly generated world when finished.",
+                job_id=job_id
+            )
         )
         # --- END FIX ---
     except Exception as e:
@@ -92,6 +99,7 @@ async def create_world_from_document_api(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle POST /import/create-from-document."""
     logger.info(f"User '{current_user.username}' submitted document '{file.filename}' to create new world '{world_name}'.")
 
     if not file.filename:
@@ -130,9 +138,11 @@ async def create_world_from_document_api(
         )
 
         # --- BEGIN FIX: Updated user-facing message ---
-        return JobSubmissionResponse(
-            message=f"Analysis of '{file.filename}' has been started using GPT-4.1 Mini for optimal element extraction. This process typically takes 10-20 minutes depending on the document size, complexity, and current system load. Please keep this browser tab open until the import completes. You can check the progress below or visit the 'My Worlds' page to see your newly generated world '{world_name}' when finished.",
-            job_id=job_id
+        return ApiResponse.success_response(
+            data=JobSubmissionResponse(
+                message=f"Analysis of '{file.filename}' has been started using GPT-4.1 Mini for optimal element extraction. This process typically takes 10-20 minutes depending on the document size, complexity, and current system load. Please keep this browser tab open until the import completes. You can check the progress below or visit the 'My Worlds' page to see your newly generated world '{world_name}' when finished.",
+                job_id=job_id
+            )
         )
         # --- END FIX ---
     except Exception as e:
@@ -148,7 +158,8 @@ async def get_job_status_api(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle GET /import/job-status/{job_id}."""
     db_job = await crud_job_status.get_job_by_job_id(db, job_id=job_id, user_id=current_user.id)
     if not db_job:
         raise HTTPException(status_code=404, detail="Job not found or you do not have permission to view it.")
-    return db_job
+    return ApiResponse.success_response(data=JobStatusRead.model_validate(db_job))

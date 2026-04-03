@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/location_connection.py
+"""API routes for location connection."""
+
+# /story_app/app/routers/location_connection.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -78,7 +80,7 @@ async def create_location_connection_for_world(
         created_connection = await crud_location_connection.create_location_connection(db, connection_in)
         await db.commit()
         await db.refresh(created_connection)
-        return created_connection
+        return ApiResponse.success_response(data=LocationConnectionRead.model_validate(created_connection))
         
     except ValueError as e:
         await db.rollback()
@@ -102,7 +104,9 @@ async def list_location_connections_for_world(
     logger.info(f"User '{current_user.username}' listing location connections for world {db_world.id}")
     
     connections = await crud_location_connection.get_connections_for_world(db, db_world.id)
-    return connections
+    return ApiResponse.success_response(
+        data=[LocationConnectionRead.model_validate(connection) for connection in connections]
+    )
 
 @router_location_connections.get("/{from_location_id}/{to_location_id}", response_model=ApiResponse)
 async def get_location_connection(
@@ -130,7 +134,7 @@ async def get_location_connection(
             detail="Not authorized to access this location connection"
         )
     
-    return connection
+    return ApiResponse.success_response(data=LocationConnectionRead.model_validate(connection))
 
 @router_location_connections.put("/{from_location_id}/{to_location_id}", response_model=ApiResponse)
 async def update_location_connection(
@@ -164,7 +168,7 @@ async def update_location_connection(
         
         await db.commit()
         await db.refresh(updated_connection)
-        return updated_connection
+        return ApiResponse.success_response(data=LocationConnectionRead.model_validate(updated_connection))
         
     except Exception as e:
         await db.rollback()
@@ -204,6 +208,7 @@ async def delete_location_connection(
             )
         
         await db.commit()
+        return None
         
     except Exception as e:
         await db.rollback()
@@ -236,7 +241,9 @@ async def get_connections_for_location(
     connections = await crud_location_connection.get_connections_for_location(
         db, location_id, include_bidirectional
     )
-    return connections
+    return ApiResponse.success_response(
+        data=[LocationConnectionRead.model_validate(connection) for connection in connections]
+    )
 
 @router_world_location_connections.get("/hierarchy", response_model=ApiResponse)
 async def get_world_location_hierarchy(
@@ -267,4 +274,4 @@ async def get_world_location_hierarchy(
             ]
         })
     
-    return result
+    return ApiResponse.success_response(data=result)

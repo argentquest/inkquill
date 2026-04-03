@@ -1,3 +1,5 @@
+"""SQLAlchemy models for user account."""
+
 from sqlalchemy import Column, Integer, String, DECIMAL, Boolean, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
@@ -6,6 +8,7 @@ from typing import Optional, List
 from app.db.database import Base
 
 class UserAccount(Base):
+    """SQLAlchemy model for user account."""
     __tablename__ = "user_accounts"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

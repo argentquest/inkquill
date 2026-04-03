@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/world_chat_context_loader.js
+// /story_app/app/static/js/world_chat_context_loader.js
 "use strict";
 
 const WorldChatContextLoader = (() => {

@@ -11,7 +11,7 @@ import time
 import semantic_kernel as sk
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.functions.function_result import FunctionResult 
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from typing import Dict, Any, Optional, List
 import logging
 
@@ -26,7 +26,6 @@ from app.core.config import settings
 from app.services.ai_model_cache import model_cache
 from app.services.sk_kernel_instance import (
     kernel,
-    retrieve_rag_context_function, 
     generate_act_narrative_only_function,
     generate_scene_narrative_only_function
 )
@@ -36,6 +35,7 @@ from app.services.sk_constants import (
 )
 from app.services.cost_tracker_service import log_ai_streaming_call
 from app.services.blog_prompt_service import BlogPromptService
+from app.services.direct_context import build_document_context
 
 logger = logging.getLogger(__name__)
 
@@ -282,21 +282,20 @@ async def handle_generate_content(
         # Build context
         context_parts = []
         
-        # Add RAG context if we have world/story context
+        # Add uploaded-document context if requested
         if message.get("use_world_context") and message.get("world_id"):
             try:
-                rag_context = await retrieve_rag_context_function.invoke(
-                    kernel,
-                    KernelArguments(
-                        world_id=message.get("world_id"),
-                        query=topic,
-                        context_type="blog_writing"
-                    )
+                document_context, _ = await build_document_context(
+                    db,
+                    int(message.get("world_id")),
+                    topic,
+                    max_documents=3,
+                    max_chars_per_document=1200,
                 )
-                if rag_context.value:
-                    context_parts.append(f"World Context:\n{rag_context.value}")
+                if document_context:
+                    context_parts.append(f"World Context:\n{document_context}")
             except Exception as e:
-                logger.warning(f"Failed to retrieve RAG context: {e}")
+                logger.warning(f"Failed to prepare uploaded-document context: {e}")
         
         # Generate prompt using prompt service
         prompt = BlogPromptService.format_content_generation_prompt(
@@ -322,7 +321,7 @@ async def handle_generate_content(
         })
         
         # Generate content
-        execution_settings = AzureChatPromptExecutionSettings(
+        execution_settings = OpenAIChatPromptExecutionSettings(
             max_tokens=model_settings.max_tokens,
             temperature=model_settings.temperature,
             top_p=model_settings.top_p
@@ -431,7 +430,7 @@ async def handle_improve_writing(
         })
         
         # Improve content
-        execution_settings = AzureChatPromptExecutionSettings(
+        execution_settings = OpenAIChatPromptExecutionSettings(
             max_tokens=model_settings.max_tokens,
             temperature=0.3,  # Lower temperature for improvements
             top_p=model_settings.top_p
@@ -540,7 +539,7 @@ async def handle_generate_title(
         })
         
         # Generate titles
-        execution_settings = AzureChatPromptExecutionSettings(
+        execution_settings = OpenAIChatPromptExecutionSettings(
             max_tokens=200,
             temperature=0.8,  # Higher creativity for titles
             top_p=model_settings.top_p
@@ -652,7 +651,7 @@ async def handle_generate_excerpt(
         })
         
         # Generate excerpt
-        execution_settings = AzureChatPromptExecutionSettings(
+        execution_settings = OpenAIChatPromptExecutionSettings(
             max_tokens=100,
             temperature=0.7,
             top_p=model_settings.top_p
@@ -764,7 +763,7 @@ async def handle_suggest_tags(
                 kernel,
                 KernelArguments(
                     prompt=prompt,
-                    execution_settings=AzureChatPromptExecutionSettings(
+                    execution_settings=OpenAIChatPromptExecutionSettings(
                         max_tokens=150,
                         temperature=0.5,
                         top_p=0.9
@@ -777,7 +776,7 @@ async def handle_suggest_tags(
                 kernel,
                 KernelArguments(
                     user_instruction=prompt,
-                    execution_settings=AzureChatPromptExecutionSettings(
+                    execution_settings=OpenAIChatPromptExecutionSettings(
                         max_tokens=150,
                         temperature=0.5,
                         top_p=0.9
@@ -850,7 +849,7 @@ async def handle_get_writing_tips(
                 kernel,
                 KernelArguments(
                     prompt=prompt,
-                    execution_settings=AzureChatPromptExecutionSettings(
+                    execution_settings=OpenAIChatPromptExecutionSettings(
                         max_tokens=400,
                         temperature=0.7,
                         top_p=0.9
@@ -863,7 +862,7 @@ async def handle_get_writing_tips(
                 kernel,
                 KernelArguments(
                     user_instruction=prompt,
-                    execution_settings=AzureChatPromptExecutionSettings(
+                    execution_settings=OpenAIChatPromptExecutionSettings(
                         max_tokens=400,
                         temperature=0.7,
                         top_p=0.9

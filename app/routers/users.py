@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/users.py
+"""API routes for users."""
+
+# /story_app/app/routers/users.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,7 +42,49 @@ async def read_users_me(
     logger.info(f"User '{current_user.username}' requesting their profile.")
     # The current_user object is already the SQLAlchemy User model instance.
     # Pydantic's UserRead schema will automatically convert it for the response.
-    return current_user
+    return ApiResponse.success_response(data=schema_user.UserRead.model_validate(current_user))
+
+
+@router.put("/me", response_model=ApiResponse, name="update_current_user_profile")
+async def update_users_me(
+    user_in: schema_user.UserProfileUpdate,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: ModelUser = Depends(get_current_active_user),
+):
+    """
+    Update the currently authenticated user's profile.
+    """
+    logger.info(f"User '{current_user.username}' updating their profile.")
+
+    update_payload = user_in.model_dump(exclude_unset=True)
+    if not update_payload:
+        return ApiResponse.success_response(data=schema_user.UserRead.model_validate(current_user))
+
+    if "username" in update_payload and update_payload["username"] != current_user.username:
+        existing_user = await crud_user.get_user_by_username(db, update_payload["username"])
+        if existing_user and existing_user.id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username is already in use",
+            )
+
+    if "email" in update_payload and update_payload["email"] != current_user.email:
+        existing_email_user = await crud_user.get_user_by_email(db, update_payload["email"])
+        if existing_email_user and existing_email_user.id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is already in use",
+            )
+
+    updated_user = await crud_user.update_user(
+        db=db,
+        db_user=current_user,
+        user_in=schema_user.UserUpdate(**update_payload),
+    )
+    await db.commit()
+    await db.refresh(updated_user)
+
+    return ApiResponse.success_response(data=schema_user.UserRead.model_validate(updated_user))
 
 @router.get("/{user_id}", response_model=ApiResponse, name="read_user_by_id")
 async def read_user_by_id(
@@ -69,7 +113,7 @@ async def read_user_by_id(
     if db_user is None:
         logger.warning(f"User ID {user_id} not found when requested by '{current_user.username}'.")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return db_user
+    return ApiResponse.success_response(data=schema_user.UserRead.model_validate(db_user))
 
 # --- Admin-only route: List all users ---
 @router.get("/", response_model=ApiResponse, name="list_all_users")
@@ -92,7 +136,9 @@ async def list_all_users(
     
     logger.info(f"Admin '{current_user.username}' listing all users.")
     users = await crud_user.get_users(db, skip=skip, limit=limit)
-    return users
+    return ApiResponse.success_response(
+        data=[schema_user.UserRead.model_validate(user) for user in users]
+    )
 
 
 # --- Admin-only route: Toggle user activation status ---
@@ -142,7 +188,7 @@ async def toggle_user_active(
     action = "activated" if new_status else "deactivated"
     logger.info(f"Admin '{current_user.username}' {action} user '{target_user.username}' (ID: {user_id})")
     
-    return updated_user
+    return ApiResponse.success_response(data=schema_user.UserRead.model_validate(updated_user))
 
 
 # --- Admin-only route: Edit user details ---
@@ -190,7 +236,7 @@ async def edit_user(
     
     logger.info(f"Admin '{current_user.username}' edited user '{target_user.username}' (ID: {user_id})")
     
-    return updated_user
+    return ApiResponse.success_response(data=schema_user.UserRead.model_validate(updated_user))
 
 # --- Example: Update user (typically for a user to update their own profile) ---
 # @router.put("/me", response_model=ApiResponse, name="update_current_user_profile")
@@ -209,3 +255,4 @@ async def edit_user(
 #     return updated_user
 
 # Add more user-related endpoints as needed (e.g., update, delete by admin, etc.)
+

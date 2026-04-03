@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/ai_cost_log.py
+"""SQLAlchemy models for ai cost log."""
+
+# /story_app/app/models/ai_cost_log.py
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Numeric, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column

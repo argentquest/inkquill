@@ -1,0 +1,114 @@
+import { expect, test } from "@playwright/test";
+
+import { mockAppApis } from "./helpers";
+
+test.describe("Sprint 2 auth", () => {
+  test("anonymous user is sent to the login experience for protected account access", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/app/account");
+
+    await expect(page).toHaveURL(/\/auth\/login\?next=%2Fapp%2Faccount/, { timeout: 30000 });
+    await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });
+  });
+
+  test("protected account route shows an error state when session bootstrap fails", async ({ page }) => {
+    await mockAppApis(page, { session: "session-error" });
+    await page.goto("/app/account");
+
+    await expect(page).toHaveURL(/\/app\/account/, { timeout: 30000 });
+    await expect(page.getByRole("heading", { name: "Account shell could not confirm the current user." })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText("Session failed")).toBeVisible();
+  });
+
+  test("login success reaches the account landing", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/login?next=%2Fapp%2Faccount");
+
+    await page.getByLabel("Username").fill("storymaker");
+    await page.locator('input[name="password"]').fill("password123");
+    await page.getByRole("button", { name: "Sign in" }).click();
+
+    await expect(page).toHaveURL(/\/app\/account/, { timeout: 20000 });
+    await expect(page.getByRole("heading", { name: "Welcome back, Story Maker." })).toBeVisible({ timeout: 20000 });
+  });
+
+  test("login constrains unsafe next targets to the account shell", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/login?next=https%3A%2F%2Fevil.example%2Fsteal");
+
+    await page.getByLabel("Username").fill("storymaker");
+    await page.locator('input[name="password"]').fill("password123");
+    await page.getByRole("button", { name: "Sign in" }).click();
+
+    await expect(page).toHaveURL(/\/app\/account/, { timeout: 20000 });
+    await expect(page.url()).not.toContain("evil.example");
+  });
+
+  test("login error renders clearly", async ({ page }) => {
+    await mockAppApis(page, { login: "error" });
+    await page.goto("/auth/login");
+
+    await page.getByLabel("Username").fill("storymaker");
+    await page.locator('input[name="password"]').fill("wrongpass1");
+    await page.getByRole("button", { name: "Sign in" }).click();
+
+    await expect(page.getByText("Incorrect username or password")).toBeVisible();
+  });
+
+  test("register success reaches the preserved protected destination", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/register?next=%2Fapp%2Faccount%3Ftab%3Dbilling");
+
+    await page.getByLabel("Username").fill("storymaker");
+    await page.getByLabel("Email").fill("storymaker@example.com");
+    await page.getByLabel("Display name").fill("Story Maker");
+    await page.locator('input[name="password"]').fill("password123");
+    await page.getByRole("checkbox").check();
+    await page.getByRole("button", { name: "Create account" }).click();
+
+    await expect(page).toHaveURL(/\/app\/account\?tab=billing/, { timeout: 20000 });
+    await expect(page.getByText("Account summary")).toBeVisible({ timeout: 20000 });
+  });
+
+  test("forgot password flow shows success messaging", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/forgot-password");
+
+    await page.getByLabel("Email").fill("storymaker@example.com");
+    await page.getByRole("button", { name: "Send reset link" }).click();
+
+    await expect(page.getByText("Reset email requested", { exact: true })).toBeVisible({ timeout: 20000 });
+  });
+
+  test("reset password flow accepts token and shows success messaging", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/reset-password?token=valid-token");
+
+    await page.locator('input[name="password"]').fill("newpassword123");
+    await page.locator('input[name="confirmPassword"]').fill("newpassword123");
+    await page.getByRole("button", { name: "Reset password" }).click();
+
+    await expect(page.getByText("Password reset complete")).toBeVisible({ timeout: 20000 });
+  });
+
+  test("logout from the shell returns the user to login", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/app/account");
+
+    await page.getByRole("button", { name: /Story Maker/ }).click();
+    await page.getByText("Log out").click();
+
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 30000 });
+    await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });
+  });
+
+  test("google sign-in entry points to the backend auth route", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/login");
+
+    await expect(page.getByRole("link", { name: "Continue with Google" })).toHaveAttribute(
+      "href",
+      "http://127.0.0.1:8000/api/v1/auth/google"
+    );
+  });
+});

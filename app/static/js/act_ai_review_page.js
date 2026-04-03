@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_ai_review_page.js
+// /story_app/app/static/js/act_ai_review_page.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {

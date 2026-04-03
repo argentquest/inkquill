@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/auth.py
+"""API routes for auth."""
+
+# /story_app/app/routers/auth.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.responses import RedirectResponse
@@ -31,14 +33,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login
 
 # Password reset schemas
 class PasswordResetRequest(BaseModel):
+    """Response or helper model for password reset request."""
     email: str
 
 class PasswordResetConfirm(BaseModel):
+    """Response or helper model for password reset confirm."""
     token: str
     new_password: str
 
 @router.post("/register", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="register_new_user", summary="Register a new user account.")
 async def register_new_user(user_in: schema_user.UserCreate, response: Response, request: Request, db: AsyncSession = Depends(get_db_session)):
+    """Handle POST /register."""
     logger.info(f"Attempting registration for username: {user_in.username}, email: {user_in.email}")
     
     # Validate Terms of Service acceptance
@@ -64,7 +69,7 @@ async def register_new_user(user_in: schema_user.UserCreate, response: Response,
         # Automatically log in the newly registered user
         access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = security.create_access_token(
-            data={"sub": created_user.username, "type": "access"},
+            data={"sub": created_user.username, "type": "access", "user_id": created_user.id},
             expires_delta=access_token_expires
         )
         response.set_cookie(
@@ -128,7 +133,7 @@ async def register_new_user(user_in: schema_user.UserCreate, response: Response,
                 logger.error(f"Failed to send welcome email to {created_user.email}: {email_error}")
                 # Don't fail registration if email fails
         
-        return ApiResponse.success_response(data=created_user)
+        return ApiResponse.success_response(data=schema_user.UserRead.model_validate(created_user))
     except Exception as e:
         await db.rollback() 
         logger.error(f"Error during user registration for '{user_in.username}': {e}", exc_info=True)
@@ -136,6 +141,7 @@ async def register_new_user(user_in: schema_user.UserCreate, response: Response,
 
 @router.post("/login", name="login_for_access_token", summary="Login for existing user, sets HttpOnly access token cookie.")
 async def login_for_access_token(response: Response, db: AsyncSession = Depends(get_db_session), form_data: OAuth2PasswordRequestForm = Depends()):
+    """Handle POST /login."""
     logger.info(f"Login attempt for username: {form_data.username}")
     user = await crud_user.get_user_by_username(db, username=form_data.username)
     if not user or not security.verify_password(form_data.password, user.hashed_password):
@@ -147,7 +153,7 @@ async def login_for_access_token(response: Response, db: AsyncSession = Depends(
     
     access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        data={"sub": user.username, "type": "access"},
+        data={"sub": user.username, "type": "access", "user_id": user.id},
         expires_delta=access_token_expires
     )
     response.set_cookie(
@@ -210,6 +216,9 @@ async def get_access_token(
             detail="Inactive user account."
         )
 
+    username = user.username
+    user_id = user.id
+
     # Get client info
     ip_address = request.client.host if request else None
     user_agent = request.headers.get("user-agent") if request else None
@@ -217,7 +226,7 @@ async def get_access_token(
     # Create access token
     access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        data={"sub": user.username, "type": "access"},
+        data={"sub": user.username, "type": "access", "user_id": user.id},
         expires_delta=access_token_expires
     )
 
@@ -226,18 +235,18 @@ async def get_access_token(
     try:
         db_refresh_token = await refresh_token_crud.create(
             db=db,
-            user_id=user.id,
+            user_id=user_id,
             ip_address=ip_address,
             user_agent=user_agent
         )
         await db.commit()
         refresh_token_value = db_refresh_token.token
     except Exception as e:
-        logger.error(f"Failed to create refresh token for user {user.id}: {e}", exc_info=True)
+        logger.error(f"Failed to create refresh token for user {user_id}: {e}", exc_info=True)
         await db.rollback()
         refresh_token_value = None
 
-    logger.info(f"User '{user.username}' obtained tokens successfully via /token endpoint.")
+    logger.info(f"User '{username}' obtained tokens successfully via /token endpoint.")
 
     token_response = TokenResponse(
         access_token=access_token,
@@ -302,7 +311,7 @@ async def refresh_access_token(
     # Create new access token
     access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        data={"sub": user.username, "type": "access"},
+        data={"sub": user.username, "type": "access", "user_id": user.id},
         expires_delta=access_token_expires
     )
 
@@ -357,6 +366,7 @@ async def logout_user(
 
 # --- Endpoint to get a WebSocket ticket ---
 class WSTicketResponse(BaseModel): 
+    """Response or helper model for w s ticket response."""
     ticket: str
     expires_at: datetime 
 
@@ -373,7 +383,7 @@ async def get_websocket_ticket(
     ticket_expires_delta = timedelta(seconds=300) # 5 minutes
 
     ticket_jwt = security.create_access_token(
-        data={"sub": current_user.username, "type": "ws-ticket"},
+        data={"sub": current_user.username, "type": "ws-ticket", "user_id": current_user.id},
         expires_delta=ticket_expires_delta
     )
     expires_at = datetime.now(timezone.utc) + ticket_expires_delta
@@ -383,6 +393,7 @@ async def get_websocket_ticket(
 
 # --- Impersonation endpoints (admin only) ---
 class ImpersonateRequest(BaseModel):
+    """Response or helper model for impersonate request."""
     username: str
 
 
@@ -427,6 +438,7 @@ async def impersonate_user(
         data={
             "sub": target_user.username,
             "type": "access",
+            "user_id": target_user.id,
             "impersonator": current_user.username,  # Track who is impersonating
             "is_impersonating": True
         },
@@ -498,7 +510,7 @@ async def stop_impersonation(
     # Create new token for the admin user (not impersonating)
     access_token_expires = timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        data={"sub": admin_user.username, "type": "access"},
+        data={"sub": admin_user.username, "type": "access", "user_id": admin_user.id},
         expires_delta=access_token_expires
     )
     
@@ -643,3 +655,4 @@ async def create_websocket_ticket(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate WebSocket ticket"
         )
+

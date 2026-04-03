@@ -1,6 +1,5 @@
 """Blog tag API endpoints."""
 import logging
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +13,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/blog/tags", tags=["blog-tags"])
 
 
+def _serialize_tag(tag):
+    """Provide internal router support for serialize tag."""
+    return BlogTagRead.model_validate(tag, from_attributes=True)
+
+
 @router.get("/", response_model=ApiResponse)
 async def get_blog_tags(
     skip: int = Query(0, ge=0),
@@ -23,7 +27,7 @@ async def get_blog_tags(
     """Get all blog tags."""
     try:
         tags = await blog_tag_service.get_all_tags(db, skip=skip, limit=limit)
-        return tags
+        return ApiResponse.success_response(data=[_serialize_tag(tag) for tag in tags])
     except Exception as e:
         logger.error(f"Error getting blog tags: {e}")
         raise HTTPException(
@@ -40,7 +44,7 @@ async def get_popular_blog_tags(
     """Get most popular blog tags."""
     try:
         tags = await blog_tag_service.get_popular_tags(db, limit=limit)
-        return tags
+        return ApiResponse.success_response(data=[_serialize_tag(tag) for tag in tags])
     except Exception as e:
         logger.error(f"Error getting popular blog tags: {e}")
         raise HTTPException(
@@ -58,7 +62,7 @@ async def search_blog_tags(
     """Search blog tags for auto-completion."""
     try:
         tags = await blog_tag_service.search_tags(db, q, limit=limit)
-        return tags
+        return ApiResponse.success_response(data=[_serialize_tag(tag) for tag in tags])
     except Exception as e:
         logger.error(f"Error searching blog tags: {e}")
         raise HTTPException(
@@ -80,7 +84,7 @@ async def get_blog_tag_by_slug(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Blog tag not found"
             )
-        return tag
+        return ApiResponse.success_response(data=_serialize_tag(tag))
     except HTTPException:
         raise
     except Exception as e:

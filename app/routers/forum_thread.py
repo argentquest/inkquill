@@ -1,5 +1,5 @@
 """API endpoints for forum threads."""
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +18,65 @@ from app.crud import forum_thread as crud_thread
 from app.crud import forum_post as crud_post
 
 router = APIRouter(prefix="/api/forum/threads", tags=["forum_threads"])
+
+
+def _build_thread_list_response(thread) -> ForumThreadListResponse:
+    """Provide internal router support for build thread list response."""
+    return ForumThreadListResponse(
+        id=thread.id,
+        title=thread.title,
+        slug=thread.slug,
+        status=thread.status,
+        category_id=thread.category_id,
+        category_name=thread.category.name if thread.category else None,
+        user_id=thread.user_id,
+        username=thread.user.username if thread.user else "Unknown",
+        world_id=thread.world_id,
+        world_name=thread.world.name if thread.world else None,
+        story_id=thread.story_id,
+        story_title=thread.story.title if thread.story else None,
+        view_count=thread.view_count,
+        post_count=thread.post_count,
+        last_post_at=thread.last_post_at,
+        last_post_by_username=thread.last_post_by.username if thread.last_post_by else None,
+        is_pinned=thread.is_pinned,
+        is_locked=thread.is_locked,
+        created_at=thread.created_at,
+    )
+
+
+def _build_post_response(post, user_vote=None) -> ForumPostResponse:
+    """Provide internal router support for build post response."""
+    user = post.__dict__.get("user")
+    character = post.__dict__.get("character")
+    location = post.__dict__.get("location")
+    edited_by = post.__dict__.get("edited_by")
+    return ForumPostResponse(
+        id=post.id,
+        content=post.content,
+        content_html=post.content_html,
+        thread_id=post.thread_id,
+        user_id=post.user_id,
+        username=user.username if user else "Unknown",
+        user_display_name=user.display_name if user else None,
+        parent_post_id=post.parent_post_id,
+        character_id=post.character_id,
+        character_name=character.name if character else None,
+        location_id=post.location_id,
+        location_name=location.name if location else None,
+        upvote_count=post.upvote_count,
+        downvote_count=post.downvote_count,
+        score=post.score,
+        user_vote=user_vote,
+        edit_count=post.edit_count,
+        edited_at=post.edited_at,
+        edited_by_username=edited_by.username if edited_by else None,
+        is_deleted=post.is_deleted,
+        deleted_at=post.deleted_at,
+        deletion_reason=post.deletion_reason,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+    )
 
 
 @router.get("/", response_model=ApiResponse)
@@ -46,32 +105,8 @@ async def get_threads(
     )
     
     # Convert to response format
-    response_threads = []
-    for thread in threads:
-        thread_dict = {
-            "id": thread.id,
-            "title": thread.title,
-            "slug": thread.slug,
-            "status": thread.status,
-            "category_id": thread.category_id,
-            "category_name": thread.category.name if thread.category else None,
-            "user_id": thread.user_id,
-            "username": thread.user.username if thread.user else "Unknown",
-            "world_id": thread.world_id,
-            "world_name": thread.world.name if thread.world else None,
-            "story_id": thread.story_id,
-            "story_title": thread.story.title if thread.story else None,
-            "view_count": thread.view_count,
-            "post_count": thread.post_count,
-            "last_post_at": thread.last_post_at,
-            "last_post_by_username": thread.last_post_by.username if thread.last_post_by else None,
-            "is_pinned": thread.is_pinned,
-            "is_locked": thread.is_locked,
-            "created_at": thread.created_at
-        }
-        response_threads.append(ForumThreadListResponse(**thread_dict))
-    
-    return response_threads
+    response_threads = [_build_thread_list_response(thread) for thread in threads]
+    return ApiResponse.success_response(data=response_threads)
 
 
 @router.get("/{thread_id}", response_model=ApiResponse)
@@ -107,33 +142,7 @@ async def get_thread(
                 db, post.id, current_user.id
             )
         
-        post_dict = {
-            "id": post.id,
-            "content": post.content,
-            "content_html": post.content_html,
-            "thread_id": post.thread_id,
-            "user_id": post.user_id,
-            "username": post.user.username if post.user else "Unknown",
-            "user_display_name": post.user.display_name if post.user else None,
-            "parent_post_id": post.parent_post_id,
-            "character_id": post.character_id,
-            "character_name": post.character.name if post.character else None,
-            "location_id": post.location_id,
-            "location_name": post.location.name if post.location else None,
-            "upvote_count": post.upvote_count,
-            "downvote_count": post.downvote_count,
-            "score": post.score,
-            "user_vote": user_vote,
-            "edit_count": post.edit_count,
-            "edited_at": post.edited_at,
-            "edited_by_username": post.edited_by.username if post.edited_by else None,
-            "is_deleted": post.is_deleted,
-            "deleted_at": post.deleted_at,
-            "deletion_reason": post.deletion_reason,
-            "created_at": post.created_at,
-            "updated_at": post.updated_at
-        }
-        response_posts.append(ForumPostResponse(**post_dict))
+        response_posts.append(_build_post_response(post, user_vote))
     
     # Convert thread to response format
     thread_response = ForumThreadDetailResponse(
@@ -161,7 +170,7 @@ async def get_thread(
         posts=response_posts
     )
     
-    return thread_response
+    return ApiResponse.success_response(data=thread_response)
 
 
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
@@ -188,11 +197,11 @@ async def create_thread(
         first_post = await crud_post.create_forum_post(
             db, initial_post, current_user.id
         )
-        
-        # Refresh to get all relationships
-        await db.refresh(new_thread)
-        
-        return ForumThreadDetailResponse(
+        new_thread = await crud_thread.get_forum_thread(db, new_thread.id)
+        first_post = await crud_post.get_forum_post(db, first_post.id)
+
+        return ApiResponse.success_response(
+            data=ForumThreadDetailResponse(
             id=new_thread.id,
             title=new_thread.title,
             slug=new_thread.slug,
@@ -214,29 +223,32 @@ async def create_thread(
             created_at=new_thread.created_at,
             updated_at=new_thread.updated_at,
             is_subscribed=True,
-            posts=[ForumPostResponse(
-                id=first_post.id,
-                content=first_post.content,
-                content_html=first_post.content_html,
-                thread_id=first_post.thread_id,
-                user_id=first_post.user_id,
-                username=current_user.username,
-                user_display_name=current_user.display_name,
-                parent_post_id=None,
-                character_id=first_post.character_id,
-                location_id=first_post.location_id,
-                upvote_count=0,
-                downvote_count=0,
-                score=0,
-                user_vote=None,
-                edit_count=0,
-                edited_at=None,
-                is_deleted=False,
-                deleted_at=None,
-                deletion_reason=None,
-                created_at=first_post.created_at,
-                updated_at=first_post.updated_at
-            )]
+            posts=[
+                ForumPostResponse(
+                    id=first_post.id,
+                    content=first_post.content,
+                    content_html=first_post.content_html,
+                    thread_id=first_post.thread_id,
+                    user_id=first_post.user_id,
+                    username=current_user.username,
+                    user_display_name=current_user.display_name,
+                    parent_post_id=None,
+                    character_id=first_post.character_id,
+                    location_id=first_post.location_id,
+                    upvote_count=0,
+                    downvote_count=0,
+                    score=0,
+                    user_vote=None,
+                    edit_count=0,
+                    edited_at=None,
+                    is_deleted=False,
+                    deleted_at=None,
+                    deletion_reason=None,
+                    created_at=first_post.created_at,
+                    updated_at=first_post.updated_at,
+                )
+            ],
+            ),
         )
     except Exception as e:
         raise HTTPException(
@@ -265,27 +277,7 @@ async def update_thread(
     
     await db.refresh(updated_thread)
     
-    return ForumThreadListResponse(
-        id=updated_thread.id,
-        title=updated_thread.title,
-        slug=updated_thread.slug,
-        status=updated_thread.status,
-        category_id=updated_thread.category_id,
-        category_name=updated_thread.category.name if updated_thread.category else None,
-        user_id=updated_thread.user_id,
-        username=updated_thread.user.username if updated_thread.user else "Unknown",
-        world_id=updated_thread.world_id,
-        world_name=updated_thread.world.name if updated_thread.world else None,
-        story_id=updated_thread.story_id,
-        story_title=updated_thread.story.title if updated_thread.story else None,
-        view_count=updated_thread.view_count,
-        post_count=updated_thread.post_count,
-        last_post_at=updated_thread.last_post_at,
-        last_post_by_username=updated_thread.last_post_by.username if updated_thread.last_post_by else None,
-        is_pinned=updated_thread.is_pinned,
-        is_locked=updated_thread.is_locked,
-        created_at=updated_thread.created_at
-    )
+    return ApiResponse.success_response(data=_build_thread_list_response(updated_thread))
 
 
 @router.delete("/{thread_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -328,27 +320,7 @@ async def toggle_thread_lock(
     
     await db.refresh(thread)
     
-    return ForumThreadListResponse(
-        id=thread.id,
-        title=thread.title,
-        slug=thread.slug,
-        status=thread.status,
-        category_id=thread.category_id,
-        category_name=thread.category.name if thread.category else None,
-        user_id=thread.user_id,
-        username=thread.user.username if thread.user else "Unknown",
-        world_id=thread.world_id,
-        world_name=thread.world.name if thread.world else None,
-        story_id=thread.story_id,
-        story_title=thread.story.title if thread.story else None,
-        view_count=thread.view_count,
-        post_count=thread.post_count,
-        last_post_at=thread.last_post_at,
-        last_post_by_username=thread.last_post_by.username if thread.last_post_by else None,
-        is_pinned=thread.is_pinned,
-        is_locked=thread.is_locked,
-        created_at=thread.created_at
-    )
+    return ApiResponse.success_response(data=_build_thread_list_response(thread))
 
 
 @router.post("/{thread_id}/toggle-pin", response_model=ApiResponse)
@@ -370,27 +342,7 @@ async def toggle_thread_pin(
     
     await db.refresh(thread)
     
-    return ForumThreadListResponse(
-        id=thread.id,
-        title=thread.title,
-        slug=thread.slug,
-        status=thread.status,
-        category_id=thread.category_id,
-        category_name=thread.category.name if thread.category else None,
-        user_id=thread.user_id,
-        username=thread.user.username if thread.user else "Unknown",
-        world_id=thread.world_id,
-        world_name=thread.world.name if thread.world else None,
-        story_id=thread.story_id,
-        story_title=thread.story.title if thread.story else None,
-        view_count=thread.view_count,
-        post_count=thread.post_count,
-        last_post_at=thread.last_post_at,
-        last_post_by_username=thread.last_post_by.username if thread.last_post_by else None,
-        is_pinned=thread.is_pinned,
-        is_locked=thread.is_locked,
-        created_at=thread.created_at
-    )
+    return ApiResponse.success_response(data=_build_thread_list_response(thread))
 
 
 @router.post("/{thread_id}/subscribe")
@@ -404,4 +356,4 @@ async def toggle_subscription(
         db, thread_id, current_user.id
     )
     
-    return {"subscribed": is_subscribed}
+    return ApiResponse.success_response(data={"subscribed": is_subscribed})

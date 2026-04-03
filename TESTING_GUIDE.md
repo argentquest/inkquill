@@ -1,6 +1,6 @@
-# Testing Guide for RAG Story Application
+# Testing Guide for Context Story Application
 
-This guide provides comprehensive information about testing the RAG Story Application.
+This guide provides comprehensive information about testing the Context Story Application.
 
 ## Table of Contents
 - [Overview](#overview)

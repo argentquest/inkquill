@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/async_image_service.py
+"""Service helpers for async image service."""
+
+# /story_app/app/services/async_image_service.py
 
 import asyncio
 import uuid
@@ -22,6 +24,7 @@ from app.services.image_service import generate_image_with_active_provider
 from app.core.config import settings
 from app.core.deps import get_db_session
 from app.db.database import async_session_local
+from app.services.storage_service import save_blob
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +142,7 @@ class AsyncImageService:
                 if not image_result:
                     raise Exception("Image generation failed - no result returned")
                 
-                # Upload image to Azure blob storage
+                # Persist generated image to local storage
                 blob_path = await AsyncImageService._upload_generated_image(
                     image_data=image_result.image_bytes,
                     element_type=element_type,
@@ -214,41 +217,16 @@ class AsyncImageService:
         element_id: int,
         world_id: Optional[int]
     ) -> str:
-        """Upload image bytes to Azure blob storage"""
-        from azure.storage.blob.aio import BlobServiceClient
-        from azure.storage.blob import ContentSettings
-        
-        # Use image bytes directly (already in bytes format)
-        image_bytes = image_data
-        
+        """Upload image bytes to local storage."""
         # Generate blob path
         image_uuid = str(uuid.uuid4())
         if world_id:
             blob_path = f"worlds/{world_id}/{element_type}s/{element_id}/{image_uuid}.png"
         else:
             blob_path = f"{element_type}s/{element_id}/{image_uuid}.png"
-        
-        # Upload to Azure blob storage
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        
-        if settings.AZURE_STORAGE_CONNECTION_STRING:
-            blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-        else:
-            account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-            from azure.identity.aio import DefaultAzureCredential
-            credential = DefaultAzureCredential()
-            blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
-        
-        async with blob_service_client:
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_path)
-            content_settings = ContentSettings(content_type='image/png')
-            await blob_client.upload_blob(
-                image_bytes, 
-                content_settings=content_settings, 
-                overwrite=True
-            )
-        
-        logger.info(f"Uploaded image to blob path: {blob_path}")
+
+        await save_blob("generated-images", blob_path, image_data, "image/png")
+        logger.info(f"Uploaded image to local storage path: {blob_path}")
         return blob_path
     
     @staticmethod
@@ -399,3 +377,4 @@ class AsyncImageService:
     def get_active_task_ids() -> list[str]:
         """Get list of currently active job IDs"""
         return list(active_image_tasks.keys())
+

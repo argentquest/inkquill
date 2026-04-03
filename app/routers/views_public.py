@@ -1,3 +1,5 @@
+"""API routes for views public."""
+
 # /mnt/c/Code2025/rag/app/routers/views_public.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Query

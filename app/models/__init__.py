@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/__init__.py
+"""Package exports for models."""
+
+# /story_app/app/models/__init__.py
 
 # Import in a logical order, starting with independent models or enums
 # and ending with models that have foreign keys to others.
@@ -9,6 +11,7 @@ from .prompt import Prompt, PromptTypeEnum, AgeTargetEnum
 from .ai_model_config import AIModelConfiguration, AIProviderEnum, AIModelTypeEnum
 from .job_status import JobStatus
 from .world_role import WorldRole
+from .world_collaborator import WorldCollaborator, CollaboratorRole, CollaboratorStatus
 from .world import World
 from .story_class import StoryClass
 from .story import Story
@@ -76,9 +79,8 @@ from .blog_author_profile import BlogAuthorProfile
 from .blog_subscription import BlogSubscription
 
 
-# Story chat models disabled - commenting out imports
-# from .story_chat_session import StoryChatSession  
-# from .story_chat_message import StoryChatMessage
+from .story_chat_session import StoryChatSession
+from .story_chat_message import StoryChatMessage
 
 # CTA Content models
 from .cta_content import CTAContent, CTAPosition, CTAStyle
@@ -87,3 +89,4 @@ from .cta_content import CTAContent, CTAPosition, CTAStyle
 # has a complete picture of all tables and their relationships before the
 # application starts trying to use them, preventing NameError issues with
 # forward-referenced relationship strings.
+

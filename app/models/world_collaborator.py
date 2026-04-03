@@ -1,6 +1,8 @@
-# /ai_rag_story_app/app/models/world_collaborator.py
+"""SQLAlchemy models for world collaborator."""
 
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, JSON
+# /story_app/app/models/world_collaborator.py
+
+from sqlalchemy import Integer, String, ForeignKey, DateTime, JSON, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
 from typing import Optional, Dict, Any, TYPE_CHECKING
@@ -99,7 +101,7 @@ class WorldCollaborator(Base):
 
     # --- Unique constraint ---
     __table_args__ = (
-        sqlalchemy.UniqueConstraint('world_id', 'user_id', name='uq_world_collaborator'),
+        UniqueConstraint('world_id', 'user_id', name='uq_world_collaborator'),
     )
 
     def has_permission(self, permission: str) -> bool:
@@ -159,3 +161,4 @@ class WorldCollaborator(Base):
 
     def __repr__(self):
         return f"<WorldCollaborator(world_id={self.world_id}, user_id={self.user_id}, role='{self.role}', status='{self.status}')>"
+

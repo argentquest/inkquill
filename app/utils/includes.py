@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/utils/includes.py
+"""Utility helpers for includes."""
+
+# /story_app/app/utils/includes.py
 
 from typing import List, Dict, Any, Optional
 from fastapi import Query
@@ -6,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-async def parse_include_param(
+def parse_include_param(
     include: Optional[str] = Query(None, description="Comma-separated list of related entities to include (e.g., 'characters,locations,lore_items')")
 ) -> List[str]:
     """
@@ -34,7 +36,7 @@ async def parse_include_param(
         logger.warning(f"Failed to parse include parameter '{include}': {e}")
         return []
 
-async def apply_includes_to_query(base_query, include_fields: List[str], valid_relations: Dict[str, Any]):
+def apply_includes_to_query(base_query, include_fields: List[str], valid_relations: Dict[str, Any]):
     """
     Apply selectinload options to a SQLAlchemy query based on include parameters.
 
@@ -85,7 +87,7 @@ class IncludeManager:
         Returns:
             Dict with relation names as keys and True as values if they should be included
         """
-        include_fields = await parse_include_param(include_str)
+        include_fields = parse_include_param(include_str)
         return {field: True for field in include_fields if field in self.valid_relations}
 
     async def apply_to_query(self, query, include_str: Optional[str]):
@@ -99,5 +101,5 @@ class IncludeManager:
         Returns:
             Modified query with selectinload options
         """
-        include_fields = await parse_include_param(include_str)
-        return await apply_includes_to_query(query, include_fields, self.valid_relations)
+        include_fields = parse_include_param(include_str)
+        return apply_includes_to_query(query, include_fields, self.valid_relations)

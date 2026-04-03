@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_ai_processor.js
+// /story_app/app/static/js/scene_ai_processor.js
 "use strict";
 
 const SceneAIProcessor = (() => {
@@ -152,33 +152,33 @@ const SceneAIProcessor = (() => {
         };
     }
 
-    function processRagContextMessageForScene(ragData) {
+    function processContextMessageForScene(contextData) {
         let summary = "No relevant background information found.";
-        let details = "No RAG context details available for this generation.";
+        let details = "No context details available for this generation.";
 
-        if (ragData) { 
-            if (Array.isArray(ragData) && ragData.length > 0) {
-                summary = ragData.map(doc => `Source: ${doc.source_filename || 'N/A'}\nSnippet: ${(doc.text || '').substring(0,100)}...`).join('\n---\n');
+        if (contextData) { 
+            if (Array.isArray(contextData) && contextData.length > 0) {
+                summary = contextData.map(doc => `Source: ${doc.source_filename || 'N/A'}\nSnippet: ${(doc.text || '').substring(0,100)}...`).join('\n---\n');
                 try {
-                    details = JSON.stringify(ragData, null, 2);
+                    details = JSON.stringify(contextData, null, 2);
                 } catch (e) {
-                    console.error("SceneAIProcessor: Error stringifying RAG details array:", e);
-                    details = "Error formatting RAG details for display. Raw data received from server.";
+                    console.error("SceneAIProcessor: Error stringifying context details array:", e);
+                    details = "Error formatting context details for display. Raw data received from server.";
                 }
-            } else if (typeof ragData === 'string' && ragData.trim() !== "") {
-                summary = ragData.substring(0, 300) + (ragData.length > 300 ? "..." : "");
-                details = ragData; 
-            } else if (typeof ragData === 'object' && Object.keys(ragData).length > 0) {
-                summary = `Received RAG data object. See details tab for full content.`; 
+            } else if (typeof contextData === 'string' && contextData.trim() !== "") {
+                summary = contextData.substring(0, 300) + (contextData.length > 300 ? "..." : "");
+                details = contextData; 
+            } else if (typeof contextData === 'object' && Object.keys(contextData).length > 0) {
+                summary = "Received context data object. See details tab for full content."; 
                 try {
-                    details = JSON.stringify(ragData, null, 2);
+                    details = JSON.stringify(contextData, null, 2);
                 } catch (e) {
-                    console.error("SceneAIProcessor: Error stringifying RAG details object:", e);
-                    details = "Error formatting RAG details object for display.";
+                    console.error("SceneAIProcessor: Error stringifying context details object:", e);
+                    details = "Error formatting context details object for display.";
                 }
-            } else if (typeof ragData === 'string' && ragData.trim() === "") {
-                summary = "RAG system returned an empty string.";
-                details = "RAG system returned an empty string.";
+            } else if (typeof contextData === 'string' && contextData.trim() === "") {
+                summary = "Context assembly returned an empty string.";
+                details = "Context assembly returned an empty string.";
             }
         }
         return { summary, details };
@@ -201,7 +201,8 @@ const SceneAIProcessor = (() => {
 
     return {
         processFullJsonResponse: processFullJsonResponse, // This now focuses on metadata JSON
-        processRagContextMessage: processRagContextMessageForScene, 
+        processContextMessage: processContextMessageForScene, 
         processFullPromptMessage: processFullPromptMessageForScene 
     };
 })();
+

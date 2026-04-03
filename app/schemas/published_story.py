@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/published_story.py
+"""Pydantic schemas for published story."""
+
+# /story_app/app/schemas/published_story.py
 
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List

@@ -1,3 +1,5 @@
+"""Core application helpers for content sanitizer."""
+
 # Content sanitization utilities to prevent XSS and malicious content injection
 import re
 import logging

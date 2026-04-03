@@ -1,3 +1,5 @@
+"""API routes for image generation."""
+
 import logging
 import base64
 import uuid
@@ -16,9 +18,7 @@ from PIL import Image, ImageOps
 import math
 
 from app.core.deps import get_db_session, get_current_active_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
-from azure.storage.blob import ContentSettings
+from app.core.storage_deps import build_storage_url
 
 from app.models.user import User
 from app.models.character import Character
@@ -39,11 +39,24 @@ from app.services.image_service import generate_image_with_active_provider
 from app.services.async_image_service import AsyncImageService
 from app.models.job_status import JobTypeEnum, JobStatus, JobStateEnum
 from app.core.config import settings
+from app.services.storage_service import save_blob, delete_blob
 
 logger = logging.getLogger(__name__)
 
 
+def _build_generated_image_blob_name(entity_type: str, entity_id: int, world_id: Union[int, str], image_uuid: uuid.UUID, extension: str) -> str:
+    """Provide internal router support for build generated image blob name."""
+    return f"worlds/{world_id}/{entity_type}s/{entity_id}/{image_uuid}.{extension}"
+
+
+async def _save_generated_image_bytes(blob_name: str, image_bytes: bytes, content_type: str) -> str:
+    """Provide internal router support for save generated image bytes."""
+    await save_blob("generated-images", blob_name, image_bytes, content_type)
+    return build_storage_url("generated-images", blob_name) or ""
+
+
 class ImageResponse(BaseModel):
+    """Response or helper model for image response."""
     id: int
     url: str
     prompt: str
@@ -246,12 +259,14 @@ router = APIRouter(
 )
 
 class ImageGenerationRequest(BaseModel):
+    """Response or helper model for image generation request."""
     element_type: str
     element_id: int
     prompt_override: Optional[str] = None
     style_prompt: Optional[str] = None
 
 class ImageGenerationModalRequest(BaseModel):
+    """Response or helper model for image generation modal request."""
     entity_type: str
     entity_id: int
     prompt: str
@@ -260,12 +275,14 @@ class ImageGenerationModalRequest(BaseModel):
     size: Optional[str] = None
 
 class ImageUploadRequest(BaseModel):
+    """Response or helper model for image upload request."""
     entity_type: str
     entity_id: int
     aspect_ratio: str  # 16:9, 4:3, 1:1, 9:16
     dimension: str     # Based on aspect ratio preset
 
 class ImageResponse(BaseModel):
+    """Response or helper model for image response."""
     id: int
     url: str
     prompt: str
@@ -275,6 +292,7 @@ class ImageResponse(BaseModel):
     aspect_ratio: Optional[str] = None
 
 class SetCurrentImageResponse(BaseModel):
+    """Response or helper model for set current image response."""
     message: str
     image_id: int
     image_url: Optional[str]
@@ -286,6 +304,7 @@ async def generate_and_save_image_task(
     element_id: int,
     prompt: str
 ):
+    """Generate and save image task."""
     from app.db.database import async_session_local
     from app.core.config import settings
     from app.models.generated_image import GeneratedImage
@@ -304,8 +323,6 @@ async def generate_and_save_image_task(
 
     revised_prompt, content_type, image_bytes = generation_result.revised_prompt, generation_result.content_type, generation_result.image_bytes
     
-    blob_service_client_async = None
-    credential_for_storage_async = None
     image_url = None
     blob_name = ""
 
@@ -313,74 +330,61 @@ async def generate_and_save_image_task(
         async with async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="RUNNING", status_message="Uploading image to storage...")
 
-        if settings.AZURE_STORAGE_CONNECTION_STRING:
-            from azure.storage.blob.aio import BlobServiceClient
-            blob_service_client_async = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-        elif settings.AZURE_STORAGE_ACCOUNT_NAME:
-            from azure.identity.aio import DefaultAzureCredential
-            from azure.storage.blob.aio import BlobServiceClient
-            account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-            credential_for_storage_async = DefaultAzureCredential()
-            blob_service_client_async = BlobServiceClient(account_url=account_url, credential=credential_for_storage_async)
-        
-        if not blob_service_client_async:
-            raise ConnectionError("Azure Storage not configured for image upload.")
+        image_uuid_for_path = uuid.uuid4()
+        async with async_session_local() as db:
+            element: Any = None
+            world_id_for_path: Union[int, str] = "unknown_world"
 
-        async with blob_service_client_async:
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            container_client = blob_service_client_async.get_container_client(container_name)
-            
-            if not await container_client.exists():
-                await container_client.create_container(public_access='blob')
-                logger.info(f"Created public blob container: {container_name}")
+            if element_type == "world":
+                element = await db.get(World, element_id)
+                if element:
+                    world_id_for_path = element.id
+            elif element_type == "character":
+                element = await db.get(Character, element_id)
+                if element:
+                    world_id_for_path = element.world_id
+            elif element_type == "location":
+                element = await db.get(Location, element_id)
+                if element:
+                    world_id_for_path = element.world_id
+            elif element_type == "lore_item":
+                element = await db.get(LoreItem, element_id)
+                if element:
+                    world_id_for_path = element.world_id
+            elif element_type == "act":
+                element = await db.get(Act, element_id)
+                if element and element.story:
+                    world_id_for_path = element.story.world_id
+            elif element_type == "scene":
+                element = await db.get(Scene, element_id)
+                if element and element.act:
+                    world_id_for_path = element.act.story.world_id
+            elif element_type == "story":
+                element = await db.get(Story, element_id)
+                if element:
+                    world_id_for_path = element.world_id
+            elif element_type == "blog_post":
+                from app.models.blog_post import BlogPost
+                if element_id == 1:
+                    element = True
+                    world_id_for_path = "blog"
+                else:
+                    element = await db.get(BlogPost, element_id)
+                    if element:
+                        world_id_for_path = "blog"
 
-            image_uuid_for_path = uuid.uuid4()
-            async with async_session_local() as db:
-                element: Any = None
-                world_id_for_path: Union[int, str] = "unknown_world"
+            if not element:
+                raise ValueError(f"Element {element_type} with ID {element_id} not found.")
 
-                if element_type == "world":
-                    element = await db.get(World, element_id)
-                    if element: world_id_for_path = element.id
-                elif element_type == "character":
-                    element = await db.get(Character, element_id)
-                    if element: world_id_for_path = element.world_id
-                elif element_type == "location":
-                    element = await db.get(Location, element_id)
-                    if element: world_id_for_path = element.world_id
-                elif element_type == "lore_item":
-                    element = await db.get(LoreItem, element_id)
-                    if element: world_id_for_path = element.world_id
-                elif element_type == "act":
-                    element = await db.get(Act, element_id)
-                    if element and element.story: world_id_for_path = element.story.world_id
-                elif element_type == "scene":
-                    element = await db.get(Scene, element_id)
-                    if element and element.act: world_id_for_path = element.act.story.world_id
-                elif element_type == "story":
-                    element = await db.get(Story, element_id)
-                    if element: world_id_for_path = element.world_id
-                elif element_type == "blog_post":
-                    from app.models.blog_post import BlogPost
-                    # For new blog posts, element_id might be 1 (dummy), so we handle it differently
-                    if element_id == 1:
-                        element = True  # Dummy element for validation
-                        world_id_for_path = "blog"  # Use blog folder for new/temporary blog posts
-                    else:
-                        element = await db.get(BlogPost, element_id)
-                        if element: 
-                            world_id_for_path = "blog"  # Blog posts don't belong to a specific world
-                
-                if not element:
-                    raise ValueError(f"Element {element_type} with ID {element_id} not found.")
+            blob_name = _build_generated_image_blob_name(
+                entity_type=element_type,
+                entity_id=element_id,
+                world_id=world_id_for_path,
+                image_uuid=image_uuid_for_path,
+                extension="png",
+            )
 
-                blob_name = f"worlds/{world_id_for_path}/{element_type}s/{element_id}/{image_uuid_for_path}.png"
-
-            blob_client = container_client.get_blob_client(blob=blob_name)
-            
-            blob_content_settings = ContentSettings(content_type=content_type)
-            await blob_client.upload_blob(image_bytes, overwrite=True, content_settings=blob_content_settings)
-            image_url = blob_client.url
+        image_url = await _save_generated_image_bytes(blob_name, image_bytes, content_type)
         
         async with async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="RUNNING", status_message="Updating database record...")
@@ -460,8 +464,7 @@ async def generate_and_save_image_task(
         async with async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="FAILED", result_message=f"Error: {str(e)[:200]}")
     finally:
-        if credential_for_storage_async:
-            await credential_for_storage_async.close()
+        pass
 
 
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_202_ACCEPTED)
@@ -471,6 +474,7 @@ async def handle_image_generation_request(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session),
 ):
+    """Handle POST /."""
     element_type = request.element_type
     element_id = request.element_id
     
@@ -611,9 +615,11 @@ async def handle_image_generation_request(
         world_id=world_id
     )
     
-    return JobSubmissionResponse(
-        message="Image generation job started successfully.",
-        job_id=job_id
+    return ApiResponse.success_response(
+        data=JobSubmissionResponse(
+            message="Image generation job started successfully.",
+            job_id=job_id
+        )
     )
 
 
@@ -750,9 +756,8 @@ async def list_all_image_generation_jobs(
                             logger.warning(f"Failed to get prompt from GeneratedImage for job {job.job_id}: {e}")
                         
                         # Construct image URL
-                        if metadata.get("blob_path") and settings.AZURE_STORAGE_ACCOUNT_NAME:
-                            container = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-                            image_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container}/{metadata['blob_path']}"
+                        if metadata.get("blob_path"):
+                            image_url = build_storage_url("generated-images", metadata["blob_path"])
                             job_data["image_url"] = image_url
                 
             except Exception as e:
@@ -850,22 +855,6 @@ async def generate_image_for_modal(
         user_account.total_spent += Decimal(str(generation_cost))
         await db.commit()
         
-        # Upload to Azure Storage
-        blob_service_client_async = None
-        if settings.AZURE_STORAGE_CONNECTION_STRING:
-            blob_service_client_async = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-        elif settings.AZURE_STORAGE_ACCOUNT_NAME:
-            from azure.identity.aio import DefaultAzureCredential
-            account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-            credential = DefaultAzureCredential()
-            blob_service_client_async = BlobServiceClient(account_url=account_url, credential=credential)
-        
-        if not blob_service_client_async:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Azure Storage not configured"
-            )
-        
         # Convert to JPEG for storage saving
         from PIL import Image
         import io
@@ -883,46 +872,38 @@ async def generate_image_for_modal(
         original_image.save(jpeg_buffer, format="JPEG", quality=85, optimize=True)
         jpeg_bytes = jpeg_buffer.getvalue()
         
-        async with blob_service_client_async:
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            container_client = blob_service_client_async.get_container_client(container_name)
-            
-            if not await container_client.exists():
-                await container_client.create_container(public_access='blob')
-            
-            # Generate blob path
-            image_uuid = uuid.uuid4()
-            world_id = "unknown_world"
-            
-            # Get world_id based on entity type
-            if request.entity_type == "story":
-                story = await db.get(Story, request.entity_id)
-                if story:
-                    world_id = story.world_id
-            elif request.entity_type == "act":
-                act = await db.get(Act, request.entity_id)
-                if act and act.story:
-                    world_id = act.story.world_id
-            elif request.entity_type == "scene":
-                scene = await db.get(Scene, request.entity_id)
-                if scene and scene.act and scene.act.story:
-                    world_id = scene.act.story.world_id
-            elif request.entity_type == "blog_post":
-                from app.models.blog_post import BlogPost
-                # For new blog posts, entity_id might be 1 (dummy), so we handle it differently
-                if request.entity_id == 1:
-                    world_id = "blog"  # Use blog folder for new/temporary blog posts
-                else:
-                    blog_post = await db.get(BlogPost, request.entity_id)
-                    if blog_post:
-                        world_id = "blog"  # Blog posts don't belong to a specific world
-            
-            blob_name = f"worlds/{world_id}/{request.entity_type}s/{request.entity_id}/{image_uuid}.jpg"
-            blob_client = container_client.get_blob_client(blob=blob_name)
-            
-            blob_content_settings = ContentSettings(content_type="image/jpeg")
-            await blob_client.upload_blob(jpeg_bytes, overwrite=True, content_settings=blob_content_settings)
-            image_url = blob_client.url
+        image_uuid = uuid.uuid4()
+        world_id = "unknown_world"
+
+        if request.entity_type == "story":
+            story = await db.get(Story, request.entity_id)
+            if story:
+                world_id = story.world_id
+        elif request.entity_type == "act":
+            act = await db.get(Act, request.entity_id)
+            if act and act.story:
+                world_id = act.story.world_id
+        elif request.entity_type == "scene":
+            scene = await db.get(Scene, request.entity_id)
+            if scene and scene.act and scene.act.story:
+                world_id = scene.act.story.world_id
+        elif request.entity_type == "blog_post":
+            from app.models.blog_post import BlogPost
+            if request.entity_id == 1:
+                world_id = "blog"
+            else:
+                blog_post = await db.get(BlogPost, request.entity_id)
+                if blog_post:
+                    world_id = "blog"
+
+        blob_name = _build_generated_image_blob_name(
+            entity_type=request.entity_type,
+            entity_id=request.entity_id,
+            world_id=world_id,
+            image_uuid=image_uuid,
+            extension="jpg",
+        )
+        image_url = await _save_generated_image_bytes(blob_name, jpeg_bytes, "image/jpeg")
         
         # Save to database
         from app.models.generated_image import GeneratedImage
@@ -1015,61 +996,38 @@ async def upload_image(
             image_data, aspect_ratio, dimension
         )
         
-        # Upload to Azure Storage (same pattern as generate endpoint)
-        blob_service_client_async = None
-        if settings.AZURE_STORAGE_CONNECTION_STRING:
-            blob_service_client_async = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-        elif settings.AZURE_STORAGE_ACCOUNT_NAME:
-            from azure.identity.aio import DefaultAzureCredential
-            account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-            credential = DefaultAzureCredential()
-            blob_service_client_async = BlobServiceClient(account_url=account_url, credential=credential)
-        
-        if not blob_service_client_async:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Azure Storage not configured"
-            )
-        
-        async with blob_service_client_async:
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            container_client = blob_service_client_async.get_container_client(container_name)
-            
-            if not await container_client.exists():
-                await container_client.create_container(public_access='blob')
-            
-            # Generate blob path
-            image_uuid = uuid.uuid4()
-            world_id = "unknown_world"
-            
-            # Get world_id based on entity type (same logic as generate endpoint)
-            if entity_type == "story":
-                story = await db.get(Story, entity_id)
-                if story:
-                    world_id = story.world_id
-            elif entity_type == "act":
-                act = await db.get(Act, entity_id)
-                if act and act.story:
-                    world_id = act.story.world_id
-            elif entity_type == "scene":
-                scene = await db.get(Scene, entity_id)
-                if scene and scene.act and scene.act.story:
-                    world_id = scene.act.story.world_id
-            elif entity_type == "blog_post":
-                from app.models.blog_post import BlogPost
-                if entity_id == 1:
-                    world_id = "blog"  # Use blog folder for new/temporary blog posts
-                else:
-                    blog_post = await db.get(BlogPost, entity_id)
-                    if blog_post:
-                        world_id = "blog"  # Blog posts don't belong to a specific world
-            
-            blob_name = f"worlds/{world_id}/{entity_type}s/{entity_id}/{image_uuid}.jpg"
-            blob_client = container_client.get_blob_client(blob=blob_name)
-            
-            blob_content_settings = ContentSettings(content_type="image/jpeg")
-            await blob_client.upload_blob(processed_image_data, overwrite=True, content_settings=blob_content_settings)
-            blob_url = blob_client.url
+        image_uuid = uuid.uuid4()
+        world_id = "unknown_world"
+
+        if entity_type == "story":
+            story = await db.get(Story, entity_id)
+            if story:
+                world_id = story.world_id
+        elif entity_type == "act":
+            act = await db.get(Act, entity_id)
+            if act and act.story:
+                world_id = act.story.world_id
+        elif entity_type == "scene":
+            scene = await db.get(Scene, entity_id)
+            if scene and scene.act and scene.act.story:
+                world_id = scene.act.story.world_id
+        elif entity_type == "blog_post":
+            from app.models.blog_post import BlogPost
+            if entity_id == 1:
+                world_id = "blog"
+            else:
+                blog_post = await db.get(BlogPost, entity_id)
+                if blog_post:
+                    world_id = "blog"
+
+        blob_name = _build_generated_image_blob_name(
+            entity_type=entity_type,
+            entity_id=entity_id,
+            world_id=world_id,
+            image_uuid=image_uuid,
+            extension="jpg",
+        )
+        blob_url = await _save_generated_image_bytes(blob_name, processed_image_data, "image/jpeg")
         
         logger.info(f"Uploaded image to blob storage: {blob_url}")
         
@@ -1129,7 +1087,23 @@ async def get_entity_images(
     
     # Get current image ID for the entity
     current_image_id = None
-    if entity_type == "story":
+    if entity_type == "world":
+        entity = await db.get(World, entity_id)
+        if entity:
+            current_image_id = entity.current_image_id
+    elif entity_type == "character":
+        entity = await db.get(Character, entity_id)
+        if entity:
+            current_image_id = entity.current_image_id
+    elif entity_type == "location":
+        entity = await db.get(Location, entity_id)
+        if entity:
+            current_image_id = entity.current_image_id
+    elif entity_type == "lore_item":
+        entity = await db.get(LoreItem, entity_id)
+        if entity:
+            current_image_id = entity.current_image_id
+    elif entity_type == "story":
         entity = await db.get(Story, entity_id)
         if entity:
             current_image_id = entity.current_image_id
@@ -1160,9 +1134,8 @@ async def get_entity_images(
     image_list = []
     for image in images:
         image_url = None
-        if image.blob_path and settings.AZURE_STORAGE_ACCOUNT_NAME:
-            container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-            image_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{image.blob_path}"
+        if image.blob_path:
+            image_url = build_storage_url("generated-images", image.blob_path)
         
         image_list.append(ImageResponse(
             id=image.id,
@@ -1174,7 +1147,7 @@ async def get_entity_images(
             aspect_ratio=image.aspect_ratio
         ))
     
-    return image_list
+    return ApiResponse.success_response(data=image_list)
 
 
 @router.post("/{entity_type}/{entity_id}/set-current/{image_id}", response_model=ApiResponse)
@@ -1205,7 +1178,27 @@ async def set_current_image(
         )
     
     # Update the entity's current image
-    if entity_type == "story":
+    if entity_type == "world":
+        entity = await db.get(World, entity_id)
+        if entity:
+            entity.current_image_id = image_id
+            entity.image_blob_path = image.blob_path
+    elif entity_type == "character":
+        entity = await db.get(Character, entity_id)
+        if entity:
+            entity.current_image_id = image_id
+            entity.image_blob_path = image.blob_path
+    elif entity_type == "location":
+        entity = await db.get(Location, entity_id)
+        if entity:
+            entity.current_image_id = image_id
+            entity.image_blob_path = image.blob_path
+    elif entity_type == "lore_item":
+        entity = await db.get(LoreItem, entity_id)
+        if entity:
+            entity.current_image_id = image_id
+            entity.image_blob_path = image.blob_path
+    elif entity_type == "story":
         entity = await db.get(Story, entity_id)
         if entity:
             entity.current_image_id = image_id
@@ -1228,20 +1221,21 @@ async def set_current_image(
             entity = await db.get(BlogPost, entity_id)
             if entity:
                 # Update the blog post's featured image URL
-                entity.featured_image_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES}/{image.blob_path}"
+                entity.featured_image_url = build_storage_url("generated-images", image.blob_path)
     
     await db.commit()
     
     # Build image URL for response
     image_url = None
-    if image.blob_path and settings.AZURE_STORAGE_ACCOUNT_NAME:
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        image_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{image.blob_path}"
+    if image.blob_path:
+        image_url = build_storage_url("generated-images", image.blob_path)
     
-    return SetCurrentImageResponse(
-        message="Current image updated successfully",
-        image_id=image_id,
-        image_url=image_url
+    return ApiResponse.success_response(
+        data=SetCurrentImageResponse(
+            message="Current image updated successfully",
+            image_id=image_id,
+            image_url=image_url
+        )
     )
 
 
@@ -1252,7 +1246,7 @@ async def delete_image(
     db: AsyncSession = Depends(get_db_session),
 ):
     """
-    Delete an image from the gallery and Azure blob storage.
+    Delete an image from the gallery and local storage.
     Only the user who created the image can delete it.
     """
     logger.info(f"Deleting image {image_id} by user {current_user.id}")
@@ -1278,31 +1272,14 @@ async def delete_image(
                 detail="You can only delete your own images"
             )
         
-        # Delete from Azure blob storage if blob_path exists
+        # Delete from storage if blob_path exists
         if image.blob_path:
             try:
-                blob_service_client_async = None
-                if settings.AZURE_STORAGE_CONNECTION_STRING:
-                    blob_service_client_async = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-                elif settings.AZURE_STORAGE_ACCOUNT_NAME:
-                    from azure.identity.aio import DefaultAzureCredential
-                    account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-                    credential = DefaultAzureCredential()
-                    blob_service_client_async = BlobServiceClient(account_url=account_url, credential=credential)
-                
-                if blob_service_client_async:
-                    async with blob_service_client_async:
-                        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-                        container_client = blob_service_client_async.get_container_client(container_name)
-                        
-                        # Delete the blob
-                        blob_client = container_client.get_blob_client(blob=image.blob_path)
-                        await blob_client.delete_blob()
-                        logger.info(f"Deleted blob: {image.blob_path}")
+                await delete_blob("generated-images", image.blob_path)
+                logger.info(f"Deleted stored image: {image.blob_path}")
                         
             except Exception as e:
-                # Log but don't fail if blob deletion fails
-                logger.warning(f"Failed to delete blob {image.blob_path}: {e}")
+                logger.warning(f"Failed to delete stored image {image.blob_path}: {e}")
         
         # Delete from database
         await db.delete(image)
@@ -1310,10 +1287,12 @@ async def delete_image(
         
         logger.info(f"Successfully deleted image {image_id}")
         
-        return {
-            "message": "Image deleted successfully",
-            "deleted_image_id": image_id
-        }
+        return ApiResponse.success_response(
+            data={
+                "message": "Image deleted successfully",
+                "deleted_image_id": image_id
+            }
+        )
         
     except HTTPException:
         raise

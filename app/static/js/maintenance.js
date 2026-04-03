@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/maintenance.js
+// /story_app/app/static/js/maintenance.js
 
 /**
  * Maintenance mode notification system

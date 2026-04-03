@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/story_crud.js
+// /story_app/app/static/js/story_crud.js
 
 /**
  * story_crud.js
@@ -199,3 +199,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     console.log("Story CRUD JS: Event listener attached to container.");
 });
+

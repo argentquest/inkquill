@@ -1,3 +1,5 @@
+"""Core application helpers for security middleware."""
+
 # Security middleware to prevent iframe embedding and other security vulnerabilities
 import logging
 import os

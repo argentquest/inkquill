@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/ai_scene_writing.py
+"""API routes for ai assisted writing."""
+
+# /story_app/app/routers/ai_scene_writing.py
 
 from fastapi import (
     APIRouter, WebSocket, WebSocketDisconnect, Depends
@@ -11,7 +13,7 @@ import time
 import semantic_kernel as sk
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.functions.function_result import FunctionResult 
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from typing import Dict, Any, Optional, List
 import logging
 
@@ -27,12 +29,12 @@ from app.core.config import settings
 from app.services.ai_model_cache import model_cache
 from app.services.sk_kernel_instance import (
     kernel,
-    retrieve_rag_context_function, 
     generate_scene_narrative_only_function, 
     generate_scene_metadata_function,      
 )
 from app.services.cost_tracker_service import log_ai_call, log_ai_streaming_call, get_usage_from_sk_result
 from app.services.temperature_optimizer import TemperatureOptimizer, TaskType
+from app.services.direct_context import build_document_context
 from openai import APIError
 from markdownify import markdownify as md
 
@@ -43,6 +45,7 @@ router = APIRouter(
 )
 
 class SceneConnectionManager:
+    """Response or helper model for scene connection manager."""
     def __init__(self):
         self.active_connections: Dict[str, WebSocket] = {}
     async def connect(self, websocket: WebSocket, connection_id: str):
@@ -65,6 +68,7 @@ class SceneConnectionManager:
 scene_ws_manager = SceneConnectionManager()
 
 def format_linked_elements_for_prompt(elements: List[Dict[str, Any]], element_type_name: str, name_field: str, role_field: str, max_elements: int = 7) -> str:
+    """Provide internal router support for format linked elements for prompt."""
     if not elements: return f"No specific {element_type_name}s are linked to this story."
     
     formatted_list = []
@@ -112,6 +116,7 @@ async def websocket_scene_content_generator(
     current_user: User = Depends(get_current_user_from_ws_ticket),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle WEBSOCKET /ws/stories/{story_id}/acts/{act_id}/scenes/{scene_id}/generate."""
     connection_id = f"scene_ws_s{story_id}_a{act_id}_sc{scene_id}_{current_user.username}"
     await scene_ws_manager.connect(websocket, connection_id)
 
@@ -190,11 +195,9 @@ async def websocket_scene_content_generator(
             linked_locations_context_str = format_linked_elements_for_prompt(linked_locs, "Location", "name", "significance_to_story")
             linked_lore_items_context_str = format_linked_elements_for_prompt(linked_lore, "Lore Item", "title", "relevance_to_story")
             
-            # RAG Context Retrieval for Scene Writing
-            rag_context_for_scene_text = "No RAG context retrieved."
+            document_context_for_scene = "No uploaded document context available."
             try:
-                if retrieve_rag_context_function and user_instruction:
-                    # Build search query from user instruction and scene context
+                if user_instruction:
                     search_query = f"{user_instruction} {story_obj.title}"
                     if current_scene_obj.title:
                         search_query += f" {current_scene_obj.title}"
@@ -202,37 +205,21 @@ async def websocket_scene_content_generator(
                         search_query += f" {parent_act_obj.title}"
                     if current_scene_obj.summary:
                         search_query += f" {current_scene_obj.summary}"
-                    
-                    # Create kernel arguments for RAG retrieval
-                    rag_exec_settings = AzureChatPromptExecutionSettings(
-                        service_id=model_config_to_use.model_name,
-                        max_tokens=2000,
-                        temperature=0.1
+                    document_context_for_scene, _ = await build_document_context(
+                        db,
+                        story_obj.world_id,
+                        search_query,
+                        max_documents=3,
+                        max_chars_per_document=1500,
                     )
+                    logger.info(f"Scene WS {connection_id}: Prepared direct document context for query: '{search_query[:100]}...'")
                     
-                    rag_kernel_args = KernelArguments(
-                        settings=rag_exec_settings,
-                        query=search_query,
-                        user_id=current_user.id,
-                        top_k=settings.RAG_WRITING_ASSISTANT_TOP_K,
-                        user_id_filter=str(current_user.id),
-                        world_id_filter=str(story_obj.world_id),
-                        min_relevance_score=0.6,  # Lower threshold for writing context
-                        max_total_tokens=6000     # Higher token limit for writing
-                    )
-                    
-                    # Retrieve RAG context
-                    rag_result = await kernel.invoke(retrieve_rag_context_function, rag_kernel_args)
-                    rag_context_for_scene_text = str(rag_result.value) if rag_result and rag_result.value else "No relevant context found."
-                    
-                    logger.info(f"Scene WS {connection_id}: Retrieved RAG context for query: '{search_query[:100]}...'")
-                    
-            except Exception as rag_error:
-                logger.error(f"Scene WS {connection_id}: Error retrieving RAG context: {rag_error}", exc_info=True)
-                rag_context_for_scene_text = "Error retrieving context - proceeding with available information."
+            except Exception as context_error:
+                logger.error(f"Scene WS {connection_id}: Error preparing direct document context: {context_error}", exc_info=True)
+                document_context_for_scene = "Error preparing document context - proceeding with available information."
 
             try:
-                narrative_exec_settings = AzureChatPromptExecutionSettings(
+                narrative_exec_settings = OpenAIChatPromptExecutionSettings(
                     service_id=model_config_to_use.model_name,
                     max_tokens=model_config_to_use.max_tokens,
                     temperature=optimal_temperature,  # Use optimized temperature instead of base
@@ -260,7 +247,7 @@ async def websocket_scene_content_generator(
                     linked_characters_context=linked_characters_context_str,
                     linked_locations_context=linked_locations_context_str,
                     linked_lore_items_context=linked_lore_items_context_str,
-                    rag_context_for_scene=rag_context_for_scene_text,
+                    document_context_for_scene=document_context_for_scene,
                     user_instruction_for_scene=user_instruction
                 )
                 
@@ -294,7 +281,7 @@ async def websocket_scene_content_generator(
                 if full_narrative_text_accumulated.strip() and generate_scene_metadata_function:
                     metadata_model_config = next((c for c in model_cache.generation_models.values() if c.is_json_mode), model_config_to_use)
                     
-                    metadata_exec_settings = AzureChatPromptExecutionSettings(
+                    metadata_exec_settings = OpenAIChatPromptExecutionSettings(
                         service_id=metadata_model_config.model_name,
                         max_tokens=metadata_model_config.max_tokens,
                         temperature=metadata_model_config.temperature,
@@ -343,3 +330,4 @@ async def websocket_scene_content_generator(
         logger.error(f"Unexpected Scene WebSocket loop error for {connection_id}: {e_ws_loop}", exc_info=True)
     finally:
         scene_ws_manager.disconnect(connection_id)
+

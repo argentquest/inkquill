@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/user.py
+"""Pydantic schemas for user."""
+
+# /story_app/app/schemas/user.py
 
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional

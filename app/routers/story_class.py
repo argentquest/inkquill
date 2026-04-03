@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/story_class.py
+"""API routes for story class."""
+
+# /story_app/app/routers/story_class.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,6 +22,19 @@ router = APIRouter(
     tags=["story-classes"],
     responses={404: {"description": "Not found"}},
 )
+
+
+def _serialize_story_class(story_class) -> dict:
+    """Provide internal router support for serialize story class."""
+    return {
+        "id": story_class.id,
+        "name": story_class.name,
+        "description": story_class.description,
+        "color": story_class.color,
+        "world_id": story_class.world_id,
+        "created_at": story_class.created_at.isoformat() if story_class.created_at else None,
+        "updated_at": story_class.updated_at.isoformat() if story_class.updated_at else None,
+    }
 
 
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
@@ -57,7 +72,7 @@ async def create_story_class(
     await db.commit()
     
     logger.info(f"Story class ID {story_class.id} created successfully for world ID {world_id}")
-    return story_class
+    return ApiResponse.success_response(_serialize_story_class(story_class))
 
 
 @router.get("/", response_model=ApiResponse)
@@ -113,7 +128,7 @@ async def list_story_classes(
         )
     
     logger.info(f"Returning {len(story_classes)} story classes for world ID: {world_id}")
-    return story_classes
+    return ApiResponse.success_response([_serialize_story_class(story_class) for story_class in story_classes])
 
 
 @router.get("/options", response_model=ApiResponse)
@@ -166,7 +181,7 @@ async def list_story_class_options(
     ]
     
     logger.info(f"Returning {len(options)} story class options for world ID: {world_id}")
-    return options
+    return ApiResponse.success_response([option.model_dump(mode="json") for option in options])
 
 
 @router.get("/{story_class_id}", response_model=ApiResponse)
@@ -200,7 +215,7 @@ async def get_story_class(
         )
     
     logger.info(f"Story class ID {story_class_id} found for user '{current_user.username}'")
-    return story_class
+    return ApiResponse.success_response(_serialize_story_class(story_class))
 
 
 @router.put("/{story_class_id}", response_model=ApiResponse)
@@ -239,7 +254,7 @@ async def update_story_class(
     await db.commit()
     
     logger.info(f"Story class ID {story_class_id} updated successfully for user '{current_user.username}'")
-    return story_class
+    return ApiResponse.success_response(_serialize_story_class(story_class))
 
 
 @router.delete("/{story_class_id}", status_code=status.HTTP_204_NO_CONTENT)

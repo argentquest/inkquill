@@ -1,3 +1,5 @@
+"""SQLAlchemy models for brainstorm session."""
+
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.db.database import Base
@@ -7,6 +9,7 @@ from typing import Dict, Any, Optional, List
 
 
 class BrainstormSession(Base):
+    """SQLAlchemy model for brainstorm session."""
     __tablename__ = "brainstorm_sessions"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -50,6 +53,7 @@ class BrainstormSession(Base):
 
 
 class BrainstormFavorite(Base):
+    """SQLAlchemy model for brainstorm favorite."""
     __tablename__ = "brainstorm_favorites"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -77,6 +81,7 @@ class BrainstormFavorite(Base):
 
 
 class BrainstormStory(Base):
+    """SQLAlchemy model for brainstorm story."""
     __tablename__ = "brainstorm_stories"
     
     id = Column(Integer, primary_key=True, index=True)

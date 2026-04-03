@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/temperature_optimizer.py
+"""Service helpers for temperature optimizer."""
+
+# /story_app/app/services/temperature_optimizer.py
 
 import logging
 from typing import Dict, Optional, Tuple
@@ -19,7 +21,7 @@ class TaskType(Enum):
     BRAINSTORMING = "brainstorming"
     JSON_EXTRACTION = "json_extraction"
     CHAT_CONVERSATION = "chat_conversation"
-    RAG_RETRIEVAL = "rag_retrieval"
+    CONTEXT_RETRIEVAL = "context_retrieval"
     METADATA_EXTRACTION = "metadata_extraction"
     SCENE_WRITING = "scene_writing"
     ACT_WRITING = "act_writing"
@@ -33,7 +35,7 @@ class TemperatureOptimizer:
     
     # Model-specific optimal temperatures for different tasks
     MODEL_TASK_TEMPERATURES = {
-        # Premium Creative Models (Azure)
+        # Premium creative models
         "DeepSeek-V3-0324": {
             TaskType.CREATIVE_WRITING: 0.85,
             TaskType.DIALOGUE_WRITING: 0.9,
@@ -47,7 +49,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.BRAINSTORMING: 1.0,
             TaskType.STORY_GENERATION: 0.8,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "gpt-4o": {
@@ -63,7 +65,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.3,
             TaskType.BRAINSTORMING: 0.95,
             TaskType.STORY_GENERATION: 0.75,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "gpt-4o-mini": {
@@ -79,7 +81,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.BRAINSTORMING: 0.9,
             TaskType.STORY_GENERATION: 0.7,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "gpt-4.1-mini": {
@@ -95,10 +97,10 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.BRAINSTORMING: 0.9,
             TaskType.STORY_GENERATION: 0.7,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
-        # Azure AI Foundry Models
+        # Additional large-model presets
         "mistral-medium-2505": {
             TaskType.CREATIVE_WRITING: 0.8,
             TaskType.DIALOGUE_WRITING: 0.85,
@@ -112,7 +114,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.35,
             TaskType.BRAINSTORMING: 0.95,
             TaskType.STORY_GENERATION: 0.75,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "Meta-Llama-4-Scout-17B-16E-Instruct": {
@@ -128,7 +130,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.BRAINSTORMING: 0.95,
             TaskType.STORY_GENERATION: 0.75,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         # OpenRouter Models
@@ -145,7 +147,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.35,
             TaskType.BRAINSTORMING: 1.1,
             TaskType.STORY_GENERATION: 0.85,
-            TaskType.RAG_RETRIEVAL: 0.15,
+            TaskType.CONTEXT_RETRIEVAL: 0.15,
         },
         
         "deepseek/deepseek-r1": {
@@ -161,7 +163,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.3,
             TaskType.PLOT_PLANNING: 0.6,  # Excellent at logical plot structure
             TaskType.STORY_GENERATION: 0.7,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "openai/gpt-4o": {
@@ -177,7 +179,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.3,
             TaskType.BRAINSTORMING: 0.95,
             TaskType.STORY_GENERATION: 0.75,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "google/gemini-2.0-flash-exp": {
@@ -193,7 +195,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.BRAINSTORMING: 0.95,
             TaskType.STORY_GENERATION: 0.75,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "google/gemini-2.0-flash-thinking-exp": {
@@ -209,7 +211,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.25,
             TaskType.PLOT_PLANNING: 0.5,
             TaskType.STORY_GENERATION: 0.7,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "meta-llama/llama-3.1-405b-instruct": {
@@ -225,7 +227,7 @@ class TemperatureOptimizer:
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.BRAINSTORMING: 0.95,
             TaskType.STORY_GENERATION: 0.75,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "qwen/qwen-2.5-coder-32b-instruct": {
@@ -237,7 +239,7 @@ class TemperatureOptimizer:
             TaskType.ACT_WRITING: 0.55,
             TaskType.CHAT_CONVERSATION: 0.5,
             TaskType.STORY_GENERATION: 0.6,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
         
         "mistralai/mixtral-8x7b-instruct": {
@@ -252,7 +254,7 @@ class TemperatureOptimizer:
             TaskType.METADATA_EXTRACTION: 0.15,
             TaskType.TECHNICAL_WRITING: 0.4,
             TaskType.STORY_GENERATION: 0.7,
-            TaskType.RAG_RETRIEVAL: 0.1,
+            TaskType.CONTEXT_RETRIEVAL: 0.1,
         },
     }
     
@@ -272,7 +274,7 @@ class TemperatureOptimizer:
         TaskType.METADATA_EXTRACTION: 0.15,
         TaskType.CHAT_CONVERSATION: 0.7,
         TaskType.STORY_GENERATION: 0.75,
-        TaskType.RAG_RETRIEVAL: 0.1,
+        TaskType.CONTEXT_RETRIEVAL: 0.1,
     }
     
     # User intent modifiers based on keywords in instructions
@@ -411,7 +413,7 @@ class TemperatureOptimizer:
             TaskType.JSON_EXTRACTION: [
                 "json", "metadata", "extract", "data", "structure", "parse"
             ],
-            TaskType.RAG_RETRIEVAL: [
+            TaskType.CONTEXT_RETRIEVAL: [
                 "search", "find", "retrieve", "context", "related", "similar"
             ],
             TaskType.DIALOGUE_WRITING: [
@@ -556,3 +558,4 @@ class TemperatureOptimizer:
         )
         
         return optimal_temp, explanation
+

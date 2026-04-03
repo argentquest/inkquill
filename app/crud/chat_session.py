@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/chat_session.py
+"""Database CRUD helpers for chat session."""
+
+# /story_app/app/crud/chat_session.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -144,6 +146,7 @@ async def touch_session_updated_at(
 
 # Create CRUD class for consistency
 class ChatSessionCRUD:
+    """Class for chat session c r u d."""
     async def create_chat_session(self, db: AsyncSession, session_data: ChatSessionCreate, user_id: int) -> ChatSession:
         return await create_chat_session(db, session_data, user_id)
     

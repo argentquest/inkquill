@@ -1,0 +1,76 @@
+AI Storytelling Assistant: System Architecture Overview
+Last Updated: {{ currentDate }}
+
+1. Overview
+
+This document outlines the architecture for the AI Storytelling Assistant, a web application designed to help users create and develop structured stories with the assistance of Artificial Intelligence. The system integrates Large Language Models (LLMs) for content generation and employs a direct context assembly system to ground AI responses in user-provided background documents and world-building elements.
+
+The application features secure user authentication, comprehensive project management (Worlds, Stories, Acts), document uploading for Context, and an interactive AI-powered editor. A key architectural pattern is the use of background jobs for long-running tasks, with a real-time status tracking system for user feedback.
+
+2. Core Components
+
+The system is composed of several key components interacting via APIs and asynchronous tasks:
+
+*   **Frontend (Browser UI):** The user interface built with server-side rendered Jinja2 templates, styled with Bootstrap/CSS, and enhanced with client-side JavaScript for dynamic interactions, form submissions, and WebSocket communication. It is responsible for initiating long-running jobs and polling for their status.
+
+*   **Backend API (FastAPI Application):** The central application logic layer. Built with Python and FastAPI, it handles all HTTP API requests, manages WebSocket connections for real-time AI writing, serves Jinja2 templates, and handles user authentication. Crucially, it schedules long-running tasks (like Context ingestion or AI-powered world generation) to run in the background.
+
+*   **Database (PostgreSQL):** The primary data store for all relational data, including users, worlds, stories, acts, scenes, and metadata for uploaded documents. It also contains tables for `job_statuses` and `ai_call_logs` to track background processing and AI costs. It is accessed via the SQLAlchemy ORM with Alembic for schema migrations.
+
+*   **AI Services (Azure OpenAI):** Provides the core AI capabilities.
+    *   **Chat Completion:** Generates creative text content (e.g., GPT-4o).
+    *   **Text Embedding:** Creates vector representations of text chunks for Context (e.g., text-embedding-3-large).
+
+*   **Context - Document Storage (Azure Blob Storage):** Scalable storage for raw user-uploaded documents and AI-generated Context texts for world elements.
+
+*   **Context - Vector Store & Search (Azure AI Search):** The high-performance search service used to store, index, and query document chunks and their vector embeddings for the Context system.
+
+*   **AI Orchestration (Semantic Kernel):** A framework integrated into the backend to manage interactions with AI services. It defines prompt templates, structures AI workflows (e.g., Context retrieval followed by LLM generation), and invokes both AI-driven functions and native Python code.
+
+*   **Security & Configuration (Azure Key Vault):** Secrets such as API keys and database credentials are not stored in code but are securely managed in Azure Key Vault. The deployed application uses a Managed Identity to access these secrets at runtime.
+
+3. Technology Stack Summary
+
+*   **Backend:** Python 3.11+, FastAPI, Uvicorn, Gunicorn
+*   **AI Orchestration:** Microsoft Semantic Kernel
+*   **AI Models:** Azure OpenAI Service
+*   **Database:** PostgreSQL, SQLAlchemy (asyncio), Alembic
+*   **Vector Search:** Azure AI Search
+*   **Storage:** Azure Blob Storage
+*   **Secrets:** Azure Key Vault
+*   **Authentication:** JWT (python-jose), Passlib (bcrypt)
+*   **Frontend:** Jinja2, HTML, CSS, JavaScript (Vanilla JS, Fetch, WebSockets), Bootstrap 5, Quill.js
+*   **Validation:** Pydantic
+*   **Azure SDKs:** `azure-identity`, `azure-storage-blob`, `azure-search-documents`, `openai`
+
+4. Data Models (Primary)
+
+*   **User:** Stores authentication details and owns all top-level creative assets.
+*   **World:** The foundational container for lore. Owns Characters, Locations, and Lore Items.
+*   **Story:** A narrative project set within a specific World.
+*   **Act & Scene:** The structural components of a Story.
+*   **UploadedDocument:** Metadata for a file ingested into the Context system.
+*   **JobStatus (New):** A record to track the progress (Pending, Running, Completed, Failed) and messages of a long-running background job.
+*   **AICallLog (New):** A log entry for every individual AI call, recording token usage, calculated cost, and latency.
+
+5. Key Workflows
+
+*   **Asynchronous Job Submission (e.g., Document Upload):**
+    1.  User submits a file and metadata via the UI.
+    2.  The FastAPI endpoint receives the request, performs initial validation, and saves the file to a temporary location.
+    3.  A new `JobStatus` record is created in the database with a unique `job_id` and a state of `PENDING`.
+    4.  A background task (e.g., `process_uploaded_document_task`) is scheduled via FastAPI's `BackgroundTasks`, passing the `job_id`.
+    5.  The API immediately returns a `202 Accepted` response to the user, including the `job_id`.
+    6.  The frontend JavaScript receives the `job_id` and begins polling the `/api/.../job-status/{job_id}` endpoint every few seconds.
+    7.  The background task starts, updating the `JobStatus` record in the database at each major step (e.g., "Extracting text...", "Generating embeddings...").
+    8.  The frontend polling receives these status updates and displays them to the user in real-time.
+    9.  Upon completion or failure, the background task sets the final state in the `JobStatus` record. The frontend's next poll sees this final state and stops polling.
+
+*   **AI-Assisted Content Generation (WebSocket):**
+    1.  User navigates to an editor UI and a WebSocket connection is established using a short-lived JWT ticket.
+    2.  User sends an instruction.
+    3.  The backend WebSocket handler invokes Semantic Kernel.
+    4.  SK's `RetrievalPlugin` queries Azure AI Search for relevant Context context.
+    5.  SK invokes a semantic function, passing the story/act/scene context, Context context, and user instruction to an Azure OpenAI chat model.
+    6.  The AI response is streamed back over the WebSocket to the UI.
+    7.  For certain calls (like metadata generation), the token usage and latency are captured and logged to the `ai_call_logs` table in a separate, atomic transaction.

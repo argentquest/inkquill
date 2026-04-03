@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/character.py
+"""Database CRUD helpers for character."""
+
+# /story_app/app/crud/character.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -25,9 +27,7 @@ async def create_character(
     background_tasks: BackgroundTasks,
     model_config_id: Optional[int] = None
 ) -> Character:
-    # --- FIX: Moved import inside function to break circular dependency ---
-    from app.processing.world_element_processor import generate_and_index_world_element_rag_text_task 
-    
+    """Create character."""
     logger.info(f"User ID {user_id} creating new character '{character_in.name}' for world ID: {world_id}")
     logger.debug(f"Character data to be inserted: {character_in.model_dump()}")
     
@@ -46,16 +46,6 @@ async def create_character(
         await db.commit()
         logger.info(f"Character '{db_character.name}' (ID: {db_character.id}) committed to database.")
         
-        background_tasks.add_task(
-            generate_and_index_world_element_rag_text_task,
-            element_type_str="character",
-            element_id=db_character.id,
-            user_id=user_id, 
-            world_id=db_character.world_id,
-            background_tasks=background_tasks,
-            model_config_id=model_config_id
-        )
-        logger.info(f"Scheduled RAG indexing for new character ID: {db_character.id}")
         return db_character
     except Exception as e:
         logger.error(f"Error creating character '{character_in.name}' in world ID {world_id}: {e}", exc_info=True)
@@ -71,9 +61,7 @@ async def update_character(
     background_tasks: BackgroundTasks,
     model_config_id: Optional[int] = None
 ) -> Character:
-    # --- FIX: Moved import inside function to break circular dependency ---
-    from app.processing.world_element_processor import generate_and_index_world_element_rag_text_task
-
+    """Update character."""
     update_data = character_in.model_dump(exclude_unset=True)
     logger.info(f"User ID {user_id} updating character ID: {db_character.id} ('{db_character.name}') with data: {update_data}")
     
@@ -97,23 +85,13 @@ async def update_character(
     logger.info(f"Character ID: {db_character.id} updated in DB session successfully.")
 
     if significant_change:
-        logger.info(f"Significant change detected for character ID: {db_character.id}. Scheduling RAG re-indexing.")
-        background_tasks.add_task(
-            generate_and_index_world_element_rag_text_task,
-            element_type_str="character",
-            element_id=db_character.id,
-            user_id=user_id, 
-            world_id=db_character.world_id,
-            background_tasks=background_tasks,
-            model_config_id=model_config_id
-        )
-    else:
-        logger.info(f"No significant RAG-relevant changes for character ID: {db_character.id}. Skipping RAG re-indexing.")
+        logger.info(f"Significant narrative fields changed for character ID: {db_character.id}.")
             
     return db_character
 
 
 async def get_character(db: AsyncSession, character_id: int) -> Optional[Character]:
+    """Return character."""
     logger.debug(f"Fetching character with ID: {character_id}")
     result = await db.execute(
         select(Character)
@@ -126,6 +104,7 @@ async def get_character(db: AsyncSession, character_id: int) -> Optional[Charact
     return result.scalars().first()
 
 async def get_characters_by_world(db: AsyncSession, world_id: int, skip: int = 0, limit: int = 100) -> List[Character]:
+    """Return characters by world."""
     logger.debug(f"Fetching characters for world ID: {world_id}, skip: {skip}, limit: {limit}")
     result = await db.execute(
         select(Character)
@@ -138,17 +117,16 @@ async def get_characters_by_world(db: AsyncSession, world_id: int, skip: int = 0
     return result.scalars().all()
 
 async def delete_character(db: AsyncSession, db_character: Character, user_id: int, world_id: int, background_tasks: BackgroundTasks) -> Character:
-    from app.services.azure_ai_search_service import delete_documents_by_filter_from_index
+    """Delete character."""
     character_id_to_delete = db_character.id
     logger.info(f"User ID {user_id} deleting character ID: {character_id_to_delete} ('{db_character.name}') from world ID {world_id}")
-    search_filter_for_delete = (f"source_element_id eq '{character_id_to_delete}' and element_type eq '{SourceElementTypeEnum.CHARACTER_LORE.value}' and world_id eq '{world_id}' and user_id eq '{user_id}'")
-    background_tasks.add_task(delete_documents_by_filter_from_index, filter_string=search_filter_for_delete)
     await crud_document_db.delete_generated_document_records(db=db, source_element_type=SourceElementTypeEnum.CHARACTER_LORE, source_element_id=character_id_to_delete, world_id=world_id, user_id=user_id, background_tasks=background_tasks)
     await db.delete(db_character)
     await db.flush()
     return db_character
 
 async def link_character_to_story(db: AsyncSession,story_id: int,character_id: int,role_in_story: Optional[str] = None) -> bool:
+    """Perform database work for link character to story."""
     values_to_set = {"story_id": story_id, "character_id": character_id, "role_in_story": role_in_story}
     stmt = pg_insert(story_character_association_table).values(**values_to_set)
     stmt = stmt.on_conflict_do_update(index_elements=['story_id', 'character_id'], set_=dict(role_in_story=stmt.excluded.role_in_story))
@@ -156,6 +134,7 @@ async def link_character_to_story(db: AsyncSession,story_id: int,character_id: i
     except Exception as e: await db.rollback(); logger.error(f"Error linking/updating role charID {character_id} to storyID {story_id}: {e}"); return False
 
 async def unlink_character_from_story(db: AsyncSession, story_id: int, character_id: int) -> bool:
+    """Perform database work for unlink character from story."""
     stmt = story_character_association_table.delete().where(story_character_association_table.c.story_id == story_id, story_character_association_table.c.character_id == character_id)
     try: result = await db.execute(stmt); await db.commit(); return result.rowcount > 0
     except Exception as e: await db.rollback(); logger.error(f"Error unlinking charID {character_id} from storyID {story_id}: {e}"); return False
@@ -183,7 +162,9 @@ async def get_characters_for_story(db: AsyncSession, story_id: int) -> List[Dict
     ]
 
 async def get_character_link_details(db: AsyncSession, story_id: int, character_id: int) -> Optional[dict]:
+    """Return character link details."""
     query = (select(Character, story_character_association_table.c.role_in_story).join(story_character_association_table, Character.id == story_character_association_table.c.character_id).filter(story_character_association_table.c.story_id == story_id, story_character_association_table.c.character_id == character_id))
     row = (await db.execute(query)).first()
     if row: c, role = row; return {"story_id":story_id,"character_id":c.id,"role_in_story":role,"character":c}
     return None
+

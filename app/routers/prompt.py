@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/prompt.py
+"""API routes for prompt."""
+
+# /story_app/app/routers/prompt.py
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Body, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,18 +24,24 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
+
+def _serialize_prompt(prompt: Prompt) -> dict:
+    """Provide internal router support for serialize prompt."""
+    return schema_prompt.PromptRead.model_validate(prompt).model_dump(mode="json")
+
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED, name="create_new_prompt")
 async def create_new_prompt(
     prompt_in: schema_prompt.PromptCreate,
     db: AsyncSession = Depends(get_db_session),
     current_user: ModelUser = Depends(get_current_active_user)
 ):
+    """Handle POST /."""
     logger.info(f"User '{current_user.username}' creating new prompt: '{prompt_in.title}'")
     try:
         created_prompt = await crud_prompt.create_prompt(db=db, prompt_in=prompt_in, creator_user_id=current_user.id)
         await db.commit()
         await db.refresh(created_prompt)
-        return created_prompt
+        return ApiResponse.success_response(_serialize_prompt(created_prompt))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating prompt '{prompt_in.title}': {e}", exc_info=True)
@@ -68,11 +76,11 @@ async def get_story_options(
         )
         
         # Convert SQLAlchemy models to Pydantic schemas for proper serialization
-        return {
-            "genres": [schema_prompt.PromptRead.model_validate(genre) for genre in genres],
-            "tones": [schema_prompt.PromptRead.model_validate(tone) for tone in tones],
-            "conflicts": [schema_prompt.PromptRead.model_validate(conflict) for conflict in conflicts]
-        }
+        return ApiResponse.success_response({
+            "genres": [_serialize_prompt(genre) for genre in genres],
+            "tones": [_serialize_prompt(tone) for tone in tones],
+            "conflicts": [_serialize_prompt(conflict) for conflict in conflicts],
+        })
     except Exception as e:
         logger.error(f"Error fetching story options: {e}", exc_info=True)
         raise HTTPException(
@@ -95,7 +103,7 @@ async def get_character_roles(
             prompt_type=PromptTypeEnum.CHARACTER_ROLE,
             is_active=True
         )
-        return roles
+        return ApiResponse.success_response([_serialize_prompt(role) for role in roles])
     except Exception as e:
         logger.error(f"Error fetching character roles: {e}", exc_info=True)
         raise HTTPException(
@@ -118,7 +126,7 @@ async def get_art_styles(
             prompt_type=PromptTypeEnum.IMAGE_STYLE,
             is_active=True
         )
-        return styles
+        return ApiResponse.success_response([_serialize_prompt(style) for style in styles])
     except Exception as e:
         logger.error(f"Error fetching art styles: {e}", exc_info=True)
         raise HTTPException(
@@ -136,6 +144,7 @@ async def list_my_prompts(
     db: AsyncSession = Depends(get_db_session),
     current_user: ModelUser = Depends(get_current_active_user)
 ):
+    """Handle GET /my-prompts."""
     logger.info(f"API list_my_prompts called by '{current_user.username}' with filter_prompt_type: {filter_prompt_type}")
     
     # The fix is now in the frontend JS, so the backend can be cleaner.
@@ -146,7 +155,7 @@ async def list_my_prompts(
         age_target=filter_age_target, is_active=filter_is_active, skip=skip, limit=limit
     )
     logger.info(f"API list_my_prompts found {len(prompts)} prompts for user '{current_user.username}' with the specified filters.")
-    return prompts
+    return ApiResponse.success_response([_serialize_prompt(prompt) for prompt in prompts])
 
 @router.get("/shared", response_model=ApiResponse, name="list_shared_prompts")
 async def list_shared_prompts(
@@ -156,6 +165,7 @@ async def list_shared_prompts(
     filter_is_active: Optional[bool] = Query(True),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle GET /shared."""
     logger.info(f"API list_shared_prompts called with filter_prompt_type: {filter_prompt_type}")
     
     prompts = await crud_prompt.get_shared_prompts(
@@ -163,7 +173,7 @@ async def list_shared_prompts(
         age_target=filter_age_target, is_active=filter_is_active, skip=skip, limit=limit
     )
     logger.info(f"API list_shared_prompts found {len(prompts)} prompts with the specified filters.")
-    return prompts
+    return ApiResponse.success_response([_serialize_prompt(prompt) for prompt in prompts])
 
 # ... the rest of the file (get_single_prompt, update_existing_prompt, delete_existing_prompt) remains unchanged ...
 
@@ -171,18 +181,20 @@ async def list_shared_prompts(
 async def get_single_prompt(
     prompt_id: int, db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)
 ):
+    """Handle GET /{prompt_id}."""
     db_prompt = await crud_prompt.get_prompt(db, prompt_id=prompt_id)
     if not db_prompt:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Prompt not found")
     if db_prompt.user_id is not None and db_prompt.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this prompt")
-    return db_prompt
+    return ApiResponse.success_response(_serialize_prompt(db_prompt))
 
 @router.put("/{prompt_id}", response_model=ApiResponse, name="update_existing_prompt")
 async def update_existing_prompt(
     prompt_id: int, prompt_in: schema_prompt.PromptUpdate,
     db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)
 ):
+    """Handle PUT /{prompt_id}."""
     db_prompt = await crud_prompt.get_prompt(db, prompt_id=prompt_id)
     if not db_prompt or db_prompt.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Prompt not found or not owned by user.")
@@ -190,7 +202,7 @@ async def update_existing_prompt(
         updated_prompt = await crud_prompt.update_prompt(db, db_prompt, prompt_in, current_user.id)
         await db.commit()
         await db.refresh(updated_prompt)
-        return updated_prompt
+        return ApiResponse.success_response(_serialize_prompt(updated_prompt))
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail="Could not update prompt.")
@@ -199,6 +211,7 @@ async def update_existing_prompt(
 async def delete_existing_prompt(
     prompt_id: int, db: AsyncSession = Depends(get_db_session), current_user: ModelUser = Depends(get_current_active_user)
 ):
+    """Handle DELETE /{prompt_id}."""
     db_prompt = await crud_prompt.get_prompt(db, prompt_id=prompt_id)
     if not db_prompt or db_prompt.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Prompt not found or not owned by user.")

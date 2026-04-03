@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/oauth_config.py
+"""Core application helpers for oauth config."""
+
+# /story_app/app/core/oauth_config.py
 
 from authlib.integrations.starlette_client import OAuth
 from app.core.config import settings

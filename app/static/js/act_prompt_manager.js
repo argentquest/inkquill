@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/act_prompt_manager.js
+// /story_app/app/static/js/act_prompt_manager.js
 "use strict";
 
 const ActPromptManager = (() => {

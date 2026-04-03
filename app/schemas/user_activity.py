@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/user_activity.py
+"""Pydantic schemas for user activity."""
+
+# /story_app/app/schemas/user_activity.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List

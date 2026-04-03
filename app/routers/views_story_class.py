@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_story_class.py
+"""API routes for views story class."""
+
+# /story_app/app/routers/views_story_class.py
 
 from fastapi import APIRouter, Depends, Request, Query, HTTPException, status
 from fastapi.responses import HTMLResponse

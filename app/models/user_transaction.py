@@ -1,3 +1,5 @@
+"""SQLAlchemy models for user transaction."""
+
 from sqlalchemy import Column, Integer, String, DECIMAL, Text, ForeignKey, DateTime, CheckConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -8,6 +10,7 @@ from enum import Enum
 from app.db.database import Base
 
 class TransactionType(str, Enum):
+    """SQLAlchemy model for transaction type."""
     CREDIT_ADD = "credit_add"
     AI_COST_DEDUCTION = "ai_cost_deduction"
     SERVICE_CHARGE = "service_charge"
@@ -19,6 +22,7 @@ class TransactionType(str, Enum):
     ADMIN_DEDUCTION = "admin_deduction"
 
 class UserTransaction(Base):
+    """SQLAlchemy model for user transaction."""
     __tablename__ = "user_transactions"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

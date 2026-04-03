@@ -1,6 +1,6 @@
 """Blog API endpoints."""
 import logging
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,13 +9,17 @@ from app.models.user import User
 from app.services.blog_service import blog_service
 from app.schemas.base import ApiResponse
 from app.schemas.blog import (
-    BlogPostCreate, BlogPostUpdate, BlogPostRead, BlogPostSummary,
-    BlogCategoryRead, BlogTagRead
+    BlogPostCreate, BlogPostUpdate, BlogPostRead
 )
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog", tags=["blog"])
+
+
+def _build_blog_post_read(post) -> BlogPostRead:
+    """Provide internal router support for build blog post read."""
+    return BlogPostRead.model_validate(post, from_attributes=True)
 
 
 @router.post("/posts", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
@@ -27,7 +31,7 @@ async def create_blog_post(
     """Create a new blog post."""
     try:
         post = await blog_service.create_post(db, post_data, current_user.id)
-        return post
+        return ApiResponse.success_response(data=_build_blog_post_read(post))
     except Exception as e:
         logger.error(f"Error creating blog post: {e}")
         raise HTTPException(
@@ -68,7 +72,9 @@ async def get_blog_posts(
             search_query=search,
             author_id=author_id
         )
-        return posts
+        return ApiResponse.success_response(
+            data=[_build_blog_post_read(post) for post in posts]
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -109,8 +115,9 @@ async def get_blog_post(
             post_id=post.id,
             user_id=current_user.id if current_user else None
         )
-        
-        return post
+
+        refreshed_post = await blog_service.get_post_by_id(db, post.id)
+        return ApiResponse.success_response(data=_build_blog_post_read(refreshed_post or post))
     except HTTPException:
         raise
     except Exception as e:
@@ -131,7 +138,7 @@ async def update_blog_post(
     """Update blog post."""
     try:
         post = await blog_service.update_post(db, post_id, post_data, current_user)
-        return post
+        return ApiResponse.success_response(data=_build_blog_post_read(post))
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -154,7 +161,7 @@ async def publish_blog_post(
     """Publish a draft blog post."""
     try:
         post = await blog_service.publish_post(db, post_id, current_user)
-        return post
+        return ApiResponse.success_response(data=_build_blog_post_read(post))
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -209,7 +216,9 @@ async def get_my_blog_posts(
             skip=skip,
             limit=limit
         )
-        return posts
+        return ApiResponse.success_response(
+            data=[_build_blog_post_read(post) for post in posts]
+        )
     except Exception as e:
         logger.error(f"Error getting user posts: {e}")
         raise HTTPException(

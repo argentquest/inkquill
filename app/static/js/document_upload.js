@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/document_upload.js
+// /story_app/app/static/js/document_upload.js
 
 "use strict";
 

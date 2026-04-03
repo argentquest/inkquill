@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/ai_model_config.py
+"""Database CRUD helpers for ai model config."""
+
+# /story_app/app/crud/ai_model_config.py
 import logging
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession

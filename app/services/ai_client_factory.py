@@ -1,6 +1,7 @@
-# /ai_rag_story_app/app/services/ai_client_factory.py
+"""Service helpers for ai client factory."""
+
+# /story_app/app/services/ai_client_factory.py
 import logging
-from typing import Optional, Union
 import openai
 from app.core.config import settings
 from app.models.ai_model_config import AIProviderEnum, AIModelConfiguration
@@ -11,7 +12,7 @@ class AIClientFactory:
     """Factory for creating provider-specific AI clients."""
     
     @staticmethod
-    def create_client(provider: AIProviderEnum) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
+    def create_client(provider: AIProviderEnum) -> openai.AsyncOpenAI:
         """
         Create an AI client based on the provider.
         
@@ -24,9 +25,7 @@ class AIClientFactory:
         Raises:
             ValueError: If provider configuration is missing or invalid
         """
-        if provider == AIProviderEnum.AZURE:
-            return AIClientFactory._create_azure_client()
-        elif provider == AIProviderEnum.OPENROUTER:
+        if provider == AIProviderEnum.OPENROUTER:
             return AIClientFactory._create_openrouter_client()
         elif provider == AIProviderEnum.OPENAI:
             return AIClientFactory._create_openai_client()
@@ -34,7 +33,7 @@ class AIClientFactory:
             raise ValueError(f"Unsupported AI provider: {provider}")
     
     @staticmethod
-    def create_client_for_model(model_config: AIModelConfiguration) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
+    def create_client_for_model(model_config: AIModelConfiguration) -> openai.AsyncOpenAI:
         """
         Create an AI client for a specific model configuration.
         
@@ -45,21 +44,6 @@ class AIClientFactory:
             Configured client instance
         """
         return AIClientFactory.create_client(model_config.provider)
-    
-    @staticmethod
-    def _create_azure_client() -> openai.AsyncAzureOpenAI:
-        """Create Azure OpenAI client."""
-        if not settings.AZURE_OPENAI_API_KEY:
-            raise ValueError("Azure OpenAI API key is not configured")
-        if not settings.AZURE_OPENAI_ENDPOINT:
-            raise ValueError("Azure OpenAI endpoint is not configured")
-            
-        logger.debug("Creating Azure OpenAI client")
-        return openai.AsyncAzureOpenAI(
-            api_key=settings.AZURE_OPENAI_API_KEY,
-            api_version=settings.AZURE_OPENAI_API_VERSION,
-            azure_endpoint=str(settings.AZURE_OPENAI_ENDPOINT)
-        )
     
     @staticmethod
     def _create_openrouter_client() -> openai.AsyncOpenAI:
@@ -104,10 +88,7 @@ class AIClientFactory:
         Returns:
             Provider-specific model name
         """
-        if model_config.provider == AIProviderEnum.AZURE:
-            # Azure uses deployment names
-            return model_config.model_name
-        elif model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI]:
+        if model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI]:
             # OpenRouter and OpenAI use full model paths
             return model_config.model_name
         else:
@@ -130,3 +111,4 @@ class AIClientFactory:
         except ValueError as e:
             logger.warning(f"Provider {provider} is not properly configured: {e}")
             return False
+

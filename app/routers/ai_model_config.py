@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/ai_model_config.py
+"""API routes for ai model config."""
+
+# /story_app/app/routers/ai_model_config.py
 import logging
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -33,7 +35,9 @@ async def list_ai_model_configurations(
         logger.warning("API: No active AI model configurations found in the database.")
         # Return an empty list, which is a valid response.
         # The frontend should handle the "No presets found" message.
-    return configs
+    return ApiResponse.success_response(
+        data=[AIModelConfigurationRead.model_validate(config) for config in configs]
+    )
 
 @router.get("/user-available", response_model=ApiResponse)
 async def get_user_available_models(
@@ -48,7 +52,9 @@ async def get_user_available_models(
     configs = await crud_ai_model_config.get_all_model_configs(db)
     if not configs:
         logger.warning("API: No active AI model configurations found for user.")
-    return configs
+    return ApiResponse.success_response(
+        data=[AIModelConfigurationRead.model_validate(config) for config in configs]
+    )
 
 @router.get("/cost-logs/recent")
 async def get_recent_cost_logs(
@@ -92,11 +98,13 @@ async def get_recent_cost_logs(
                 "created_at": log.created_at.isoformat() if log.created_at else None
             })
         
-        return {
-            "total_count": total_count,
-            "recent_logs": recent_logs,
-            "act_review_count": len([l for l in recent_logs if l["call_type"] == "act_review"])
-        }
+        return ApiResponse.success_response(
+            data={
+                "total_count": total_count,
+                "recent_logs": recent_logs,
+                "act_review_count": len([l for l in recent_logs if l["call_type"] == "act_review"])
+            }
+        )
         
     except Exception as e:
         logger.error(f"Error fetching cost logs: {e}", exc_info=True)

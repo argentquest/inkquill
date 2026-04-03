@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_admin_maintenance.py
+"""API routes for views admin maintenance."""
+
+# /story_app/app/routers/views_admin_maintenance.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Form
 from fastapi.responses import HTMLResponse, JSONResponse

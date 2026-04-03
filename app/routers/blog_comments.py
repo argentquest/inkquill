@@ -18,6 +18,23 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/blog", tags=["blog-comments"])
 
 
+def _serialize_comment(comment) -> dict:
+    """Provide internal router support for serialize comment."""
+    return {
+        "id": comment.id,
+        "content": comment.content,
+        "author_id": comment.author_id,
+        "post_id": comment.post_id,
+        "parent_comment_id": comment.parent_comment_id,
+        "status": comment.status.value,
+        "like_count": comment.like_count,
+        "reply_count": comment.reply_count,
+        "is_author_reply": comment.is_author_reply,
+        "created_at": comment.created_at.isoformat(),
+        "updated_at": comment.updated_at.isoformat(),
+    }
+
+
 @router.post("/posts/{post_id}/comments", status_code=status.HTTP_201_CREATED)
 async def create_comment(
     post_id: int,
@@ -51,20 +68,7 @@ async def create_comment(
             parent_comment_id=comment_data.parent_comment_id
         )
         
-        # Convert to dict to avoid SQLAlchemy serialization issues
-        return {
-            "id": comment.id,
-            "content": comment.content,
-            "author_id": comment.author_id,
-            "post_id": comment.post_id,
-            "parent_comment_id": comment.parent_comment_id,
-            "status": comment.status.value,
-            "like_count": comment.like_count,
-            "reply_count": comment.reply_count,
-            "is_author_reply": comment.is_author_reply,
-            "created_at": comment.created_at.isoformat(),
-            "updated_at": comment.updated_at.isoformat()
-        }
+        return ApiResponse.success_response(data=_serialize_comment(comment))
     except HTTPException:
         raise
     except Exception as e:
@@ -145,7 +149,7 @@ async def get_post_comments(
         elif sort_by == "popular":
             result.sort(key=lambda x: x["like_count"], reverse=True)
         
-        return result
+        return ApiResponse.success_response(data=result)
         
     except Exception as e:
         logger.error(f"Error getting comments for post {post_id}: {e}")
@@ -171,7 +175,7 @@ async def update_comment(
                 detail="Comment not found"
             )
         
-        if comment.user_id != current_user.id:
+        if comment.author_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You can only edit your own comments"
@@ -184,20 +188,7 @@ async def update_comment(
             user_id=current_user.id
         )
         
-        # Convert to dict to avoid SQLAlchemy serialization issues
-        return {
-            "id": updated_comment.id,
-            "content": updated_comment.content,
-            "author_id": updated_comment.author_id,
-            "post_id": updated_comment.post_id,
-            "parent_comment_id": updated_comment.parent_comment_id,
-            "status": updated_comment.status.value,
-            "like_count": updated_comment.like_count,
-            "reply_count": updated_comment.reply_count,
-            "is_author_reply": updated_comment.is_author_reply,
-            "created_at": updated_comment.created_at.isoformat(),
-            "updated_at": updated_comment.updated_at.isoformat()
-        }
+        return ApiResponse.success_response(data=_serialize_comment(updated_comment))
         
     except HTTPException:
         raise
@@ -228,7 +219,7 @@ async def delete_comment(
         from app.services.blog_service import blog_service
         post = await blog_service.get_post_by_id(db, comment.post_id)
         
-        if comment.user_id != current_user.id and post.author_id != current_user.id:
+        if comment.author_id != current_user.id and post.author_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You can only delete your own comments or comments on your posts"
@@ -237,7 +228,8 @@ async def delete_comment(
         await blog_comment_service.delete_comment(
             db=db,
             comment_id=comment_id,
-            user_id=current_user.id
+            user_id=current_user.id,
+            is_admin=bool(current_user.is_admin or post.author_id == current_user.id)
         )
         
     except HTTPException:
@@ -272,7 +264,9 @@ async def like_comment(
         comment.like_count = (comment.like_count or 0) + 1
         await db.commit()
         
-        return {"liked": True, "like_count": comment.like_count}
+        return ApiResponse.success_response(
+            data={"liked": True, "like_count": comment.like_count}
+        )
         
     except HTTPException:
         raise
@@ -304,11 +298,11 @@ async def report_comment(
         await blog_comment_service.report_comment(
             db=db,
             comment_id=comment_id,
-            user_id=current_user.id,
+            reporter_id=current_user.id,
             reason=reason
         )
         
-        return {"message": "Comment reported successfully"}
+        return ApiResponse.success_response(data={"message": "Comment reported successfully"})
         
     except HTTPException:
         raise
@@ -331,7 +325,7 @@ async def moderate_comment(
     """Moderate a comment (admin/moderator only)."""
     try:
         # Check if user is admin or moderator
-        if not current_user.is_superuser:
+        if not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Only administrators can moderate comments"
@@ -342,23 +336,10 @@ async def moderate_comment(
             comment_id=comment_id,
             moderator_id=current_user.id,
             status=status,
-            reason=reason
+            reason=reason,
         )
         
-        # Convert to dict to avoid SQLAlchemy serialization issues
-        return {
-            "id": comment.id,
-            "content": comment.content,
-            "author_id": comment.author_id,
-            "post_id": comment.post_id,
-            "parent_comment_id": comment.parent_comment_id,
-            "status": comment.status.value,
-            "like_count": comment.like_count,
-            "reply_count": comment.reply_count,
-            "is_author_reply": comment.is_author_reply,
-            "created_at": comment.created_at.isoformat(),
-            "updated_at": comment.updated_at.isoformat()
-        }
+        return ApiResponse.success_response(data=_serialize_comment(comment))
         
     except HTTPException:
         raise
@@ -380,7 +361,7 @@ async def get_pending_comments(
     """Get comments pending moderation (admin/moderator only)."""
     try:
         # Check if user is admin or moderator
-        if not current_user.is_superuser:
+        if not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Only administrators can view pending comments"
@@ -416,7 +397,7 @@ async def get_pending_comments(
             }
             result.append(comment_dict)
         
-        return result
+        return ApiResponse.success_response(data=result)
         
     except HTTPException:
         raise

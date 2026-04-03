@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/document_upload.py
+"""API routes for document upload."""
+
+# /story_app/app/routers/document_upload.py
 
 from fastapi import (
     APIRouter, Depends, UploadFile, File, Form, 
@@ -21,8 +23,7 @@ from app.models.uploaded_document import DocumentStatus, SourceElementTypeEnum
 from app.crud import document as crud_document_db
 from app.core.config import settings
 
-# --- MODIFIED IMPORT ---
-from app.processing.rag_ingestion import process_uploaded_document_task
+from app.processing.document_processing import process_uploaded_document_task
 
 from app.models.job_status import JobTypeEnum
 from app.crud import job_status as crud_job_status
@@ -47,18 +48,19 @@ ALLOWED_EXTENSIONS = [".pdf", ".txt", ".docx"]
     response_model=ApiResponse,
     status_code=status.HTTP_202_ACCEPTED,
     # <<< MODIFICATION: Added name attribute to match the template's url_for call >>>
-    name="upload_document_for_rag",
+    name="upload_document",
     # <<< END MODIFICATION >>>
-    summary="Upload a document for RAG processing.",
-    description="Accepts a file, creates a database record, and schedules a background job for RAG indexing. Returns a job_id for tracking."
+    summary="Upload a document for context processing.",
+    description="Accepts a file, stores it, extracts text for later direct-context use, and returns a job_id for tracking."
 )
-async def handle_document_upload_for_rag(
+async def handle_document_upload_for_context(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(..., description="The document file (PDF, TXT, DOCX)."),
     world_id: int = Form(..., description="Required ID of the World to associate this document with."),
     current_user: ModelUser = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
+    """Handle POST /upload."""
     if not file.filename:
         logger.warning(f"User '{current_user.username}' attempted upload with no filename.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Filename cannot be empty.")
@@ -116,7 +118,7 @@ async def handle_document_upload_for_rag(
             db=db,
             job_id=job_id,
             user_id=current_user.id,
-            job_type=JobTypeEnum.DOCUMENT_RAG_PROCESSING,
+            job_type=JobTypeEnum.DOCUMENT_CONTEXT_PROCESSING,
             status_message=f"Job initiated for document '{db_document.filename}'."
         )
 
@@ -126,11 +128,13 @@ async def handle_document_upload_for_rag(
             db_document_id=db_document.id,
             file_path_on_disk=temp_file_path
         )
-        logger.info(f"Scheduled RAG processing job {job_id} for document ID {db_document.id} ('{db_document.filename}') for user '{current_user.username}'.")
+        logger.info(f"Scheduled document processing job {job_id} for document ID {db_document.id} ('{db_document.filename}') for user '{current_user.username}'.")
         
-        return JobSubmissionResponse(
-            message=f"Document '{db_document.filename}' accepted. Processing started.",
-            job_id=job_id
+        return ApiResponse.success_response(
+            data=JobSubmissionResponse(
+                message=f"Document '{db_document.filename}' accepted. Processing started.",
+                job_id=job_id
+            )
         )
 
     except HTTPException: 
@@ -154,8 +158,10 @@ async def download_document(
 ):
     """Download a document file."""
     from fastapi.responses import StreamingResponse
-    from app.core.azure_deps import get_blob_service_client
     import mimetypes
+    from app.core.storage_deps import LocalStorageClient
+
+    storage_client = LocalStorageClient(settings.LOCAL_STORAGE_BASE_PATH)
     
     # Get document record
     document = await crud_document_db.get_document_record_for_user(db, document_id=document_id, user_id=current_user.id)
@@ -166,35 +172,18 @@ async def download_document(
         )
     
     try:
-        # Get blob service client
-        from azure.storage.blob import BlobServiceClient
-        if settings.AZURE_STORAGE_CONNECTION_STRING:
-            blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-        elif settings.AZURE_STORAGE_ACCOUNT_NAME:
-            from azure.identity import DefaultAzureCredential
-            account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-            credential = DefaultAzureCredential()
-            blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
-        else:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Azure Storage not configured")
-        
-        # Get blob client
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_RAG_DOCS
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=document.blob_storage_path)
-        
-        # Check if blob exists
-        if not blob_client.exists():
+        blob_client = storage_client.get_blob_client(container="documents", blob=document.blob_storage_path)
+        if not await blob_client.exists():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document file not found in storage")
-        
-        # Download blob
-        download_stream = blob_client.download_blob()
+        download_stream = await blob_client.download_blob()
+        blob_bytes = await download_stream.readall()
         
         # Determine content type
         content_type = document.content_type or mimetypes.guess_type(document.filename)[0] or "application/octet-stream"
         
         # Return streaming response
         return StreamingResponse(
-            download_stream.chunks(),
+            iter([blob_bytes]),
             media_type=content_type,
             headers={
                 "Content-Disposition": f'inline; filename="{document.filename}"'
@@ -216,6 +205,7 @@ async def download_document(
 )
 async def delete_document(
     document_id: int,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
     current_user: ModelUser = Depends(get_current_active_user)
 ):
@@ -230,7 +220,12 @@ async def delete_document(
     
     try:
         # Delete document record and blob
-        await crud_document_db.delete_document_record_and_blob(db, document_id, current_user.id)
+        await crud_document_db.delete_document_record_and_blob(
+            db,
+            document_id,
+            current_user.id,
+            background_tasks=background_tasks,
+        )
         logger.info(f"User '{current_user.username}' successfully deleted document {document_id} ('{document.filename}')")
         
     except Exception as e:
@@ -239,3 +234,4 @@ async def delete_document(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error deleting document"
         )
+

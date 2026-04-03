@@ -1,6 +1,7 @@
 """Blog subscription API endpoints."""
 import logging
-from typing import List, Optional, Dict, Any
+import json
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,12 +20,14 @@ router = APIRouter(prefix="/api/blog/subscriptions", tags=["blog-subscriptions"]
 
 # Pydantic models
 class SubscriptionRequest(BaseModel):
+    """Response or helper model for subscription request."""
     email: EmailStr
     frequency: SubscriptionFrequency = SubscriptionFrequency.WEEKLY
     source: str = "website"
 
 
 class SubscriptionResponse(BaseModel):
+    """Response or helper model for subscription response."""
     id: int
     email: str
     status: SubscriptionStatus
@@ -34,9 +37,38 @@ class SubscriptionResponse(BaseModel):
 
 
 class SubscriptionUpdateRequest(BaseModel):
+    """Response or helper model for subscription update request."""
     frequency: Optional[SubscriptionFrequency] = None
     include_categories: Optional[List[int]] = None
     include_tags: Optional[List[int]] = None
+
+
+def _parse_json_list(value: Optional[str]) -> List[int]:
+    """Provide internal router support for parse json list."""
+    if not value:
+        return []
+    try:
+        return list(json.loads(value))
+    except (TypeError, json.JSONDecodeError):
+        return []
+
+
+def _serialize_subscription(subscription) -> dict:
+    """Provide internal router support for serialize subscription."""
+    return {
+        "id": subscription.id,
+        "email": subscription.email,
+        "status": subscription.status.value,
+        "frequency": subscription.frequency.value,
+        "confirmed_at": subscription.confirmed_at.isoformat() if subscription.confirmed_at else None,
+        "created_at": subscription.created_at.isoformat(),
+        "updated_at": subscription.updated_at.isoformat() if subscription.updated_at else None,
+        "include_categories": _parse_json_list(subscription.include_categories),
+        "include_tags": _parse_json_list(subscription.include_tags),
+        "total_emails_sent": subscription.total_emails_sent,
+        "open_count": subscription.open_count,
+        "needs_confirmation": subscription.needs_confirmation,
+    }
 
 
 @router.post("/subscribe", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
@@ -68,16 +100,10 @@ async def subscribe_to_newsletter(
         else:
             message = "Successfully subscribed to the newsletter!"
         
-        return {
+        return ApiResponse.success_response(data={
             "message": message,
-            "subscription": {
-                "id": subscription.id,
-                "email": subscription.email,
-                "status": subscription.status.value,
-                "frequency": subscription.frequency.value,
-                "needs_confirmation": subscription.needs_confirmation
-            }
-        }
+            "subscription": _serialize_subscription(subscription),
+        })
         
     except Exception as e:
         logger.error(f"Error subscribing {subscription_data.email}: {e}")
@@ -197,24 +223,15 @@ async def get_my_subscription(
         )
         
         if not subscription:
-            return {
+            return ApiResponse.success_response(data={
                 "subscribed": False,
                 "message": "You are not currently subscribed to the newsletter."
-            }
-        
-        return {
+            })
+
+        return ApiResponse.success_response(data={
             "subscribed": True,
-            "subscription": {
-                "id": subscription.id,
-                "email": subscription.email,
-                "status": subscription.status.value,
-                "frequency": subscription.frequency.value,
-                "confirmed_at": subscription.confirmed_at.isoformat() if subscription.confirmed_at else None,
-                "created_at": subscription.created_at.isoformat(),
-                "total_emails_sent": subscription.total_emails_sent,
-                "open_count": subscription.open_count
-            }
-        }
+            "subscription": _serialize_subscription(subscription),
+        })
         
     except Exception as e:
         logger.error(f"Error getting subscription for user {current_user.id}: {e}")
@@ -256,14 +273,10 @@ async def update_my_subscription(
                 detail="Failed to update subscription preferences"
             )
         
-        return {
+        return ApiResponse.success_response(data={
             "message": "Subscription preferences updated successfully",
-            "subscription": {
-                "frequency": updated_subscription.frequency.value,
-                "include_categories": updated_subscription.include_categories,
-                "include_tags": updated_subscription.include_tags
-            }
-        }
+            "subscription": _serialize_subscription(updated_subscription),
+        })
         
     except HTTPException:
         raise
@@ -312,14 +325,14 @@ async def get_subscription_stats(
 ):
     """Get subscription statistics (admin only)."""
     try:
-        if not current_user.is_superuser:
+        if not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Only administrators can view subscription statistics"
             )
         
         stats = await blog_subscription_service.get_subscription_stats(db)
-        return stats
+        return ApiResponse.success_response(data=stats)
         
     except HTTPException:
         raise
@@ -342,7 +355,7 @@ async def list_subscriptions(
 ):
     """List subscriptions (admin only)."""
     try:
-        if not current_user.is_superuser:
+        if not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Only administrators can list subscriptions"
@@ -357,19 +370,7 @@ async def list_subscriptions(
             limit=limit
         )
         
-        return [
-            {
-                "id": sub.id,
-                "email": sub.email,
-                "status": sub.status.value,
-                "frequency": sub.frequency.value,
-                "created_at": sub.created_at.isoformat(),
-                "confirmed_at": sub.confirmed_at.isoformat() if sub.confirmed_at else None,
-                "total_emails_sent": sub.total_emails_sent,
-                "open_count": sub.open_count
-            }
-            for sub in subscriptions
-        ]
+        return ApiResponse.success_response(data=[_serialize_subscription(sub) for sub in subscriptions])
         
     except HTTPException:
         raise

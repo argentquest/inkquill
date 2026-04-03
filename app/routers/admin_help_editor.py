@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/admin_help_editor.py
+"""API routes for admin help editor."""
+
+# /story_app/app/routers/admin_help_editor.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, JSONResponse

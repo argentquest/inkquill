@@ -1,5 +1,4 @@
 """API endpoints for forum categories."""
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,6 +15,22 @@ from app.crud import forum_category as crud_category
 router = APIRouter(prefix="/api/forum/categories", tags=["forum_categories"])
 
 
+def _build_category_response(category) -> ForumCategoryResponse:
+    """Provide internal router support for build category response."""
+    return ForumCategoryResponse(
+        id=category.id,
+        name=category.name,
+        description=category.description,
+        slug=category.slug,
+        sort_order=category.sort_order,
+        is_active=category.is_active,
+        icon=category.icon,
+        thread_count=len([thread for thread in category.threads if not thread.is_deleted]),
+        created_at=category.created_at,
+        updated_at=category.updated_at,
+    )
+
+
 @router.get("/", response_model=ApiResponse)
 async def get_categories(
     skip: int = 0,
@@ -29,23 +44,8 @@ async def get_categories(
     )
     
     # Add thread counts
-    response_categories = []
-    for category in categories:
-        category_dict = {
-            "id": category.id,
-            "name": category.name,
-            "description": category.description,
-            "slug": category.slug,
-            "sort_order": category.sort_order,
-            "is_active": category.is_active,
-            "icon": category.icon,
-            "thread_count": len([t for t in category.threads if not t.is_deleted]),
-            "created_at": category.created_at,
-            "updated_at": category.updated_at
-        }
-        response_categories.append(ForumCategoryResponse(**category_dict))
-    
-    return response_categories
+    response_categories = [_build_category_response(category) for category in categories]
+    return ApiResponse.success_response(data=response_categories)
 
 
 @router.get("/{category_id}", response_model=ApiResponse)
@@ -61,18 +61,7 @@ async def get_category(
             detail="Category not found"
         )
     
-    return ForumCategoryResponse(
-        id=category.id,
-        name=category.name,
-        description=category.description,
-        slug=category.slug,
-        sort_order=category.sort_order,
-        is_active=category.is_active,
-        icon=category.icon,
-        thread_count=len([t for t in category.threads if not t.is_deleted]),
-        created_at=category.created_at,
-        updated_at=category.updated_at
-    )
+    return ApiResponse.success_response(data=_build_category_response(category))
 
 
 @router.get("/slug/{slug}", response_model=ApiResponse)
@@ -88,18 +77,7 @@ async def get_category_by_slug(
             detail="Category not found"
         )
     
-    return ForumCategoryResponse(
-        id=category.id,
-        name=category.name,
-        description=category.description,
-        slug=category.slug,
-        sort_order=category.sort_order,
-        is_active=category.is_active,
-        icon=category.icon,
-        thread_count=len([t for t in category.threads if not t.is_deleted]),
-        created_at=category.created_at,
-        updated_at=category.updated_at
-    )
+    return ApiResponse.success_response(data=_build_category_response(category))
 
 
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
@@ -117,18 +95,7 @@ async def create_category(
     
     try:
         new_category = await crud_category.create_forum_category(db, category)
-        return ForumCategoryResponse(
-            id=new_category.id,
-            name=new_category.name,
-            description=new_category.description,
-            slug=new_category.slug,
-            sort_order=new_category.sort_order,
-            is_active=new_category.is_active,
-            icon=new_category.icon,
-            thread_count=0,
-            created_at=new_category.created_at,
-            updated_at=new_category.updated_at
-        )
+        return ApiResponse.success_response(data=_build_category_response(new_category))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -160,18 +127,7 @@ async def update_category(
                 detail="Category not found"
             )
         
-        return ForumCategoryResponse(
-            id=updated_category.id,
-            name=updated_category.name,
-            description=updated_category.description,
-            slug=updated_category.slug,
-            sort_order=updated_category.sort_order,
-            is_active=updated_category.is_active,
-            icon=updated_category.icon,
-            thread_count=len([t for t in updated_category.threads if not t.is_deleted]),
-            created_at=updated_category.created_at,
-            updated_at=updated_category.updated_at
-        )
+        return ApiResponse.success_response(data=_build_category_response(updated_category))
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

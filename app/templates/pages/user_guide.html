@@ -1,4 +1,4 @@
-{# /ai_rag_story_app/app/templates/pages/user_guide.html #}
+{# /story_app/app/templates/pages/user_guide.html #}
 
 {% extends "layouts/base.html" %}
 
@@ -106,7 +106,7 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-3">Welcome to the AI Storytelling Assistant! This application is built on one core idea: <strong>a smarter AI companion is one that you teach.</strong></p>
-                        <p class="mb-3">Instead of relying on a generic AI, this tool uses a powerful <strong>Retrieval-Augmented Generation (RAG)</strong> system. This means the AI's "brain" is your own custom knowledge base. The more detail you provide about your fictional universe, the more consistent, creative, and context-aware its suggestions will be. The foundation of this knowledge base is the <strong>World</strong>.</p>
+                        <p class="mb-3">Instead of relying on a generic AI, this tool builds direct prompt context from your worlds, characters, locations, lore, and uploaded documents. The more detail you provide about your fictional universe, the more consistent, creative, and context-aware its suggestions will be. The foundation of this knowledge base is the <strong>World</strong>.</p>
                     </div>
                 </div>
 
@@ -339,11 +339,11 @@
                                                 <i class="fas fa-brain"></i>
                                             </div>
                                             <div>
-                                                <h4 id="rag-system">The RAG System: The AI's Memory</h4>
-                                                <div class="text-secondary">Retrieval-Augmented Generation</div>
+                                                <h4 id="context-system">The Context System: The AI's Memory</h4>
+                                                <div class="text-secondary">Direct prompt context from your story data</div>
                                             </div>
                                         </div>
-                                        <p class="mb-3">The AI's ability to remember your world comes from the RAG system. It's automatically fed by the <strong>Characters, Locations, and Lore Items</strong> you create.</p>
+                                        <p class="mb-3">The AI's ability to remember your world comes from the context system. It is automatically fed by the <strong>Characters, Locations, Lore Items</strong>, and documents you create.</p>
                                         <p class="small">You can further enhance its knowledge by uploading your own documents (e.g., research notes, timelines, inspirational texts) via the <strong>Manage Documents</strong> page and associating them with a world.</p>
                                     </div>
                                 </div>
@@ -487,3 +487,4 @@
     });
 </script>
 {% endblock %}
+

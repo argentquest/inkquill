@@ -1,9 +1,12 @@
-# /ai_rag_story_app/app/routers/batch.py
+"""API routes for batch."""
 
-from fastapi import APIRouter, Depends, status, HTTPException
+# /story_app/app/routers/batch.py
+
+from fastapi import APIRouter, Depends, status, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List, Optional
+from pydantic import BaseModel
 import logging
 
 # --- Core Application Imports ---
@@ -12,10 +15,11 @@ from app.models.user import User
 from app.models.character import Character
 from app.models.location import Location
 from app.models.lore_item import LoreItem
+from app.models.world import World
 from app.schemas.base import ApiResponse
-from app.schemas.character import CharacterBase, CharacterCreate
-from app.schemas.location import LocationBase, LocationCreate
-from app.schemas.lore_item import LoreItemBase, LoreItemCreate
+from app.schemas.character import CharacterCreate, CharacterRead
+from app.schemas.location import LocationCreate, LocationRead
+from app.schemas.lore_item import LoreItemCreate, LoreItemRead
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +29,31 @@ router = APIRouter(
 )
 
 # --- Batch Response Schemas ---
-class BatchResponse:
+class BatchResponse(BaseModel):
     """Response for batch operations"""
     success_count: int
     error_count: int
     results: List[dict]
 
+
+class BatchCharacterCreate(CharacterCreate):
+    """Response or helper model for batch character create."""
+    world_id: int
+
+
+class BatchLocationCreate(LocationCreate):
+    """Response or helper model for batch location create."""
+    world_id: int
+
+
+class BatchLoreItemCreate(LoreItemCreate):
+    """Response or helper model for batch lore item create."""
+    world_id: int
+
 # Character batch endpoints
 @router.post("/characters", response_model=ApiResponse)
 async def create_batch_characters(
-    characters: List[CharacterCreate],
+    characters: List[BatchCharacterCreate],
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user_from_bearer_token)
 ):
@@ -51,17 +70,12 @@ async def create_batch_characters(
             try:
                 # Create character
                 db_character = Character(
-                    user_id=current_user.id,
                     world_id=char_data.world_id,
                     name=char_data.name,
-                    title=char_data.title,
                     backstory=char_data.backstory,
-                    personality=char_data.personality,
-                    motivations=char_data.motivations,
-                    physical_description=char_data.physical_description,
-                    age=char_data.age,
-                    occupation=char_data.occupation,
-                    skills=char_data.skills,
+                    personality_traits=char_data.personality_traits,
+                    age_category=getattr(char_data, "age_category", None),
+                    profession=char_data.profession,
                     relationships=char_data.relationships
                 )
 
@@ -101,7 +115,7 @@ async def create_batch_characters(
 
 @router.get("/characters", response_model=ApiResponse)
 async def get_batch_characters(
-    character_ids: List[int],
+    character_ids: List[int] = Query(default_factory=list),
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user_from_bearer_token)
 ):
@@ -115,15 +129,21 @@ async def get_batch_characters(
         logger.info(f"Getting batch characters for user {current_user.id}: {len(character_ids)} items")
 
         # Query characters that belong to the current user
-        query = select(Character).where(
-            Character.id.in_(character_ids),
-            Character.user_id == current_user.id
+        query = (
+            select(Character)
+            .join(World, Character.world_id == World.id)
+            .where(
+                Character.id.in_(character_ids),
+                World.user_id == current_user.id,
+            )
         )
         result = await db.execute(query)
         characters = result.scalars().all()
 
         # Convert to response schema
-        character_responses = [CharacterBase.model_validate(char) for char in characters]
+        character_responses = [
+            CharacterRead.model_validate(char, from_attributes=True) for char in characters
+        ]
 
         logger.info(f"Retrieved {len(characters)} characters from batch query")
         return ApiResponse.success_response(data=character_responses)
@@ -138,7 +158,7 @@ async def get_batch_characters(
 # Location batch endpoints
 @router.post("/locations", response_model=ApiResponse)
 async def create_batch_locations(
-    locations: List[LocationCreate],
+    locations: List[BatchLocationCreate],
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user_from_bearer_token)
 ):
@@ -155,17 +175,13 @@ async def create_batch_locations(
             try:
                 # Create location
                 db_location = Location(
-                    user_id=current_user.id,
                     world_id=loc_data.world_id,
                     name=loc_data.name,
                     description=loc_data.description,
-                    type=loc_data.type,
-                    climate=loc_data.climate,
                     geography=loc_data.geography,
-                    population=loc_data.population,
-                    government=loc_data.government,
-                    economy=loc_data.economy,
-                    culture=loc_data.culture
+                    cultural_context=loc_data.cultural_context,
+                    scale=loc_data.scale,
+                    parent_location_id=loc_data.parent_location_id
                 )
 
                 db.add(db_location)
@@ -204,7 +220,7 @@ async def create_batch_locations(
 
 @router.get("/locations", response_model=ApiResponse)
 async def get_batch_locations(
-    location_ids: List[int],
+    location_ids: List[int] = Query(default_factory=list),
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user_from_bearer_token)
 ):
@@ -218,15 +234,21 @@ async def get_batch_locations(
         logger.info(f"Getting batch locations for user {current_user.id}: {len(location_ids)} items")
 
         # Query locations that belong to the current user
-        query = select(Location).where(
-            Location.id.in_(location_ids),
-            Location.user_id == current_user.id
+        query = (
+            select(Location)
+            .join(World, Location.world_id == World.id)
+            .where(
+                Location.id.in_(location_ids),
+                World.user_id == current_user.id,
+            )
         )
         result = await db.execute(query)
         locations = result.scalars().all()
 
         # Convert to response schema
-        location_responses = [LocationBase.model_validate(loc) for loc in locations]
+        location_responses = [
+            LocationRead.model_validate(loc, from_attributes=True) for loc in locations
+        ]
 
         logger.info(f"Retrieved {len(locations)} locations from batch query")
         return ApiResponse.success_response(data=location_responses)
@@ -241,7 +263,7 @@ async def get_batch_locations(
 # Lore Item batch endpoints
 @router.post("/lore-items", response_model=ApiResponse)
 async def create_batch_lore_items(
-    lore_items: List[LoreItemCreate],
+    lore_items: List[BatchLoreItemCreate],
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user_from_bearer_token)
 ):
@@ -258,14 +280,12 @@ async def create_batch_lore_items(
             try:
                 # Create lore item
                 db_lore_item = LoreItem(
-                    user_id=current_user.id,
                     world_id=lore_data.world_id,
-                    name=lore_data.name,
+                    title=lore_data.title,
                     description=lore_data.description,
-                    type=lore_data.type,
                     category=lore_data.category,
-                    rarity=lore_data.rarity,
-                    lore=lore_data.lore
+                    importance_rating=lore_data.importance_rating,
+                    related_elements=lore_data.related_elements
                 )
 
                 db.add(db_lore_item)
@@ -274,7 +294,7 @@ async def create_batch_lore_items(
 
                 created_lore_items.append({
                     "id": db_lore_item.id,
-                    "name": db_lore_item.name,
+                    "name": db_lore_item.title,
                     "status": "created"
                 })
 
@@ -304,7 +324,7 @@ async def create_batch_lore_items(
 
 @router.get("/lore-items", response_model=ApiResponse)
 async def get_batch_lore_items(
-    lore_item_ids: List[int],
+    lore_item_ids: List[int] = Query(default_factory=list),
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user_from_bearer_token)
 ):
@@ -318,15 +338,21 @@ async def get_batch_lore_items(
         logger.info(f"Getting batch lore-items for user {current_user.id}: {len(lore_item_ids)} items")
 
         # Query lore items that belong to the current user
-        query = select(LoreItem).where(
-            LoreItem.id.in_(lore_item_ids),
-            LoreItem.user_id == current_user.id
+        query = (
+            select(LoreItem)
+            .join(World, LoreItem.world_id == World.id)
+            .where(
+                LoreItem.id.in_(lore_item_ids),
+                World.user_id == current_user.id,
+            )
         )
         result = await db.execute(query)
         lore_items = result.scalars().all()
 
         # Convert to response schema
-        lore_item_responses = [LoreItemBase.model_validate(item) for item in lore_items]
+        lore_item_responses = [
+            LoreItemRead.model_validate(item, from_attributes=True) for item in lore_items
+        ]
 
         logger.info(f"Retrieved {len(lore_items)} lore items from batch query")
         return ApiResponse.success_response(data=lore_item_responses)

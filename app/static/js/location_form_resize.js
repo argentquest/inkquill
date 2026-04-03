@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/location_form_resize.js
+// /story_app/app/static/js/location_form_resize.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {

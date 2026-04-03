@@ -1,3 +1,5 @@
+"""Service helpers for billing service."""
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from decimal import Decimal
@@ -13,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class BillingService:
     
+    """Service class for billing service."""
     async def check_sufficient_balance(self, db: AsyncSession, user_id: int, required_amount: Decimal) -> bool:
         """Check if user has sufficient balance for an operation"""
         account = await billing_crud.get_or_create_user_account(db, user_id)

@@ -1,22 +1,25 @@
 """Blog media management API endpoints."""
 import logging
+import os
 import uuid
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
-from sqlalchemy.ext.asyncio import AsyncSession
 from PIL import Image, ImageOps
 import io
 
-from app.core.deps import get_db_session, get_current_active_user
+from app.core.deps import get_current_active_user
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.base import ApiResponse
+from app.services.storage.local_storage import LocalStorageProvider
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/media", tags=["blog-media"])
+UPLOAD_DIR = Path(settings.LOCAL_STORAGE_BASE_PATH) / settings.LOCAL_STORAGE_BLOG_MEDIA_PATH
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # Configuration
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
@@ -110,60 +113,70 @@ def generate_aspect_ratio_versions(image_data: bytes, aspect_ratios: Dict[str, t
         raise
 
 
-async def upload_to_azure_blob(
+def _serialize_media_entry(
+    *,
+    storage_path: str,
+    url: str,
+    file_type: str,
+    content_type: str,
+    file_size: int,
+    original_filename: Optional[str] = None,
+    alt_text: Optional[str] = None,
+    caption: Optional[str] = None,
+    uploaded_by: Optional[int] = None,
+    created_at: Optional[str] = None,
+    thumbnail_url: Optional[str] = None,
+    image_info: Optional[Dict[str, Any]] = None,
+    aspect_ratio_urls: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """Provide internal router support for serialize media entry."""
+    entry = {
+        "id": str(uuid.uuid4()),
+        "filename": Path(storage_path).name,
+        "storage_path": storage_path,
+        "original_filename": original_filename or Path(storage_path).name,
+        "url": url,
+        "file_type": file_type,
+        "content_type": content_type,
+        "file_size": file_size,
+        "alt_text": alt_text,
+        "caption": caption,
+        "uploaded_by": uploaded_by,
+        "created_at": created_at or datetime.now().isoformat(),
+    }
+    if thumbnail_url:
+        entry["thumbnail_url"] = thumbnail_url
+    if image_info:
+        entry.update(image_info)
+    if aspect_ratio_urls:
+        entry["aspect_ratio_urls"] = aspect_ratio_urls
+    return entry
+
+
+async def upload_to_local_storage(
     file_data: bytes,
     filename: str,
     content_type: str,
     user_id: int,
     metadata: Optional[Dict[str, str]] = None
-) -> str:
-    """Upload file to Azure Blob Storage and return the blob URL."""
-    from azure.storage.blob.aio import BlobServiceClient
-    from azure.storage.blob import ContentSettings
-    
-    # Create blob path with date organization
-    date_path = datetime.now().strftime("%Y/%m/%d")
-    blob_name = f"{date_path}/{filename}"
-    
-    # Upload to Azure blob storage
-    container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_BLOG_MEDIA
-    
-    if settings.AZURE_STORAGE_CONNECTION_STRING:
-        blob_service_client = BlobServiceClient.from_connection_string(settings.AZURE_STORAGE_CONNECTION_STRING)
-    else:
-        account_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-        from azure.identity.aio import DefaultAzureCredential
-        credential = DefaultAzureCredential()
-        blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
-    
-    try:
-        async with blob_service_client:
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
-            content_settings = ContentSettings(content_type=content_type)
-            
-            # Prepare blob metadata
-            blob_metadata = metadata or {}
-            blob_metadata.update({
-                'user_id': str(user_id),
-                'original_filename': filename.split('_', 1)[-1] if '_' in filename else filename,
-                'upload_time': datetime.now().isoformat()
-            })
-            
-            await blob_client.upload_blob(
-                file_data,
-                content_settings=content_settings,
-                metadata=blob_metadata,
-                overwrite=True
-            )
-            
-            # Return the blob URL
-            blob_url = f"https://{settings.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{blob_name}"
-            logger.info(f"File uploaded to Azure Blob: {blob_url}")
-            return blob_url
-            
-    except Exception as e:
-        logger.error(f"Error uploading to Azure Blob: {e}")
-        raise
+) -> tuple[str, str]:
+    """Upload file to local storage and return relative path plus public URL."""
+    provider = LocalStorageProvider(str(UPLOAD_DIR))
+    blob_metadata = metadata or {}
+    blob_metadata.update({
+        'user_id': str(user_id),
+        'original_filename': filename.split('_', 1)[-1] if '_' in filename else filename,
+        'upload_time': datetime.now().isoformat()
+    })
+    relative_path = await provider.upload(
+        file_data=io.BytesIO(file_data),
+        filename=filename,
+        content_type=content_type,
+        metadata=blob_metadata
+    )
+    url = await provider.get_url(relative_path)
+    logger.info(f"File uploaded to local storage: {url}")
+    return relative_path, url
 
 
 async def validate_image(file_path: Path) -> Dict[str, Any]:
@@ -208,9 +221,8 @@ async def upload_media(
     alt_text: Optional[str] = Form(None),
     caption: Optional[str] = Form(None),
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db_session)
 ):
-    """Upload a media file to Azure Blob Storage."""
+    """Upload a media file to local storage."""
     try:
         # Validate file type
         if not file.content_type:
@@ -236,6 +248,13 @@ async def upload_media(
         image_info = None
         aspect_ratio_urls = {}
         
+        metadata = {
+            "alt_text": alt_text or "",
+            "caption": caption or "",
+            "file_type": file_type,
+            "original_filename": file.filename or "unnamed"
+        }
+
         if file_type == "image":
             try:
                 # Validate image using PIL
@@ -267,7 +286,7 @@ async def upload_media(
                         aspect_name
                     )
                     
-                    aspect_url = await upload_to_azure_blob(
+                    _, aspect_url = await upload_to_local_storage(
                         file_data=aspect_data,
                         filename=aspect_filename,
                         content_type="image/jpeg",
@@ -290,16 +309,7 @@ async def upload_media(
         # Generate unique filename
         filename = generate_filename(file.filename or "unnamed", current_user.id)
         
-        # Prepare metadata
-        metadata = {
-            "alt_text": alt_text or "",
-            "caption": caption or "",
-            "file_type": file_type,
-            "original_filename": file.filename or "unnamed"
-        }
-        
-        # Upload to Azure Blob Storage
-        blob_url = await upload_to_azure_blob(
+        storage_path, blob_url = await upload_to_local_storage(
             file_data=content,
             filename=filename,
             content_type=file.content_type,
@@ -308,40 +318,31 @@ async def upload_media(
         )
         
         # Return media info
-        media_info = {
-            "id": str(uuid.uuid4()),  # In a real system, this would be from database
-            "filename": filename,
-            "original_filename": file.filename,
-            "url": blob_url,
-            "file_type": file_type,
-            "content_type": file.content_type,
-            "file_size": file_size,
-            "alt_text": alt_text,
-            "caption": caption,
-            "uploaded_by": current_user.id,
-            "created_at": datetime.now().isoformat()
-        }
+        media_info = _serialize_media_entry(
+            storage_path=storage_path,
+            url=blob_url,
+            file_type=file_type,
+            content_type=file.content_type,
+            file_size=file_size,
+            original_filename=file.filename,
+            alt_text=alt_text,
+            caption=caption,
+            uploaded_by=current_user.id,
+            image_info=image_info,
+            aspect_ratio_urls=aspect_ratio_urls if image_info else None,
+        )
         
-        # Add image-specific info
-        if image_info:
-            media_info.update({
-                "width": image_info["width"],
-                "height": image_info["height"],
-                "format": image_info["format"],
-                "aspect_ratio_urls": aspect_ratio_urls
-            })
+        logger.info(f"User {current_user.id} uploaded media to local storage: {filename}")
         
-        logger.info(f"User {current_user.id} uploaded media to Azure Blob: {filename}")
-        
-        return {
-            "message": "File uploaded successfully to Azure Blob Storage",
+        return ApiResponse.success_response(data={
+            "message": "File uploaded successfully",
             "media": media_info
-        }
+        })
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error uploading media to Azure Blob: {e}")
+        logger.error(f"Error uploading media to local storage: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload media file"
@@ -354,50 +355,45 @@ async def list_media(
     skip: int = 0,
     limit: int = 50,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db_session)
 ):
     """List uploaded media files."""
     try:
         # In a real implementation, this would query a database
         # For now, we'll list files from the upload directory
         media_files = []
-        
+        provider = LocalStorageProvider(str(UPLOAD_DIR))
+
         if UPLOAD_DIR.exists():
-            for file_path in UPLOAD_DIR.iterdir():
-                if file_path.is_file() and not file_path.name.startswith("thumb_"):
-                    # Extract user ID from filename
-                    if file_path.name.startswith(f"{current_user.id}_"):
-                        stat = file_path.stat()
-                        
-                        # Determine content type from extension
-                        ext = file_path.suffix.lower()
-                        content_type = {
-                            '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-                            '.png': 'image/png', '.gif': 'image/gif',
-                            '.webp': 'image/webp', '.mp4': 'video/mp4',
-                            '.webm': 'video/webm', '.mp3': 'audio/mp3',
-                            '.wav': 'audio/wav'
-                        }.get(ext, 'application/octet-stream')
-                        
-                        file_type_detected = get_file_type(content_type)
-                        
-                        # Filter by file type if specified
-                        if file_type and file_type_detected != file_type:
-                            continue
-                        
-                        # Check for thumbnail
-                        thumbnail_path = UPLOAD_DIR / f"thumb_{file_path.name}"
-                        thumbnail_url = f"/static/uploads/blog/thumb_{file_path.name}" if thumbnail_path.exists() else None
-                        
-                        media_files.append({
-                            "filename": file_path.name,
-                            "url": f"/static/uploads/blog/{file_path.name}",
-                            "thumbnail_url": thumbnail_url,
-                            "file_type": file_type_detected,
-                            "content_type": content_type,
-                            "file_size": stat.st_size,
-                            "created_at": stat.st_ctime
-                        })
+            for file_path in UPLOAD_DIR.rglob("*"):
+                if file_path.is_file() and not file_path.name.endswith(".meta") and not file_path.name.startswith("thumb_"):
+                    if not file_path.name.startswith(f"{current_user.id}_"):
+                        continue
+
+                    stat = file_path.stat()
+                    relative_path = str(file_path.relative_to(UPLOAD_DIR)).replace("\\", "/")
+                    ext = file_path.suffix.lower()
+                    content_type = {
+                        '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+                        '.png': 'image/png', '.gif': 'image/gif',
+                        '.webp': 'image/webp', '.mp4': 'video/mp4',
+                        '.webm': 'video/webm', '.mp3': 'audio/mp3',
+                        '.wav': 'audio/wav'
+                    }.get(ext, 'application/octet-stream')
+                    file_type_detected = get_file_type(content_type)
+
+                    if file_type and file_type_detected != file_type:
+                        continue
+
+                    media_files.append(
+                        _serialize_media_entry(
+                            storage_path=relative_path,
+                            url=await provider.get_url(relative_path),
+                            file_type=file_type_detected,
+                            content_type=content_type,
+                            file_size=stat.st_size,
+                            created_at=datetime.fromtimestamp(stat.st_ctime).isoformat(),
+                        )
+                    )
         
         # Sort by creation time (newest first)
         media_files.sort(key=lambda x: x["created_at"], reverse=True)
@@ -406,7 +402,7 @@ async def list_media(
         total = len(media_files)
         media_files = media_files[skip:skip + limit]
         
-        return media_files
+        return ApiResponse.success_response(data=media_files)
         
     except Exception as e:
         logger.error(f"Error listing media files: {e}")
@@ -416,37 +412,41 @@ async def list_media(
         )
 
 
-@router.delete("/{filename}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{file_path:path}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_media(
-    filename: str,
+    file_path: str,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db_session)
 ):
     """Delete a media file."""
     try:
         # Validate that the file belongs to the current user
-        if not filename.startswith(f"{current_user.id}_"):
+        normalized_path = file_path.replace("\\", "/")
+        if not Path(normalized_path).name.startswith(f"{current_user.id}_"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You can only delete your own files"
             )
         
-        file_path = UPLOAD_DIR / filename
-        if not file_path.exists():
+        resolved_path = UPLOAD_DIR / normalized_path
+        if not resolved_path.exists():
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="File not found"
             )
         
         # Delete main file
-        os.unlink(file_path)
+        os.unlink(resolved_path)
         
         # Delete thumbnail if it exists
-        thumbnail_path = UPLOAD_DIR / f"thumb_{filename}"
+        thumbnail_path = resolved_path.parent / f"thumb_{resolved_path.name}"
         if thumbnail_path.exists():
             os.unlink(thumbnail_path)
+
+        metadata_path = resolved_path.with_suffix(resolved_path.suffix + ".meta")
+        if metadata_path.exists():
+            os.unlink(metadata_path)
         
-        logger.info(f"User {current_user.id} deleted media: {filename}")
+        logger.info(f"User {current_user.id} deleted media: {normalized_path}")
         
     except HTTPException:
         raise
@@ -458,32 +458,32 @@ async def delete_media(
         )
 
 
-@router.get("/info/{filename}", response_model=ApiResponse)
+@router.get("/info/{file_path:path}", response_model=ApiResponse)
 async def get_media_info(
-    filename: str,
+    file_path: str,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db_session)
 ):
     """Get information about a media file."""
     try:
-        file_path = UPLOAD_DIR / filename
-        if not file_path.exists():
+        normalized_path = file_path.replace("\\", "/")
+        resolved_path = UPLOAD_DIR / normalized_path
+        if not resolved_path.exists():
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="File not found"
             )
         
         # Validate that the file belongs to the current user or is publicly accessible
-        if not filename.startswith(f"{current_user.id}_") and not current_user.is_superuser:
+        if not Path(normalized_path).name.startswith(f"{current_user.id}_") and not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Access denied"
             )
         
-        stat = file_path.stat()
+        stat = resolved_path.stat()
         
         # Determine content type
-        ext = file_path.suffix.lower()
+        ext = resolved_path.suffix.lower()
         content_type = {
             '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
             '.png': 'image/png', '.gif': 'image/gif',
@@ -494,19 +494,20 @@ async def get_media_info(
         
         file_type = get_file_type(content_type)
         
-        info = {
-            "filename": filename,
-            "url": f"/static/uploads/blog/{filename}",
-            "file_type": file_type,
-            "content_type": content_type,
-            "file_size": stat.st_size,
-            "created_at": stat.st_ctime,
-            "modified_at": stat.st_mtime
-        }
+        provider = LocalStorageProvider(str(UPLOAD_DIR))
+        info = _serialize_media_entry(
+            storage_path=normalized_path,
+            url=await provider.get_url(normalized_path),
+            file_type=file_type,
+            content_type=content_type,
+            file_size=stat.st_size,
+            created_at=datetime.fromtimestamp(stat.st_ctime).isoformat(),
+        )
+        info["modified_at"] = datetime.fromtimestamp(stat.st_mtime).isoformat()
         
         # Add image-specific info
         if file_type == "image":
-            image_info = await validate_image(file_path)
+            image_info = await validate_image(resolved_path)
             if image_info["is_valid"]:
                 info.update({
                     "width": image_info.get("width"),
@@ -515,11 +516,13 @@ async def get_media_info(
                 })
             
             # Check for thumbnail
-            thumbnail_path = UPLOAD_DIR / f"thumb_{filename}"
+            thumbnail_path = resolved_path.parent / f"thumb_{resolved_path.name}"
             if thumbnail_path.exists():
-                info["thumbnail_url"] = f"/static/uploads/blog/thumb_{filename}"
+                info["thumbnail_url"] = await provider.get_url(
+                    str(thumbnail_path.relative_to(UPLOAD_DIR)).replace("\\", "/")
+                )
         
-        return info
+        return ApiResponse.success_response(data=info)
         
     except HTTPException:
         raise
@@ -535,7 +538,6 @@ async def get_media_info(
 async def bulk_upload_media(
     files: List[UploadFile] = File(...),
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db_session)
 ):
     """Upload multiple media files at once."""
     try:
@@ -550,11 +552,11 @@ async def bulk_upload_media(
             try:
                 # Process each file individually
                 # This is a simplified version - in practice you'd want to optimize this
-                result = await upload_media(file, None, None, current_user, db)
+                result = await upload_media(file, None, None, current_user)
                 results.append({
                     "filename": file.filename,
                     "status": "success",
-                    "media": result["media"]
+                    "media": result.data["media"]
                 })
             except Exception as e:
                 results.append({
@@ -563,7 +565,7 @@ async def bulk_upload_media(
                     "error": str(e)
                 })
         
-        return results
+        return ApiResponse.success_response(data=results)
         
     except HTTPException:
         raise
@@ -573,3 +575,4 @@ async def bulk_upload_media(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to process bulk upload"
         )
+

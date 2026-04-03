@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/utils/prompt_validator.py
+"""Utility helpers for prompt validator."""
+
+# /story_app/app/utils/prompt_validator.py
 
 import re
 import logging

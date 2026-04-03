@@ -1,3 +1,5 @@
+"""API routes for views admin cta."""
+
 # Admin CTA Manager View Router
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse

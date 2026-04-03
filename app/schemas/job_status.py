@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/job_status.py
+"""Pydantic schemas for job status."""
+
+# /story_app/app/schemas/job_status.py
 
 from pydantic import BaseModel, Field
 from typing import Optional

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/views_prompt.py
+"""API routes for views prompt."""
+
+# /story_app/app/routers/views_prompt.py
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse 
@@ -72,6 +74,7 @@ async def list_prompts_ui(
     db: AsyncSession = Depends(get_db_session),
     current_user: Optional[User] = Depends(get_optional_current_user_for_prompt_views)
 ):
+    """Handle GET /."""
     logger.info(f"User {current_user.username if current_user else 'Anonymous'} requesting /ui/prompts with filters: type_str='{filter_prompt_type_str}', age_target_str='{filter_age_target_str}', active_str='{filter_is_active_str}', scope='{filter_scope}'")
 
     actual_filter_prompt_type: Optional[PromptTypeEnum] = None
@@ -201,6 +204,7 @@ async def create_prompt_ui_form(
     request: Request,
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /new."""
     logger.info(f"User {current_user.username} accessing create new prompt form.")
     prompt_types_for_form = [ptype for ptype in PromptTypeEnum]
     age_targets_for_form = [age for age in AgeTargetEnum]
@@ -223,6 +227,7 @@ async def edit_prompt_ui_form(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user)
 ):
+    """Handle GET /{prompt_id}/edit."""
     logger.info(f"User {current_user.username} accessing edit form for prompt ID: {prompt_id}")
     prompt = await crud_prompt.get_prompt(db, prompt_id=prompt_id)
     if not prompt:

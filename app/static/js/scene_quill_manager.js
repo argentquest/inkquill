@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_quill_manager.js
+// /story_app/app/static/js/scene_quill_manager.js
 "use strict";
 
 const SceneQuillManager = (() => {

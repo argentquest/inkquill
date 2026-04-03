@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/base.py
+"""Pydantic schemas for base."""
+
+# /story_app/app/schemas/base.py
 # Base schemas for API responses (ApiResponse) and errors (ApiError).
 
 from pydantic import BaseModel, Field
@@ -46,3 +48,4 @@ class ApiResponse(BaseModel):
     def error_response(cls, errors: List[ApiError], meta: ApiMeta = None) -> "ApiResponse":
         """Factory method for error responses."""
         return cls(success=False, errors=errors, meta=meta)
+

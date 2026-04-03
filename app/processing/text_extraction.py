@@ -1,9 +1,11 @@
-# /ai_rag_story_app/app/processing/text_extraction.py
+"""Background processing helpers for text extraction."""
+
+# /story_app/app/processing/text_extraction.py
 
 import io
 import os
 import logging
-from typing import Optional, Union
+from typing import Optional
 
 # File Parsing Library Imports
 try:
@@ -19,10 +21,6 @@ try:
 except ImportError:
     DOCX_INSTALLED = False
     logging.getLogger(__name__).warning("python-docx not installed. DOCX processing might be affected.")
-
-# Azure SDK Imports (used by extract_text_from_blob)
-from azure.storage.blob.aio import BlobServiceClient
-from azure.identity.aio import DefaultAzureCredential # Ensure this is the async version if used in async funcs
 
 logger = logging.getLogger(__name__)
 
@@ -90,44 +88,24 @@ async def extract_text_from_blob(
     blob_name: str
 ) -> Optional[str]:
     """
-    Downloads a document from Azure Blob Storage and extracts its text content.
+    Reads a document from local storage and extracts its text content.
     """
-    logger.info(f"[TextExtractorBlob] Attempting to download and extract text from blob: {container_name}/{blob_name}")
-    blob_service_client: Optional[BlobServiceClient] = None
-    credential = None # For DefaultAzureCredential
+    from app.core.storage_deps import resolve_storage_path
+
+    logger.info(f"[TextExtractorBlob] Attempting to read and extract text from storage path: {container_name}/{blob_name}")
     try:
-        if account_name and not connection_string: # Prioritize Managed Identity if account_name is given
-            account_url = f"https://{account_name}.blob.core.windows.net"
-            credential = DefaultAzureCredential() # Async version is azure.identity.aio.DefaultAzureCredential
-            blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
-            logger.debug(f"[TextExtractorBlob] Using DefaultAzureCredential for account: {account_url}")
-        elif connection_string:
-            blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-            logger.debug(f"[TextExtractorBlob] Using connection string.")
-        else:
-            logger.error("[TextExtractorBlob] Missing Azure Storage configuration (connection string or account name).")
+        del connection_string
+        del account_name
+        file_path = resolve_storage_path(container_name, blob_name)
+        if not file_path.exists():
+            logger.error(f"[TextExtractorBlob] Storage path not found: {file_path}")
             return None
-
-        async with blob_service_client:
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
-            logger.debug(f"[TextExtractorBlob] Downloading blob: {blob_name}...")
-            stream_downloader = await blob_client.download_blob()
-            file_content_bytes = await stream_downloader.readall()
-            logger.info(f"[TextExtractorBlob] Downloaded {len(file_content_bytes)} bytes from '{blob_name}'.")
-            
-            blob_properties = await blob_client.get_blob_properties()
-            content_type_from_blob = blob_properties.content_settings.content_type
-            logger.debug(f"[TextExtractorBlob] Blob content type from properties: {content_type_from_blob}")
-            
-            return await _process_bytes_for_text_extraction(file_content_bytes, blob_name, content_type_from_blob)
-
+        file_content_bytes = file_path.read_bytes()
+        logger.info(f"[TextExtractorBlob] Read {len(file_content_bytes)} bytes from '{file_path}'.")
+        return await _process_bytes_for_text_extraction(file_content_bytes, blob_name)
     except Exception as e:
-        logger.error(f"[TextExtractorBlob] Failed to extract text from blob {blob_name}. Error: {e}", exc_info=True)
+        logger.error(f"[TextExtractorBlob] Failed to extract text from storage path {blob_name}. Error: {e}", exc_info=True)
         return None
-    finally:
-        if credential: # Important to close DefaultAzureCredential if used
-            await credential.close()
-            logger.debug("[TextExtractorBlob] Closed Azure credential.")
 
 async def extract_text_from_file_path(
     file_path: str,
@@ -155,3 +133,4 @@ async def extract_text_from_file_path(
     except Exception as e:
         logger.error(f"[TextExtractorPath] Failed to extract text from file {file_path}. Error: {e}", exc_info=True)
         return None
+

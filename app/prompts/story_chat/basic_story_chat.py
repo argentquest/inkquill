@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/prompts/story_chat/basic_story_chat.py
+"""Prompt helpers for basic story chat."""
+
+# /story_app/app/prompts/story_chat/basic_story_chat.py
 
 BASIC_STORY_CHAT_PROMPT = """You are an AI writing assistant specialized in helping authors with Basic Stories - focused, streamlined storytelling without complex world-building.
 

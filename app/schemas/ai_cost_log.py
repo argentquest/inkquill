@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/ai_cost_log.py
+"""Pydantic schemas for ai cost log."""
+
+# /story_app/app/schemas/ai_cost_log.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List

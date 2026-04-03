@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/llm_models.py
+"""Database CRUD helpers for llm models."""
+
+# /story_app/app/crud/llm_models.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.models.ai_model_config import AIModelConfiguration

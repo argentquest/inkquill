@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/ai_model_config.py
+"""SQLAlchemy models for ai model config."""
+
+# /story_app/app/models/ai_model_config.py
 import enum
 from sqlalchemy import Column, Integer, String, Boolean, Float, Enum as SQLAlchemyEnum, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -11,16 +13,18 @@ if TYPE_CHECKING:
 # --- FIX: The self-import was removed. These enums are defined right here. ---
 
 class AIProviderEnum(str, enum.Enum):
-    AZURE = "AZURE"
+    """SQLAlchemy model for a i provider enum."""
     OPENROUTER = "OPENROUTER"
     OPENAI = "OPENAI"
     RUNPOD = "RUNPOD"
 
 class AIModelTypeEnum(str, enum.Enum):
+    """SQLAlchemy model for a i model type enum."""
     GENERATION = "GENERATION"
     EMBEDDING = "EMBEDDING"
 
 class AIModelConfiguration(Base):
+    """SQLAlchemy model for a i model configuration."""
     __tablename__ = "ai_model_configurations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -51,3 +55,4 @@ class AIModelConfiguration(Base):
 
     def __repr__(self):
         return f"<AIModelConfiguration(id={self.id}, name='{self.display_name}', model='{self.model_name}')>"
+

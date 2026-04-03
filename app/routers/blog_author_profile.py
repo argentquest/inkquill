@@ -11,12 +11,17 @@ from app.models.blog_post import BlogPost, BlogPostStatus
 from app.models.blog_author_profile import BlogAuthorProfile
 from app.models.blog_follow import BlogFollow
 from app.models.blog_like import BlogLike
-from app.schemas.blog import BlogAuthorProfileCreate, BlogAuthorProfileUpdate, BlogAuthorProfileRead
+from app.schemas.blog import BlogAuthorProfileUpdate, BlogAuthorProfileRead
 from app.schemas.base import ApiResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/blog/author-profile", tags=["blog-author-profile"])
+
+
+def _serialize_profile(profile: BlogAuthorProfile) -> BlogAuthorProfileRead:
+    """Provide internal router support for serialize profile."""
+    return BlogAuthorProfileRead.model_validate(profile, from_attributes=True)
 
 
 @router.get("/", response_model=ApiResponse)
@@ -48,7 +53,7 @@ async def get_my_author_profile(
         # Update statistics
         await update_profile_stats(db, profile)
         
-        return profile
+        return ApiResponse.success_response(data=_serialize_profile(profile))
         
     except Exception as e:
         logger.error(f"Error getting author profile for user {current_user.id}: {e}")
@@ -84,7 +89,7 @@ async def update_my_author_profile(
         await db.commit()
         await db.refresh(profile)
         
-        return profile
+        return ApiResponse.success_response(data=_serialize_profile(profile))
         
     except Exception as e:
         logger.error(f"Error updating author profile for user {current_user.id}: {e}")
@@ -95,7 +100,7 @@ async def update_my_author_profile(
         )
 
 
-@router.get("/stats")
+@router.get("/stats", response_model=ApiResponse)
 async def get_my_author_stats(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -166,7 +171,7 @@ async def get_my_author_stats(
         )
         recent_follows = recent_follows_result.scalar() or 0
         
-        return {
+        return ApiResponse.success_response(data={
             "total_posts": stats.total_posts or 0,
             "total_views": stats.total_views or 0,
             "total_likes": stats.total_likes or 0,
@@ -176,7 +181,7 @@ async def get_my_author_stats(
                 "likes_last_30_days": recent_likes,
                 "follows_last_30_days": recent_follows
             }
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error getting author stats for user {current_user.id}: {e}")
@@ -186,7 +191,7 @@ async def get_my_author_stats(
         )
 
 
-@router.get("/dashboard")
+@router.get("/dashboard", response_model=ApiResponse)
 async def get_author_dashboard(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
@@ -278,7 +283,7 @@ async def get_author_dashboard(
         )
         profile = profile_result.scalar_one_or_none()
         
-        return {
+        return ApiResponse.success_response(data={
             "recent_posts": [
                 {
                     "id": post.id,
@@ -321,7 +326,7 @@ async def get_author_dashboard(
                 "follower_count": profile.follower_count if profile else 0
             },
             "is_admin": current_user.is_admin
-        }
+        })
         
     except Exception as e:
         logger.error(f"Error getting author dashboard for user {current_user.id}: {e}")
@@ -358,7 +363,7 @@ async def get_author_profile(
         
         if not profile:
             # Return basic profile info
-            return {
+            return ApiResponse.success_response(data={
                 "id": 0,
                 "user_id": user_id,
                 "bio": "",
@@ -373,11 +378,11 @@ async def get_author_profile(
                 "follower_count": 0,
                 "created_at": user.created_at,
                 "updated_at": user.updated_at
-            }
+            })
         
         # Update and return profile
         await update_profile_stats(db, profile)
-        return profile
+        return ApiResponse.success_response(data=_serialize_profile(profile))
         
     except HTTPException:
         raise
@@ -423,6 +428,7 @@ async def update_profile_stats(db: AsyncSession, profile: BlogAuthorProfile):
         profile.follower_count = follower_count
         
         await db.commit()
+        await db.refresh(profile)
         
     except Exception as e:
         logger.error(f"Error updating profile stats for user {profile.user_id}: {e}")

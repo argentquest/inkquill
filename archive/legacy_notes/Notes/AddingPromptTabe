@@ -1,0 +1,458 @@
+Added a New Tabled Called Prompt
+
+# /story_app/app/models/prompt.py
+
+from sqlalchemy import (
+    Column, Integer, String, Text, Boolean, ForeignKey, DateTime,
+    Enum as SQLAlchemyEnum # To store Python enums as native DB enums
+)
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql import func
+from typing import Optional, TYPE_CHECKING
+import enum # Python's standard enum module
+
+# --- Core Application Imports ---
+from app.db.database import Base # Your SQLAlchemy declarative base
+
+# --- Type Checking Imports ---
+if TYPE_CHECKING:
+    from .user import User # For relationship type hinting
+
+# --- Define the Python Enum for PromptType ---
+# The values will be stored in uppercase in the database as per your requirement.
+class PromptTypeEnum(str, enum.Enum):
+    # Existing types
+    GENERAL = "GENERAL"
+    CHARACTER_DEVELOPMENT = "CHARACTER_DEVELOPMENT"
+    PLOT_POINT = "PLOT_POINT"
+    WORLD_BUILDING = "WORLD_BUILDING"
+    DIALOGUE = "DIALOGUE"
+    SCENE_GENERATION = "SCENE_GENERATION"
+    # New types requested by user
+    SYSTEM = "SYSTEM" # For system-level prompts, e.g., defining AI persona
+    ACT = "ACT"       # Prompts specifically for generating or refining Act content
+    STORY = "STORY"   # Prompts related to overall story structure, themes, or outlines
+    OTHER = "OTHER"   # A catch-all for miscellaneous prompt types
+    # Add other prompt types as needed
+
+class Prompt(Base):
+    """
+    SQLAlchemy ORM Model representing a reusable Prompt.
+    Each prompt has a title, content, an active status, a type, a reason for its use, and an optional comment.
+    It is created by a user and can be updated, tracking the last updater.
+    Prompts are not deleted when the creating user is deleted (user_id becomes NULL).
+    """
+    __tablename__ = "prompts"
+
+    # --- Table Columns ---
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
+    # Title of the prompt, max 200 characters, indexed for searching.
+    title: Mapped[str] = mapped_column(String(200), index=True, nullable=False)
+
+    # PromptContent: The actual text of the prompt. Using Text for large content.
+    prompt_content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # ReasonToUse: Explains why or when this prompt is useful. Using Text for potentially detailed explanations.
+    reason_to_use: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Comment: Optional additional notes or comments about the prompt.
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True) # New field
+
+    # IsActive: Boolean flag to activate/deactivate the prompt. Defaults to True.
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # PromptType: Uses the Python enum `PromptTypeEnum`.
+    prompt_type: Mapped[PromptTypeEnum] = mapped_column(
+        SQLAlchemyEnum(
+            PromptTypeEnum,
+            name="prompt_type_enum", # Name of the ENUM type in PostgreSQL
+            create_type=True,       # Instruct SQLAlchemy to create the ENUM type in the DB
+            native_enum=True        # Use PostgreSQL's native ENUM type
+        ),
+        nullable=False,
+        index=True
+    )
+
+    # user_id: Foreign key linking this prompt to the 'id' column in the 'users' table.
+    # This represents the original creator of the prompt.
+    # Made nullable=True to allow setting to NULL if the user is deleted.
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+
+    # last_updated_by_user_id: Foreign key linking to the user who last updated this prompt.
+    # Already nullable. Ensure ON DELETE SET NULL at DB level.
+    last_updated_by_user_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+
+    # Timestamps
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # --- Relationships ---
+    # Relationship to the User model who created this prompt.
+    # This relationship will become None if the user is deleted and user_id is set to NULL.
+    owner: Mapped[Optional["User"]] = relationship("User", foreign_keys=[user_id], back_populates="prompts")
+
+    # Relationship to the User model who last updated this prompt.
+    last_updated_by: Mapped[Optional["User"]] = relationship("User", foreign_keys=[last_updated_by_user_id])
+    # No back_populates specified here for last_updated_by, meaning it's a one-way query from Prompt.
+    # If User model needs to list prompts they updated, add a corresponding relationship there.
+
+    def __repr__(self):
+        # Ensure self.prompt_type is not None before accessing .value
+        prompt_type_value = self.prompt_type.value if self.prompt_type else "UNKNOWN_TYPE"
+        return f"<Prompt(id={self.id}, title='{self.title}', type='{prompt_type_value}', owner_id={self.user_id})>"
+
+# --- Guidance for Updating the User model (`app/models/user.py`) ---
+# No changes needed in User model for this specific field addition to Prompt,
+# unless you want a new relationship for 'prompts_where_user_is_last_updater'
+# which is not typically required.
+#
+# The existing `prompts` relationship in the User model (for prompts created by the user)
+# should still have its `cascade` behavior reviewed as per previous discussions if you
+# want `ON DELETE SET NULL` behavior for `Prompt.user_id`.
+# Example for User.prompts (if not cascade deleting):
+#
+# from typing import List, TYPE_CHECKING # Ensure List is imported
+# if TYPE_CHECKING:
+#     from .prompt import Prompt # Import Prompt for type hinting
+#
+# class User(Base):
+#     # ... other attributes and relationships ...
+#
+#     prompts: Mapped[List["Prompt"]] = relationship(
+#         "Prompt",
+#         foreign_keys="[Prompt.user_id]", 
+#         back_populates="owner"
+#         # cascade="all, delete-orphan" would be removed or changed
+#     )
+#
+
+
+
+# /story_app/alembic/env.py
+
+import asyncio
+import os # Added os
+import sys # Added sys
+from logging.config import fileConfig
+
+from sqlalchemy import pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import async_engine_from_config # Use async engine
+
+from alembic import context
+
+# --- Add project root to Python path ---
+# This allows Alembic to find your 'app' module.
+# Assumes this env.py file is in alembic/ directory, one level down from project root.
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+# --- End Add project root ---
+
+
+# --- Core Application Imports ---
+# Import the Base for model metadata and the database URL from your application config
+# These imports should now work because PROJECT_ROOT is in sys.path
+from app.db.database import Base
+from app.core.config import SQLALCHEMY_DATABASE_URI # Get the DB URL
+
+# Import all your SQLAlchemy models here so Alembic can detect them
+# This ensures that when Alembic compares the database schema to your models,
+# it knows about all the tables defined in your application.
+from app.models.user import User
+from app.models.story import Story
+from app.models.act import Act
+from app.models.uploaded_document import UploadedDocument
+from app.models.prompt import Prompt # <<< Make sure to import your new Prompt model
+# Add imports for any other models you create
+
+# --- Alembic Configuration ---
+# This is the Alembic Config object, which provides access to the values within the .ini file.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# --- Model Metadata ---
+# Set the SQLAlchemy Base model's metadata as the target for 'autogenerate' support.
+# Alembic compares this metadata against the database schema.
+target_metadata = Base.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+# --- Database Connection URL ---
+# Set the database URL from your application's configuration.
+# This ensures Alembic connects to the same database as your application.
+# Make sure SQLALCHEMY_DATABASE_URI is correctly set in your config/environment.
+config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
+
+# --- Run Migrations Logic ---
+
+def run_migrations_offline() -> None:
+    """
+    Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well. By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True, # Render SQL parameters directly in the script (useful for offline mode)
+        dialect_opts={"paramstyle": "named"}, # Dialect options
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def do_run_migrations(connection: Connection) -> None:
+    """
+    Helper function to run migrations using an active database connection.
+
+    Args:
+        connection: An active SQLAlchemy Connection object.
+    """
+    # Configure the Alembic context with the connection and target metadata.
+    context.configure(connection=connection, target_metadata=target_metadata)
+
+    # Begin a transaction and run the migrations within that transaction.
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+async def run_migrations_online() -> None:
+    """
+    Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+    This function is asynchronous to work with SQLAlchemy's async engine.
+    """
+    # Create an asynchronous engine using configuration from the alembic.ini file.
+    # `prefix='sqlalchemy.'` tells Alembic to look for keys starting with 'sqlalchemy.'
+    # `poolclass=pool.NullPool` disables pooling, which is recommended for migration scripts
+    # as they are typically short-lived processes.
+    connectable = async_engine_from_config(
+        config.get_section(config.config_main_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    # Acquire an asynchronous connection from the engine.
+    async with connectable.connect() as connection:
+        # Run the actual migration logic within the connection's context.
+        # We use `await connection.run_sync(do_run_migrations)` to execute the
+        # synchronous `do_run_migrations` function within the async connection's event loop.
+        await connection.run_sync(do_run_migrations)
+
+    # Dispose of the engine when done.
+    await connectable.dispose()
+
+
+# --- Main Execution Logic ---
+# Determine if Alembic is running in offline or online mode and call the appropriate function.
+if context.is_offline_mode():
+    print("Running migrations offline...")
+    run_migrations_offline()
+else:
+    print("Running migrations online...")
+    # Use asyncio.run to execute the asynchronous online migration function.
+    asyncio.run(run_migrations_online())
+
+Creates all the base FileExistsError
+
+Now trying to update database 
+
+
+============
+
+  File "C:\Code2025\rag\alembic\env.py", line 118, in run_migrations_online
+    config.get_section(config.config_main_section, {}),
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'config_main_section'. Did you mean: 'config_ini_section'?
+
+You are correct! That AttributeError in alembic/env.py is because the attribute config.config_main_section has been renamed or is different in the version of Alembic or its interaction with SQLAlchemy you are using.
+
+The error message Did you mean: 'config_ini_section'? is a strong hint.
+
+To fix this, you need to change config.config_main_section to config.config_ini_section in your /story_app/alembic/env.py file.
+
+I will update the content of the alembic/env.py file in the Canvas.
+
+Key Change in the Canvas:
+
+In the run_migrations_online() function within /story_app/alembic/env.py: Changed:
+Python
+
+connectable = async_engine_from_config(
+    config.get_section(config.config_main_section, {}), # Old line
+    prefix="sqlalchemy.",
+    poolclass=pool.NullPool,
+)
+to:
+Python
+
+connectable = async_engine_from_config(
+    config.get_section(config.config_ini_section, {}), # <<< CORRECTED HERE
+    prefix="sqlalchemy.",
+    poolclass=pool.NullPool,
+)
+This change aligns with the attribute name suggested by the error message and should allow Alembic to correctly find its main configuration section.
+
+After updating your alembic/env.py file, please try running your Alembic command again:
+
+Bash
+
+alembic revision -m "add_prompts_table_and_prompt_type_enum_with_user_fk_updates" --autogenerate
+This should now proceed without the AttributeError.
+
+=====================
+
+INFO  [alembic.autogenerate.compare] Detected changed index 'ix_users_email' on 'users': unique=False to unique=True
+INFO  [alembic.autogenerate.compare] Detected changed index 'ix_users_username' on 'users': unique=False to unique=True
+Generating C:\Code2025\rag\alembic\versions\e78d28c57a7c_add_prompts_table_and_prompt_type_enum_.py ...  FAILED
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Code2025\rag\.venv\Scripts\alembic.exe\__main__.py", line 7, in <module>
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\config.py", line 636, in main
+    CommandLine(prog=prog).main(argv=argv)
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\config.py", line 626, in main
+    self.run_cmd(cfg, options)
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\config.py", line 603, in run_cmd
+    fn(
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\command.py", line 243, in revision
+    scripts = [script for script in revision_context.generate_scripts()]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\command.py", line 243, in <listcomp>
+    scripts = [script for script in revision_context.generate_scripts()]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\autogenerate\api.py", line 650, in generate_scripts
+    yield self._to_script(generated_revision)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\autogenerate\api.py", line 555, in _to_script
+    return self.script_directory.generate_revision(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\script\base.py", line 751, in generate_revision
+    self._generate_template(
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\script\base.py", line 596, in _generate_template
+    util.template_to_file(src, dest, self.output_encoding, **kw)
+  File "c:\Code2025\rag\.venv\Lib\site-packages\alembic\util\pyfiles.py", line 41, in template_to_file
+    with open(dest, "wb") as f:
+         ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Code2025\\rag\\alembic\\versions\\e78d28c57a7c_add_prompts_table_and_prompt_type_enum_.py'
+
+===============
+
+
+Okay, that sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[User(users)]' has no property 'prompts' error is very specific. It means that when SQLAlchemy is setting up the relationships between your models, the Prompt model's owner relationship is trying to link to a prompts attribute on the User model (via back_populates="prompts"), but it cannot find such an attribute on the User model.
+
+This usually happens if:
+
+The prompts relationship was not added to your app/models/user.py file.
+There's a typo in the back_populates string in either app/models/prompt.py or app/models/user.py.
+A circular import issue is preventing SQLAlchemy from fully processing one of the models before trying to link them (though TYPE_CHECKING usually helps with this).
+Let's ensure your /story_app/app/models/user.py file has the correct prompts relationship defined. I'll provide the full content for this file, incorporating the relationships for created_stories, uploaded_documents, and the new prompts.
+
+I will update the /story_app/app/models/user.py file in the Canvas.
+# /story_app/app/models/user.py
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.sql import func
+from typing import List, TYPE_CHECKING
+
+# --- Core Application Imports ---
+from app.db.database import Base # Your SQLAlchemy declarative base
+
+# --- Type Checking Imports ---
+# Use TYPE_CHECKING to avoid circular import errors at runtime for relationship type hints.
+if TYPE_CHECKING:
+    from .story import Story
+    from .uploaded_document import UploadedDocument
+    from .prompt import Prompt # Added import for Prompt model
+
+# --- Background: SQLAlchemy ORM Model ---
+# This file defines the `User` model using SQLAlchemy's ORM.
+# This Python class `User` maps directly to the `users` table in our PostgreSQL database.
+
+class User(Base):
+    """
+    SQLAlchemy ORM Model representing a User in the application.
+    """
+    __tablename__ = "users"
+
+    # --- Table Columns ---
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=True)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+    display_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # --- Relationships ---
+
+    # Relationship to Stories created by this user
+    # The `Prompt.owner` relationship back_populates to this `created_stories` attribute.
+    created_stories: Mapped[List["Story"]] = relationship(
+        "Story",
+        back_populates="OwnerUser", # Must match 'OwnerUser' in Story model's relationship to User
+        cascade="all, delete-orphan" # If user is deleted, their stories are also deleted
+    )
+
+    # Relationship to UploadedDocuments owned by this user
+    # The `UploadedDocument.owner` relationship back_populates to this.
+    uploaded_documents: Mapped[List["UploadedDocument"]] = relationship(
+        "UploadedDocument",
+        back_populates="owner",
+        # Decide cascade behavior: if user is deleted, should their document records be deleted?
+        # Or set user_id to NULL in uploaded_documents?
+        # If setting to NULL, then UploadedDocument.user_id needs ondelete="SET NULL"
+        # and this cascade should be removed or changed.
+        # For now, assuming cascade delete for uploaded_document records.
+        cascade="all, delete-orphan"
+    )
+
+    # Relationship to Prompts created by this user
+    # The `Prompt.owner` relationship (linked via Prompt.user_id) back_populates to this.
+    prompts: Mapped[List["Prompt"]] = relationship(
+        "Prompt",
+        foreign_keys="[Prompt.user_id]", # Explicitly state which FK in Prompt model this refers to
+        back_populates="owner",
+        # No cascade="all, delete-orphan" here if we want prompts to remain
+        # when a user is deleted (and Prompt.user_id is set to NULL via ON DELETE SET NULL).
+        # If you want prompts deleted with the user, add cascade="all, delete-orphan".
+        # Based on previous discussion, we want prompts to remain, so no cascade.
+    )
+
+    # Optional: Relationship for prompts last updated by this user
+    # This would be populated if Prompt.last_updated_by had a back_populates="updated_prompts_by_user" (example name)
+    # updated_prompts: Mapped[List["Prompt"]] = relationship(
+    #     "Prompt",
+    #     foreign_keys="[Prompt.last_updated_by_user_id]",
+    #     # back_populates="last_updated_by" # if Prompt.last_updated_by has this
+    # )
+
+
+    def __repr__(self):
+        return f"<User(id={self.id}, username='{self.username}')>"
+
+
+
+

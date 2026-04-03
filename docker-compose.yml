@@ -1,4 +1,4 @@
-# /ai_rag_story_app/docker-compose.yml
+# /story_app/docker-compose.yml
 
 # --- Background: Docker Compose for Local Development ---
 # Docker Compose is a tool for defining and running multi-container Docker applications.

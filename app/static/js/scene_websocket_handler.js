@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/scene_websocket_handler.js
+// /story_app/app/static/js/scene_websocket_handler.js
 "use strict";
 
 const SceneWebSocketHandler = (() => {

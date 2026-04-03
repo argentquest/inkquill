@@ -1,13 +1,14 @@
-"""Blog search service integrating with Azure AI Search."""
+"""Blog search service backed by local database search."""
 import logging
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
+from sqlalchemy.orm import selectinload
 
 from app.models.blog_post import BlogPost, BlogPostStatus
 from app.models.blog_tag import BlogTag, blog_post_tags
 from app.models.blog_category import BlogCategory
-from app.services.azure_ai_search_service import AzureAISearchService
+# Blog search uses database full-text search (no external search service needed)
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,11 @@ class BlogSearchService:
                     BlogPost.status == BlogPostStatus.PUBLISHED,
                     BlogPost.deleted_at.is_(None)
                 ))
+                .options(
+                    selectinload(BlogPost.author),
+                    selectinload(BlogPost.category),
+                    selectinload(BlogPost.tags)
+                )
             )
             
             # Apply text search
@@ -138,6 +144,7 @@ class BlogSearchService:
             current_post_result = await db.execute(
                 select(BlogPost)
                 .where(BlogPost.id == post_id)
+                .options(selectinload(BlogPost.tags))
             )
             current_post = current_post_result.scalar_one_or_none()
             
@@ -152,6 +159,11 @@ class BlogSearchService:
                     BlogPost.status == BlogPostStatus.PUBLISHED,
                     BlogPost.deleted_at.is_(None)
                 ))
+                .options(
+                    selectinload(BlogPost.author),
+                    selectinload(BlogPost.category),
+                    selectinload(BlogPost.tags)
+                )
             )
             
             # Prioritize posts with same category
@@ -186,6 +198,11 @@ class BlogSearchService:
                             BlogPost.deleted_at.is_(None),
                             blog_post_tags.c.tag_id.in_(current_tag_ids)
                         ))
+                        .options(
+                            selectinload(BlogPost.author),
+                            selectinload(BlogPost.category),
+                            selectinload(BlogPost.tags)
+                        )
                         .order_by(BlogPost.published_at.desc())
                         .limit(limit - len(related_posts))
                     )
@@ -228,6 +245,11 @@ class BlogSearchService:
                     BlogPost.deleted_at.is_(None),
                     BlogPost.published_at >= since_date
                 ))
+                .options(
+                    selectinload(BlogPost.author),
+                    selectinload(BlogPost.category),
+                    selectinload(BlogPost.tags)
+                )
                 .order_by(
                     (BlogPost.view_count + BlogPost.like_count * 2 + BlogPost.comment_count * 3).desc()
                 )
@@ -247,7 +269,7 @@ class BlogSearchService:
     ) -> None:
         """Index blog post for full-text search (if using external search service)."""
         try:
-            # This would integrate with Azure AI Search or similar service
+            # Future enhancement point for richer ranking if needed.
             # For now, we'll use database full-text search
             
             # Prepare search document

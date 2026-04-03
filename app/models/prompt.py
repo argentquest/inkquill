@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/models/prompt.py
+"""SQLAlchemy models for prompt."""
+
+# /story_app/app/models/prompt.py
 
 from sqlalchemy import (
     Column, Integer, String, Text, Boolean, ForeignKey, DateTime,
@@ -15,6 +17,7 @@ if TYPE_CHECKING:
     from .user import User
 
 class PromptTypeEnum(str, enum.Enum):
+    """SQLAlchemy model for prompt type enum."""
     GENERAL = "GENERAL"
     CHARACTER_DEVELOPMENT = "CHARACTER_DEVELOPMENT"
     PLOT_POINT = "PLOT_POINT"
@@ -33,6 +36,7 @@ class PromptTypeEnum(str, enum.Enum):
     OTHER = "OTHER"
 
 class AgeTargetEnum(str, enum.Enum):
+    """SQLAlchemy model for age target enum."""
     AGES_2_5 = "AGES_2_5"
     AGES_6_8 = "AGES_6_8"
     AGES_9_12 = "AGES_9_12"
@@ -41,6 +45,7 @@ class AgeTargetEnum(str, enum.Enum):
     ALL_AGES = "ALL_AGES"
 
 class Prompt(Base):
+    """SQLAlchemy model for prompt."""
     __tablename__ = "prompts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

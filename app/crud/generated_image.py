@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/generated_image.py
+"""Database CRUD helpers for generated image."""
+
+# /story_app/app/crud/generated_image.py
 import logging
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession

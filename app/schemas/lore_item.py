@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/lore_item.py
+"""Pydantic schemas for lore item."""
+
+# /story_app/app/schemas/lore_item.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -13,7 +15,7 @@ class LoreItemBase(BaseModel):
     description: Optional[str] = Field(None, description="A detailed description of the lore item.")
     category: LoreItemCategoryEnum = Field(..., description="The category of the lore item (e.g., Magic System, Historical Event).")
     image_prompt_definition: Optional[str] = Field(None, description="Text prompt for generating an image related to this lore item.")
-    image_blob_path: Optional[str] = Field(None, max_length=1024, description="Path to the lore item's image in Azure Blob Storage.")
+    image_blob_path: Optional[str] = Field(None, max_length=1024, description="Path to the lore item's image in storage.")
     
     current_location_id: Optional[int] = Field(None, description="ID of the location where this lore item is currently placed")
     placement_note: Optional[str] = Field(None, description="Description of how/where the lore item is placed at the location")
@@ -87,3 +89,4 @@ class LoreItemInStoryRead(BaseModel):
     class Config:
         from_attributes = True
         use_enum_values = True
+

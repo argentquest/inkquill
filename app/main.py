@@ -1,4 +1,4 @@
-# /ai_rag_story_app/app/main.py
+# /story_app/app/main.py
 """
 Main FastAPI application entry point.
 Configures logging, middleware, routers, and application lifecycle.
@@ -48,8 +48,6 @@ from app.core.security_middleware import SecurityHeadersMiddleware
 from app.db.database import engine
 
 # --- Service imports ---
-from app.services.azure_ai_search_service import AzureAISearchService
-from app.services import embedding_service
 from app.services import sk_kernel_instance
 
 # --- API Router imports ---
@@ -145,6 +143,7 @@ log_application_settings()
 
 @asynccontextmanager
 async def lifespan(app_instance: FastAPI):
+    """Handle lifespan."""
     logger.info("Lifespan: Application startup sequence initiated.")
     
     # Load AI model configurations into cache
@@ -152,26 +151,10 @@ async def lifespan(app_instance: FastAPI):
     await model_cache.load_models_from_db()
     logger.info("Lifespan: AI Model Cache loaded from database.")
     
-    embedding_service.initialize_embedding_client()
-    logger.info("Lifespan: Embedding service client initialization attempted.")
-
     if sk_kernel_instance.kernel and sk_kernel_instance.review_act_content_function:
         logger.info("Lifespan: Semantic Kernel instance and key functions appear to be available.")
     else:
         logger.error("Lifespan: CRITICAL - Semantic Kernel instance or essential functions NOT available. Check sk_kernel_instance.py logs.")
-
-    logger.info("Lifespan: Instantiating AzureAISearchService...")
-    search_service_instance = AzureAISearchService(
-        endpoint=str(settings.AZURE_AI_SEARCH_ENDPOINT) if settings.AZURE_AI_SEARCH_ENDPOINT else None,
-        api_key=settings.AZURE_AI_SEARCH_API_KEY,
-        index_name=settings.AZURE_AI_SEARCH_INDEX_NAME
-    )
-    app_instance.state.search_service = search_service_instance
-
-    if not app_instance.state.search_service.get_search_client():
-        logger.error("Lifespan: CRITICAL - AzureAISearchService client initialization failed. Search features will be unavailable.")
-    else:
-        logger.info("Lifespan: AzureAISearchService client initialized successfully.")
     
     try:
         async with engine.connect() as connection:
@@ -185,22 +168,6 @@ async def lifespan(app_instance: FastAPI):
     
     # --- Shutdown logic ---
     logger.info("Lifespan: Application shutdown sequence initiated.")
-    await embedding_service.close_embedding_client()
-    logger.info("Lifespan: Embedding service client closed.")
-
-    if hasattr(app_instance.state, 'search_service') and app_instance.state.search_service:
-        await app_instance.state.search_service.close_async_clients()
-        logger.info("Lifespan: AzureAISearchService clients closed.")
-    
-    if hasattr(sk_kernel_instance, 'kernel') and sk_kernel_instance.kernel.plugins.get(sk_kernel_instance.RETRIEVAL_PLUGIN_NAME):
-        try:
-            retrieval_plugin_instance = sk_kernel_instance.kernel.plugins[sk_kernel_instance.RETRIEVAL_PLUGIN_NAME]._plugin_instance
-            if hasattr(retrieval_plugin_instance, 'close_clients') and callable(getattr(retrieval_plugin_instance, 'close_clients')):
-                await retrieval_plugin_instance.close_clients()
-                logger.info("Lifespan: RetrievalPlugin clients closed.")
-        except Exception as e_sk_close:
-            logger.error(f"Lifespan: Error closing RetrievalPlugin clients: {e_sk_close}", exc_info=True)
-
     if engine:
         await engine.dispose()
         logger.info("Lifespan: Database engine disposed.")
@@ -269,6 +236,13 @@ logger.info("UserActivityMiddleware added for request logging.")
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 logger.info("Static files mounted at /static.")
+
+# Serve locally published HTML stories
+import os as _os
+_published_dir = _os.path.join(settings.LOCAL_STORAGE_BASE_PATH, settings.LOCAL_STORAGE_PUBLISHED_STORIES_PATH)
+_os.makedirs(_published_dir, exist_ok=True)
+app.mount("/published/stories", StaticFiles(directory=_published_dir), name="published_stories")
+logger.info(f"Published stories served at /published/stories from {_published_dir}")
 
 # --- Setup Jinja2 Template Globals ---
 from app.core.template_filters import setup_secure_templates
@@ -439,6 +413,7 @@ async def robots_txt():
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False, name="root_redirect_to_ui_home")
 async def root_redirect_to_ui_home(request: Request):
+    """Handle root redirect to ui home."""
     try: 
         ui_home_url = str(request.url_for('ui_home'))
     except Exception as e_url: 
@@ -467,3 +442,4 @@ if __name__ == "__main__":
         reload=True,
         log_level=log_level_uvicorn
     )
+

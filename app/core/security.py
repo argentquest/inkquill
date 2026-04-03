@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/security.py
+"""Core application helpers for security."""
+
+# /story_app/app/core/security.py
 
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union, Optional, Dict # Added Dict for type hint
@@ -26,6 +28,7 @@ class JWTError(Exception):
     pass
 
 class TokenPayload(BaseModel):
+    """Class for token payload."""
     sub: Optional[str] = None 
     type: Optional[str] = None 
     exp: Optional[datetime] = None 

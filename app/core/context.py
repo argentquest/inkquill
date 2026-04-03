@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/core/context.py
+"""Core application helpers for context."""
+
+# /story_app/app/core/context.py
 from contextvars import ContextVar, Token as ContextVarToken # Import Token for type hints
 from typing import Optional, Any # <<< ADDED Any HERE
 
@@ -14,19 +16,25 @@ user_identifier_var: ContextVar[str] = ContextVar("user_identifier", default="[n
 # user_db_id_var: ContextVar[Optional[int]] = ContextVar("user_db_id", default=None)
 
 def get_request_id() -> Optional[str]:
+    """Return request id."""
     return request_id_var.get()
 
 def set_request_id(req_id: str) -> ContextVarToken: # Return the specific Token type
+    """Provide dependency and core support for set request id."""
     return request_id_var.set(req_id)
 
 def reset_request_id(token: ContextVarToken): # Expect the specific Token type
+    """Provide dependency and core support for reset request id."""
     request_id_var.reset(token)
 
 def get_user_identifier() -> str:
+    """Return user identifier."""
     return user_identifier_var.get()
 
 def set_user_identifier(identifier: str) -> ContextVarToken: # Return the specific Token type
+    """Provide dependency and core support for set user identifier."""
     return user_identifier_var.set(identifier)
 
 def reset_user_identifier(token: ContextVarToken): # Expect the specific Token type
+    """Provide dependency and core support for reset user identifier."""
     user_identifier_var.reset(token)

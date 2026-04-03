@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/scene.py
+"""Database CRUD helpers for scene."""
+
+# /story_app/app/crud/scene.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func, delete 
@@ -12,11 +14,13 @@ from app.schemas.scene import SceneCreate, SceneUpdate
 logger = logging.getLogger(__name__)
 
 async def get_next_scene_number(db: AsyncSession, act_id: int) -> int:
+    """Return next scene number."""
     max_scene_number_result = await db.execute(select(func.max(Scene.scene_number)).where(Scene.act_id == act_id))
     max_scene_number = max_scene_number_result.scalar_one_or_none()
     return (max_scene_number or 0) + 10
 
 async def create_scene(db: AsyncSession, scene_in: SceneCreate, act_id: int) -> Scene:
+    """Create scene."""
     scene_data = scene_in.model_dump()
     logger.info(f"Creating scene for act_id: {act_id} with data: {scene_data}")
     db_scene = Scene(**scene_data, act_id=act_id)
@@ -27,6 +31,7 @@ async def create_scene(db: AsyncSession, scene_in: SceneCreate, act_id: int) -> 
     return db_scene
 
 async def create_multiple_scenes(db: AsyncSession, scenes_data: List[Dict[str, Any]], act_id: int) -> List[Scene]:
+    """Create multiple scenes."""
     created_scenes: List[Scene] = []
     current_scene_number = 0 
     logger.info(f"Creating {len(scenes_data)} scenes for act_id: {act_id}")
@@ -44,6 +49,7 @@ async def create_multiple_scenes(db: AsyncSession, scenes_data: List[Dict[str, A
     return created_scenes
 
 async def get_scene(db: AsyncSession, scene_id: int) -> Optional[Scene]:
+    """Return scene."""
     logger.debug(f"Fetching scene with ID: {scene_id}")
     result = await db.execute(select(Scene).filter(Scene.id == scene_id).options(
         selectinload(Scene.act), 
@@ -53,6 +59,7 @@ async def get_scene(db: AsyncSession, scene_id: int) -> Optional[Scene]:
     return result.scalars().first()
 
 async def get_scenes_by_act(db: AsyncSession, act_id: int, skip: int = 0, limit: int = 100) -> List[Scene]:
+    """Return scenes by act."""
     logger.debug(f"Fetching scenes for act_id: {act_id}, skip: {skip}, limit: {limit}")
     result = await db.execute(select(Scene).filter(Scene.act_id == act_id).order_by(Scene.scene_number).offset(skip).limit(limit).options(
         selectinload(Scene.story_class),
@@ -61,6 +68,7 @@ async def get_scenes_by_act(db: AsyncSession, act_id: int, skip: int = 0, limit:
     return result.scalars().all()
 
 async def update_scene(db: AsyncSession, db_scene: Scene, scene_in: SceneUpdate) -> Scene:
+    """Update scene."""
     update_data = scene_in.model_dump(exclude_unset=True)
     logger.info(f"Updating scene ID: {db_scene.id} with data: {update_data}")
     if update_data:
@@ -74,6 +82,7 @@ async def update_scene(db: AsyncSession, db_scene: Scene, scene_in: SceneUpdate)
     return db_scene
 
 async def delete_scene(db: AsyncSession, db_scene: Scene) -> Scene:
+    """Delete scene."""
     logger.info(f"Deleting scene ID: {db_scene.id}")
     await db.delete(db_scene)
     await db.flush()
@@ -81,6 +90,7 @@ async def delete_scene(db: AsyncSession, db_scene: Scene) -> Scene:
     return db_scene 
 
 async def delete_scenes_for_act(db: AsyncSession, act_id: int) -> int:
+    """Delete scenes for act."""
     logger.info(f"Attempting to delete all scenes for act_id: {act_id}")
     stmt = delete(Scene).where(Scene.act_id == act_id)
     result = await db.execute(stmt)

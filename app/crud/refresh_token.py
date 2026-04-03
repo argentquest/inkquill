@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/refresh_token.py
+"""Database CRUD helpers for refresh token."""
+
+# /story_app/app/crud/refresh_token.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -53,6 +55,14 @@ async def get_valid_token_by_value(db: AsyncSession, token_value: str) -> Option
     return result.scalars().first()
 
 
+async def get_token_by_value(db: AsyncSession, token_value: str) -> Optional[RefreshToken]:
+    """Retrieve a refresh token by value without applying active/expiry filters."""
+    result = await db.execute(
+        select(RefreshToken).where(RefreshToken.token == token_value)
+    )
+    return result.scalars().first()
+
+
 async def revoke_token(db: AsyncSession, db_token: RefreshToken) -> RefreshToken:
     """
     Marks a refresh token as revoked and sets the revocation time.
@@ -93,6 +103,7 @@ async def revoke_all_user_tokens(db: AsyncSession, user_id: int) -> int:
 # --- CRUD Class for Consistency ---
 
 class RefreshTokenCRUD:
+    """Class for refresh token c r u d."""
     def __init__(self, settings):
         self.settings = settings
     
@@ -107,12 +118,25 @@ class RefreshTokenCRUD:
     
     async def get_valid(self, db: AsyncSession, token_value: str) -> Optional[RefreshToken]:
         return await get_valid_token_by_value(db, token_value)
-    
+
+    async def get_by_token(self, db: AsyncSession, token: str) -> Optional[RefreshToken]:
+        return await get_token_by_value(db, token)
+
+    async def update_last_used(self, db: AsyncSession, db_obj: RefreshToken) -> RefreshToken:
+        # The model does not currently persist last-used metadata; keep this as a compatibility no-op.
+        db.add(db_obj)
+        await db.flush()
+        return db_obj
+
     async def revoke(self, db: AsyncSession, db_token: RefreshToken) -> RefreshToken:
         return await revoke_token(db, db_token)
-    
+
     async def revoke_all(self, db: AsyncSession, user_id: int) -> int:
+        return await revoke_all_user_tokens(db, user_id)
+
+    async def revoke_all_for_user(self, db: AsyncSession, user_id: int) -> int:
         return await revoke_all_user_tokens(db, user_id)
 
 # Initialize CRUD object with settings from config
 refresh_token_crud = RefreshTokenCRUD(settings)
+

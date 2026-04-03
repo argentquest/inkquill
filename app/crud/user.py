@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/crud/user.py
+"""Database CRUD helpers for user."""
+
+# /story_app/app/crud/user.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -9,22 +11,27 @@ from app.schemas import user as schema_user
 from app.core.security import get_password_hash
 
 async def get_user(db: AsyncSession, user_id: int) -> Optional[model_user.User]:
+    """Return user."""
     result = await db.execute(select(model_user.User).filter(model_user.User.id == user_id))
     return result.scalars().first()
 
 async def get_user_by_username(db: AsyncSession, username: str) -> Optional[model_user.User]:
+    """Return user by username."""
     result = await db.execute(select(model_user.User).filter(model_user.User.username == username))
     return result.scalars().first()
 
 async def get_user_by_email(db: AsyncSession, email: str) -> Optional[model_user.User]:
+    """Return user by email."""
     result = await db.execute(select(model_user.User).filter(model_user.User.email == email))
     return result.scalars().first()
 
 async def get_user_by_reset_token(db: AsyncSession, reset_token: str) -> Optional[model_user.User]:
+    """Return user by reset token."""
     result = await db.execute(select(model_user.User).filter(model_user.User.reset_token == reset_token))
     return result.scalars().first()
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[model_user.User]:
+    """Return users."""
     result = await db.execute(
         select(model_user.User).offset(skip).limit(limit).order_by(model_user.User.id)
     )
@@ -32,6 +39,7 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[m
 
 async def create_user(db: AsyncSession, user: schema_user.UserCreate) -> model_user.User:
     # Ensure hashed_password is never None since the database column is non-nullable
+    """Create user."""
     if user.password:
         hashed_password = get_password_hash(user.password)
     else:
@@ -52,6 +60,7 @@ async def create_user(db: AsyncSession, user: schema_user.UserCreate) -> model_u
     return db_user
 
 async def update_user(db: AsyncSession, db_user: model_user.User, user_in: schema_user.UserUpdate) -> model_user.User:
+    """Update user."""
     update_data = user_in.model_dump(exclude_unset=True)
     if "password" in update_data and update_data["password"]:
         hashed_password = get_password_hash(update_data["password"])
@@ -70,6 +79,7 @@ async def update_user(db: AsyncSession, db_user: model_user.User, user_in: schem
     return db_user
 
 async def delete_user(db: AsyncSession, user_id: int) -> Optional[model_user.User]:
+    """Delete user."""
     db_user = await get_user(db, user_id=user_id)
     if db_user:
         await db.delete(db_user)
@@ -166,6 +176,7 @@ async def get_user_statistics(db: AsyncSession, user_id: int) -> dict:
 
 # Create CRUD class for consistency with other modules
 class UserCRUD:
+    """Class for user c r u d."""
     async def get_user(self, db: AsyncSession, user_id: int) -> Optional[model_user.User]:
         return await get_user(db, user_id)
     

@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/story_chat.py
+"""API routes for story chat."""
+
+# /story_app/app/routers/story_chat.py
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from fastapi.websockets import WebSocketState
@@ -77,7 +79,8 @@ async def create_chat_session(
 ):
     """Create a new story chat session"""
     service = StoryChatService(db)
-    return await service.create_session(story_id, current_user.id, session_data)
+    session = await service.create_session(story_id, current_user.id, session_data)
+    return ApiResponse.success_response(data=session)
 
 @router.get("/stories/{story_id}/sessions")
 async def list_chat_sessions(
@@ -87,7 +90,8 @@ async def list_chat_sessions(
 ):
     """List all chat sessions for a story"""
     service = StoryChatService(db)
-    return await service.get_sessions(story_id, current_user.id)
+    sessions = await service.get_sessions(story_id, current_user.id)
+    return ApiResponse.success_response(data=sessions)
 
 @router.get("/stories/{story_id}/sessions/{session_id}", response_model=ApiResponse)
 async def get_chat_session(
@@ -101,7 +105,7 @@ async def get_chat_session(
     session = await service.get_session_with_messages(story_id, session_id, current_user.id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    return session
+    return ApiResponse.success_response(data=session)
 
 @router.delete("/stories/{story_id}/sessions/{session_id}")
 async def delete_chat_session(
@@ -115,7 +119,7 @@ async def delete_chat_session(
     success = await service.delete_session(story_id, session_id, current_user.id)
     if not success:
         raise HTTPException(status_code=404, detail="Session not found")
-    return {"message": "Session deleted successfully"}
+    return ApiResponse.success_response(data={"message": "Session deleted successfully"})
 
 # --- WebSocket Endpoint ---
 
@@ -156,7 +160,7 @@ async def story_chat_websocket(
             await websocket.close(code=1008, reason="Invalid authentication ticket")
             return
             
-        current_user = await crud_user.get_by_username(db, username=username)
+        current_user = await crud_user.get_user_by_username(db, username=username)
         if not current_user:
             await websocket.close(code=1008, reason="User not found")
             return

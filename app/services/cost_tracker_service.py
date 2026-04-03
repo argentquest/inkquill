@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/services/cost_tracker_service.py
+"""Service helpers for cost tracker service."""
+
+# /story_app/app/services/cost_tracker_service.py
 
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -96,7 +98,7 @@ def estimate_tokens_for_streaming_call(input_text: str, output_text: str, model_
         # Default to cl100k_base for unknown models
         encoding_name = encoding_map.get(model_name.lower(), "cl100k_base")
         
-        # Handle Azure model names (they often have additional prefixes/suffixes)
+        # Handle provider-specific model naming variations
         for key in encoding_map.keys():
             if key in model_name.lower():
                 encoding_name = encoding_map[key]
@@ -146,7 +148,7 @@ def _calculate_cost(model_config: AIModelConfiguration, usage_dict: Dict[str, in
         completion_cost = (usage_dict.get("completion_tokens", 0) / 1_000_000) * model_config.user_price_output_usd_pm
         return prompt_cost + completion_cost
     else:
-        # Use standard token-based calculation for Azure and OpenAI
+        # Use standard token-based calculation for OpenAI-compatible models
         prompt_cost = (usage_dict.get("prompt_tokens", 0) / 1_000_000) * model_config.user_price_input_usd_pm
         completion_cost = (usage_dict.get("completion_tokens", 0) / 1_000_000) * model_config.user_price_output_usd_pm
         return prompt_cost + completion_cost
@@ -222,7 +224,7 @@ def _get_tokenizer_for_model(model_name: str) -> tiktoken.Encoding:
             encoding_name = get_openrouter_token_encoding(model_name)
             return tiktoken.get_encoding(encoding_name)
         else:
-            # Try direct model lookup for Azure/OpenAI models
+            # Try direct model lookup for OpenAI-compatible models
             return tiktoken.encoding_for_model(model_name)
     except KeyError:
         # Fallback to cl100k_base for unknown models
@@ -480,3 +482,4 @@ class CostTrackerService:
         except Exception as e:
             logger.error(f"Error in CostTrackerService.log_ai_call: {e}")
             return None
+

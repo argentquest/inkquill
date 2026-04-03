@@ -1,3 +1,5 @@
+"""Database CRUD helpers for chat sample."""
+
 # /mnt/c/Code2025/rag/app/crud/chat_sample.py
 
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -1,9 +1,10 @@
 """Blog engagement API endpoints for likes and follows."""
 import logging
-from typing import List, Dict, Any
+from typing import Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, func
+from sqlalchemy.orm import selectinload
 
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
@@ -19,12 +20,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/blog/engagement", tags=["blog-engagement"])
 
 
-@router.post("/posts/{post_id}/like")
+def _build_blog_post_read(post: BlogPost) -> BlogPostRead:
+    """Provide internal router support for build blog post read."""
+    return BlogPostRead.model_validate(post, from_attributes=True)
+
+
+@router.post("/posts/{post_id}/like", response_model=ApiResponse)
 async def like_post(
     post_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+):
     """Like or unlike a blog post."""
     try:
         # Check if post exists
@@ -60,11 +66,13 @@ async def like_post(
             
             await db.commit()
             
-            return {
-                "liked": False,
-                "like_count": post.like_count,
-                "message": "Post unliked successfully"
-            }
+            return ApiResponse.success_response(
+                data={
+                    "liked": False,
+                    "like_count": post.like_count,
+                    "message": "Post unliked successfully",
+                }
+            )
         else:
             # Like the post
             new_like = BlogLike(
@@ -79,11 +87,13 @@ async def like_post(
             
             await db.commit()
             
-            return {
-                "liked": True,
-                "like_count": post.like_count,
-                "message": "Post liked successfully"
-            }
+            return ApiResponse.success_response(
+                data={
+                    "liked": True,
+                    "like_count": post.like_count,
+                    "message": "Post liked successfully",
+                }
+            )
             
     except HTTPException:
         raise
@@ -96,12 +106,12 @@ async def like_post(
         )
 
 
-@router.get("/posts/{post_id}/like-status")
+@router.get("/posts/{post_id}/like-status", response_model=ApiResponse)
 async def get_like_status(
     post_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+):
     """Check if current user has liked a post."""
     try:
         # Check if user liked this post
@@ -121,10 +131,12 @@ async def get_like_status(
         )
         like_count = post_result.scalar() or 0
         
-        return {
-            "liked": existing_like is not None,
-            "like_count": like_count
-        }
+        return ApiResponse.success_response(
+            data={
+                "liked": existing_like is not None,
+                "like_count": like_count,
+            }
+        )
         
     except Exception as e:
         logger.error(f"Error getting like status for post {post_id}: {e}")
@@ -134,12 +146,12 @@ async def get_like_status(
         )
 
 
-@router.post("/authors/{author_id}/follow")
+@router.post("/authors/{author_id}/follow", response_model=ApiResponse)
 async def follow_author(
     author_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+):
     """Follow or unfollow a blog author."""
     try:
         # Can't follow yourself
@@ -177,10 +189,12 @@ async def follow_author(
             await db.delete(existing_follow)
             await db.commit()
             
-            return {
-                "following": False,
-                "message": f"Unfollowed {author.display_name or author.username}"
-            }
+            return ApiResponse.success_response(
+                data={
+                    "following": False,
+                    "message": f"Unfollowed {author.display_name or author.username}",
+                }
+            )
         else:
             # Follow
             new_follow = BlogFollow(
@@ -190,10 +204,12 @@ async def follow_author(
             db.add(new_follow)
             await db.commit()
             
-            return {
-                "following": True,
-                "message": f"Now following {author.display_name or author.username}"
-            }
+            return ApiResponse.success_response(
+                data={
+                    "following": True,
+                    "message": f"Now following {author.display_name or author.username}",
+                }
+            )
             
     except HTTPException:
         raise
@@ -206,12 +222,12 @@ async def follow_author(
         )
 
 
-@router.get("/authors/{author_id}/follow-status")
+@router.get("/authors/{author_id}/follow-status", response_model=ApiResponse)
 async def get_follow_status(
     author_id: int,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+):
     """Check if current user is following an author."""
     try:
         # Check if following this author
@@ -231,10 +247,12 @@ async def get_follow_status(
         )
         follower_count = follower_count_result.scalar() or 0
         
-        return {
-            "following": existing_follow is not None,
-            "follower_count": follower_count
-        }
+        return ApiResponse.success_response(
+            data={
+                "following": existing_follow is not None,
+                "follower_count": follower_count,
+            }
+        )
         
     except Exception as e:
         logger.error(f"Error getting follow status for author {author_id}: {e}")
@@ -264,17 +282,24 @@ async def get_my_liked_posts(
         liked_post_ids = [row[0] for row in liked_posts_result.fetchall()]
         
         if not liked_post_ids:
-            return []
+            return ApiResponse.success_response(data=[])
         
         # Get the actual posts
         posts_result = await db.execute(
             select(BlogPost)
             .where(BlogPost.id.in_(liked_post_ids))
+            .options(
+                selectinload(BlogPost.author),
+                selectinload(BlogPost.category),
+                selectinload(BlogPost.tags),
+            )
             .order_by(BlogPost.published_at.desc())
         )
         posts = posts_result.scalars().all()
         
-        return posts
+        return ApiResponse.success_response(
+            data=[_build_blog_post_read(post) for post in posts]
+        )
         
     except Exception as e:
         logger.error(f"Error getting liked posts: {e}")
@@ -301,7 +326,7 @@ async def get_following_posts(
         followed_author_ids = [row[0] for row in following_result.fetchall()]
         
         if not followed_author_ids:
-            return []
+            return ApiResponse.success_response(data=[])
         
         # Get posts from followed authors
         posts = await blog_service.get_published_posts(
@@ -311,7 +336,9 @@ async def get_following_posts(
             author_ids=followed_author_ids
         )
         
-        return posts
+        return ApiResponse.success_response(
+            data=[_build_blog_post_read(post) for post in posts]
+        )
         
     except Exception as e:
         logger.error(f"Error getting following posts: {e}")
@@ -321,11 +348,11 @@ async def get_following_posts(
         )
 
 
-@router.get("/my-followers")
+@router.get("/my-followers", response_model=ApiResponse)
 async def get_my_followers(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+):
     """Get current user's followers."""
     try:
         # Get follower count and recent followers
@@ -354,10 +381,12 @@ async def get_my_followers(
         )
         total_count = count_result.scalar() or 0
         
-        return {
-            "followers": followers,
-            "total_count": total_count
-        }
+        return ApiResponse.success_response(
+            data={
+                "followers": followers,
+                "total_count": total_count,
+            }
+        )
         
     except Exception as e:
         logger.error(f"Error getting followers: {e}")
@@ -367,11 +396,11 @@ async def get_my_followers(
         )
 
 
-@router.get("/my-following")
+@router.get("/my-following", response_model=ApiResponse)
 async def get_my_following(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
-) -> Dict[str, Any]:
+):
     """Get authors that current user is following."""
     try:
         # Get following data
@@ -392,10 +421,12 @@ async def get_my_following(
                 "followed_at": follow.created_at.isoformat()
             })
         
-        return {
-            "following": following,
-            "total_count": len(following)
-        }
+        return ApiResponse.success_response(
+            data={
+                "following": following,
+                "total_count": len(following),
+            }
+        )
         
     except Exception as e:
         logger.error(f"Error getting following: {e}")

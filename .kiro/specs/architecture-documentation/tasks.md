@@ -32,7 +32,7 @@
 
   - Document Azure OpenAI service integration patterns
   - Create Semantic Kernel plugin architecture documentation
-  - Document AI search service implementation and RAG patterns
+  - Document AI search service implementation and Context patterns
   - Map AI model configuration and management system
   - Document cost tracking and usage monitoring architecture
   - _Requirements: 2.2, 3.2, 3.3_

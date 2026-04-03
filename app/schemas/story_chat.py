@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/story_chat.py
+"""Pydantic schemas for story chat."""
+
+# /story_app/app/schemas/story_chat.py
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any

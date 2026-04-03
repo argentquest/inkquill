@@ -1,10 +1,10 @@
-# AI Storytelling Assistant with Worlds & RAG
+# AI Storytelling Assistant with Worlds & Context
 
 ## 1. Overview
 
 The AI Storytelling Assistant is a web application built with FastAPI, designed to help users craft and develop structured stories. It leverages Large Language Models (LLMs) via Azure OpenAI Service for content generation and refinement.
 
-A key feature is the integrated World-Building toolkit, allowing users to define detailed **Worlds** with unique **Characters**, **Locations**, and **Lore Items**. These world elements, along with user-uploaded documents, form a rich knowledge base for **Retrieval Augmented Generation (RAG)**, enabling the AI to provide deeply context-aware and factually grounded assistance.
+A key feature is the integrated World-Building toolkit, allowing users to define detailed **Worlds** with unique **Characters**, **Locations**, and **Lore Items**. These world elements, along with user-uploaded documents, form a rich knowledge base for **direct context assembly**, enabling the AI to provide deeply context-aware and factually grounded assistance.
 
 The application features secure user authentication, comprehensive project management, asynchronous job processing with real-time status feedback, and a powerful "Import World from Book Title" feature.
 
@@ -20,13 +20,13 @@ The application features secure user authentication, comprehensive project manag
     *   **Acts & Scenes:** Structure your narratives logically using acts and scenes with rich text editing capabilities.
     *   **World Element Linking:** Explicitly link characters, locations, and lore from your World to a specific Story to provide the AI with highly relevant context.
 *   **Prompt Library:** A personal and shared library for creating, managing, and reusing prompts to instruct the AI effectively.
-*   **RAG System & Asynchronous Job Processing:**
-    *   **World Element RAG:** When a world element is created or updated, a background job automatically generates a descriptive text summary, embeds it, and indexes it into Azure AI Search, making your lore instantly available to the AI.
+*   **Context System & Asynchronous Job Processing:**
+    *   **World Element Context:** When a world element is created or updated, a background job automatically generates a descriptive text summary, embeds it, and indexes it into Azure AI Search, making your lore instantly available to the AI.
     *   **User Document Uploads:** Upload your own documents (PDF, DOCX, TXT) and associate them with a World to expand the AI's knowledge base.
     *   **Job Status Tracking:** All long-running background tasks (like document ingestion or world imports) are tracked, providing real-time status updates to the user.
 *   **AI-Assisted Content Generation:**
     *   **Interactive Editors:** Dedicated editors for Acts and Scenes with real-time AI assistance via WebSockets.
-    *   **Context-Aware AI:** The RAG system automatically retrieves relevant information from your world elements and documents to inform the AI's creative process.
+    *   **Context-Aware AI:** The Context system automatically retrieves relevant information from your world elements and documents to inform the AI's creative process.
     *   **Cost & Latency Tracking:** Every call to an AI service is logged to a database table, recording token usage, calculated cost, and round-trip time for monitoring and analysis.
 *   **Publishing:** Compile a finished story into a single, shareable HTML file.
 
@@ -37,7 +37,7 @@ The application features secure user authentication, comprehensive project manag
 *   **AI Models:** Azure OpenAI Service (Chat Completion & Text Embedding)
 *   **Database:** PostgreSQL (driver: `asyncpg`)
 *   **ORM & Migrations:** SQLAlchemy (asyncio), Alembic
-*   **Vector Search / RAG Store:** Azure AI Search
+*   **Vector Search / Context Store:** Azure AI Search
 *   **Storage:** Azure Blob Storage
 *   **Authentication:** JWT (via `python-jose`), Password Hashing (`passlib[bcrypt]`)
 *   **Frontend:** Jinja2 Templating, Vanilla JavaScript (Fetch, WebSockets), Bootstrap 5, Quill.js
@@ -47,7 +47,7 @@ The application features secure user authentication, comprehensive project manag
 
 ## 4. Project Structure
 
-`/ai_rag_story_app/`
+`/story_app/`
 |
 |-- `/app/`
 |   |-- `/core/`                # Config, security, logging, shared dependencies & utilities
@@ -56,8 +56,8 @@ The application features secure user authentication, comprehensive project manag
 |   |-- `/schemas/`             # Pydantic schemas (user.py, world.py, job_status.py, etc.)
 |   |-- `/crud/`                # Database CRUD operations
 |   |-- `/routers/`             # API & UI endpoint definitions
-|   |-- `/services/`            # Business logic (Semantic Kernel, RAG, cost tracking, etc.)
-|   |-- `/processing/`          # Background task logic (RAG ingestion, world import)
+|   |-- `/services/`            # Business logic (Semantic Kernel, Context, cost tracking, etc.)
+|   |-- `/processing/`          # Background task logic (Context ingestion, world import)
 |   |-- `/prompts/`
 |   |-- `/static/`
 |   |-- `/templates/`
@@ -81,7 +81,7 @@ The application features secure user authentication, comprehensive project manag
 1.  **Clone the Repository:**
     ```bash
     git clone <your-repo-url>
-    cd ai_rag_story_app
+    cd story_app
     ```
 
 2.  **Set up Virtual Environment:**

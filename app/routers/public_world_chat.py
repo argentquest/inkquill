@@ -1,3 +1,5 @@
+"""API routes for public world chat."""
+
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,8 +8,8 @@ from typing import List, Optional
 import logging
 
 from app.core.deps import get_db_session, get_current_user
-from app.core.azure_deps import get_blob_service_client
-from azure.storage.blob.aio import BlobServiceClient
+from app.core.storage_deps import LocalStorageClient, get_blob_service_client
+from app.core.storage_deps import LocalStorageClient
 from app.models.world import World
 from app.models.user import User
 from app.models.chat_session import ChatSession
@@ -28,14 +30,12 @@ router = APIRouter(prefix="/public", tags=["public-world-chat"])
 ANONYMOUS_SESSION_COOKIE = "anon_session"
 ANONYMOUS_USER_COOKIE = "anon_user_id"
 
-async def _check_and_get_image_url(blob_service_client: BlobServiceClient, blob_path: Optional[str]) -> Optional[str]:
+async def _check_and_get_image_url(blob_service_client: LocalStorageClient, blob_path: Optional[str]) -> Optional[str]:
     """Helper function to check if image blob exists and return URL"""
-    from app.core.config import settings
     if not blob_path:
         return None
     try:
-        container_name = settings.AZURE_STORAGE_CONTAINER_NAME_FOR_GENERATED_IMAGES
-        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_path)
+        blob_client = blob_service_client.get_blob_client(container="generated-images", blob=blob_path)
         if await blob_client.exists():
             return blob_client.url
     except Exception as e:
@@ -135,7 +135,7 @@ async def get_chat_samples(db: AsyncSession = Depends(get_db_session)):
         logger.info("Chat samples endpoint called")
         samples = await chat_sample_crud.get_active_chat_samples(db)
         logger.info(f"Retrieved {len(samples)} chat samples")
-        return [
+        return ApiResponse.success_response(data=[
             {
                 "id": sample.id,
                 "title": sample.title,
@@ -144,7 +144,7 @@ async def get_chat_samples(db: AsyncSession = Depends(get_db_session)):
                 "sort_order": sample.sort_order
             }
             for sample in samples
-        ]
+        ])
     except Exception as e:
         logger.error(f"Error getting chat samples: {e}", exc_info=True)
         raise HTTPException(
@@ -155,7 +155,7 @@ async def get_chat_samples(db: AsyncSession = Depends(get_db_session)):
 @router.get("/worlds", response_model=ApiResponse)
 async def get_public_worlds(
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Get all worlds available for public chat"""
     try:
@@ -185,7 +185,7 @@ async def get_public_worlds(
             }
             world_responses.append(WorldRead(**world_dict))
         
-        return world_responses
+        return ApiResponse.success_response(data=world_responses)
         
     except Exception as e:
         logger.error(f"Error getting public worlds: {e}")
@@ -198,7 +198,7 @@ async def get_public_worlds(
 async def get_public_world_details(
     world_id: int,
     db: AsyncSession = Depends(get_db_session),
-    blob_service_client: BlobServiceClient = Depends(get_blob_service_client)
+    blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Get detailed information about a public world including characters, locations, lore"""
     try:
@@ -228,7 +228,7 @@ async def get_public_world_details(
         # Get image URL if available
         image_url = await _check_and_get_image_url(blob_service_client, world.image_blob_path)
         
-        return {
+        return ApiResponse.success_response(data={
             "world": {
                 "id": world.id,
                 "name": world.name,
@@ -256,7 +256,7 @@ async def get_public_world_details(
                     "description": lore.description
                 } for lore in lore_items
             ]
-        }
+        })
         
     except HTTPException:
         raise
@@ -327,13 +327,13 @@ async def start_chat_session(
         chat_session = await chat_session_crud.create_chat_session(db, session_data, user.id)
         await db.commit()
         
-        return {
+        return ApiResponse.success_response(data={
             "session_id": chat_session.id,
             "world_name": world.name,
             "remaining_balance": float(account),
             "user_id": user.id,
             "username": user.username
-        }
+        })
         
     except HTTPException:
         raise
@@ -433,7 +433,7 @@ async def send_chat_message(
         # Get updated balance
         new_balance = await billing_service.get_user_balance(db, user.id)
         
-        return {
+        return ApiResponse.success_response(data={
             "user_message": {
                 "id": response.user_message.id,
                 "content": response.user_message.content,
@@ -457,7 +457,7 @@ async def send_chat_message(
                 "model_name": response.call_stats.model_name,
                 "duration_ms": response.call_stats.duration_ms
             } if response.call_stats else None
-        }
+        })
         
     except HTTPException:
         raise
@@ -498,7 +498,7 @@ async def get_chat_messages(
         # Get messages
         messages = await chat_message_crud.get_messages_by_session(db, session_id)
         
-        return {
+        return ApiResponse.success_response(data={
             "session_id": session_id,
             "messages": [
                 {
@@ -509,7 +509,7 @@ async def get_chat_messages(
                     "full_context": msg.full_context  # Include full context with sources
                 } for msg in messages
             ]
-        }
+        })
         
     except HTTPException:
         raise
@@ -545,13 +545,13 @@ async def get_anonymous_user_balance(
         balance = await billing_service.get_or_create_anonymous_user_balance(db, user.id, is_anon)
         logger.info(f"User balance: {balance}")
         
-        return {
+        return ApiResponse.success_response(data={
             "balance": float(balance),
             "currency": "Coins",
             "username": user.username,
             "display_name": user.display_name,
             "weekly_limit": 5
-        }
+        })
         
     except HTTPException:
         # Re-raise HTTP exceptions as-is

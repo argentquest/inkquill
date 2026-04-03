@@ -34,7 +34,7 @@ graph TB
     subgraph "Data Layer"
         POSTGRES[(PostgreSQL Database)]
         AZURE_SEARCH[Azure AI Search]
-        BLOB_STORAGE[Azure Blob Storage]
+        BLOB_STOContextE[Azure Blob Storage]
     end
     
     subgraph "External Services"
@@ -57,7 +57,7 @@ graph TB
     STORY --> POSTGRES
     WORLD --> POSTGRES
     AI --> AZURE_SEARCH
-    AI --> BLOB_STORAGE
+    AI --> BLOB_STOContextE
     FORUM --> POSTGRES
     BILLING --> POSTGRES
     
@@ -86,7 +86,7 @@ graph TB
         end
         
         subgraph "Storage Services"
-            BLOB_STORAGE_SVC[Azure Blob Storage]
+            BLOB_STOContextE_SVC[Azure Blob Storage]
         end
         
         subgraph "Security Services"
@@ -103,7 +103,7 @@ graph TB
     WEBAPP --> POSTGRES_AZURE
     WEBAPP --> AZURE_OPENAI_SVC
     WEBAPP --> AZURE_SEARCH_SVC
-    WEBAPP --> BLOB_STORAGE_SVC
+    WEBAPP --> BLOB_STOContextE_SVC
     WEBAPP --> KEY_VAULT
     WEBAPP --> OPENROUTER_EXT
     WEBAPP --> RUNPOD_EXT
@@ -152,7 +152,7 @@ graph TB
   - Multi-model support
 - **AI Search Service** (`app/services/azure_ai_search_service.py`)
   - Vector search capabilities
-  - RAG (Retrieval Augmented Generation)
+  - Context (direct context assembly)
   - Content indexing
 
 ### Business Logic Components

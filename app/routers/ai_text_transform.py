@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/routers/ai_text_transform.py
+"""API routes for ai text transform."""
+
+# /story_app/app/routers/ai_text_transform.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +11,7 @@ import logging
 import semantic_kernel as sk
 from semantic_kernel.functions import kernel_function
 from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.connectors.ai.open_ai import AzureChatPromptExecutionSettings
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 
 from app.core.deps import get_db_session, get_current_active_user, get_current_user
 from app.models.user import User
@@ -236,8 +238,8 @@ async def transform_text(
         )
         
         # Create execution settings
-        execution_settings = AzureChatPromptExecutionSettings(
-            service_id="azure_openai_chat_service",
+        execution_settings = OpenAIChatPromptExecutionSettings(
+            service_id="chat_service",
             temperature=temperature,
             max_tokens=model_config.max_tokens,
             top_p=model_config.top_p
@@ -437,3 +439,4 @@ def _format_context(context: Dict[str, Any]) -> str:
         context_parts.append(f"Story excerpt: {context['story_excerpt']}")
     
     return "\n".join(context_parts) if context_parts else ""
+

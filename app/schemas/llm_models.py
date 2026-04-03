@@ -1,4 +1,6 @@
-# /ai_rag_story_app/app/schemas/llm_models.py
+"""Pydantic schemas for llm models."""
+
+# /story_app/app/schemas/llm_models.py
 from pydantic import BaseModel
 from typing import Optional
 from app.models.ai_model_config import AIProviderEnum, AIModelTypeEnum

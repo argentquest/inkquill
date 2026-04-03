@@ -23,16 +23,16 @@ First, CAREFULLY REVIEW ALL THE PROVIDED CONTEXT. This context is crucial for yo
    - Lore Items: {{$linked_lore_items_context}}
    Use these elements accurately if relevant to the user's instruction.
 
-**5. Background Information (from RAG system, if relevant to user's instruction):**
-   {{$rag_context}}
-   If this retrieved context provides useful facts or details, try to weave them naturally into the generated content if relevant to the user's instruction.
+**5. Background Information (from uploaded documents, if relevant to user's instruction):**
+   {{$document_context}}
+   If this context provides useful facts or details, try to weave them naturally into the generated content if relevant to the user's instruction.
 
 **CONTEXT PRIORITY HIERARCHY:**
 When context elements conflict or when you must choose what to emphasize, follow this priority order:
 1. **HIGHEST**: User's specific instruction and current act content/goals
 2. **HIGH**: Story title, description, and established character/world elements
 3. **MEDIUM**: Previous acts summaries and overall story continuity
-4. **LOW**: RAG background information (use only if it enhances without contradicting higher priorities)
+4. **LOW**: Uploaded document background information (use only if it enhances without contradicting higher priorities)
 
 If any context seems contradictory, always favor the higher priority elements and maintain internal consistency within the current act.
 

@@ -1,4 +1,4 @@
-That's excellent! It sounds like the core functionality for managing stories, acts, and the AI-assisted writing (including RAG and prompt selection) is now in a good state.
+That's excellent! It sounds like the core functionality for managing stories, acts, and the AI-assisted writing (including Context and prompt selection) is now in a good state.
 
 Now that these foundational pieces are working, here are a few suggestions for what you could consider next to improve and expand your "AI Storytelling Assistant" concept. I'll try to offer a mix of UI/UX enhancements, AI interaction improvements, and content organization ideas:
 
@@ -15,19 +15,19 @@ Initialize the editor on the <textarea id="act-content-editor">.
 Update act_editor.js to get HTML content from the editor's API when saving (editor.getContent()) and send this HTML string to your backend.
 Ensure your Act.description database column (which is Text) can store HTML.
 Crucially: Sanitize any HTML on the backend with a library like Bleach before displaying it outside the editor to prevent XSS attacks.
-2. Enhance RAG Interaction: Display Retrieved Context:
+2. Enhance Context Interaction: Display Retrieved Context:
 
-Current State: The RAG context is fetched by the backend and injected into the LLM prompt, but the user doesn't directly see what information was retrieved.
-Suggestion: On the "Act Editor" page, after the user provides an instruction and before (or alongside) the AI generates content, display the top 2-3 snippets of text that the RAG system retrieved from Azure AI Search.
+Current State: The Context context is fetched by the backend and injected into the LLM prompt, but the user doesn't directly see what information was retrieved.
+Suggestion: On the "Act Editor" page, after the user provides an instruction and before (or alongside) the AI generates content, display the top 2-3 snippets of text that the context system assembled from uploaded documents and story data.
 Benefits:
 Transparency: Users understand what information the AI is basing its generation on.
-Control & Iteration: If the retrieved context is irrelevant or not what the user intended, they can rephrase their instruction to guide the RAG system better before the LLM generates a potentially off-target response.
+Control & Iteration: If the assembled context is irrelevant or not what the user intended, they can rephrase their instruction to guide the context assembly better before the LLM generates a potentially off-target response.
 Trust: Builds trust in the AI's output by showing its "sources."
 Implementation Sketch:
-The WebSocket endpoint (ai_assisted_writing.py) would first call the retrieve_rag_context_function.
-It would send a distinct WebSocket message to the client containing these retrieved snippets (e.g., {"type": "rag_context", "data": ["snippet1...", "snippet2..."]}).
+The WebSocket endpoint (ai_assisted_writing.py) would first call the retrieve_context_context_function.
+It would send a distinct WebSocket message to the client containing these retrieved snippets (e.g., {"type": "context_context", "data": ["snippet1...", "snippet2..."]}).
 act_editor.js would listen for this message type and display the snippets in a dedicated div on the page.
-The backend would then proceed to call the generate_act_content_function with this same RAG context.
+The backend would then proceed to call the generate_act_content_function with this same Context context.
 3. Advanced Prompt Management & Usage:
 
 A. Display Active System Prompt on Act Editor:
@@ -54,7 +54,7 @@ Allow linking Personas to a Story (e.g., a list of main characters for that stor
 On the "Act Editor" page, display the Personas associated with the current Story.
 Modify the GenerateActContent prompt template and the KernelArguments in ai_assisted_writing.py to include information about these "active" Personas (e.g., their names, key traits from Persona.description or a new Persona.summary field).
 Benefits: The AI can then generate content that is more consistent with the defined characters, use their names correctly, and reflect their personalities.
-These are a few directions you could take. I'd recommend picking one or two that you feel would add the most value or are most interesting to you right now. For example, implementing the Rich Text Editor and Displaying RAG Context would be significant UX and AI interaction improvements.
+These are a few directions you could take. I'd recommend picking one or two that you feel would add the most value or are most interesting to you right now. For example, implementing the Rich Text Editor and displaying assembled document context would be significant UX and AI interaction improvements.
 
 
 
@@ -87,7 +87,7 @@ Test the UI thoroughly to ensure both suggestions and metrics are displayed clea
 Labels: priority:critical, feature:ai-review, bug, area:backend, area:frontend, area:ai-rag
 II. Medium Priority - Refactoring & Enhancements
 Task: Refactor semantic_kernel_setup.py into Smaller, Modular Plugin Setup Files.
-Explanation: The current semantic_kernel_setup.py is becoming large as it registers all Semantic Kernel functions for various features (Act writing, Scene writing, RAG text generation for world elements, world import, AI review, etc.). Breaking this down will improve code organization, readability, and maintainability. The goal is to have a core file that initializes the kernel and its AI services (AzureChatCompletion, AzureTextEmbedding), and then separate Python files for each logical "plugin" (e.g., Storytelling, StoryAnalysis, WorldBuilding) that are responsible for loading their specific prompts and registering their functions with the shared kernel instance.
+Explanation: The current semantic_kernel_setup.py is becoming large as it registers all Semantic Kernel functions for various features (Act writing, Scene writing, Context text generation for world elements, world import, AI review, etc.). Breaking this down will improve code organization, readability, and maintainability. The goal is to have a core file that initializes the kernel and its AI services (AzureChatCompletion, AzureTextEmbedding), and then separate Python files for each logical "plugin" (e.g., Storytelling, StoryAnalysis, WorldBuilding) that are responsible for loading their specific prompts and registering their functions with the shared kernel instance.
 Proposed Structure (Example):
 app/services/sk_kernel_instance.py: Initializes sk.Kernel(), adds Azure AI services.
 app/services/sk_plugins/story_analysis_plugin_setup.py: Loads enhanced_act_review_prompt.txt, registers ReviewActContentEnhanced function.
@@ -141,3 +141,4 @@ The main sk_kernel_instance.py would import these registration functions and cal
 Routers and other services that need to invoke SK functions would then get them from the globally initialized kernel instance by their plugin name and function name (e.g., kernel.plugins["StoryAnalysisPlugin"]["ReviewActContentEnhanced"]).
 This refactoring will make the SK setup cleaner, easier to manage as you add more AI capabilities, and individual plugin setups more isolated.
 This updated list and explanation should provide a clear path forward. The immediate next step is to get those startup logs for semantic_kernel_setup.py to ensure ReviewActContentEnhanced is being registered correctly.
+

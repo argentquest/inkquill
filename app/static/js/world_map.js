@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/world_map.js
+// /story_app/app/static/js/world_map.js
 "use strict";
 
 document.addEventListener('DOMContentLoaded', () => {

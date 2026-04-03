@@ -1,4 +1,4 @@
-// /ai_rag_story_app/app/static/js/image_job_monitor.js
+// /story_app/app/static/js/image_job_monitor.js
 "use strict";
 
 /**

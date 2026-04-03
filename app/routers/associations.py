@@ -1,3 +1,5 @@
+"""API routes for associations."""
+
 # /app/routers/associations.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -60,13 +62,13 @@ async def get_role_suggestions(
     
     roles = get_predefined_roles(element_type, container_type)
     
-    return {
+    return ApiResponse.success_response(data={
         "container_type": container_type,
         "element_type": element_type,
         "predefined_roles": roles,
         "allow_custom": True,
         "max_custom_roles": 5
-    }
+    })
 
 # === STORY ASSOCIATIONS ===
 
@@ -126,7 +128,7 @@ async def create_story_character_association(
     await db.commit()
     await db.refresh(db_association)
     
-    return StoryCharacterAssociationRead.from_orm(db_association)
+    return ApiResponse.success_response(data=StoryCharacterAssociationRead.model_validate(db_association))
 
 @router.get("/story/{story_id}/characters", response_model=ApiResponse)
 async def get_story_character_associations(
@@ -149,7 +151,9 @@ async def get_story_character_associations(
     )
     associations = result.scalars().all()
     
-    return [StoryCharacterAssociationRead.from_orm(assoc) for assoc in associations]
+    return ApiResponse.success_response(
+        data=[StoryCharacterAssociationRead.model_validate(assoc) for assoc in associations]
+    )
 
 @router.put("/story/{story_id}/character/{character_id}", response_model=ApiResponse)
 async def update_story_character_association(
@@ -187,7 +191,7 @@ async def update_story_character_association(
     await db.commit()
     await db.refresh(association)
     
-    return StoryCharacterAssociationRead.from_orm(association)
+    return ApiResponse.success_response(data=StoryCharacterAssociationRead.model_validate(association))
 
 @router.delete("/story/{story_id}/character/{character_id}")
 async def delete_story_character_association(
@@ -218,7 +222,7 @@ async def delete_story_character_association(
     await db.delete(association)
     await db.commit()
     
-    return {"message": "Association deleted successfully"}
+    return ApiResponse.success_response(data={"message": "Association deleted successfully"})
 
 # === SIMILAR ENDPOINTS FOR LOCATIONS AND LORE ITEMS ===
 # I'll add the location and lore item endpoints following the same pattern
@@ -266,7 +270,7 @@ async def create_story_location_association(
     await db.commit()
     await db.refresh(db_association)
     
-    return StoryLocationAssociationRead.from_orm(db_association)
+    return ApiResponse.success_response(data=StoryLocationAssociationRead.model_validate(db_association))
 
 # === GET ALL ASSOCIATIONS FOR A STORY ===
 @router.get("/story/{story_id}/all")
@@ -303,11 +307,11 @@ async def get_all_story_associations(
         .options(selectinload(StoryLoreItemAssociation.lore_item))
     )
     
-    return {
+    return ApiResponse.success_response(data={
         "characters": [StoryCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
         "locations": [StoryLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
         "lore_items": [StoryLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
-    }
+    })
 
 # === ACT ASSOCIATIONS ===
 
@@ -358,7 +362,7 @@ async def create_act_character_association(
     await db.commit()
     await db.refresh(db_association)
     
-    return ActCharacterAssociationRead.from_orm(db_association)
+    return ApiResponse.success_response(data=ActCharacterAssociationRead.model_validate(db_association))
 
 @router.get("/act/{act_id}/all")
 async def get_all_act_associations(
@@ -398,11 +402,11 @@ async def get_all_act_associations(
         .options(selectinload(ActLoreItemAssociation.lore_item))
     )
     
-    return {
+    return ApiResponse.success_response(data={
         "characters": [ActCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
         "locations": [ActLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
         "lore_items": [ActLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
-    }
+    })
 
 @router.get("/scene/{scene_id}/all")
 async def get_all_scene_associations(
@@ -446,11 +450,11 @@ async def get_all_scene_associations(
         .options(selectinload(SceneLoreItemAssociation.lore_item))
     )
     
-    return {
+    return ApiResponse.success_response(data={
         "characters": [SceneCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
         "locations": [SceneLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
         "lore_items": [SceneLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
-    }
+    })
 
 # === LOCATION ASSOCIATIONS ===
 
@@ -501,7 +505,7 @@ async def create_act_location_association(
     await db.commit()
     await db.refresh(db_association)
     
-    return ActLocationAssociationRead.from_orm(db_association)
+    return ApiResponse.success_response(data=ActLocationAssociationRead.model_validate(db_association))
 
 @router.post("/story/{story_id}/lore_item/{lore_item_id}", response_model=ApiResponse)
 async def create_story_lore_item_association(
@@ -546,7 +550,7 @@ async def create_story_lore_item_association(
     await db.commit()
     await db.refresh(db_association)
     
-    return StoryLoreItemAssociationRead.from_orm(db_association)
+    return ApiResponse.success_response(data=StoryLoreItemAssociationRead.model_validate(db_association))
 
 # === LORE ITEM ASSOCIATIONS ===
 
@@ -597,7 +601,7 @@ async def create_act_lore_item_association(
     await db.commit()
     await db.refresh(db_association)
     
-    return ActLoreItemAssociationRead.from_orm(db_association)
+    return ApiResponse.success_response(data=ActLoreItemAssociationRead.model_validate(db_association))
 
 # === SINGLE ASSOCIATION RETRIEVAL ===
 
@@ -697,7 +701,7 @@ async def get_single_association(
             detail=f"Association between {container_type} {container_id} and {element_type} {element_id} not found"
         )
     
-    return {
+    return ApiResponse.success_response(data={
         "container_type": container_type,
         "container_id": container_id,
         "element_type": element_type,
@@ -706,7 +710,7 @@ async def get_single_association(
         "notes": association.notes,
         "created_at": association.created_at,
         "updated_at": association.updated_at
-    }
+    })
 
 # === UPDATE ASSOCIATION ===
 
@@ -820,7 +824,7 @@ async def update_association(
     await db.commit()
     await db.refresh(association)
     
-    return {
+    return ApiResponse.success_response(data={
         "container_type": container_type,
         "container_id": container_id,
         "element_type": element_type,
@@ -829,7 +833,7 @@ async def update_association(
         "notes": association.notes,
         "created_at": association.created_at,
         "updated_at": association.updated_at
-    }
+    })
 
 # === BULK ASSOCIATION OPERATIONS ===
 
@@ -904,10 +908,10 @@ async def create_bulk_associations(
             # Log error but continue with other associations
             print(f"Error creating association for {element_type} {element_id}: {e}")
             
-    return {
+    return ApiResponse.success_response(data={
         "message": f"Processed {len(results)} associations",
         "associations": results
-    }
+    })
 
 # === GENERIC DELETE ASSOCIATION ENDPOINT ===
 
@@ -998,4 +1002,4 @@ async def delete_association(
     await db.delete(association)
     await db.commit()
     
-    return {"message": "Association removed successfully"}
+    return ApiResponse.success_response(data={"message": "Association removed successfully"})

@@ -1,0 +1,41 @@
+Okay, let's list the Managed Identity permissions your Azure App Service will need to interact securely with the other Azure resources in your architecture.
+
+You'll enable a System-Assigned Managed Identity on your Azure App Service instance. Then, you need to grant this identity specific Azure RBAC (Role-Based Access Control) roles on each target resource:
+
+Azure Key Vault:
+
+Purpose: To allow your FastAPI application to securely read secrets (like API keys for OpenAI/AI Search, DB passwords if used, JWT secret).
+Required Role: Key Vault Secrets User
+Scope: Assign this role on your specific Azure Key Vault instance.
+Azure Blob Storage:
+
+Purpose: To allow your application (specifically the document upload endpoint and the background processor) to write the uploaded raw documents and potentially read them back for processing.
+Required Role: Storage Blob Data Contributor
+Scope: Assign this role on your specific Azure Storage Account, or ideally, limit it to just the container (rag-documents) where the files are stored, if possible through IAM conditions or custom roles (though assigning at the account level is common).
+Azure AI Search:
+
+Purpose:
+The background processor needs to write/update documents (chunks and embeddings) in the search index.
+The Context retrieval service/plugin needs to read/query the search index.
+Required Role: Search Index Data Contributor (This role typically includes read permissions needed for querying as well). Alternatively, you could assign both Search Index Data Reader and Search Index Data Contributor if you want more granular control, but Contributor usually suffices for an application doing both indexing and querying.
+Scope: Assign this role on your specific Azure AI Search service instance.
+Azure Database for PostgreSQL:
+
+Purpose: To allow your FastAPI application to connect to the database and perform CRUD operations (SELECT, INSERT, UPDATE, DELETE) on its tables (users, stories, acts, uploaded_documents) using Azure AD authentication instead of a password.
+Azure RBAC Role (on Server): No specific Azure RBAC role is typically needed on the server resource itself just for the application to connect using AAD authentication once AAD auth is enabled on the server.
+Database-Level Permissions (Crucial):
+You must first enable Azure AD authentication on your Azure Database for PostgreSQL server.
+Then, you need to connect to the database (e.g., as an AAD admin user) and execute SQL commands (CREATE ROLE, GRANT) to add the App Service's Managed Identity as a user (or add it to a group that is a user) within the PostgreSQL database itself.
+Finally, grant the necessary database permissions (e.g., GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users TO "YourAppServiceNameMI";) to this database user representing the Managed Identity.
+Azure OpenAI Service:
+
+Purpose: The application needs the API key and endpoint to make calls for chat completions and embeddings.
+Managed Identity Role: The Managed Identity is not directly used to authenticate data plane calls (like getting completions) to Azure OpenAI; those use the API key. The Managed Identity's role here is to securely retrieve the Azure OpenAI API key and endpoint from Azure Key Vault. Therefore, the necessary permission is the Key Vault Secrets User role on the Key Vault (as listed in point 1). No specific RBAC role assignment is typically required on the Azure OpenAI resource itself for the application's runtime data plane operations using the key.
+In Summary:
+
+Your App Service's System-Assigned Managed Identity needs these Azure RBAC role assignments:
+
+Key Vault Secrets User on the Key Vault.
+Storage Blob Data Contributor on the Storage Account (or specific container).
+Search Index Data Contributor on the AI Search Service.
+Additionally, you need to configure Azure AD Authentication on your PostgreSQL server and grant database-level permissions to the Managed Identity within PostgreSQL using SQL commands.

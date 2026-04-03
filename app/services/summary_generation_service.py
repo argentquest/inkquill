@@ -1,3 +1,5 @@
+"""Service helpers for summary generation service."""
+
 # app/services/summary_generation_service.py
 import logging
 from typing import Optional
