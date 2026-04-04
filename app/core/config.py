@@ -63,6 +63,10 @@ class Settings(BaseSettings):
     # Default model - any OpenRouter-compatible model identifier
     OPENROUTER_DEFAULT_MODEL: str = Field(default="openai/gpt-4o-mini", alias="OPENROUTER_DEFAULT_MODEL")
     OPENROUTER_PREMIUM_MODEL: str = Field(default="openai/gpt-4o", alias="OPENROUTER_PREMIUM_MODEL")
+    
+    # --- Care Circle Specific Provider Configuration ---
+    CARE_CIRCLE_DEFAULT_TEXT_MODEL: str = Field(default="google/gemini-3.1-flash-lite-preview", alias="CARE_CIRCLE_DEFAULT_TEXT_MODEL")
+    CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="openai/gpt-image-1", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
 
     # --- Standard OpenAI API Configuration (optional fallback) ---
     OPENAI_API_KEY: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")

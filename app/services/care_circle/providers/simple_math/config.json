@@ -1,0 +1,12 @@
+{
+    "grid_width": 2,
+    "grid_height": 2,
+    "common": true,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    }
+}

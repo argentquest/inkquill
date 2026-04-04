@@ -1,0 +1,21 @@
+.simple-math {
+    padding: 24px;
+    text-align: center;
+}
+
+.simple-math__problem {
+    margin: 0;
+    font-size: 64px;
+    font-weight: 700;
+    font-family: "Courier New", monospace;
+    color: #1e293b;
+}
+
+.simple-math__answer {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 48px;
+    font-weight: 700;
+    color: #059669;
+    transform: rotate(180deg);
+}

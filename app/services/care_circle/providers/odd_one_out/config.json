@@ -1,0 +1,218 @@
+{
+    "name": "Odd One Out",
+    "description": "Find the item that does not belong.",
+    "technical_summary": "Provides categories with items where users identify the odd one out.",
+    "categories": {
+        "tools": [
+            "Hammer",
+            "Wrench",
+            "Screwdriver",
+            "Level",
+            "Paintbrush"
+        ],
+        "weather": [
+            "Snow",
+            "Rain",
+            "Sunshine",
+            "Clouds",
+            "Hail"
+        ],
+        "trees": [
+            "Maple",
+            "Oak",
+            "Birch",
+            "Pine",
+            "Willow"
+        ],
+        "seasons": [
+            "Spring",
+            "Summer",
+            "Autumn",
+            "Winter",
+            "Monday"
+        ],
+        "vehicles": [
+            "Car",
+            "Truck",
+            "Bus",
+            "Train",
+            "Bicycle"
+        ],
+        "fruits": [
+            "Apple",
+            "Banana",
+            "Carrot",
+            "Orange",
+            "Grape"
+        ],
+        "vegetables": [
+            "Carrot",
+            "Potato",
+            "Tomato",
+            "Cucumber",
+            "Rose"
+        ],
+        "flowers": [
+            "Rose",
+            "Daisy",
+            "Tulip",
+            "Daffodil",
+            "Spinach"
+        ],
+        "colors": [
+            "Red",
+            "Blue",
+            "Green",
+            "Heavy",
+            "Yellow"
+        ],
+        "animals": [
+            "Dog",
+            "Cat",
+            "Rabbit",
+            "Goldfish",
+            "Table"
+        ],
+        "birds": [
+            "Robin",
+            "Sparrow",
+            "Eagle",
+            "Pigeon",
+            "Salmon"
+        ],
+        "kitchen_items": [
+            "Pot",
+            "Pan",
+            "Spatula",
+            "Spoon",
+            "Hammer"
+        ],
+        "clothing": [
+            "Shirt",
+            "Trousers",
+            "Jacket",
+            "Shoes",
+            "Umbrella"
+        ],
+        "furniture": [
+            "Chair",
+            "Table",
+            "Sofa",
+            "Bed",
+            "Spoon"
+        ],
+        "musical_instruments": [
+            "Piano",
+            "Guitar",
+            "Violin",
+            "Trumpet",
+            "Brick"
+        ],
+        "sports": [
+            "Tennis",
+            "Football",
+            "Cricket",
+            "Swimming",
+            "Reading"
+        ],
+        "months": [
+            "January",
+            "March",
+            "June",
+            "October",
+            "Tuesday"
+        ],
+        "days_of_week": [
+            "Monday",
+            "Tuesday",
+            "Friday",
+            "Sunday",
+            "August"
+        ],
+        "drinks": [
+            "Tea",
+            "Coffee",
+            "Water",
+            "Milk",
+            "Sandwich"
+        ],
+        "breads": [
+            "White",
+            "Rye",
+            "Sourdough",
+            "Bagel",
+            "Pork"
+        ],
+        "desserts": [
+            "Cake",
+            "Pie",
+            "Pudding",
+            "Cookie",
+            "Steak"
+        ],
+        "farm_animals": [
+            "Cow",
+            "Horse",
+            "Pig",
+            "Chicken",
+            "Shark"
+        ],
+        "ocean_creatures": [
+            "Whale",
+            "Dolphin",
+            "Shark",
+            "Lobster",
+            "Eagle"
+        ],
+        "body_parts": [
+            "Arm",
+            "Leg",
+            "Nose",
+            "Ear",
+            "Window"
+        ]
+    },
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "category_type": "obvious",
+            "hint_available": true,
+            "show_explanation": true,
+            "preferred_categories": [
+                "fruits",
+                "vegetables",
+                "animals",
+                "seasons",
+                "vehicles"
+            ]
+        },
+        "medium": {
+            "category_type": "moderate",
+            "hint_available": false,
+            "show_explanation": true,
+            "preferred_categories": [
+                "tools",
+                "sports",
+                "musical_instruments",
+                "furniture",
+                "clothing"
+            ]
+        },
+        "hard": {
+            "category_type": "subtle",
+            "hint_available": false,
+            "show_explanation": false,
+            "preferred_categories": [
+                "breads",
+                "ocean_creatures",
+                "days_of_week",
+                "months",
+                "colors"
+            ]
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": false
+}

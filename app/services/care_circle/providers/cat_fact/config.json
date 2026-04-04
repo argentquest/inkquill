@@ -1,0 +1,31 @@
+{
+    "name": "Cat Fact",
+    "description": "Interesting cat facts with a cute photo.",
+    "technical_summary": "Fetches cat facts from catfact.ninja API and images from cataas.com. Falls back to stored fact if APIs fail.",
+    "api_url": "https://catfact.ninja/fact",
+    "image_api": "https://cataas.com/cat",
+    "fallback": "Cats sleep for about 70% of their lives. Thats about 13-16 hours a day!",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "max_fact_length": 100,
+            "include_image": true,
+            "language": "simple"
+        },
+        "medium": {
+            "max_fact_length": 200,
+            "include_image": true,
+            "language": "moderate"
+        },
+        "hard": {
+            "max_fact_length": 400,
+            "include_image": true,
+            "language": "detailed",
+            "include_followup": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": false
+}

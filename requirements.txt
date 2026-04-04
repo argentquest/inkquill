@@ -58,3 +58,5 @@ gunicorn==23.0.0
 pillow
 markdown
 
+python-constraint==1.4.0
+word-search-generator==5.0.0

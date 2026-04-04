@@ -1,0 +1,12 @@
+<div class="section section--dog_photo">
+    <h2 class="section__title">🐶 Furry Friend of the Day</h2>
+    <div class="pet-photo">
+        <div class="pet-photo__content">
+            <p class="section__body pet-photo__caption">{{ caption }}</p>
+            <p class="section__subtitle pet-photo__meta">Breed: {{ breed }}</p>
+        </div>
+        {% if image_url %}
+        <img class="pet-photo__image" src="{{ image_url }}" alt="A cute dog">
+        {% endif %}
+    </div>
+</div>

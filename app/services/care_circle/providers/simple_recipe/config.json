@@ -1,0 +1,58 @@
+{
+    "name": "Simple Recipe",
+    "description": "Easy-to-make recipes with simple ingredients.",
+    "technical_summary": "Provides curated simple recipes with name, ingredients, and step-by-step instructions from a configurable list.",
+    "recipes": [
+        {
+            "name": "Classic Hot Cocoa",
+            "ingredients": "Milk, cocoa powder, sugar, a pinch of salt",
+            "steps": "Warm the milk gently. Stir in the cocoa powder and sugar until smooth. Pour into your favorite mug. Add marshmallows if you like!"
+        },
+        {
+            "name": "Cinnamon Toast",
+            "ingredients": "Bread, butter, cinnamon, sugar",
+            "steps": "Toast the bread until golden. Spread butter while warm. Sprinkle cinnamon and sugar on top. Enjoy with a cup of tea!"
+        },
+        {
+            "name": "Simple Banana Smoothie",
+            "ingredients": "1 banana, 1 cup milk, 1 spoon honey",
+            "steps": "Peel the banana and break into pieces. Put everything in a blender. Blend until smooth. Pour and enjoy!"
+        },
+        {
+            "name": "Grilled Cheese Sandwich",
+            "ingredients": "Bread, butter, your favorite cheese",
+            "steps": "Butter one side of each bread slice. Place cheese between the slices (butter side out). Cook in a pan on medium heat until golden on both sides."
+        },
+        {
+            "name": "Warm Apple Slices",
+            "ingredients": "1 apple, butter, cinnamon, brown sugar",
+            "steps": "Slice the apple. Melt a little butter in a pan. Add the apple slices. Sprinkle with cinnamon and brown sugar. Cook until soft and warm."
+        }
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "max_ingredients": 4,
+            "max_steps": 3,
+            "cooking_skill": "beginner",
+            "no_heat_required": false
+        },
+        "medium": {
+            "max_ingredients": 6,
+            "max_steps": 5,
+            "cooking_skill": "intermediate",
+            "no_heat_required": false
+        },
+        "hard": {
+            "max_ingredients": 10,
+            "max_steps": 8,
+            "cooking_skill": "advanced",
+            "no_heat_required": false,
+            "include_variation": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 4,
+    "common": true,
+    "llm": true
+}

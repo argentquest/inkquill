@@ -18,6 +18,24 @@ async def read_care_circle_providers(
     providers = await care_circle_crud.list_provider_catalog(db)
     return ApiResponse.success_response(data=providers)
 
+from pydantic import BaseModel
+class ProviderUpdate(BaseModel):
+    enabled: bool
+    patient_visible: bool
+
+@router.put("/providers/{provider_key}", response_model=ApiResponse)
+async def update_care_circle_provider(
+    provider_key: str,
+    payload: ProviderUpdate,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    provider = await care_circle_crud.update_provider_catalog(db, provider_key, payload.enabled, payload.patient_visible)
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    return ApiResponse.success_response(data={"message": "Updated successfully"})
+
+
 
 @router.get("/family/patients", response_model=ApiResponse)
 async def read_family_patients(
@@ -64,6 +82,12 @@ async def read_patient_session(
     patient_id: int,
     db: AsyncSession = Depends(get_db_session),
 ):
+    from app.services.care_circle.session_assembler import assemble_daily_patient_session
+    
+    # Attempt to regenerate fresh provider cards dynamically for the patient
+    # In production, this shifts to Celery off-hours scheduling
+    await assemble_daily_patient_session(db, patient_id)
+    
     patient = await care_circle_crud.get_patient_session(db, patient_id)
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient session not found")

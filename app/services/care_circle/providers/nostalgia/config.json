@@ -1,0 +1,74 @@
+{
+    "name": "Nostalgia",
+    "description": "Warm memories from your youth to cherish and enjoy.",
+    "technical_summary": "Returns era-specific nostalgic facts and memories from configurable fact database based on user era_of_youth preference.",
+    "default_era": "1950s",
+    "fallback": "Do you remember the wonderful music and dances from your youth?",
+    "facts": {
+        "1930s": [
+            "Do you remember listening to radio programs like The Lone Ranger with your family?",
+            "The movies were magical back then! Do you remember going to the picture show?",
+            "Shirley Temple was the biggest star. Did you ever tap dance like her?",
+            "Families would gather around the radio for evening entertainment."
+        ],
+        "1940s": [
+            "Do you remember when a loaf of bread cost just 8 cents?",
+            "The Andrews Sisters were singing everywhere. Do you remember their songs?",
+            "Victory gardens were in every backyard. Did your family grow vegetables?",
+            "Do you remember saving tin cans and rubber for the war effort?",
+            "The jitterbug and swing dancing were all the rage!"
+        ],
+        "1950s": [
+            "On this day in 1955, the first Mickey Mouse Club episode aired!",
+            "Do you remember when everyone got their first television set?",
+            "Poodle skirts and sock hops were the height of fashion!",
+            "Elvis Presley changed music forever. Do you remember hearing him for the first time?",
+            "Drive-in movies were the perfect date night. Did you have a favorite?"
+        ],
+        "1960s": [
+            "Do you remember the first time you heard The Beatles on the radio?",
+            "The space race was exciting! Do you remember watching the moon landing?",
+            "Woodstock brought people together through music. What a time!",
+            "Bell-bottoms and peace signs were everywhere.",
+            "Gordon Lightfoot and folk music filled the airwaves."
+        ],
+        "1970s": [
+            "Do you remember when the first Star Wars movie captivated everyone in 1977?",
+            "Disco fever had everyone dancing! Did you do the Hustle?",
+            "Pet rocks were somehow a thing. Did anyone you know have one?",
+            "The Bee Gees were on every radio station.",
+            "Fonzie and Happy Days brought back the feeling of the 1950s."
+        ],
+        "1980s": [
+            "MTV launched and changed how we experienced music. Do you remember?",
+            "The first personal computers started appearing in homes.",
+            "E.T. had everyone saying phone home. Did you see it in theaters?",
+            "Pac-Man fever swept the nation. Did you play video games?"
+        ]
+    },
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "sentences": 2,
+            "include_question": true,
+            "complexity": "simple"
+        },
+        "medium": {
+            "sentences": 3,
+            "include_question": true,
+            "complexity": "moderate",
+            "include_context": true
+        },
+        "hard": {
+            "sentences": 4,
+            "include_question": true,
+            "complexity": "rich",
+            "include_context": true,
+            "deep_reflection": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

@@ -1,0 +1,317 @@
+{
+    "name": "Complete the Duo",
+    "description": "Complete the famous pair \u2014 Laurel and ___!",
+    "technical_summary": "Shows one half of a well-known pair for gentle recognition-based engagement. No LLM required. Pairs rotate daily via date-hash.",
+    "pairs_per_day": 4,
+    "pairs": [
+        {
+            "prompt": "Laurel and",
+            "answer": "Hardy",
+            "category": "comedy"
+        },
+        {
+            "prompt": "Morecambe and",
+            "answer": "Wise",
+            "category": "comedy"
+        },
+        {
+            "prompt": "Hinge and",
+            "answer": "Bracket",
+            "category": "comedy"
+        },
+        {
+            "prompt": "Tom and",
+            "answer": "Jerry",
+            "category": "cartoon"
+        },
+        {
+            "prompt": "Mickey and",
+            "answer": "Minnie",
+            "category": "cartoon"
+        },
+        {
+            "prompt": "Sooty and",
+            "answer": "Sweep",
+            "category": "entertainment"
+        },
+        {
+            "prompt": "Batman and",
+            "answer": "Robin",
+            "category": "comics"
+        },
+        {
+            "prompt": "Romeo and",
+            "answer": "Juliet",
+            "category": "literature"
+        },
+        {
+            "prompt": "Hansel and",
+            "answer": "Gretel",
+            "category": "fairytale"
+        },
+        {
+            "prompt": "Jack and",
+            "answer": "Jill",
+            "category": "nursery_rhyme"
+        },
+        {
+            "prompt": "Punch and",
+            "answer": "Judy",
+            "category": "entertainment"
+        },
+        {
+            "prompt": "Adam and",
+            "answer": "Eve",
+            "category": "history"
+        },
+        {
+            "prompt": "Sherlock and",
+            "answer": "Watson",
+            "category": "literature"
+        },
+        {
+            "prompt": "Bonnie and",
+            "answer": "Clyde",
+            "category": "history"
+        },
+        {
+            "prompt": "Fred and",
+            "answer": "Ginger",
+            "category": "entertainment"
+        },
+        {
+            "prompt": "Torvill and",
+            "answer": "Dean",
+            "category": "sport"
+        },
+        {
+            "prompt": "Simon and",
+            "answer": "Garfunkel",
+            "category": "music"
+        },
+        {
+            "prompt": "Salt and",
+            "answer": "Pepper",
+            "category": "food"
+        },
+        {
+            "prompt": "Bread and",
+            "answer": "Butter",
+            "category": "food"
+        },
+        {
+            "prompt": "Fish and",
+            "answer": "Chips",
+            "category": "food"
+        },
+        {
+            "prompt": "Bacon and",
+            "answer": "Eggs",
+            "category": "food"
+        },
+        {
+            "prompt": "Tea and",
+            "answer": "Biscuits",
+            "category": "food"
+        },
+        {
+            "prompt": "Jam and",
+            "answer": "Cream",
+            "category": "food"
+        },
+        {
+            "prompt": "Cheese and",
+            "answer": "Crackers",
+            "category": "food"
+        },
+        {
+            "prompt": "Sugar and",
+            "answer": "Spice",
+            "category": "food"
+        },
+        {
+            "prompt": "Milk and",
+            "answer": "Honey",
+            "category": "food"
+        },
+        {
+            "prompt": "Bangers and",
+            "answer": "Mash",
+            "category": "food"
+        },
+        {
+            "prompt": "Peaches and",
+            "answer": "Cream",
+            "category": "food"
+        },
+        {
+            "prompt": "Bubble and",
+            "answer": "Squeak",
+            "category": "food"
+        },
+        {
+            "prompt": "Apples and",
+            "answer": "Pears",
+            "category": "food"
+        },
+        {
+            "prompt": "Knife and",
+            "answer": "Fork",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Cup and",
+            "answer": "Saucer",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Hat and",
+            "answer": "Coat",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Lock and",
+            "answer": "Key",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Needle and",
+            "answer": "Thread",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Bow and",
+            "answer": "Arrow",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Bed and",
+            "answer": "Breakfast",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Shoes and",
+            "answer": "Socks",
+            "category": "clothing"
+        },
+        {
+            "prompt": "Soap and",
+            "answer": "Water",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Brush and",
+            "answer": "Comb",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Pen and",
+            "answer": "Paper",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Hammer and",
+            "answer": "Nails",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Horse and",
+            "answer": "Cart",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Thunder and",
+            "answer": "Lightning",
+            "category": "nature"
+        },
+        {
+            "prompt": "Sun and",
+            "answer": "Moon",
+            "category": "nature"
+        },
+        {
+            "prompt": "Day and",
+            "answer": "Night",
+            "category": "nature"
+        },
+        {
+            "prompt": "Cats and",
+            "answer": "Dogs",
+            "category": "animals"
+        },
+        {
+            "prompt": "Black and",
+            "answer": "White",
+            "category": "colours"
+        },
+        {
+            "prompt": "Hot and",
+            "answer": "Cold",
+            "category": "opposites"
+        },
+        {
+            "prompt": "Up and",
+            "answer": "Down",
+            "category": "opposites"
+        },
+        {
+            "prompt": "Left and",
+            "answer": "Right",
+            "category": "opposites"
+        },
+        {
+            "prompt": "Rock and",
+            "answer": "Roll",
+            "category": "music"
+        },
+        {
+            "prompt": "Noughts and",
+            "answer": "Crosses",
+            "category": "games"
+        },
+        {
+            "prompt": "Snakes and",
+            "answer": "Ladders",
+            "category": "games"
+        },
+        {
+            "prompt": "Sticks and",
+            "answer": "Stones",
+            "category": "idiom"
+        },
+        {
+            "prompt": "Huff and",
+            "answer": "Puff",
+            "category": "fairytale"
+        },
+        {
+            "prompt": "Rise and",
+            "answer": "Shine",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Peace and",
+            "answer": "Quiet",
+            "category": "everyday"
+        },
+        {
+            "prompt": "Safe and",
+            "answer": "Sound",
+            "category": "idiom"
+        },
+        {
+            "prompt": "Bags of",
+            "answer": "Fun",
+            "category": "idiom"
+        },
+        {
+            "prompt": "Odds and",
+            "answer": "Ends",
+            "category": "idiom"
+        }
+    ],
+    "grid_width": 3,
+    "grid_height": 3,
+    "common": true,
+    "llm": false
+}

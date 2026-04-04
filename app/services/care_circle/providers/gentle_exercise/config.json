@@ -1,0 +1,257 @@
+{
+    "name": "Gentle Exercise",
+    "description": "Simple seated exercises for gentle movement.",
+    "technical_summary": "Provides guided seated exercise instructions from a curated list with steps and benefit descriptions.",
+    "exercises": [
+        {
+            "name": "Seated Arm Raise",
+            "steps": "Sit comfortably. Slowly raise both arms above your head. Hold for 5 seconds. Lower slowly. Repeat 3 times.",
+            "benefit": "Improves shoulder mobility and circulation.",
+            "type": "arm",
+            "intensity": "low"
+        },
+        {
+            "name": "Ankle Circles",
+            "steps": "Sit in a chair with feet flat. Lift one foot and rotate your ankle in small circles \u00e2\u20ac\u201d 5 times one way, then 5 times the other. Switch feet.",
+            "benefit": "Keeps ankles flexible and helps prevent stiffness.",
+            "type": "leg",
+            "intensity": "low"
+        },
+        {
+            "name": "Gentle Neck Stretch",
+            "steps": "Sit tall. Slowly tilt your head to the right, bringing your ear toward your shoulder. Hold for 10 seconds. Return to center. Repeat on the left side.",
+            "benefit": "Relieves neck tension and improves range of motion.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Hand Squeeze",
+            "steps": "Hold a soft ball or rolled-up sock. Squeeze gently for 5 seconds. Release. Repeat 10 times with each hand.",
+            "benefit": "Strengthens grip and keeps fingers nimble.",
+            "type": "hand",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Marching",
+            "steps": "Sit tall in a chair. Slowly lift one knee up, then lower it. Alternate legs as if marching in place. Do 10 on each side.",
+            "benefit": "Gets your blood flowing and strengthens your legs.",
+            "type": "leg",
+            "intensity": "medium"
+        },
+        {
+            "name": "Shoulder Rolls",
+            "steps": "Sit up straight. Roll both shoulders forward in a slow circle 5 times. Then roll them backward 5 times.",
+            "benefit": "Releases shoulder tension and improves posture.",
+            "type": "arm",
+            "intensity": "low"
+        },
+        {
+            "name": "Finger Stretches",
+            "steps": "Hold one hand out flat. Spread your fingers wide and hold for 5 seconds. Then make a loose fist. Repeat 5 times on each hand.",
+            "benefit": "Keeps hands and fingers flexible and reduces stiffness.",
+            "type": "hand",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Side Bend",
+            "steps": "Sit tall. Place your right hand on your right thigh. Slowly reach your left arm up and lean gently to the right. Hold for 5 seconds. Repeat on the other side. Do 3 times each.",
+            "benefit": "Stretches the sides of your body and improves flexibility.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Chin Tucks",
+            "steps": "Sit tall. Gently pull your chin straight back, making a slight double chin. Hold for 5 seconds. Release. Repeat 5 times.",
+            "benefit": "Strengthens neck muscles and improves posture.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Toe Taps",
+            "steps": "Sit with both feet flat on the floor. Keeping your heels down, lift your toes up as high as comfortable. Lower them. Repeat 10 times.",
+            "benefit": "Improves circulation in the lower legs and feet.",
+            "type": "leg",
+            "intensity": "low"
+        },
+        {
+            "name": "Wrist Rotations",
+            "steps": "Extend your arms out in front of you. Slowly rotate your wrists in circles \u00e2\u20ac\u201d 5 times one direction, then 5 times the other.",
+            "benefit": "Keeps wrists mobile and can help with arthritis discomfort.",
+            "type": "hand",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Cat Stretch",
+            "steps": "Sit at the edge of your chair. Place both hands on your knees. Slowly arch your back and look up. Then gently round your back and look down. Repeat 3 times.",
+            "benefit": "Gently mobilizes the spine and relieves back tension.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Deep Breathing",
+            "steps": "Sit comfortably. Breathe in slowly through your nose for 4 counts. Hold gently for 2 counts. Breathe out slowly through your mouth for 6 counts. Repeat 5 times.",
+            "benefit": "Calms the mind, reduces stress, and improves oxygen flow.",
+            "type": "breathing",
+            "intensity": "low"
+        },
+        {
+            "name": "Eye Circles",
+            "steps": "Sit comfortably. Without moving your head, slowly move your eyes in a large circle \u00e2\u20ac\u201d up, to the side, down, and back. Do 3 slow circles each direction.",
+            "benefit": "Exercises eye muscles and can reduce eye strain.",
+            "type": "eye",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Heel Raises",
+            "steps": "Sit with feet flat on the floor. Keeping your toes on the ground, lift both heels as high as comfortable. Lower slowly. Repeat 10 times.",
+            "benefit": "Strengthens calf muscles and improves circulation.",
+            "type": "leg",
+            "intensity": "medium"
+        },
+        {
+            "name": "Ear to Shoulder Stretch",
+            "steps": "Sit tall. Drop your right ear slowly toward your right shoulder. Use your right hand to add very gentle pressure. Hold 10 seconds. Repeat on the left.",
+            "benefit": "Releases tight neck and upper shoulder muscles.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Torso Twist",
+            "steps": "Sit tall with hands on your thighs. Slowly turn your upper body to the right, looking over your right shoulder. Hold 5 seconds. Return to center. Repeat on the left. Do 3 times each side.",
+            "benefit": "Improves spinal rotation and digestion.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Thumb Touches",
+            "steps": "Hold one hand out. Touch your thumb to each fingertip one at a time \u00e2\u20ac\u201d index, middle, ring, little \u00e2\u20ac\u201d then back again. Repeat 3 times on each hand.",
+            "benefit": "Improves fine motor coordination and keeps fingers nimble.",
+            "type": "hand",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Forward Lean",
+            "steps": "Sit at the edge of your chair. Place hands on your knees. Slowly lean forward from the hips until you feel a gentle stretch in your lower back. Hold 10 seconds. Sit back up slowly.",
+            "benefit": "Gently stretches the lower back and hamstrings.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Lip Breathing",
+            "steps": "Breathe in slowly through your nose for 2 counts. Then breathe out through pursed lips (as if blowing out a candle) for 4 counts. Repeat 6 times.",
+            "benefit": "Slows breathing, improves lung efficiency, and is very calming.",
+            "type": "breathing",
+            "intensity": "low"
+        },
+        {
+            "name": "Clapping Hands",
+            "steps": "Hold your hands out in front of you. Clap slowly 10 times. Then clap with your left hand on top 10 times, and your right hand on top 10 times.",
+            "benefit": "Stimulates circulation in the hands and is a gentle coordination exercise.",
+            "type": "hand",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Hip Circles",
+            "steps": "Sit at the edge of your chair, feet flat. Place hands on your hips. Slowly make small circles with your hips \u00e2\u20ac\u201d 5 times one way, 5 times the other.",
+            "benefit": "Loosens the hip joints and lower back.",
+            "type": "leg",
+            "intensity": "medium"
+        },
+        {
+            "name": "Eyebrow Raises",
+            "steps": "Sit comfortably. Raise your eyebrows up as high as you can. Hold for 3 seconds. Let them relax. Repeat 5 times.",
+            "benefit": "Exercises the muscles of the forehead and face.",
+            "type": "eye",
+            "intensity": "low"
+        },
+        {
+            "name": "Gentle Fist Pumps",
+            "steps": "Make a loose fist with both hands. Slowly pump your arms up and down \u00e2\u20ac\u201d not too high, just a gentle rhythm. Do 20 pumps.",
+            "benefit": "Raises heart rate slightly and warms up the upper body.",
+            "type": "arm",
+            "intensity": "medium"
+        },
+        {
+            "name": "Knee Lifts with Clap",
+            "steps": "Sit tall. Lift your right knee. As it rises, clap your hands under it. Lower. Repeat on the left. Alternate for 10 total \u00e2\u20ac\u201d 5 each side.",
+            "benefit": "Combines arm and leg movement for gentle whole-body coordination.",
+            "type": "compound",
+            "intensity": "medium"
+        },
+        {
+            "name": "Shoulder Squeeze",
+            "steps": "Sit tall. Bring both shoulders back and squeeze your shoulder blades together. Hold for 5 seconds. Release. Repeat 8 times.",
+            "benefit": "Strengthens upper back and counteracts rounded posture.",
+            "type": "arm",
+            "intensity": "low"
+        },
+        {
+            "name": "Head Turns",
+            "steps": "Sit tall. Slowly turn your head to the right as far as comfortable. Hold 5 seconds. Return to center. Repeat on the left. Do 4 times each side.",
+            "benefit": "Improves neck flexibility and reduces stiffness.",
+            "type": "stretch",
+            "intensity": "low"
+        },
+        {
+            "name": "Gentle Leg Extension",
+            "steps": "Sit tall. Slowly straighten your right leg out in front of you. Hold for 5 seconds. Lower slowly. Repeat with the left leg. Do 5 times each side.",
+            "benefit": "Strengthens the thighs and keeps knees flexible.",
+            "type": "leg",
+            "intensity": "medium"
+        },
+        {
+            "name": "Elbow Circles",
+            "steps": "Raise both arms and touch your shoulders with your fingertips. Slowly make large circles with your elbows \u00e2\u20ac\u201d forward 5 times, then backward 5 times.",
+            "benefit": "Warms up the shoulders and upper arms.",
+            "type": "arm",
+            "intensity": "low"
+        },
+        {
+            "name": "Seated Star Stretch",
+            "steps": "Sit at the edge of your chair. Spread your arms out wide and extend your legs slightly out to the sides. Take a deep breath in as you expand. Breathe out as you return to center. Repeat 4 times.",
+            "benefit": "A gentle full-body stretch that feels refreshing and energizing.",
+            "type": "compound",
+            "intensity": "low"
+        }
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "exercise_types": [
+                "breathing",
+                "eye",
+                "hand"
+            ],
+            "max_repetitions": 5,
+            "hold_seconds": 5,
+            "intensity_filter": "low"
+        },
+        "medium": {
+            "exercise_types": [
+                "breathing",
+                "eye",
+                "hand",
+                "stretch",
+                "arm"
+            ],
+            "max_repetitions": 10,
+            "hold_seconds": 10,
+            "intensity_filter": "low"
+        },
+        "hard": {
+            "exercise_types": [
+                "arm",
+                "leg",
+                "stretch",
+                "compound"
+            ],
+            "max_repetitions": 15,
+            "hold_seconds": 15,
+            "intensity_filter": "medium"
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": false
+}

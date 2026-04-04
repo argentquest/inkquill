@@ -1,0 +1,11 @@
+<div class="section section--cat_fact">
+    <h2 class="section__title">🐱 Fun Cat Fact</h2>
+    <div class="pet-photo">
+        <div class="pet-photo__content">
+            <p class="section__body pet-photo__caption">{{ fact }}</p>
+        </div>
+        {% if image_url %}
+        <img class="pet-photo__image" src="{{ image_url }}" alt="A cute cat">
+        {% endif %}
+    </div>
+</div>

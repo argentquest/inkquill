@@ -1,0 +1,24 @@
+{
+    "grid_width": 2,
+    "grid_height": 3,
+    "common": true,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    },
+    "color_pairs": [
+        {"color": "Red", "object": "Apple", "options": ["Apple", "Banana", "Grape"]},
+        {"color": "Yellow", "object": "Sunflower", "options": ["Sunflower", "Rose", "Tulip"]},
+        {"color": "Blue", "object": "Sky", "options": ["Sky", "Grass", "Cloud"]},
+        {"color": "Green", "object": "Grass", "options": ["Grass", "Ocean", "Fire"]},
+        {"color": "Orange", "object": "Orange", "options": ["Orange", "Apple", "Lemon"]},
+        {"color": "Purple", "object": "Grape", "options": ["Grape", "Carrot", "Sky"]},
+        {"color": "White", "object": "Snow", "options": ["Snow", "Leaf", "Mud"]},
+        {"color": "Brown", "object": "Chocolate", "options": ["Chocolate", "Sky", "Lemon"]},
+        {"color": "Pink", "object": "Rose", "options": ["Rose", "Grass", "Ocean"]},
+        {"color": "Black", "object": "Night Sky", "options": ["Night Sky", "Snow", "Sun"]}
+    ]
+}

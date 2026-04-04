@@ -1,0 +1,351 @@
+{
+    "name": "Finish the Phrase",
+    "description": "Complete familiar sayings and song lyrics.",
+    "technical_summary": "Provides common phrases and song lyrics with missing endings. Era-tagged so content matches the user's generation.",
+    "phrases": [
+        {
+            "phrase": "A penny saved is a penny",
+            "answer": "earned",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Measure twice, cut",
+            "answer": "once",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Every cloud has a silver",
+            "answer": "lining",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Home is where the heart",
+            "answer": "is",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "The early bird catches the",
+            "answer": "worm",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "An apple a day keeps the doctor",
+            "answer": "away",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "A stitch in time saves",
+            "answer": "nine",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Don't count your chickens before they",
+            "answer": "hatch",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Where there's smoke, there's",
+            "answer": "fire",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Too many cooks spoil the",
+            "answer": "broth",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "The more the",
+            "answer": "merrier",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "All that glitters is not",
+            "answer": "gold",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Actions speak louder than",
+            "answer": "words",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Better late than",
+            "answer": "never",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Birds of a feather flock",
+            "answer": "together",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Don't bite the hand that",
+            "answer": "feeds you",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Good things come to those who",
+            "answer": "wait",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "If you can't beat them,",
+            "answer": "join them",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Keep your friends close and your enemies",
+            "answer": "closer",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Laughter is the best",
+            "answer": "medicine",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Look before you",
+            "answer": "leap",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "No news is",
+            "answer": "good news",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Practice makes",
+            "answer": "perfect",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "The grass is always greener on the other",
+            "answer": "side",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Two wrongs don't make a",
+            "answer": "right",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "When life gives you lemons, make",
+            "answer": "lemonade",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "You can't judge a book by its",
+            "answer": "cover",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "You can lead a horse to water but you can't make it",
+            "answer": "drink",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Absence makes the heart grow",
+            "answer": "fonder",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Don't put all your eggs in one",
+            "answer": "basket",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Rome wasn't built in a",
+            "answer": "day",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Somewhere over the",
+            "answer": "rainbow",
+            "category": "lyric",
+            "era": "1930s",
+            "artist": "Judy Garland"
+        },
+        {
+            "phrase": "We'll meet again, don't know where, don't know",
+            "answer": "when",
+            "category": "lyric",
+            "era": "1940s",
+            "artist": "Vera Lynn"
+        },
+        {
+            "phrase": "You are my sunshine, my only",
+            "answer": "sunshine",
+            "category": "lyric",
+            "era": "1940s"
+        },
+        {
+            "phrase": "Que sera, sera, whatever will be,",
+            "answer": "will be",
+            "category": "lyric",
+            "era": "1950s",
+            "artist": "Doris Day"
+        },
+        {
+            "phrase": "Love me tender, love me",
+            "answer": "sweet",
+            "category": "lyric",
+            "era": "1950s",
+            "artist": "Elvis Presley"
+        },
+        {
+            "phrase": "Rock around the",
+            "answer": "clock",
+            "category": "lyric",
+            "era": "1950s",
+            "artist": "Bill Haley"
+        },
+        {
+            "phrase": "You'll never walk",
+            "answer": "alone",
+            "category": "lyric",
+            "era": "1950s"
+        },
+        {
+            "phrase": "Moon river, wider than a",
+            "answer": "mile",
+            "category": "lyric",
+            "era": "1960s",
+            "artist": "Andy Williams"
+        },
+        {
+            "phrase": "Yesterday, all my troubles seemed so far",
+            "answer": "away",
+            "category": "lyric",
+            "era": "1960s",
+            "artist": "The Beatles"
+        },
+        {
+            "phrase": "What the world needs now is love,",
+            "answer": "sweet love",
+            "category": "lyric",
+            "era": "1960s"
+        },
+        {
+            "phrase": "Those were the",
+            "answer": "days",
+            "category": "lyric",
+            "era": "1960s",
+            "artist": "Mary Hopkin"
+        },
+        {
+            "phrase": "Leaving on a jet",
+            "answer": "plane",
+            "category": "lyric",
+            "era": "1960s",
+            "artist": "John Denver"
+        },
+        {
+            "phrase": "I can see clearly",
+            "answer": "now",
+            "category": "lyric",
+            "era": "1970s",
+            "artist": "Johnny Nash"
+        },
+        {
+            "phrase": "You light up my",
+            "answer": "life",
+            "category": "lyric",
+            "era": "1970s"
+        },
+        {
+            "phrase": "Don't stop",
+            "answer": "believin'",
+            "category": "lyric",
+            "era": "1980s",
+            "artist": "Journey"
+        },
+        {
+            "phrase": "What a wonderful",
+            "answer": "world",
+            "category": "lyric",
+            "era": "all",
+            "artist": "Louis Armstrong"
+        },
+        {
+            "phrase": "Fly me to the",
+            "answer": "moon",
+            "category": "lyric",
+            "era": "1950s",
+            "artist": "Frank Sinatra"
+        },
+        {
+            "phrase": "My way or the",
+            "answer": "highway",
+            "category": "idiom",
+            "era": "all"
+        },
+        {
+            "phrase": "Every rose has its",
+            "answer": "thorn",
+            "category": "lyric",
+            "era": "1980s"
+        }
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "categories": [
+                "idiom"
+            ],
+            "hint_available": true,
+            "show_first_letter": true
+        },
+        "medium": {
+            "categories": [
+                "idiom",
+                "lyric"
+            ],
+            "hint_available": true,
+            "show_first_letter": false
+        },
+        "hard": {
+            "categories": [
+                "idiom",
+                "lyric"
+            ],
+            "hint_available": false,
+            "show_first_letter": false,
+            "timed": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": false
+}

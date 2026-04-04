@@ -1,0 +1,13 @@
+{
+    "grid_width": 2,
+    "grid_height": 3,
+    "common": true,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    },
+    "fallback_description": "A warm and happy memory from times gone by."
+}

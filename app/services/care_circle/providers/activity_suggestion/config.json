@@ -1,0 +1,11 @@
+{
+    "name": "Activity Suggestion",
+    "description": "A gentle, warm suggestion to enjoy one of your favourite activities today.",
+    "technical_summary": "Picks a random item from profile.preferences.favorite_activities and generates a 2-sentence LLM invitation to enjoy it today.",
+    "fallback_activities": ["a gentle walk", "listening to music", "sitting in the garden"],
+    "fallback_text": "Today would be a lovely day to do something you enjoy. It always brings such warmth and happiness.",
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

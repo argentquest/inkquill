@@ -1,0 +1,24 @@
+<div class="section section--word-connect">
+    <h2 class="section__title">🔗 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body word-connect">
+        {% for pair in pairs %}
+        <div class="word-connect__pair">
+            <div class="word-connect__word">
+                {{ pair.word1 }}
+            </div>
+            <div class="word-connect__word">
+                {{ pair.word2 }}
+            </div>
+        </div>
+        {% endfor %}
+        <p class="section__body section__body--italic text-muted mt-md word-connect__note">(Answers are upside down below)</p>
+        <div class="word-connect__answers">
+            {% for pair in pairs %}
+            <span class="word-connect__answer">
+                {{ pair.word1 }} ⟷ {{ pair.word2 }}: {{ pair.connection }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+</div>

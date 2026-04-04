@@ -1,0 +1,43 @@
+{
+    "name": "Nature Scene",
+    "description": "Peaceful nature scenes with calming descriptions.",
+    "technical_summary": "Provides static nature-themed image prompts with calming descriptive text from curated list. No external API required.",
+    "image_width": 600,
+    "image_height": 400,
+    "descriptions": [
+        "Take a moment to look at this beautiful scene. Breathe in and imagine you are there.",
+        "Nature has a way of making everything feel calm. Enjoy this peaceful view.",
+        "Close your eyes after looking at this picture. Can you imagine the sounds of nature?",
+        "What does this picture remind you of? Maybe a place you visited long ago.",
+        "Isnt this lovely? Nature always has something beautiful to show us.",
+        "Imagine walking slowly through this scene. What would you see and hear?",
+        "The colors of nature are so soothing. Notice the greens, blues, and earth tones.",
+        "Picture yourself sitting in this peaceful place with a warm drink in your hands."
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "description_sentences": 2,
+            "image_enabled": true,
+            "prompt_complexity": "simple",
+            "sensory_details": false
+        },
+        "medium": {
+            "description_sentences": 3,
+            "image_enabled": true,
+            "prompt_complexity": "moderate",
+            "sensory_details": false
+        },
+        "hard": {
+            "description_sentences": 4,
+            "image_enabled": true,
+            "prompt_complexity": "rich",
+            "sensory_details": true,
+            "include_memory_prompt": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 4,
+    "common": true,
+    "llm": true
+}

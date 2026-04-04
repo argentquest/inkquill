@@ -1,0 +1,118 @@
+/* Shared provider styling for PDF/print rendering. */
+
+@page {
+    size: letter portrait;
+    margin: 0;
+}
+
+html,
+body {
+    font-family: Verdana, Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.newsletter-page {
+    padding: var(--print-page-padding, 24px);
+}
+
+.newsletter-hero {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.newsletter-hero__title {
+    margin: 0 0 6px;
+    font-size: 34px;
+    line-height: 1.1;
+    color: #0f172a;
+}
+
+.newsletter-hero__date {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0ea5e9;
+}
+
+.newsletter-card,
+.newsletter-provider {
+    margin-bottom: 18px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.newsletter-card {
+    padding: 16px;
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.newsletter-card--hopper {
+    background: #fef3c7;
+    border-color: #fcd34d;
+}
+
+.newsletter-card__title {
+    margin: 0 0 8px;
+    font-size: 20px;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.newsletter-card__body {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #1e293b;
+}
+
+.section {
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 12px;
+}
+
+.section__title {
+    margin: 0 0 4px;
+    font-size: 18px;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.section__subtitle {
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.section__body {
+    font-size: 14px;
+    line-height: 1.45;
+    color: #1e293b;
+}
+
+.section__body--italic {
+    font-style: italic;
+}
+
+.text-muted {
+    color: #64748b;
+}
+
+.mt-md {
+    margin-top: 8px;
+}

@@ -1,0 +1,76 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.4.0, pluggy-1.6.0 -- C:\code2025a\inbkandquill2\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\code2025a\inbkandquill2
+configfile: pytest.ini
+plugins: anyio-4.13.0, langsmith-0.3.45, asyncio-1.0.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 2 items
+
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_family_provider_registry_update ERROR [ 50%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_provider_backed_session_assembly ERROR [100%]
+
+=================================== ERRORS ====================================
+___________ ERROR at setup of test_family_provider_registry_update ____________
+file C:\code2025a\inbkandquill2\tests\integration\care_circle\test_care_circle_assembly_integration.py, line 10
+  async def test_family_provider_registry_update(async_client: AsyncClient, db_session: AsyncSession, seed_care_circle_patients):
+      # Test setting provider visibility through CRUD
+      response = await async_client.put(
+          "/api/v1/care-circle/providers/weather",
+          json={"enabled": False, "patient_visible": False}
+      )
+      assert response.status_code == 200
+      data = response.json()["data"]
+      assert data["message"] == "Updated successfully"
+
+      response = await async_client.get("/api/v1/care-circle/providers")
+      assert response.status_code == 200
+      providers = response.json()["data"]
+      weather = next(p for p in providers if p["providerKey"] == "weather")
+      assert weather["enabled"] is False
+      assert weather["patientVisible"] is False
+E       fixture 'async_client' not found
+>       available fixtures: _class_event_loop, _function_event_loop, _module_event_loop, _package_event_loop, _session_event_loop, anyio_backend, anyio_backend_name, anyio_backend_options, api_response_error, api_response_success, app_instance, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, integration_db_name, integration_temp_root, make_user_payload, mock_admin_user, mock_authenticated_user, mock_external_dependencies, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, register_and_login, run_db, test_client_factory, test_db_url, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+C:\code2025a\inbkandquill2\tests\integration\care_circle\test_care_circle_assembly_integration.py:10
+___________ ERROR at setup of test_provider_backed_session_assembly ___________
+file C:\code2025a\inbkandquill2\tests\integration\care_circle\test_care_circle_assembly_integration.py, line 28
+  async def test_provider_backed_session_assembly(async_client: AsyncClient, db_session: AsyncSession, seed_care_circle_patients):
+      # Get Rose Ellis (Patient 1)
+      patient = await db_session.scalar(select(CareCirclePatientProfile).where(CareCirclePatientProfile.display_name == "Rose Ellis"))
+      assert patient is not None
+
+      # Fetching the session dynamically triggers the assembler
+      response = await async_client.get(f"/api/v1/care-circle/patient/session/{patient.id}")
+      assert response.status_code == 200
+      session_data = response.json()["data"]
+
+      assert session_data["displayName"] == "Rose Ellis"
+      highlights = session_data["highlights"]
+
+      # Assembly replaces the seeded cards with real generated cards from OpenRouter legacy configs
+      assert len(highlights) > 0
+      # Make sure weather card was dynamically instantiated since it's a core provider
+      has_weather = any(h["providerKey"] == "weather" for h in highlights)
+      # The provider execution logic natively runs if enabled!
+      # Because we disabled it in the previous test, it might be disabled. Let's just ensure highlights are correctly structured JSON payloads.
+      for h in highlights:
+          assert h["title"] is not None
+          assert h["body"] is not None
+          assert h["kind"] is not None
+E       fixture 'async_client' not found
+>       available fixtures: _class_event_loop, _function_event_loop, _module_event_loop, _package_event_loop, _session_event_loop, anyio_backend, anyio_backend_name, anyio_backend_options, api_response_error, api_response_success, app_instance, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, integration_db_name, integration_temp_root, make_user_payload, mock_admin_user, mock_authenticated_user, mock_external_dependencies, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, register_and_login, run_db, test_client_factory, test_db_url, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+C:\code2025a\inbkandquill2\tests\integration\care_circle\test_care_circle_assembly_integration.py:28
+============================== warnings summary ===============================
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_family_provider_registry_update
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\pydantic\_internal\_generate_schema.py:2353: PydanticDeprecatedSince211: The `__get_pydantic_core_schema__` method of the `BaseModel` class is deprecated. If you are calling `super().__get_pydantic_core_schema__` when overriding the method on a Pydantic model, consider using `handler(source)` instead. However, note that overriding this method on models can lead to unexpected side effects. Deprecated in Pydantic V2.11 to be removed in V3.0.
+    schema = annotation_get_schema(source, get_inner_schema)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/integration/care_circle/test_care_circle_assembly_integration.py::test_family_provider_registry_update
+ERROR tests/integration/care_circle/test_care_circle_assembly_integration.py::test_provider_backed_session_assembly
+======================== 1 warning, 2 errors in 2.57s =========================

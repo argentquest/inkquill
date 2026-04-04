@@ -1,0 +1,268 @@
+/*
+ * Theme: Soft Pastel
+ * Gentle, calming colors with rounded shapes.
+ * Lower visual intensity for comfort-focused readers.
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 22px;
+    line-height: 1.7;
+    color: #374151;
+    background: #fefce8;
+}
+
+.section {
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+    border: 2px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.section__title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed currentColor;
+}
+
+.section__body {
+    font-size: 23px;
+    font-weight: 500;
+    line-height: 1.8;
+}
+
+.section__body--italic {
+    font-style: italic;
+}
+
+.section__body--large {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.section__subtitle {
+    font-size: 17px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    opacity: 0.6;
+}
+
+/* === Provider Colors (soft pastels) === */
+
+/* Sky — weather */
+.section--weather {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+}
+.section--weather .section__title {
+    color: #0c4a6e;
+    border-color: #bae6fd;
+}
+
+/* Periwinkle — news and history */
+.section--world-news,
+.section--this_day_history,
+.section--local_history {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+.section--world-news .section__title,
+.section--this_day_history .section__title,
+.section--local_history .section__title {
+    color: #3730a3;
+    border-color: #c7d2fe;
+}
+
+/* Honey — nostalgia, trivia, quotes, music */
+.section--nostalgia,
+.section--ai_trivia,
+.section--daily_quote,
+.section--song-of-the-day {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__title,
+.section--ai_trivia .section__title,
+.section--daily_quote .section__title,
+.section--song-of-the-day .section__title {
+    color: #92400e;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__body,
+.section--ai_trivia .section__body {
+    color: #a16207;
+}
+
+/* Peach — hobbies, pets, recipes */
+.section--hobby_spotlight,
+.section--simple_recipe,
+.section--cat_fact,
+.section--dog_photo {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.section--hobby_spotlight .section__title,
+.section--simple_recipe .section__title,
+.section--cat_fact .section__title,
+.section--dog_photo .section__title {
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+
+/* Mint — brain games and logic puzzles */
+.section--puzzle,
+.section--brain_booster,
+.section--riddle,
+.section--spot-the-difference,
+.section--finish-phrase {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+.section--puzzle .section__title,
+.section--brain_booster .section__title,
+.section--riddle .section__title,
+.section--spot-the-difference .section__title,
+.section--finish-phrase .section__title {
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+/* Aqua — word puzzles */
+.section--missing-vowels,
+.section--word-scramble,
+.section--gridless-crossword,
+.section--complete-the-duo,
+.section--odd-one-out {
+    background: #f0fdfa;
+    border-color: #99f6e4;
+}
+.section--missing-vowels .section__title,
+.section--word-scramble .section__title,
+.section--gridless-crossword .section__title,
+.section--complete-the-duo .section__title,
+.section--odd-one-out .section__title {
+    color: #134e4a;
+    border-color: #99f6e4;
+}
+
+/* Sage — nature, movement, and activity */
+.section--nature_scene,
+.section--gentle_exercise,
+.section--activity_suggestion {
+    background: #f7fee7;
+    border-color: #d9f99d;
+}
+.section--nature_scene .section__title,
+.section--gentle_exercise .section__title,
+.section--activity_suggestion .section__title {
+    color: #3f6212;
+    border-color: #d9f99d;
+}
+
+/* Lavender — jokes and sensory */
+.section--joke,
+.section--sensory {
+    background: #faf5ff;
+    border-color: #e9d5ff;
+}
+.section--joke .section__title,
+.section--sensory .section__title {
+    color: #581c87;
+    border-color: #e9d5ff;
+}
+
+/* Lilac — affirmations and gratitude */
+.section--gratitude,
+.section--daily_affirmation,
+.section--personal_affirmation {
+    background: #fdf4ff;
+    border-color: #f0abfc;
+}
+.section--gratitude .section__title,
+.section--daily_affirmation .section__title,
+.section--personal_affirmation .section__title {
+    color: #701a75;
+    border-color: #f0abfc;
+}
+
+/* Blush — personal letters and family */
+.section--family_greeting,
+.section--family {
+    background: #fff1f2;
+    border-color: #fda4af;
+    text-align: center;
+}
+.section--family_greeting .section__title,
+.section--family .section__title {
+    color: #9f1239;
+    border-color: #fda4af;
+}
+.section--family_greeting .section__body,
+.section--family .section__body {
+    color: #be123c;
+}
+.section--pen-pal-letter {
+    background: #fff1f2;
+    border-color: #fda4af;
+}
+.section--pen-pal-letter .section__title {
+    color: #9f1239;
+    border-color: #fda4af;
+}
+
+/* === Utilities === */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #9ca3af;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 28px;
+}
+
+.text-2xl {
+    font-size: 36px;
+}
+
+.mt-md {
+    margin-top: 16px;
+}
+
+.mb-md {
+    margin-bottom: 16px;
+}
+
+.divider {
+    border-top: 2px dashed #e5e7eb;
+    margin: 20px 0;
+}
+
+@media print {
+    body {
+        background: #fff;
+    }
+
+    .section {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+}

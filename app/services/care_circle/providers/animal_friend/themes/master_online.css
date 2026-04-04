@@ -1,0 +1,28 @@
+.animal-friend {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px;
+}
+
+.animal-friend__image {
+    flex: 0 0 70%;
+    width: 70%;
+    max-width: 260px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+.animal-friend__fallback {
+    flex: 0 0 70%;
+    width: 70%;
+    padding: 36px;
+    font-size: 120px;
+    line-height: 1;
+}
+
+.animal-friend__fact {
+    flex: 0 0 30%;
+    margin: 0;
+    font-style: italic;
+}

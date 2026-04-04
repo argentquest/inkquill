@@ -1,0 +1,10 @@
+{
+    "name": "Personal Affirmation",
+    "description": "A loving affirmation written just for you, using your name.",
+    "technical_summary": "Uses recipient_name and a random item from profile.preferences.favorite_activities to generate a personalised 2-sentence LLM affirmation.",
+    "fallback_text": "You are loved and you bring joy to everyone around you.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": true
+}

@@ -1,0 +1,44 @@
+{
+    "name": "Sensory Activity",
+    "description": "Gentle sensory suggestions to engage your senses calmly.",
+    "technical_summary": "Provides sensory activity suggestions based on user favorite_singer preference. Templates support variable substitution.",
+    "default_singer": "Frank Sinatra",
+    "suggestions": [
+        "Todays suggested activity: Have a warm cup of tea and listen to {singer}.",
+        "Take a moment to smell the lavender or vanilla lotion in your bathroom.",
+        "Rub a soft, fuzzy blanket between your hands and enjoy the warmth.",
+        "Listen to the birds singing outside your window. Can you count how many you hear?",
+        "Feel the texture of your favorite sweater. What memories does it bring back?",
+        "Take three slow, deep breaths. Notice how calm your body feels.",
+        "Run cool water over your hands and feel it flow between your fingers.",
+        "Close your eyes and listen to your favorite song by {singer}. Hum along if you like.",
+        "Smell a fresh orange or lemon. Does it remind you of anything?",
+        "Feel the warmth of sunlight coming through the window on your skin."
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "sense_count": 1,
+            "activity_duration": "short",
+            "include_memory_prompt": false,
+            "guidance_level": "detailed"
+        },
+        "medium": {
+            "sense_count": 2,
+            "activity_duration": "moderate",
+            "include_memory_prompt": true,
+            "guidance_level": "moderate"
+        },
+        "hard": {
+            "sense_count": 3,
+            "activity_duration": "extended",
+            "include_memory_prompt": true,
+            "guidance_level": "minimal",
+            "mindfulness_focus": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

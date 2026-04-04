@@ -1,0 +1,30 @@
+{
+    "name": "This Day in History",
+    "description": "Historical events that happened on this day.",
+    "technical_summary": "Fetches historical events from ByAbbe API for the current month/day. Falls back to static message on API failure.",
+    "api_url": "https://byabbe.se/on-this-day/{month}/{day}/events.json",
+    "fallback": "Many wonderful things have happened on this day throughout history!",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "event_count": 1,
+            "description_length": "brief",
+            "language": "simple"
+        },
+        "medium": {
+            "event_count": 2,
+            "description_length": "moderate",
+            "language": "moderate"
+        },
+        "hard": {
+            "event_count": 3,
+            "description_length": "detailed",
+            "language": "detailed",
+            "include_context": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": true
+}

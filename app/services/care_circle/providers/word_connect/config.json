@@ -1,0 +1,29 @@
+{
+    "grid_width": 2,
+    "grid_height": 3,
+    "common": true,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    },
+    "word_pairs": [
+        {"word1": "Sun", "word2": "Sky", "connection": "Both are in the sky"},
+        {"word1": "Cat", "word2": "Meow", "connection": "Cats say meow"},
+        {"word1": "Bread", "word2": "Butter", "connection": "They go together"},
+        {"word1": "Day", "word2": "Night", "connection": "Opposites of the day"},
+        {"word1": "Dog", "word2": "Bark", "connection": "Dogs bark"},
+        {"word1": "Rain", "word2": "Umbrella", "connection": "Keeps you dry"},
+        {"word1": "Book", "word2": "Read", "connection": "You read a book"},
+        {"word1": "Coffee", "word2": "Morning", "connection": "People drink it in the morning"},
+        {"word1": "Snow", "word2": "Winter", "connection": "Happens in winter"},
+        {"word1": "Flower", "word2": "Garden", "connection": "Flowers grow in gardens"},
+        {"word1": "Phone", "word2": "Call", "connection": "You make a call"},
+        {"word1": "Bed", "word2": "Sleep", "connection": "You sleep in a bed"},
+        {"word1": "Water", "word2": "Thirst", "connection": "Water quenches thirst"},
+        {"word1": "Music", "word2": "Song", "connection": "A song is music"},
+        {"word1": "Chair", "word2": "Sit", "connection": "You sit on a chair"}
+    ]
+}

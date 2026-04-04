@@ -1,0 +1,40 @@
+{
+    "name": "Gratitude",
+    "description": "Prompts to reflect on things you are grateful for.",
+    "technical_summary": "Provides gratitude prompts from a curated list to encourage positive reflection and memory recall.",
+    "prompts": [
+        "What is one thing that made you smile yesterday?",
+        "Think of someone you love. Whats your favorite memory with them?",
+        "What is your favorite meal? Who used to make it for you?",
+        "Name three things you can see right now that are beautiful.",
+        "What sound makes you feel calm and peaceful?",
+        "Who is someone that always made you laugh?",
+        "What is a place you loved to visit? Imagine you are there right now.",
+        "What is the best gift you ever received?",
+        "Think about a pet you loved. What was their name?",
+        "What season do you enjoy the most? What do you love about it?"
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "prompt_count": 1,
+            "include_followup": false,
+            "response_style": "open"
+        },
+        "medium": {
+            "prompt_count": 1,
+            "include_followup": true,
+            "response_style": "guided"
+        },
+        "hard": {
+            "prompt_count": 2,
+            "include_followup": true,
+            "response_style": "reflective",
+            "deep_reflection": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": true,
+    "llm": true
+}

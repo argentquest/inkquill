@@ -80,12 +80,12 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - [x] Build a family patient list route with active, inactive, and archived-state handling.
 - [x] Build a patient detail hub for family-side management actions.
 - [x] Build the first patient post-login session surface as a calm daily-highlights view with minimal actions.
-- [ ] Build the first version of the realtime family event feed route.
-- [ ] Build the first version of the shared family media library route.
+- [x] Build the first version of the realtime family event feed route.
+- [x] Build the first version of the shared family media library route.
 - [x] Add route-safe handling for patient archive and access deactivation states.
 - [x] Add Playwright coverage for family entry, patient direct login, patient-state restrictions, and calm daily-session rendering.
-- [ ] Capture patient login, family event feed, and patient-state behavior in `uiBehaviorCapture.md`.
-- [ ] Capture family-managed patient preference behavior and patient daily-session behavior in `uiBehaviorCapture.md`.
+- [x] Capture patient login, family event feed, and patient-state behavior in `uiBehaviorCapture.md`.
+- [x] Capture family-managed patient preference behavior and patient daily-session behavior in `uiBehaviorCapture.md`.
 - [x] Verify family-owned billing and family-context loading assumptions against backend contracts.
 
 ## Exit Criteria

@@ -27,4 +27,25 @@ test.describe("Care Circle DailyNewsletter import", () => {
     await expect(page.getByText("Family hello")).toBeVisible();
     await expect(page.getByText("Memory lane")).toBeVisible();
   });
+  test("family provider registry correctly maps catalog data", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/providers");
+
+    await expect(page.getByRole("heading", { name: "Content Providers" })).toBeVisible();
+    await expect(page.getByText("Review and configure the content providers available")).toBeVisible();
+    
+    // Test the mock provider renders natively
+    await expect(page.getByRole("heading", { name: "Weather" })).toBeVisible();
+    await expect(page.getByText("Active").first()).toBeVisible();
+  });
+
+  test("family provider details navigate accurately", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/providers/weather");
+
+    await expect(page.getByRole("heading", { name: "Weather" })).toBeVisible();
+    await expect(page.getByText("weather")).toBeVisible();
+    await expect(page.getByText("Safe for Direct Display")).toBeVisible();
+    await expect(page.getByRole('link', { name: "Back to Providers" })).toBeVisible();
+  });
 });

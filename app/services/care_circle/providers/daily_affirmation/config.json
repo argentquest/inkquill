@@ -1,0 +1,30 @@
+{
+    "name": "Daily Affirmation",
+    "description": "Positive affirmation to start your day with hope.",
+    "technical_summary": "Fetches affirmations from affirmations.dev API. Falls back to default affirmation on failure.",
+    "api_url": "https://www.affirmations.dev/",
+    "fallback": "You are loved. You are enough. You matter.",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "length": "short",
+            "include_action": false,
+            "tone": "warm"
+        },
+        "medium": {
+            "length": "medium",
+            "include_action": true,
+            "tone": "encouraging"
+        },
+        "hard": {
+            "length": "long",
+            "include_action": true,
+            "tone": "empowering",
+            "include_journal_prompt": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": true,
+    "llm": false
+}

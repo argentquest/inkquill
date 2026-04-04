@@ -1,0 +1,240 @@
+/*
+ * Theme: High Contrast
+ * Maximum readability for low-vision users.
+ * Bold black/white with vivid accent borders.
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Verdana', 'Arial', sans-serif;
+    font-size: 24px;
+    line-height: 1.7;
+    color: #000000;
+    background: #ffffff;
+}
+
+.section {
+    padding: 32px;
+    margin-bottom: 28px;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    background: #ffffff;
+}
+
+.section__title {
+    font-size: 38px;
+    font-weight: 900;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 4px solid #000000;
+    color: #000000;
+}
+
+.section__body {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.8;
+    color: #000000;
+}
+
+.section__body--italic {
+    font-style: italic;
+}
+
+.section__body--large {
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.section__subtitle {
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+/* === Provider Borders (vivid colors on white) === */
+
+/* Slate — weather */
+.section--weather {
+    border-color: #0369a1;
+}
+.section--weather .section__title {
+    color: #0c4a6e;
+}
+
+/* Blue — news and history */
+.section--world-news,
+.section--this_day_history,
+.section--local_history {
+    border-color: #1d4ed8;
+}
+.section--world-news .section__title,
+.section--this_day_history .section__title,
+.section--local_history .section__title {
+    color: #1e3a8a;
+}
+
+/* Amber — nostalgia, trivia, quotes, music */
+.section--nostalgia,
+.section--ai_trivia,
+.section--daily_quote,
+.section--song-of-the-day {
+    border-color: #b45309;
+}
+.section--nostalgia .section__title,
+.section--ai_trivia .section__title,
+.section--daily_quote .section__title,
+.section--song-of-the-day .section__title {
+    color: #78350f;
+}
+
+/* Orange — hobbies, pets, recipes */
+.section--hobby_spotlight,
+.section--simple_recipe,
+.section--cat_fact,
+.section--dog_photo {
+    border-color: #c2410c;
+}
+.section--hobby_spotlight .section__title,
+.section--simple_recipe .section__title,
+.section--cat_fact .section__title,
+.section--dog_photo .section__title {
+    color: #7c2d12;
+}
+
+/* Green — brain games and logic puzzles */
+.section--puzzle,
+.section--brain_booster,
+.section--riddle,
+.section--spot-the-difference,
+.section--finish-phrase {
+    border-color: #047857;
+}
+.section--puzzle .section__title,
+.section--brain_booster .section__title,
+.section--riddle .section__title,
+.section--spot-the-difference .section__title,
+.section--finish-phrase .section__title {
+    color: #064e3b;
+}
+
+/* Teal — word puzzles */
+.section--missing-vowels,
+.section--word-scramble,
+.section--gridless-crossword,
+.section--complete-the-duo,
+.section--odd-one-out {
+    border-color: #0f766e;
+}
+.section--missing-vowels .section__title,
+.section--word-scramble .section__title,
+.section--gridless-crossword .section__title,
+.section--complete-the-duo .section__title,
+.section--odd-one-out .section__title {
+    color: #134e4a;
+}
+
+/* Lime — nature, movement, and activity */
+.section--nature_scene,
+.section--gentle_exercise,
+.section--activity_suggestion {
+    border-color: #4d7c0f;
+}
+.section--nature_scene .section__title,
+.section--gentle_exercise .section__title,
+.section--activity_suggestion .section__title {
+    color: #365314;
+}
+
+/* Indigo — jokes and sensory */
+.section--joke,
+.section--sensory {
+    border-color: #4338ca;
+}
+.section--joke .section__title,
+.section--sensory .section__title {
+    color: #312e81;
+}
+
+/* Purple — affirmations and gratitude */
+.section--gratitude,
+.section--daily_affirmation,
+.section--personal_affirmation {
+    border-color: #7c3aed;
+}
+.section--gratitude .section__title,
+.section--daily_affirmation .section__title,
+.section--personal_affirmation .section__title {
+    color: #4c1d95;
+}
+
+/* Rose — personal letters and family */
+.section--family_greeting,
+.section--pen-pal-letter,
+.section--family {
+    border-color: #be123c;
+}
+.section--family_greeting .section__title,
+.section--pen-pal-letter .section__title,
+.section--family .section__title {
+    color: #881337;
+}
+.section--family_greeting,
+.section--family {
+    text-align: center;
+}
+.section--family_greeting .section__body,
+.section--family .section__body {
+    font-weight: 800;
+}
+
+/* === Utilities === */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #374151;
+}
+
+.text-bold {
+    font-weight: 800;
+}
+
+.text-xl {
+    font-size: 34px;
+}
+
+.text-2xl {
+    font-size: 42px;
+}
+
+.mt-md {
+    margin-top: 16px;
+}
+
+.mb-md {
+    margin-bottom: 16px;
+}
+
+.divider {
+    border-top: 4px solid #000000;
+    margin: 24px 0;
+}
+
+@media print {
+    body {
+        background: #fff;
+    }
+
+    .section {
+        break-inside: avoid;
+    }
+}

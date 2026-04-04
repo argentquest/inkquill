@@ -1,0 +1,13 @@
+<div class="section section--song-of-the-day">
+    <h2 class="section__title">🎵 Song of the Day</h2>
+    <div class="song-of-the-day">
+        {% if image %}
+        <img class="song-of-the-day__image" src="{{ image }}" alt="{{ artist }}">
+        {% endif %}
+        <div class="song-of-the-day__content">
+            <p class="song-of-the-day__song">{{ song }}</p>
+            <p class="song-of-the-day__artist">{{ artist }}{% if year %} &mdash; {{ year }}{% endif %}</p>
+            <p class="song-of-the-day__fact">{{ fact }}</p>
+        </div>
+    </div>
+</div>

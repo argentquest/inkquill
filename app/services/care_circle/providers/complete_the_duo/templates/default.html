@@ -1,0 +1,16 @@
+<div class="section section--complete-the-duo">
+    <h2 class="section__title">🤝 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body complete-the-duo">
+        {% for pair in pairs %}
+        <div class="complete-the-duo__row">
+            <span class="complete-the-duo__prompt">{{ loop.index }}. {{ pair.prompt }}</span>
+            <span class="complete-the-duo__blank">&nbsp;</span>
+        </div>
+        {% endfor %}
+        <p class="section__body section__body--italic text-muted mt-md">(Answers below — upside down)</p>
+        <div class="complete-the-duo__answers">
+            {% for pair in pairs %}<span>{{ loop.index }}. {{ pair.answer }}</span>{% endfor %}
+        </div>
+    </div>
+</div>

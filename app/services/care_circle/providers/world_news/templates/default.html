@@ -1,0 +1,14 @@
+<div class="section section--world-news">
+    <h2 class="section__title">🌍 World News</h2>
+    <div class="world-news">
+        {% for story in stories %}
+        <div class="world-news__story">
+            <span class="world-news__index">{{ loop.index }}.</span>
+            <div class="world-news__content">
+                <p class="world-news__title">{{ story.title }}</p>
+                <p class="world-news__summary">{{ story.summary }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

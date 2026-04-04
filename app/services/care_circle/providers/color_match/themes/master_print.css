@@ -1,0 +1,30 @@
+.color-match {
+    padding: 8px 4px;
+    text-align: center;
+}
+
+.color-match__options {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.color-match__option {
+    min-width: 68px;
+    padding: 8px 14px;
+    border: 1px solid #059669;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.color-match__answer {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    transform: rotate(180deg);
+}

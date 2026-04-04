@@ -1,0 +1,64 @@
+{
+    "name": "Daily Riddle",
+    "description": "Fun riddles with answers to ponder.",
+    "technical_summary": "Provides riddles with questions and answers from a curated configurable list.",
+    "riddles": [
+        {
+            "question": "What has hands but cant clap?",
+            "answer": "A clock"
+        },
+        {
+            "question": "What has a head and a tail but no body?",
+            "answer": "A coin"
+        },
+        {
+            "question": "What gets wetter the more it dries?",
+            "answer": "A towel"
+        },
+        {
+            "question": "What can you catch but not throw?",
+            "answer": "A cold"
+        },
+        {
+            "question": "What has keys but no locks?",
+            "answer": "A piano"
+        },
+        {
+            "question": "What goes up but never comes down?",
+            "answer": "Your age"
+        },
+        {
+            "question": "What has a neck but no head?",
+            "answer": "A bottle"
+        },
+        {
+            "question": "What has four legs but cant walk?",
+            "answer": "A table"
+        }
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "type": "object",
+            "hint_available": true,
+            "auto_reveal_answer": true,
+            "reveal_delay_seconds": 10
+        },
+        "medium": {
+            "type": "mixed",
+            "hint_available": true,
+            "auto_reveal_answer": false,
+            "reveal_on_tap": true
+        },
+        "hard": {
+            "type": "abstract",
+            "hint_available": false,
+            "auto_reveal_answer": false,
+            "reveal_on_tap": false
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": true
+}

@@ -1,0 +1,284 @@
+{
+    "name": "Song of the Day",
+    "description": "Classic songs from the era you love.",
+    "technical_summary": "Provides era-appropriate song recommendations from a curated list of classic artists.",
+    "artists": [
+        {
+            "name": "Gordon Lightfoot",
+            "era": "1960s-1970s",
+            "genre": "Folk",
+            "songs": [
+                "If You Could Read My Mind",
+                "Sundown",
+                "The Wreck of the Edmund Fitzgerald",
+                "Carefree Highway",
+                "Early Morning Rain"
+            ]
+        },
+        {
+            "name": "Neil Young",
+            "era": "1960s-1970s",
+            "genre": "Folk Rock",
+            "songs": [
+                "Heart of Gold",
+                "Harvest Moon",
+                "Old Man",
+                "Comes a Time",
+                "Helpless"
+            ]
+        },
+        {
+            "name": "Leonard Cohen",
+            "era": "1960s-1970s",
+            "genre": "Folk",
+            "songs": [
+                "Suzanne",
+                "Hallelujah",
+                "So Long, Marianne",
+                "Bird on the Wire",
+                "Sisters of Mercy"
+            ]
+        },
+        {
+            "name": "The Beatles",
+            "era": "1960s",
+            "genre": "Rock",
+            "songs": [
+                "Yesterday",
+                "Let It Be",
+                "Hey Jude",
+                "In My Life",
+                "Here Comes the Sun",
+                "Blackbird",
+                "Something"
+            ]
+        },
+        {
+            "name": "Frank Sinatra",
+            "era": "1950s-1960s",
+            "genre": "Jazz/Pop",
+            "songs": [
+                "Fly Me to the Moon",
+                "My Way",
+                "New York, New York",
+                "The Best Is Yet to Come",
+                "Strangers in the Night",
+                "Summer Wind"
+            ]
+        },
+        {
+            "name": "Doris Day",
+            "era": "1950s",
+            "genre": "Pop",
+            "songs": [
+                "Que Sera Sera",
+                "Que Sera Sera",
+                "Secret Love",
+                "It's Magic",
+                "Sentimental Journey",
+                "Perhaps Perhaps Perhaps"
+            ]
+        },
+        {
+            "name": "Elvis Presley",
+            "era": "1950s-1960s",
+            "genre": "Rock and Roll",
+            "songs": [
+                "Love Me Tender",
+                "Are You Lonesome Tonight",
+                "Can't Help Falling in Love",
+                "Suspicious Minds",
+                "Hound Dog",
+                "Blue Suede Shoes"
+            ]
+        },
+        {
+            "name": "Nat King Cole",
+            "era": "1950s-1960s",
+            "genre": "Jazz/Pop",
+            "songs": [
+                "Unforgettable",
+                "Mona Lisa",
+                "L-O-V-E",
+                "When I Fall in Love",
+                "Autumn Leaves",
+                "Smile"
+            ]
+        },
+        {
+            "name": "Patsy Cline",
+            "era": "1950s-1960s",
+            "genre": "Country",
+            "songs": [
+                "Crazy",
+                "I Fall to Pieces",
+                "Walkin' After Midnight",
+                "Sweet Dreams",
+                "She's Got You"
+            ]
+        },
+        {
+            "name": "Johnny Cash",
+            "era": "1950s-1970s",
+            "genre": "Country",
+            "songs": [
+                "Ring of Fire",
+                "I Walk the Line",
+                "Man in Black",
+                "Folsom Prison Blues",
+                "Jackson"
+            ]
+        },
+        {
+            "name": "Judy Garland",
+            "era": "1930s-1940s",
+            "genre": "Classic",
+            "songs": [
+                "Somewhere Over the Rainbow",
+                "Have Yourself a Merry Little Christmas",
+                "The Trolley Song",
+                "Get Happy"
+            ]
+        },
+        {
+            "name": "Bing Crosby",
+            "era": "1940s-1950s",
+            "genre": "Classic Pop",
+            "songs": [
+                "White Christmas",
+                "Pennies from Heaven",
+                "Blue Skies",
+                "Swinging on a Star",
+                "In the Cool Cool Cool of the Evening"
+            ]
+        },
+        {
+            "name": "Dean Martin",
+            "era": "1950s-1960s",
+            "genre": "Pop",
+            "songs": [
+                "That's Amore",
+                "Everybody Loves Somebody",
+                "Volare",
+                "Sway",
+                "Return to Me"
+            ]
+        },
+        {
+            "name": "Joni Mitchell",
+            "era": "1960s-1970s",
+            "genre": "Folk",
+            "songs": [
+                "Big Yellow Taxi",
+                "Both Sides Now",
+                "The Circle Game",
+                "River",
+                "A Case of You"
+            ]
+        },
+        {
+            "name": "Jim Reeves",
+            "era": "1950s-1960s",
+            "genre": "Country",
+            "songs": [
+                "He'll Have to Go",
+                "Welcome to My World",
+                "Distant Drums",
+                "Four Walls",
+                "Am I Losing You"
+            ]
+        },
+        {
+            "name": "Perry Como",
+            "era": "1940s-1960s",
+            "genre": "Pop",
+            "songs": [
+                "Catch a Falling Star",
+                "Magic Moments",
+                "And I Love You So",
+                "It's Impossible",
+                "Don't Let the Stars Get in Your Eyes"
+            ]
+        },
+        {
+            "name": "Andy Williams",
+            "era": "1960s-1970s",
+            "genre": "Pop",
+            "songs": [
+                "Moon River",
+                "Can't Take My Eyes Off You",
+                "Happy Heart",
+                "Love Story",
+                "Where Do I Begin"
+            ]
+        },
+        {
+            "name": "John Denver",
+            "era": "1970s",
+            "genre": "Folk/Country",
+            "songs": [
+                "Take Me Home Country Roads",
+                "Rocky Mountain High",
+                "Sunshine on My Shoulders",
+                "Annie's Song",
+                "Leaving on a Jet Plane"
+            ]
+        },
+        {
+            "name": "Vera Lynn",
+            "era": "1940s",
+            "genre": "Classic",
+            "songs": [
+                "We'll Meet Again",
+                "The White Cliffs of Dover",
+                "A Nightingale Sang in Berkeley Square",
+                "Yours"
+            ]
+        },
+        {
+            "name": "Louis Armstrong",
+            "era": "1950s-1960s",
+            "genre": "Jazz",
+            "songs": [
+                "What a Wonderful World",
+                "La Vie en Rose",
+                "Hello Dolly",
+                "We Have All the Time in the World",
+                "When the Saints Go Marching In"
+            ]
+        }
+    ],
+    "fallback_fact": "Music has a way of bringing back beautiful memories. Enjoy this classic song!",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "familiarity": "well_known",
+            "include_lyrics_hint": true,
+            "include_memory_prompt": false,
+            "preferred_artists": [
+                "Frank Sinatra",
+                "Elvis Presley",
+                "The Beatles",
+                "Doris Day",
+                "Nat King Cole"
+            ]
+        },
+        "medium": {
+            "familiarity": "popular",
+            "include_lyrics_hint": false,
+            "include_memory_prompt": true,
+            "preferred_artists": []
+        },
+        "hard": {
+            "familiarity": "deep_cut",
+            "include_lyrics_hint": false,
+            "include_memory_prompt": true,
+            "include_trivia": true,
+            "preferred_artists": []
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": true
+}

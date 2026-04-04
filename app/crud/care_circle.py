@@ -241,6 +241,16 @@ async def list_provider_catalog(db: AsyncSession) -> list[dict[str, Any]]:
 async def get_patient_auth_catalog() -> list[dict[str, str]]:
     return PATIENT_AUTH_CATALOG
 
+async def update_provider_catalog(db: AsyncSession, provider_key: str, enabled: bool, patient_visible: bool):
+    provider = await db.scalar(select(CareCircleProviderCatalog).where(CareCircleProviderCatalog.provider_key == provider_key))
+    if not provider:
+        return None
+    provider.enabled = enabled
+    provider.patient_visible = patient_visible
+    await db.commit()
+    await db.refresh(provider)
+    return provider
+
 
 async def authenticate_patient_by_images(db: AsyncSession, selected_keys: list[str]) -> dict[str, Any] | None:
     unique_keys = []

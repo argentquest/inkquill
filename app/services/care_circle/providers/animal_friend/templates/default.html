@@ -1,0 +1,13 @@
+<div class="section section--animal-friend">
+    <h2 class="section__title">🐾 {{ title | default("Animal Friend") }}</h2>
+    <div class="animal-friend">
+        {% if image_url %}
+        <img src="{{ image_url }}" alt="{{ animal }}" class="animal-friend__image">
+        {% else %}
+        <div class="animal-friend__fallback">🐕</div>
+        {% endif %}
+        <p class="section__body section__body--large animal-friend__fact">
+            {{ fact }}
+        </p>
+    </div>
+</div>

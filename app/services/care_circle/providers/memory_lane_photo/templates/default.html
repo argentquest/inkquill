@@ -1,0 +1,13 @@
+<div class="section section--memory-lane-photo memory-lane-photo">
+    <h2 class="section__title memory-lane-photo__title">📷 Memory Lane</h2>
+    <div class="memory-lane-photo__frame">
+        {% if image_url %}
+        <img src="{{ image_url }}" alt="Vintage memory" class="memory-lane-photo__image">
+        {% endif %}
+        <div class="memory-lane-photo__content">
+            <p class="section__body section__body--large memory-lane-photo__description">
+                {{ description }}
+            </p>
+        </div>
+    </div>
+</div>

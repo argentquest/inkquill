@@ -1,0 +1,34 @@
+{
+    "grid_width": 2,
+    "grid_height": 2,
+    "common": true,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    },
+    "blessings": [
+        "May your day be filled with gentle joy and peaceful moments.",
+        "You are a blessing to everyone who knows you.",
+        "May the warmth of the sun bring a smile to your heart today.",
+        "You are loved more than you know.",
+        "Today is a gift. Enjoy every moment.",
+        "May your heart be light and your spirit be calm.",
+        "You bring so much happiness to those around you.",
+        "May peace find you wherever you go today.",
+        "Your smile makes the world a better place.",
+        "You are stronger than you know and loved more than you realize.",
+        "May this day bring you moments of quiet happiness.",
+        "You are a treasure to your family and friends.",
+        "Today, may you feel the warmth of love all around you.",
+        "Every day with you is a blessing to us all.",
+        "May your heart be filled with gratitude today.",
+        "You make the world a kinder place just by being in it.",
+        "May the simple pleasures of today bring you great joy.",
+        "You are a shining light to everyone who loves you.",
+        "Today, know that you are thought of with warmth and care.",
+        "May your day be as wonderful as you are."
+    ]
+}

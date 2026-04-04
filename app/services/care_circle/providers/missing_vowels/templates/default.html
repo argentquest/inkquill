@@ -1,0 +1,14 @@
+<div class="section section--missing-vowels">
+    <h2 class="section__title">🔤 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body missing-vowels">
+        <p class="missing-vowels__puzzle">
+            {{ puzzle }}
+        </p>
+        {% if hint %}
+        <p class="missing-vowels__hint">{{ hint }}</p>
+        {% endif %}
+        <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
+        <p class="section__body missing-vowels__answer">{{ answer }}</p>
+    </div>
+</div>

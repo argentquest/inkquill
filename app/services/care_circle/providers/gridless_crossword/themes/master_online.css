@@ -1,0 +1,105 @@
+.gridless-crossword__word-bank {
+    margin-bottom: 24px;
+    padding: 16px;
+    text-align: center;
+    border-radius: 8px;
+    background: #e0f2fe;
+}
+
+.gridless-crossword__bank-title {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0369a1;
+}
+
+.gridless-crossword__bank-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.gridless-crossword__bank-chip {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: #fff;
+    color: #1e40af;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.gridless-crossword__clue {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+.gridless-crossword__clue-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.gridless-crossword__clue-number {
+    min-width: 24px;
+    color: #3b82f6;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.gridless-crossword__clue-length {
+    min-width: 45px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.gridless-crossword__clue-text {
+    font-size: 15px;
+}
+
+.gridless-crossword__secret-hint {
+    margin-top: 20px;
+    padding: 12px;
+    text-align: center;
+    border-radius: 6px;
+    background: #fef3c7;
+}
+
+.gridless-crossword__secret-text {
+    margin: 0;
+    color: #92400e;
+    font-size: 13px;
+}
+
+.gridless-crossword__answers {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.gridless-crossword__answers-note {
+    font-size: 12px;
+}
+
+.gridless-crossword__answers-list {
+    margin-top: 8px;
+    text-align: center;
+    transform: rotate(180deg);
+}
+
+.gridless-crossword__answer-chip {
+    display: inline-block;
+    margin: 3px;
+    font-size: 16px;
+}
+
+.gridless-crossword__secret-answer {
+    margin-top: 16px;
+    color: #059669;
+    font-size: 18px;
+    font-weight: 700;
+}

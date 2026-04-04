@@ -1,0 +1,14 @@
+.pen-pal-letter {
+    padding: 16px;
+    border: 2px solid #f59e0b;
+    border-radius: 8px;
+    background: #fffbeb;
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.9;
+}
+
+.pen-pal-letter__text {
+    margin: 0;
+    font-size: 20px;
+    white-space: pre-line;
+}

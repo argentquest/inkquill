@@ -1,0 +1,54 @@
+.spot-the-difference {
+    padding: 8px;
+}
+
+.spot-the-difference__lists {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.spot-the-difference__list {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.spot-the-difference__list--a {
+    border: 1px solid #1e40af;
+}
+
+.spot-the-difference__list--b {
+    border: 1px solid #9d174d;
+}
+
+.spot-the-difference__label {
+    margin: 0 0 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.spot-the-difference__label--a {
+    color: #1e40af;
+}
+
+.spot-the-difference__label--b {
+    color: #9d174d;
+}
+
+.spot-the-difference__word {
+    margin: 0;
+    padding: 4px 0;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.spot-the-difference__answer {
+    margin-top: 6px;
+    text-align: center;
+    font-weight: 700;
+    transform: rotate(180deg);
+}

@@ -1,0 +1,329 @@
+/*
+ * Theme: Grid Print
+ * Compact, print-optimised styles for the GridAssembler PDF output.
+ *
+ * Design goals:
+ *   - Card content fits inside small grid cells (font-size 14–15 px)
+ *   - Backgrounds and borders print reliably (print-color-adjust: exact)
+ *   - @page rule prevents browser-default margin from doubling Playwright's margin
+ *   - Inherits the same color palette as classic.css for visual consistency
+ *   - Compatible with BEM classes used by all provider templates:
+ *       .section, .section__title, .section__body, .section__subtitle
+ *
+ * Usage: GridAssembler injects this file once at document level. Individual
+ * provider card fragments are rendered WITHOUT any embedded theme CSS so
+ * that this single source of truth applies uniformly.
+ */
+
+/* ── Page setup ─────────────────────────────────────────── */
+
+@page {
+    size: letter portrait;
+    /* Set to 0 so only the Playwright margin= parameter controls margins.
+       Without this rule the browser may add its own default @page margin
+       on top of the Playwright-supplied value, causing double-indentation. */
+    margin: 0;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    font-family: 'Verdana', 'Arial', sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #1e293b;
+    background: #ffffff;
+    /* Ensure colored backgrounds and borders print, not just text. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ── Section card ───────────────────────────────────────── */
+
+.section {
+    height: 100%;
+    overflow: hidden;
+}
+
+.section__title {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
+    border-bottom: 2px solid currentColor;
+    line-height: 1.2;
+}
+
+.section__body {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.section__body--italic {
+    font-style: italic;
+}
+
+.section__body--large {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.section__subtitle {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+    opacity: 0.7;
+}
+
+/* ── Generic element sizing inside grid cards ───────────── */
+
+p, li, td {
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+h2, h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+ul, ol {
+    margin: 3px 0 0 12px;
+    padding: 0;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* ── Provider colour variants ───────────────────────────── */
+
+/* Slate — weather */
+.section--weather {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+.section--weather .section__title {
+    color: #1e293b;
+    border-color: #cbd5e1;
+}
+
+/* Blue — news and history */
+.section--world-news,
+.section--this_day_history,
+.section--local_history {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+.section--world-news .section__title,
+.section--this_day_history .section__title,
+.section--local_history .section__title {
+    color: #1e3a8a;
+    border-color: #bfdbfe;
+}
+
+/* Amber — nostalgia, trivia, quotes, music */
+.section--nostalgia,
+.section--ai_trivia,
+.section--daily_quote,
+.section--song-of-the-day,
+.section--song_of_the_day {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__title,
+.section--ai_trivia .section__title,
+.section--daily_quote .section__title,
+.section--song-of-the-day .section__title,
+.section--song_of_the_day .section__title {
+    color: #78350f;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__body,
+.section--ai_trivia .section__body {
+    color: #92400e;
+}
+
+/* Orange — hobbies, pets, recipes */
+.section--hobby_spotlight,
+.section--simple_recipe,
+.section--cat_fact,
+.section--dog_photo {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.section--hobby_spotlight .section__title,
+.section--simple_recipe .section__title,
+.section--cat_fact .section__title,
+.section--dog_photo .section__title {
+    color: #7c2d12;
+    border-color: #fed7aa;
+}
+
+/* Green — brain games and logic puzzles */
+.section--puzzle,
+.section--brain_booster,
+.section--riddle,
+.section--spot-the-difference,
+.section--spot_the_difference,
+.section--finish-phrase,
+.section--finish_phrase {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+.section--puzzle .section__title,
+.section--brain_booster .section__title,
+.section--riddle .section__title,
+.section--spot-the-difference .section__title,
+.section--spot_the_difference .section__title,
+.section--finish-phrase .section__title,
+.section--finish_phrase .section__title {
+    color: #064e3b;
+    border-color: #a7f3d0;
+}
+
+/* Teal — word puzzles */
+.section--missing-vowels,
+.section--missing_vowels,
+.section--word-scramble,
+.section--word_scramble,
+.section--gridless-crossword,
+.section--gridless_crossword,
+.section--complete-the-duo,
+.section--complete_the_duo,
+.section--odd-one-out,
+.section--odd_one_out {
+    background: #f0fdfa;
+    border-color: #99f6e4;
+}
+.section--missing-vowels .section__title,
+.section--missing_vowels .section__title,
+.section--word-scramble .section__title,
+.section--word_scramble .section__title,
+.section--gridless-crossword .section__title,
+.section--gridless_crossword .section__title,
+.section--complete-the-duo .section__title,
+.section--complete_the_duo .section__title,
+.section--odd-one-out .section__title,
+.section--odd_one_out .section__title {
+    color: #134e4a;
+    border-color: #99f6e4;
+}
+
+/* Lime — nature, movement, and activity */
+.section--nature_scene,
+.section--gentle_exercise,
+.section--activity_suggestion {
+    background: #f7fee7;
+    border-color: #d9f99d;
+}
+.section--nature_scene .section__title,
+.section--gentle_exercise .section__title,
+.section--activity_suggestion .section__title {
+    color: #365314;
+    border-color: #d9f99d;
+}
+
+/* Indigo — jokes and sensory */
+.section--joke,
+.section--sensory {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+.section--joke .section__title,
+.section--sensory .section__title {
+    color: #312e81;
+    border-color: #c7d2fe;
+}
+
+/* Purple — affirmations and gratitude */
+.section--gratitude,
+.section--daily_affirmation,
+.section--personal_affirmation {
+    background: #faf5ff;
+    border-color: #e9d5ff;
+}
+.section--gratitude .section__title,
+.section--daily_affirmation .section__title,
+.section--personal_affirmation .section__title {
+    color: #581c87;
+    border-color: #e9d5ff;
+}
+
+/* Rose — personal letters and family */
+.section--family_greeting,
+.section--family {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    text-align: center;
+}
+.section--family_greeting .section__title,
+.section--family .section__title {
+    color: #881337;
+    border-color: #fecdd3;
+}
+.section--family_greeting .section__body,
+.section--family .section__body {
+    color: #9f1239;
+    font-weight: 700;
+}
+.section--pen-pal-letter,
+.section--pen_pal_letter {
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+.section--pen-pal-letter .section__title,
+.section--pen_pal_letter .section__title {
+    color: #881337;
+    border-color: #fecdd3;
+}
+
+/* ── Utilities ──────────────────────────────────────────── */
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #64748b;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 15px;
+}
+
+.text-2xl {
+    font-size: 16px;
+}
+
+.mt-md {
+    margin-top: 6px;
+}
+
+.mb-md {
+    margin-bottom: 6px;
+}
+
+.divider {
+    border-top: 1px solid #e2e8f0;
+    margin: 6px 0;
+}

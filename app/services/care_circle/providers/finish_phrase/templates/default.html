@@ -1,0 +1,16 @@
+<div class="section section--finish-phrase">
+    <h2 class="section__title">💬 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body finish-phrase">
+        <p class="finish-phrase__phrase">
+            {{ phrase }}
+        </p>
+        {% if hint %}
+        <p class="finish-phrase__hint">
+            {{ hint }}
+        </p>
+        {% endif %}
+        <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
+        <p class="section__body finish-phrase__answer">{{ answer }}</p>
+    </div>
+</div>

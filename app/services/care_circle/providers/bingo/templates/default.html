@@ -1,0 +1,24 @@
+<div class="section section--bingo">
+    <h2 class="section__title">🎯 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body bingo">
+        <table class="bingo__table">
+            <tr class="bingo__header-row">
+                <th class="bingo__header-cell">B</th>
+                <th class="bingo__header-cell">I</th>
+                <th class="bingo__header-cell">N</th>
+                <th class="bingo__header-cell">G</th>
+                <th class="bingo__header-cell">O</th>
+            </tr>
+            {% for row in card %}
+            <tr>
+                {% for cell in row %}
+                <td class="bingo__cell{% if cell == 'FREE' %} bingo__cell--free{% endif %}">
+                    {{ cell }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>

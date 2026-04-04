@@ -1,0 +1,25 @@
+.missing-vowels {
+    padding: 10px;
+    text-align: center;
+}
+
+.missing-vowels__puzzle {
+    margin: 0;
+    font-family: monospace;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 4px;
+}
+
+.missing-vowels__hint {
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.missing-vowels__answer {
+    margin-top: 8px;
+    text-align: center;
+    font-weight: 700;
+    transform: rotate(180deg);
+}

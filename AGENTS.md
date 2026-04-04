@@ -60,11 +60,11 @@ This file defines how coding agents should operate in this repository.
 ```
 - Unit + integration (current stable subset):
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests\unit tests\integration --ignore=tests/integration/test_document_upload_integration.py --ignore=tests/integration/test_image_generation_integration.py -q
+.\.venv\Scripts\python.exe -m pytest tests\unit tests\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py -q
 ```
 - Coverage (backend API profile):
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests\unit tests\integration --ignore=tests/integration/test_document_upload_integration.py --ignore=tests/integration/test_image_generation_integration.py --cov --cov-config=.coveragerc.backend_api --cov-report=term -q
+.\.venv\Scripts\python.exe -m pytest tests\unit tests\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py --cov --cov-config=.coveragerc.backend_api --cov-report=term -q
 ```
 - Frontend build:
 ```powershell

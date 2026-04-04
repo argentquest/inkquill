@@ -1,0 +1,112 @@
+{
+    "name": "Gridless Crossword",
+    "description": "A daily word puzzle with 10 clues - the first letters of answers spell a secret word.",
+    "grid_width": 8,
+    "grid_height": 6,
+    "day_categories": {
+        "0": "nature",
+        "1": "food",
+        "2": "daily_life",
+        "3": "entertainment",
+        "4": "memories",
+        "5": "nature",
+        "6": "food"
+    },
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "word_count": 10,
+            "min_word_len": 4,
+            "max_word_len": 8,
+            "secret_word_len": 10
+        },
+        "medium": {
+            "word_count": 10,
+            "min_word_len": 5,
+            "max_word_len": 9,
+            "secret_word_len": 10
+        },
+        "hard": {
+            "word_count": 10,
+            "min_word_len": 6,
+            "max_word_len": 10,
+            "secret_word_len": 10
+        }
+    },
+    "secret_words": {
+        "nature": [
+            "BLOSSOM",
+            "MEADOW",
+            "SUNSHINE",
+            "BUTTERFLY"
+        ],
+        "food": [
+            "DELICIOUS",
+            "APPETITE",
+            "BREAKFAST",
+            "SWEETNESS"
+        ],
+        "daily_life": [
+            "HAPPINESS",
+            "COMFORT",
+            "KINDNESS",
+            "FRIENDSHIP"
+        ],
+        "entertainment": [
+            "ADVENTURE",
+            "MUSIC",
+            "LAUGHTER",
+            "ENTERTAIN"
+        ],
+        "memories": [
+            "TREASURE",
+            "REMEMBER",
+            "NOSTALGIA",
+            "CHERISH"
+        ]
+    },
+    "fallback_words": [
+        {
+            "word": "ORBIT",
+            "clue": "The curved path of a celestial object around a star or planet."
+        },
+        {
+            "word": "COMET",
+            "clue": "A 'dirty snowball' that develops a tail when near the sun."
+        },
+        {
+            "word": "NEBULA",
+            "clue": "A giant cloud of dust and gas in space where stars are born."
+        },
+        {
+            "word": "ZENITH",
+            "clue": "The point in the sky directly above an observer."
+        },
+        {
+            "word": "ECLIPSE",
+            "clue": "The obscuring of light from one celestial body by another."
+        },
+        {
+            "word": "GALAXY",
+            "clue": "A massive system of stars, gas, and dust held together by gravity."
+        },
+        {
+            "word": "ASTEROID",
+            "clue": "A small rocky body orbiting the sun, mainly between Mars and Jupiter."
+        },
+        {
+            "word": "PLANET",
+            "clue": "A large body that orbits a star and does not produce its own light."
+        },
+        {
+            "word": "SATELLITE",
+            "clue": "An object that orbits a larger body in space, either natural or artificial."
+        },
+        {
+            "word": "TELESCOPE",
+            "clue": "An instrument used to view distant objects in space."
+        }
+    ],
+    "common": true,
+    "llm": true
+}

@@ -1,0 +1,83 @@
+{
+    "name": "Brain Booster",
+    "description": "Simple cognitive prompts to keep your mind engaged.",
+    "technical_summary": "Provides phrase-completion and either/or style cognitive prompts from configurable prompt list for mental engagement.",
+    "prompts": [
+        {
+            "type": "phrase",
+            "prompt": "Finish the phrase: An apple a day keeps the...",
+            "answer": "doctor away"
+        },
+        {
+            "type": "phrase",
+            "prompt": "Finish the phrase: A penny saved is a penny...",
+            "answer": "earned"
+        },
+        {
+            "type": "phrase",
+            "prompt": "Finish the phrase: The early bird catches the...",
+            "answer": "worm"
+        },
+        {
+            "type": "phrase",
+            "prompt": "Finish the phrase: Home is where the heart...",
+            "answer": "is"
+        },
+        {
+            "type": "phrase",
+            "prompt": "Finish the phrase: A stitch in time saves...",
+            "answer": "nine"
+        },
+        {
+            "type": "phrase",
+            "prompt": "Finish the phrase: When it rains, it...",
+            "answer": "pours"
+        },
+        {
+            "type": "either_or",
+            "prompt": "Which do you prefer: Chocolate ice cream or Vanilla?",
+            "answer": ""
+        },
+        {
+            "type": "either_or",
+            "prompt": "Did you prefer going to the beach or the mountains?",
+            "answer": ""
+        },
+        {
+            "type": "either_or",
+            "prompt": "Which sounds better: A warm cup of tea or hot cocoa?",
+            "answer": ""
+        }
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "prompt_types": [
+                "phrase"
+            ],
+            "hint_available": true,
+            "auto_reveal_answer": true
+        },
+        "medium": {
+            "prompt_types": [
+                "phrase",
+                "either_or"
+            ],
+            "hint_available": true,
+            "auto_reveal_answer": false
+        },
+        "hard": {
+            "prompt_types": [
+                "phrase",
+                "either_or"
+            ],
+            "hint_available": false,
+            "auto_reveal_answer": false,
+            "timed": true
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": true,
+    "llm": true
+}

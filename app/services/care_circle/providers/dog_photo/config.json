@@ -1,0 +1,30 @@
+{
+    "name": "Dog Photo",
+    "description": "A cheerful dog photo to brighten your day.",
+    "technical_summary": "Fetches random dog images from dog.ceo API with optional breed specification. Includes configurable caption.",
+    "api_url": "https://dog.ceo/api/breeds/image/random",
+    "default_caption": "Heres a friendly pup to brighten your day!",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "caption_style": "simple",
+            "include_breed_fact": false,
+            "include_activity": false
+        },
+        "medium": {
+            "caption_style": "descriptive",
+            "include_breed_fact": true,
+            "include_activity": false
+        },
+        "hard": {
+            "caption_style": "interactive",
+            "include_breed_fact": true,
+            "include_activity": true,
+            "activity_prompt": "Can you think of a name for this dog?"
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 4,
+    "common": true,
+    "llm": false
+}

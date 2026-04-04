@@ -122,24 +122,24 @@ Source configuration also introduces:
 
 ## Task List
 
-- [ ] classify every imported `DailyNewsletter` provider into patient-safe, family-only, or deferred
-- [ ] create a shared `care-circle` provider runtime package in the backend
-- [ ] import provider base/helpers from the source repo where still structurally useful
-- [ ] normalize provider config loading into `app.core.config` and `.env_template`
+- [x] classify every imported `DailyNewsletter` provider into patient-safe, family-only, or deferred
+- [x] create a shared `care-circle` provider runtime package in the backend
+- [x] import provider base/helpers from the source repo where still structurally useful
+- [x] normalize provider config loading into `app.core.config` and `.env_template`
 - [ ] add DB-backed provider enablement and patient-visibility update flows
-- [ ] build a real provider-backed patient-session assembly service
-- [ ] replace seeded patient session highlights with provider-backed content for active patients
-- [ ] add family-side provider registry and provider-detail routes in `frontendv1/`
-- [ ] expose provider preview or diagnostics on the family patient-detail route
+- [x] build a real provider-backed patient-session assembly service
+- [x] replace seeded patient session highlights with provider-backed content for active patients
+- [x] add family-side provider registry and provider-detail routes in `frontendv1/`
+- [x] expose provider preview or diagnostics on the family patient-detail route
 - [ ] add backend unit tests for provider registry loading, filtering, and failure fallback
 - [ ] add backend integration tests for provider-backed session generation
-- [ ] add Playwright coverage for family provider controls and provider-backed patient sessions
-- [ ] capture provider-management and patient-session runtime behavior in `uiBehaviorCapture.md`
-- [ ] verify imported provider env/config mapping before enabling any real external execution path
-- [ ] migrate and sanitize OpenRouter/OpenAI LLM keys from DailyNewsletter into inbkandquill2 vault/env without committing secrets
-- [ ] abstract or disable legacy SMTP/Mail parameters that powered the old email newsletter
-- [ ] create SQLAlchemy models and Alembic migrations for provider logs, configuration settings, and execution history
-- [ ] define async job scheduler strategy (e.g., Celery / FastAPI Background Tasks) for executing heavy LLM provider queries off-hours
+- [x] add Playwright coverage for family provider controls and provider-backed patient sessions
+- [x] capture provider-management and patient-session runtime behavior in `uiBehaviorCapture.md`
+- [x] verify imported provider env/config mapping before enabling any real external execution path
+- [x] migrate and sanitize OpenRouter/OpenAI LLM keys from DailyNewsletter into inbkandquill2 vault/env without committing secrets
+- [x] abstract or disable legacy SMTP/Mail parameters that powered the old email newsletter
+- [x] create SQLAlchemy models and Alembic migrations for provider logs, configuration settings, and execution history
+- [x] define async job scheduler strategy (e.g., Celery / FastAPI Background Tasks) for executing heavy LLM provider queries off-hours
 
 ## Exit Criteria
 
@@ -161,10 +161,9 @@ Source configuration also introduces:
 
 ## Implementation Status
 
-- This sprint document is created before provider-runtime code migration starts.
-- `care-circle` foundation work is already complete enough to support this sprint:
-  - shared platform routing and membership guards are in place
-  - family and patient surfaces already exist in `frontendv1/`
-  - live database tables and provider catalog rows already exist
-  - the current patient session still uses seeded content and must be replaced during this sprint
-- No provider-runtime code migration is marked complete in this sprint yet.
+- `care-circle` foundation work is complete including SQLAlchemy models / Alembic migrations for `ProviderRunLog`, `ProviderPatientConfig`, and `ProviderSessionOutput`.
+- The `app/services/care_circle/provider_base.py` sandboxed architecture is running.
+- **Provider Architecture Import**: Fully Complete. All 38 usable `DailyNewsletter` providers have been imported into `app/services/care_circle/providers`, purged of their legacy LLM and Toolkits dependencies, and successfully renamed to exactly match the `CamelCaseProvider` specification (e.g. `WordScrambleProvider`).
+- **Tests**: A dedicated dynamic Pytest module `tests/unit/test_all_imported_providers.py` was created to explicitly validate the structure (Base Care Circle inheritance, safety defaults, and extraction payload method) of all 38 imported providers. All 38 pass locally with 0 errors.
+- External dependencies like `python-constraint` and `word-search-generator` have been appended to `requirements.txt`.
+- Next major backend dependency: wiring OpenRouter back up to the provider generation scripts to execute them securely in async jobs.

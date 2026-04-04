@@ -1,0 +1,17 @@
+<div class="section section--color-match">
+    <h2 class="section__title">🎨 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body color-match">
+        <div class="color-match__options">
+            {% for option in options %}
+            <div class="color-match__option">
+                {{ option }}
+            </div>
+            {% endfor %}
+        </div>
+        <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
+        <p class="section__body color-match__answer">
+            {{ answer }}
+        </p>
+    </div>
+</div>

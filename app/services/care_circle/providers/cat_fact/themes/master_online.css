@@ -1,0 +1,22 @@
+.pet-photo {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.pet-photo__content {
+    flex: 1 1 30%;
+    min-width: 0;
+}
+
+.pet-photo__caption {
+    margin: 0;
+}
+
+.pet-photo__image {
+    flex: 0 0 70%;
+    width: 70%;
+    max-width: 260px;
+    border-radius: 12px;
+    object-fit: cover;
+}

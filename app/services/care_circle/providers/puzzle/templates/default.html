@@ -1,0 +1,9 @@
+<div class="section section--puzzle">
+    <h2 class="section__title">🧩 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body">{{ puzzle_content | safe }}</div>
+    {% if answer %}
+    <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
+    <p class="section__body puzzle-answer--upside-down">{{ answer }}</p>
+    {% endif %}
+</div>

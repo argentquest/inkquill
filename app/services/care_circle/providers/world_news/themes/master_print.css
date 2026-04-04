@@ -1,0 +1,32 @@
+.world-news {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.world-news__story {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.world-news__index {
+    flex-shrink: 0;
+    color: #1e40af;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.world-news__title {
+    margin: 0 0 2px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.world-news__summary {
+    margin: 0;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.35;
+}

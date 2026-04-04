@@ -1,0 +1,7 @@
+.answer-upside-down {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    transform: rotate(180deg);
+}

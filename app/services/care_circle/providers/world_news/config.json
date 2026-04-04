@@ -1,0 +1,32 @@
+{
+    "name": "World News",
+    "description": "Top 5 world news headlines with short, plain-language summaries.",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "item_count": 5,
+    "grid_width": 8,
+    "grid_height": 3,
+    "fallback_stories": [
+        {
+            "title": "World Leaders Meet for Peace Talks",
+            "summary": "Leaders from many countries gathered to discuss ways to keep the world safe and peaceful."
+        },
+        {
+            "title": "Scientists Make Exciting Discovery",
+            "summary": "Researchers have found something new that could help improve people's health and lives."
+        },
+        {
+            "title": "Communities Come Together After Storm",
+            "summary": "Neighbours helped each other rebuild after a strong storm passed through the region."
+        },
+        {
+            "title": "Museum Opens a New History Exhibit",
+            "summary": "Families and visitors gather to enjoy art, stories, and treasured objects from the past."
+        },
+        {
+            "title": "Town Garden Project Brings Joy",
+            "summary": "Volunteers planted flowers and made a shared public space brighter and more welcoming."
+        }
+    ],
+    "common": true,
+    "llm": true
+}

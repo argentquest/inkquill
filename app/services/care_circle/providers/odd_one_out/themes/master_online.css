@@ -1,0 +1,28 @@
+.odd-one-out {
+    padding: 20px;
+    text-align: center;
+}
+
+.odd-one-out__items {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.odd-one-out__item {
+    min-width: 120px;
+    padding: 20px 30px;
+    border: 3px solid #059669;
+    border-radius: 12px;
+    background: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.odd-one-out__answer {
+    margin-top: 12px;
+    text-align: center;
+    font-weight: 700;
+    transform: rotate(180deg);
+}

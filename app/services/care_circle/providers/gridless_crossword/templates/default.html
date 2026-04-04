@@ -1,0 +1,46 @@
+<div class="section section--gridless-crossword">
+    <h2 class="section__title">📝 Gridless Crossword</h2>
+    <p class="section__subtitle">
+        Solve the 10 clues below. The first letters of all answers spell a secret word!
+    </p>
+    <div class="section__body">
+        <div class="gridless-crossword__word-bank">
+            <p class="gridless-crossword__bank-title">🔤 WORD BANK (scrambled letters)</p>
+            <div class="gridless-crossword__bank-list">
+                {% for scrambled in scrambled_words %}
+                <span class="gridless-crossword__bank-chip">{{ scrambled }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="gridless-crossword__clues">
+            {% for item in words %}
+            <div class="gridless-crossword__clue">
+                <div class="gridless-crossword__clue-row">
+                    <span class="gridless-crossword__clue-number">{{ loop.index }}.</span>
+                    <span class="gridless-crossword__clue-length">[{{ item.word|length }} letters]</span>
+                    <span class="gridless-crossword__clue-text">{{ item.clue }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="gridless-crossword__secret-hint">
+            <p class="gridless-crossword__secret-text">
+                🔮 <strong>Secret Word:</strong> The first letter of each answer spells a hidden word!
+            </p>
+        </div>
+
+        <div class="gridless-crossword__answers">
+            <p class="section__body section__body--italic text-muted gridless-crossword__answers-note">(Answers are upside down below)</p>
+            <div class="gridless-crossword__answers-list">
+                {% for item in words %}
+                <span class="gridless-crossword__answer-chip">{{ item.word }}</span>
+                {% endfor %}
+            </div>
+            <p class="gridless-crossword__secret-answer">
+                Secret Word: {{ secret_word }}
+            </p>
+        </div>
+    </div>
+</div>

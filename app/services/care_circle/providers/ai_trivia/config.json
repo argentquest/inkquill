@@ -1,0 +1,36 @@
+{
+    "name": "AI Trivia",
+    "description": "AI-generated trivia questions from your era.",
+    "technical_summary": "Uses LLM (via OpenRouter) to generate era-specific trivia and music suggestions. Falls back to static content on API failure.",
+    "default_era": "1950s",
+    "default_singer": "Frank Sinatra",
+    "default_model": "gpt-4o-mini",
+    "system_prompt": "You are a helpful assistant that outputs clean JSON.",
+    "fallback_trivia": "Did you know that in the 1950s, the St. Lawrence Seaway was one of the greatest engineering feats?",
+    "fallback_music": "Have a warm cup of tea and listen to {singer} or some classic 1960s Quebec music!",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "format": "multiple_choice",
+            "options_count": 3,
+            "era_specific": true,
+            "topic_familiarity": "everyday_life"
+        },
+        "medium": {
+            "format": "fill_in_blank",
+            "hint_available": true,
+            "era_specific": true,
+            "topic_familiarity": "popular_culture"
+        },
+        "hard": {
+            "format": "open_ended",
+            "hint_available": false,
+            "era_specific": false,
+            "topic_familiarity": "general_knowledge"
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": true,
+    "llm": true
+}

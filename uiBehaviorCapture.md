@@ -361,3 +361,62 @@ Use this for fast discovery passes before writing full detail.
    world chat, story chat, world builder, hierarchy, map behavior
 5. Sprint 8-10:
    published story reader, forum/blog interactions, billing/referrals, admin tools
+
+---
+
+## Care Circle Behavior Capture
+
+### Example 6
+- Route: `/care-circle-patient/login`
+- Screen name: Patient Picture Sign-In
+
+- Element name: Daily Sign-In Keys
+- Element type: image grid validation
+- Legacy location: `frontendv1/app/care-circle-patient/login`
+
+- What job does this element do for the user?
+- Authenticates the patient without forcing passwords or typing.
+- Default state: Grid of picture buttons.
+- Trigger/Behavior: User selects three exact keys; submits array to backend. Redirects to `/home` on success.
+- API: `/api/v1/care-circle/patient/auth/login`
+- React rebuild decision: Keep exactly as built.
+
+### Example 7
+- Route: `/care-circle-family/events`
+- Screen name: Family Event Stream
+
+- Element name: Asynchronous Activity Feed
+- Element type: list
+- Legacy location: `frontendv1/app/care-circle-family/events`
+
+- What job does this element do for the user?
+- Streams realtime LLM provider activities (e.g. Generation delays, Fallback triggers) and patient session activities.
+- Behavior details: Fetches telemetry dynamically, pushes alerts asynchronously.
+- React rebuild decision: Keep but extend with WebSocket integration later.
+
+### Example 8
+- Route: `/care-circle-family/patients/:patientId/preferences`
+- Screen name: Patient Preferences
+
+- Element name: Family Managed Patient Settings
+- Element type: form / toggle list
+- Legacy location: Concept migrated from DailyNewsletter DB
+
+- What job does this element do for the user?
+- Family configures what providers the patient can use, blocking negative topics or injecting preferred topics (e.g. 1950s music).
+- Behavior details: Directly impacts the `CareCircleProviderPatientConfig` map during session assembly.
+- React rebuild decision: Improve to include explicit inline toggles mapping directly to the DB schema.
+
+### Example 9
+- Route: `/care-circle-patient/session`
+- Screen name: Calm Daily Content
+
+- Element name: Patient Highlights View
+- Element type: read-only cards
+- Legacy location: `frontendv1/app/care-circle-patient/home`
+
+- What job does this element do for the user?
+- Serves generative AI output (Weather, Word Scrambles, Daily Quotes) exactly as structured from OpenRouter.
+- Behavior details: Completely read-only. No action required. Assembly triggered dynamically behind API.
+- React rebuild decision: Keep the calm interface; no stressful CTAs.
+

@@ -1,0 +1,35 @@
+.memory-lane-photo {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.memory-lane-photo__title {
+    margin-bottom: 16px;
+}
+
+.memory-lane-photo__frame {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.memory-lane-photo__image {
+    flex: 0 0 70%;
+    width: 70%;
+    max-width: 260px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.memory-lane-photo__content {
+    flex: 0 0 30%;
+    padding: 0;
+}
+
+.memory-lane-photo__description {
+    margin: 0;
+    text-align: left;
+    font-style: italic;
+    color: #475569;
+}

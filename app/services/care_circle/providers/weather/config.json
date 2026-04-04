@@ -1,0 +1,30 @@
+{
+    "name": "Weather",
+    "description": "Today's weather forecast for your area with friendly suggestions.",
+    "technical_summary": "Fetches weather data from wttr.in API based on user configured city. Falls back to static message if unavailable.",
+    "api_url": "https://wttr.in/{city}?format=%C+%t",
+    "fallback": "Weather unavailable.",
+    "no_city_message": "Weather unavailable.",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "format": "simple",
+            "detail_level": "basic",
+            "label": "Today's Weather"
+        },
+        "medium": {
+            "format": "detailed",
+            "detail_level": "moderate",
+            "label": "Weather Forecast"
+        },
+        "hard": {
+            "format": "full",
+            "detail_level": "extended",
+            "label": "Full Weather Report"
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": true
+}

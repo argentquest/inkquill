@@ -1,0 +1,203 @@
+{
+    "name": "Puzzle",
+    "description": "Fun word search and fill-in-the-blank puzzles to enjoy.",
+    "technical_summary": "Generates word search grids and fill-in-the-blank puzzles with configurable word lists.",
+    "grid_size": 10,
+    "default_words": [
+        "SPRING",
+        "FLOWERS",
+        "SUNSHINE",
+        "GARDEN",
+        "PICNIC",
+        "RAINBOW",
+        "MEADOW"
+    ],
+    "min_custom_words": 4,
+    "filler_words": [
+        "JOY",
+        "PEACE",
+        "LOVE",
+        "HOPE",
+        "CALM"
+    ],
+    "fill_in_the_blank_prompts": [
+        {
+            "phrase": "An apple a day keeps the _____ away.",
+            "answer": "DOCTOR"
+        },
+        {
+            "phrase": "A penny saved is a penny _____.",
+            "answer": "EARNED"
+        },
+        {
+            "phrase": "Don't count your _____ before they hatch.",
+            "answer": "CHICKENS"
+        },
+        {
+            "phrase": "Every cloud has a silver _____.",
+            "answer": "LINING"
+        },
+        {
+            "phrase": "You can't judge a book by its _____.",
+            "answer": "COVER"
+        },
+        {
+            "phrase": "Good things come to those who _____.",
+            "answer": "WAIT"
+        },
+        {
+            "phrase": "The early bird catches the _____.",
+            "answer": "WORM"
+        },
+        {
+            "phrase": "Actions speak louder than _____.",
+            "answer": "WORDS"
+        },
+        {
+            "phrase": "A stitch in time saves _____.",
+            "answer": "NINE"
+        },
+        {
+            "phrase": "Laughter is the best _____.",
+            "answer": "MEDICINE"
+        },
+        {
+            "phrase": "Practice makes _____.",
+            "answer": "PERFECT"
+        },
+        {
+            "phrase": "Home is where the _____ is.",
+            "answer": "HEART"
+        },
+        {
+            "phrase": "Better late than _____.",
+            "answer": "NEVER"
+        },
+        {
+            "phrase": "Two wrongs don't make a _____.",
+            "answer": "RIGHT"
+        },
+        {
+            "phrase": "No news is _____ news.",
+            "answer": "GOOD"
+        },
+        {
+            "phrase": "Every rose has its _____.",
+            "answer": "THORN"
+        },
+        {
+            "phrase": "Rome wasn't built in a _____.",
+            "answer": "DAY"
+        },
+        {
+            "phrase": "When life gives you lemons, make _____.",
+            "answer": "LEMONADE"
+        },
+        {
+            "phrase": "Birds of a feather flock _____.",
+            "answer": "TOGETHER"
+        },
+        {
+            "phrase": "Absence makes the heart grow _____.",
+            "answer": "FONDER"
+        }
+    ],
+    "word_pairs": [
+        {
+            "across": "BUTTER",
+            "down": "BREAD",
+            "clue_across": "Spread it on toast",
+            "clue_down": "Baked from flour and yeast"
+        },
+        {
+            "across": "MOTHER",
+            "down": "MAPLE",
+            "clue_across": "She raised you with love",
+            "clue_down": "A tree with sweet sap"
+        },
+        {
+            "across": "SPRING",
+            "down": "SUNNY",
+            "clue_across": "Season of new beginnings",
+            "clue_down": "A bright, warm day"
+        },
+        {
+            "across": "FLOWER",
+            "down": "FIELD",
+            "clue_across": "A blooming plant",
+            "clue_down": "Open grassy land"
+        },
+        {
+            "across": "CANDLE",
+            "down": "CHAIR",
+            "clue_across": "It gives off a warm glow",
+            "clue_down": "A piece of furniture to sit on"
+        },
+        {
+            "across": "COFFEE",
+            "down": "CREAM",
+            "clue_across": "A morning hot drink",
+            "clue_down": "Often added to your cup"
+        },
+        {
+            "across": "GARDEN",
+            "down": "GREEN",
+            "clue_across": "Where flowers and vegetables grow",
+            "clue_down": "The colour of fresh leaves"
+        },
+        {
+            "across": "WINTER",
+            "down": "WHITE",
+            "clue_across": "The coldest season",
+            "clue_down": "The colour of fresh snow"
+        },
+        {
+            "across": "KITTEN",
+            "down": "KNIFE",
+            "clue_across": "A baby cat",
+            "clue_down": "Used to cut bread"
+        },
+        {
+            "across": "SUNDAY",
+            "down": "SWEET",
+            "clue_across": "A day of rest",
+            "clue_down": "Tastes like sugar"
+        }
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "grid_size": 6,
+            "word_count": 4,
+            "show_word_list": true,
+            "puzzle_types": [
+                "fill_in_the_blank",
+                "word_pair"
+            ]
+        },
+        "medium": {
+            "grid_size": 8,
+            "word_count": 6,
+            "show_word_list": true,
+            "puzzle_types": [
+                "fill_in_the_blank",
+                "word_pair",
+                "word_search"
+            ]
+        },
+        "hard": {
+            "grid_size": 10,
+            "word_count": 8,
+            "show_word_list": false,
+            "puzzle_types": [
+                "fill_in_the_blank",
+                "word_pair",
+                "word_search"
+            ]
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 4,
+    "common": true,
+    "llm": false
+}

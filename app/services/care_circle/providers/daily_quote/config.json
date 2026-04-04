@@ -1,0 +1,31 @@
+{
+    "name": "Daily Quote",
+    "description": "Inspirational quote to start your day positively.",
+    "technical_summary": "Fetches random inspirational quotes from ZenQuotes API. Falls back to stored quote if API unavailable.",
+    "api_url": "https://zenquotes.io/api/random",
+    "fallback_quote": "Every day is a new beginning. Take a deep breath and start again.",
+    "fallback_author": "Unknown",
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "max_length": 100,
+            "include_reflection": false,
+            "language": "simple"
+        },
+        "medium": {
+            "max_length": 200,
+            "include_reflection": true,
+            "language": "moderate"
+        },
+        "hard": {
+            "max_length": 300,
+            "include_reflection": true,
+            "reflection_depth": "deep",
+            "language": "philosophical"
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": true,
+    "llm": false
+}

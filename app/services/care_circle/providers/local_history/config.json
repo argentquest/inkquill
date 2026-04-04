@@ -1,0 +1,10 @@
+{
+    "name": "Local History",
+    "description": "A warm and cheerful fact about your home town.",
+    "technical_summary": "Uses profile.preferences.city_for_weather as the location and generates a 2-sentence LLM fact about a positive local landmark or tradition.",
+    "fallback_text": "Every town has a wonderful history full of kind people and happy memories.",
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

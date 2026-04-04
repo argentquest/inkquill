@@ -1,0 +1,11 @@
+{
+    "name": "Hobby Spotlight",
+    "description": "A warm personal story about one of your favourite hobbies.",
+    "technical_summary": "Picks a random hobby from profile.preferences.hobbies and generates a 2-sentence LLM story personalised with the recipient's name.",
+    "fallback_hobbies": ["gardening", "reading", "knitting"],
+    "fallback_text": "Your hobby brings you so much joy every single day.",
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

@@ -1,0 +1,34 @@
+.complete-the-duo {
+    padding: 12px;
+}
+
+.complete-the-duo__row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.complete-the-duo__prompt {
+    flex: 1;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.complete-the-duo__blank {
+    display: inline-block;
+    min-width: 140px;
+    border-bottom: 3px solid #059669;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.complete-the-duo__answers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.8;
+    transform: rotate(180deg);
+}

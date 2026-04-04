@@ -1,0 +1,32 @@
+{
+    "name": "Pen Pal Letter",
+    "description": "A warm letter from an old friend, just for you.",
+    "technical_summary": "LLM generates an 80-100 word personalised letter addressed to the resident by name, in the voice of a fictional old friend. Mentions season, nostalgic memory, and ends with a gentle question.",
+    "friend_names": [
+        "Margaret",
+        "Dorothy",
+        "Ethel",
+        "Vera",
+        "Agnes",
+        "Doris",
+        "Violet",
+        "Gladys",
+        "Mabel",
+        "Beatrice",
+        "Arthur",
+        "Harold",
+        "Norman",
+        "Reginald",
+        "Stanley"
+    ],
+    "fallback_letters": [
+        "Dear {name},\n\nThe spring flowers are out at last and they made me think of you straight away! The daffodils along our old road are simply beautiful this year. I was smiling to myself remembering that lovely summer we spent at the seaside \u2014 do you remember how we laughed? What sunshine those days were! I wonder, what is your favourite memory of a summer's day?\n\nWith love, {friend}",
+        "Dear {name},\n\nI hope this finds you well and in good spirits! The autumn leaves are turning the most gorgeous shades of gold and copper \u2014 it feels like the whole world is putting on a show just for us. I was thinking about those wonderful Saturday dances we used to go to. What a time that was! Do you have a favourite song from those happy days?\n\nWith love, {friend}",
+        "Dear {name},\n\nWinter has arrived and brought such a cosy feeling with it! I have been thinking of you over a warm cup of tea. Do you remember the old tea shop on the High Street? Such lovely cream scones they made there. It always feels like those simple, happy moments were the best of all. What is the meal or treat that always makes you smile?\n\nWith love, {friend}",
+        "Dear {name},\n\nSummer is here and the garden is looking so lovely! Everything in bloom reminds me of you. I was walking past the old dance hall yesterday and found myself humming one of our favourite tunes. Isn't it funny how music can take you right back? Tell me \u2014 what was the song that always got you up on your feet?\n\nWith love, {friend}"
+    ],
+    "grid_width": 4,
+    "grid_height": 4,
+    "common": false,
+    "llm": true
+}

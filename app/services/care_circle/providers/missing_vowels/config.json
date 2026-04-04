@@ -1,0 +1,73 @@
+{
+    "name": "Missing Vowels",
+    "description": "Fill in the missing vowels to solve the puzzle.",
+    "technical_summary": "Provides words with vowels removed for users to solve. Words are familiar everyday nouns.",
+    "words": [
+        "KITCHEN",
+        "GARDEN",
+        "BUTTER",
+        "FLOWER",
+        "WINDOW",
+        "CHICKEN",
+        "MORNING",
+        "CANDLE",
+        "AUTUMN",
+        "WINTER",
+        "SUNDAY",
+        "BASKET",
+        "CARPET",
+        "PILLOW",
+        "MIRROR",
+        "ORANGE",
+        "APPLE",
+        "HONEY",
+        "MARKET",
+        "SILVER",
+        "MOTHER",
+        "SISTER",
+        "SPRING",
+        "SUMMER",
+        "SUNSET",
+        "TEAPOT",
+        "KITTEN",
+        "RABBIT",
+        "SWEATER",
+        "VIOLIN",
+        "BLANKET",
+        "FEATHER",
+        "LAUNDRY",
+        "MUSTARD",
+        "PUMPKIN",
+        "ROCKING",
+        "SHELTER",
+        "THUNDER",
+        "TULIP",
+        "VELVET"
+    ],
+    "difficulty": {
+        "default": "easy",
+        "easy": {
+            "min_word_length": 4,
+            "max_word_length": 6,
+            "show_vowel_count": true,
+            "show_consonants": true
+        },
+        "medium": {
+            "min_word_length": 6,
+            "max_word_length": 8,
+            "show_vowel_count": false,
+            "show_consonants": true
+        },
+        "hard": {
+            "min_word_length": 7,
+            "max_word_length": 12,
+            "show_vowel_count": false,
+            "show_consonants": true,
+            "hint_available": false
+        }
+    },
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": false
+}

@@ -1,0 +1,24 @@
+<div class="section section--spot-the-difference">
+    <h2 class="section__title">🔍 {{ title }}</h2>
+    <p class="section__subtitle">{{ instruction }}</p>
+    <div class="section__body spot-the-difference">
+        <div class="spot-the-difference__lists">
+            <div class="spot-the-difference__list spot-the-difference__list--a">
+                <p class="spot-the-difference__label spot-the-difference__label--a">List A</p>
+                {% for word in list_a %}
+                <p class="spot-the-difference__word">{{ word }}</p>
+                {% endfor %}
+            </div>
+            <div class="spot-the-difference__list spot-the-difference__list--b">
+                <p class="spot-the-difference__label spot-the-difference__label--b">List B</p>
+                {% for word in list_b %}
+                <p class="spot-the-difference__word">{{ word }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <p class="section__body section__body--italic text-muted mt-md">(Answer below — upside down)</p>
+        <p class="section__body spot-the-difference__answer">
+            List A had "{{ changed_in_a }}" — List B had "{{ changed_in_b }}"
+        </p>
+    </div>
+</div>

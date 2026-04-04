@@ -1,0 +1,37 @@
+.song-of-the-day {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.song-of-the-day__image {
+    width: 70%;
+    max-width: 260px;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 70%;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.song-of-the-day__content {
+    flex: 0 0 30%;
+    min-width: 0;
+}
+
+.song-of-the-day__song {
+    margin: 0 0 2px;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.song-of-the-day__artist {
+    margin: 0 0 10px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.song-of-the-day__fact {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+}

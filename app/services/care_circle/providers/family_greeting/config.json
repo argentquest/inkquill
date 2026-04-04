@@ -1,0 +1,10 @@
+{
+    "name": "Family Greeting",
+    "description": "A warm note from a loved one, just for you.",
+    "technical_summary": "Picks a random name from profile.preferences.family_members and generates a 2-sentence LLM message written as if from that person to the recipient.",
+    "fallback_text": "We are all thinking of you today. You are so very loved.",
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

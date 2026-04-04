@@ -1,0 +1,137 @@
+{
+    "name": "Spot the Difference",
+    "description": "Find the one word that changed between the two lists.",
+    "technical_summary": "LLM generates two near-identical 5-word lists with one item swapped. Gentle visual attention game. Falls back to static pairs.",
+    "fallback_sets": [
+        {
+            "list_a": [
+                "Apple",
+                "Chair",
+                "Robin",
+                "Kettle",
+                "Garden"
+            ],
+            "list_b": [
+                "Apple",
+                "Chair",
+                "Sparrow",
+                "Kettle",
+                "Garden"
+            ],
+            "changed_in_a": "Robin",
+            "changed_in_b": "Sparrow"
+        },
+        {
+            "list_a": [
+                "Dog",
+                "Roses",
+                "Table",
+                "Summer",
+                "Bread"
+            ],
+            "list_b": [
+                "Dog",
+                "Tulips",
+                "Table",
+                "Summer",
+                "Bread"
+            ],
+            "changed_in_a": "Roses",
+            "changed_in_b": "Tulips"
+        },
+        {
+            "list_a": [
+                "River",
+                "Tea",
+                "Clock",
+                "Cat",
+                "Blue"
+            ],
+            "list_b": [
+                "River",
+                "Tea",
+                "Clock",
+                "Dog",
+                "Blue"
+            ],
+            "changed_in_a": "Cat",
+            "changed_in_b": "Dog"
+        },
+        {
+            "list_a": [
+                "Rain",
+                "Butter",
+                "Hat",
+                "Daffodil",
+                "Lamp"
+            ],
+            "list_b": [
+                "Sun",
+                "Butter",
+                "Hat",
+                "Daffodil",
+                "Lamp"
+            ],
+            "changed_in_a": "Rain",
+            "changed_in_b": "Sun"
+        },
+        {
+            "list_a": [
+                "Piano",
+                "Bread",
+                "Window",
+                "Horse",
+                "Green"
+            ],
+            "list_b": [
+                "Piano",
+                "Cake",
+                "Window",
+                "Horse",
+                "Green"
+            ],
+            "changed_in_a": "Bread",
+            "changed_in_b": "Cake"
+        },
+        {
+            "list_a": [
+                "Candle",
+                "Bird",
+                "Soup",
+                "Gloves",
+                "Oak"
+            ],
+            "list_b": [
+                "Candle",
+                "Bird",
+                "Stew",
+                "Gloves",
+                "Oak"
+            ],
+            "changed_in_a": "Soup",
+            "changed_in_b": "Stew"
+        },
+        {
+            "list_a": [
+                "Daisy",
+                "Copper",
+                "Rug",
+                "Sparrow",
+                "Cream"
+            ],
+            "list_b": [
+                "Daisy",
+                "Silver",
+                "Rug",
+                "Sparrow",
+                "Cream"
+            ],
+            "changed_in_a": "Copper",
+            "changed_in_b": "Silver"
+        }
+    ],
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": true,
+    "llm": true
+}
