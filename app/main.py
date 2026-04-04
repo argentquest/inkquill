@@ -111,7 +111,8 @@ from app.routers import (
     blog_analytics,
     blog_integration,
     blog_seo,
-    referrals
+    referrals,
+    care_circle
 )
 from app.routers.act import story_acts_router, acts_router
 
@@ -366,6 +367,7 @@ app.include_router(blog_seo.router)
 
 # Referral API router
 app.include_router(referrals.router, prefix=api_v1_prefix)
+app.include_router(care_circle.router, prefix=api_v1_prefix)
 
 # Bot Analytics API router (for debugging/monitoring)
 app.include_router(bot_analytics.router)

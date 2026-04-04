@@ -15,7 +15,7 @@ export default defineConfig({
     video: "retain-on-failure"
   },
   webServer: {
-    command: "npm run dev -- --port 3001",
+    command: "npm run start -- --port 3001",
     url: "http://127.0.0.1:3001",
     reuseExistingServer: true,
     timeout: 120000

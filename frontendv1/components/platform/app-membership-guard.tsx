@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLayoutEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { LoadingState } from "@/components/ui/loading-state";
 import { useSession } from "@/components/providers/app-providers";
@@ -9,21 +9,20 @@ import { resolvePlatformContext } from "@/components/platform/platform-context";
 
 export function AppMembershipGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const session = useSession();
   const context = resolvePlatformContext(pathname, session);
   const forcedDenied = searchParams.get("membership") === "denied";
   const membership = context.memberships.find((item) => item.surface_id === context.surface_id);
+  const deniedTarget = `/access-denied?surface=${encodeURIComponent(context.surface_id)}`;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!forcedDenied) {
       return;
     }
 
-    const target = `/access-denied?surface=${encodeURIComponent(context.surface_id)}`;
-    router.replace(target);
-  }, [context.surface_id, forcedDenied, router]);
+    window.location.replace(deniedTarget);
+  }, [deniedTarget, forcedDenied]);
 
   if (session.status === "loading") {
     return <LoadingState label="Resolving platform access" />;

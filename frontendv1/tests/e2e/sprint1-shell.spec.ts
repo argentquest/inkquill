@@ -24,16 +24,18 @@ test.describe("Sprint 1 shell", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/app/account");
 
-    await expect(page.getByRole("heading", { name: "Welcome back, Story Maker." })).toBeVisible();
+    await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 30000 });
+    await expect(page.getByText("Account summary")).toBeVisible();
     await expect(page.getByText("Username: storymaker")).toBeVisible();
     await expect(page.getByText("Admin: Yes")).toBeVisible();
-    await expect(page.locator("article").filter({ hasText: "Coin balance" }).getByRole("heading", { name: "25.75" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /25\.75 Coins/ })).toBeVisible();
   });
 
   test("maintenance mode shows banner and workspace gate", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated", maintenance: "on" });
     await page.goto("/app/account");
 
+    await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 30000 });
     await expect(page.getByText("Maintenance Mode")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Maintenance is active" })).toBeVisible();
     await expect(page.getByText("Planned maintenance window", { exact: true })).toBeVisible();

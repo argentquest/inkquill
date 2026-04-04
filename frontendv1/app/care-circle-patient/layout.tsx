@@ -1,10 +1,10 @@
-import { AppShellResolver } from "@/components/platform/app-shell-resolver";
+import { PatientShell } from "@/components/care-circle-patient/patient-shell";
 import { PlatformAppGate } from "@/components/platform/platform-app-gate";
 
 export default function CareCirclePatientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShellResolver>
-      <PlatformAppGate>{children}</PlatformAppGate>
-    </AppShellResolver>
+    <PlatformAppGate>
+      <PatientShell>{children}</PatientShell>
+    </PlatformAppGate>
   );
 }

@@ -10,9 +10,11 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - `care-circle-patient` route and shell foundation
 - family and patient identity model assumptions in the frontend
 - patient direct-entry login surface
+- patient calm-content and image-based easy-sign-in foundations
 - family patient-list and patient-state foundation
 - family event-feed foundation
 - family media-library foundation
+- patient personalization and scheduled-content preference foundations
 
 ## Route Backlog
 
@@ -26,6 +28,7 @@ Establish `care-circle` as a second application on the shared platform, with sep
 | `/care-circle-patient` | net-new | P0 | Patient app landing and login entry |
 | `/care-circle-patient/login` | net-new | P0 | Direct image-based sign-in flow |
 | `/care-circle-patient/home` | net-new | P0 | Simplified patient home after login |
+| `/care-circle-patient/session` | net-new | P1 | Calm read-only session surface for daily patient content |
 
 ## Shared Components
 
@@ -34,6 +37,8 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - `FamilyPatientCard`
 - `PatientAccessStateBadge`
 - `PatientImageLoginGrid`
+- `PatientDailyHighlights`
+- `PatientPreferenceSummary`
 - `FamilyEventFeed`
 - `FamilyMediaLibraryGrid`
 
@@ -42,6 +47,8 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - family membership and family context endpoints
 - patient list, create, archive, and access-state endpoints
 - patient login and login-reset endpoints
+- patient session bootstrap endpoint with daily-content summary and simplified surface metadata
+- patient preference and personalization endpoints
 - family media endpoints
 - family event-stream endpoint
 - family-owned billing and balance endpoints
@@ -51,6 +58,8 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - family landing and patient management flow
 - patient direct-entry login behavior
 - fixed-position image grid interaction
+- family-managed patient personalization and preference capture
+- patient calm daily-content session rendering
 - patient inactive or archived access states
 - live family event feed behavior
 - family media library loading and empty states
@@ -58,38 +67,88 @@ Establish `care-circle` as a second application on the shared platform, with sep
 ## Risks and Decisions
 
 - Keep the patient application permanently simplified and separate from family patterns.
+- The patient surface should stay calm and read-only by default, with family-side preference management driving what the patient sees.
 - Do not overfit early family pages before the household model and patient auth contract are stable.
 - Family media, patient content, events, and access state should be treated as first-class behaviors, not side effects of generic CRUD pages.
 
 ## Task List
 
-- [ ] Define `care-circle-family` and `care-circle-patient` as separate top-level route trees.
-- [ ] Build the family landing route and shell foundation.
-- [ ] Build the patient direct-entry login route with fixed-position image-grid behavior.
-- [ ] Build a family patient list route with active, inactive, and archived-state handling.
-- [ ] Build a patient detail hub for family-side management actions.
+- [x] Define `care-circle-family` and `care-circle-patient` as separate top-level route trees.
+- [x] Build the family landing route and shell foundation.
+- [x] Build the patient direct-entry login route with fixed-position image-grid behavior.
+- [x] Apply family-managed patient profile, patient preference, and image-based easy-sign-in concepts to the care-circle routes.
+- [x] Build a family patient list route with active, inactive, and archived-state handling.
+- [x] Build a patient detail hub for family-side management actions.
+- [x] Build the first patient post-login session surface as a calm daily-highlights view with minimal actions.
 - [ ] Build the first version of the realtime family event feed route.
 - [ ] Build the first version of the shared family media library route.
-- [ ] Add route-safe handling for patient archive and access deactivation states.
-- [ ] Add Playwright coverage for family entry, patient direct login, and patient-state restrictions.
+- [x] Add route-safe handling for patient archive and access deactivation states.
+- [x] Add Playwright coverage for family entry, patient direct login, patient-state restrictions, and calm daily-session rendering.
 - [ ] Capture patient login, family event feed, and patient-state behavior in `uiBehaviorCapture.md`.
-- [ ] Verify family-owned billing and family-context loading assumptions against backend contracts.
+- [ ] Capture family-managed patient preference behavior and patient daily-session behavior in `uiBehaviorCapture.md`.
+- [x] Verify family-owned billing and family-context loading assumptions against backend contracts.
 
 ## Exit Criteria
 
 - care-circle exists as a distinct application with separate family and patient route spaces
 - patient direct-entry login and simplified shell are established
+- patient interaction model supports calm daily-content viewing driven by family-managed preferences
 - family-side patient management, event feed, and media foundations are reachable and stable
 
 ## Exit Verification
 
 | Criterion | Verification Method | Evidence |
 |---|---|---|
-| care-circle exists as a distinct application with separate family and patient route spaces | Browser verification and code review confirm independent family and patient route trees with the correct shells | To be recorded during implementation |
-| patient direct-entry login and simplified shell are established | Playwright covers patient login route, fixed image-grid interaction, and post-login patient shell rendering | To be recorded during implementation |
-| family-side patient management, event feed, and media foundations are reachable and stable | Playwright smoke coverage plus code checks verify patient list, patient detail, event feed, and media routes | To be recorded during implementation |
+| care-circle exists as a distinct application with separate family and patient route spaces | Browser verification and code review confirm independent family and patient route trees with the correct shells | `cd frontendv1; npm run build`; `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-import.spec.ts --reporter=line` |
+| patient direct-entry login and simplified shell are established | Playwright covers patient login route, fixed image-grid interaction, and post-login patient shell rendering | `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-import.spec.ts --reporter=line` |
+| patient interaction model supports calm daily-content viewing driven by family-managed preferences | Playwright and code checks confirm family-side profile rendering, image-based sign-in, and simplified patient session rendering | `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-import.spec.ts --reporter=line` |
+| family-side patient management, event feed, and media foundations are reachable and stable | Code review plus backend and browser checks confirm family landing, patient list, patient detail, patient auth restrictions, and seeded provider-backed patient sessions; events and media remain pending | `cd frontendv1; npm run build`; `cd frontendv1; npm run test:e2e -- tests/e2e/sprint-care-circle-import.spec.ts --reporter=line`; `.\.venv\Scripts\python.exe -m pytest tests\unit\test_care_circle_unit.py -q` |
 
 ## Implementation Status
 
-- Planning only.
-- This sprint establishes the first executable care-circle foundation and should follow the common platform sprint.
+- Care-circle route import work is now active in `frontendv1/`.
+- Initial import work now brings `DailyNewsletter` concepts into `frontendv1/` as:
+  - family-managed patient profile routes
+  - image-based patient sign-in
+  - calm patient daily-highlights session
+- The import now uses shared backend contracts, database models, seeded DailyNewsletter provider catalog data, and route-level React Query clients instead of local-only UI data.
+- Backend domain delivery now includes SQLAlchemy models, Alembic migration `7b8f4c2a1d10`, `care-circle` API routes, and unit coverage for provider, family patient, patient auth, and patient session routes.
+- Frontend verification now passes for `npm run build` and the targeted Playwright care-circle spec.
+
+## DailyNewsletter Provider Import Scope
+
+The imported `DailyNewsletter` app includes a provider registry that must be carried into the care-circle backend import rather than left behind as mock-only frontend behavior.
+
+Provider groups identified in the source app:
+
+- core daily content: `weather`, `daily_quote`, `daily_affirmation`, `family_greeting`, `world_news`
+- memory and comfort: `nostalgia`, `local_history`, `memory_lane_photo`, `nature_scene`, `personal_affirmation`, `activity_suggestion`, `song_of_the_day`, `animal_friend`, `dog_photo`, `cat_fact`
+- games and cognition: `puzzle`, `brain_booster`, `riddle`, `missing_vowels`, `finish_phrase`, `odd_one_out`, `word_scramble`, `gridless_crossword`, `crossword`, `word_connect`, `complete_the_duo`, `spot_the_difference`, `bingo`, `simple_math`, `color_match`, `whats_missing`, `ai_trivia`
+- wellbeing and lifestyle: `sensory`, `gratitude`, `gentle_exercise`, `simple_recipe`, `daily_blessing`, `hobby_spotlight`, `pen_pal_letter`
+
+Required follow-up backend import tasks:
+
+- [x] import the provider registry and provider configuration shape into this repo's backend
+- [ ] decide which providers become `care-circle-patient` daily-session cards versus family-only tools
+- [ ] import provider template or rendering strategy where still relevant
+- [x] add backend tests for provider selection, ordering, and patient-safe filtering
+
+## DailyNewsletter Environment Notes
+
+The source application's `.env` includes sensitive runtime settings for LLM access, database access, SMTP delivery, and provider logging.
+
+Environment migration rules:
+
+- do not copy source `.env` secrets verbatim into this repo
+- treat imported API keys, SMTP credentials, and database credentials as secrets to rotate and re-enter safely
+- only copy variable names and required configuration categories into this repo's `.env_template` or deployment docs
+- map source settings into this repo's existing config system before wiring provider execution
+
+Environment categories found in the source app:
+
+- OpenRouter and OpenAI-compatible LLM configuration
+- PostgreSQL connection settings
+- SMTP email settings
+- provider log output directory
+- Cloudflare and pgAdmin support in `.env.example`
+

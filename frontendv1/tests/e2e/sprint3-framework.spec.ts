@@ -10,14 +10,16 @@ test.describe("Sprint 3 framework routes", () => {
     await page.getByLabel("Display name").fill("Draft Cartographer");
     await page.getByRole("button", { name: "Save profile" }).click();
 
+    await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 20000 });
     await expect(page.getByText("Profile updated")).toBeVisible({ timeout: 20000 });
-    await expect(page.getByRole("button", { name: /Draft Cartographer/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Draft Cartographer" })).toBeVisible({ timeout: 20000 });
   });
 
   test("billing route loads dashboard data", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/app/billing");
 
+    await expect(page).toHaveURL(/\/storytelling\/billing/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: "Your balance, packages, and transaction history live in one route." })).toBeVisible({ timeout: 20000 });
     await expect(page.getByText("2555.0000")).toBeVisible();
     await expect(page.getByRole("table", { name: "Billing transactions" })).toBeVisible();
@@ -28,6 +30,7 @@ test.describe("Sprint 3 framework routes", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/app/referrals");
 
+    await expect(page).toHaveURL(/\/storytelling\/referrals/, { timeout: 30000 });
     await expect(page.getByText("Track invitations, conversions, and earned coins from one route.")).toBeVisible({ timeout: 20000 });
     await expect(page.getByText("40%")).toBeVisible();
     await expect(page.getByRole("table", { name: "Referral history" })).toBeVisible();
@@ -37,6 +40,7 @@ test.describe("Sprint 3 framework routes", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/app/onboarding");
 
+    await expect(page).toHaveURL(/\/storytelling\/onboarding/, { timeout: 30000 });
     await expect(page.getByText("Set the direction for your writing workspace.")).toBeVisible({ timeout: 20000 });
     await expect(page.getByText("Welcome! Let's get to know you better")).toBeVisible();
     await expect(page.getByText("No personalized insights yet.")).toBeVisible();

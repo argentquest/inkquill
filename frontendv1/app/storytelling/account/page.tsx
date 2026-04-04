@@ -1,5 +1,5 @@
-import { PlatformRouteBridge } from "@/components/platform/platform-route-bridge";
+import { StorytellingAccountWorkspace } from "./account-workspace";
 
-export default function LegacyAccountPage() {
-  return <PlatformRouteBridge />;
+export default function StorytellingAccountPage() {
+  return <StorytellingAccountWorkspace />;
 }

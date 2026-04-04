@@ -15,21 +15,21 @@ test.describe("Sprint 2 auth", () => {
     await mockAppApis(page, { session: "session-error" });
     await page.goto("/app/account");
 
-    await expect(page).toHaveURL(/\/app\/account/, { timeout: 30000 });
-    await expect(page.getByRole("heading", { name: "Account shell could not confirm the current user." })).toBeVisible({ timeout: 30000 });
-    await expect(page.getByText("Session failed")).toBeVisible();
+    await expect(page).toHaveURL(/\/auth\/login\?next=%2Fapp%2Faccount/, { timeout: 30000 });
+    await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });
   });
 
   test("login success reaches the account landing", async ({ page }) => {
     await mockAppApis(page);
-    await page.goto("/auth/login?next=%2Fapp%2Faccount");
+    await page.goto("/auth/login?next=%2Fstorytelling%2Faccount");
 
     await page.getByLabel("Username").fill("storymaker");
     await page.locator('input[name="password"]').fill("password123");
     await page.getByRole("button", { name: "Sign in" }).click();
 
-    await expect(page).toHaveURL(/\/app\/account/, { timeout: 20000 });
-    await expect(page.getByRole("heading", { name: "Welcome back, Story Maker." })).toBeVisible({ timeout: 20000 });
+    await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 20000 });
+    await expect(page.getByText("Account summary")).toBeVisible({ timeout: 20000 });
+    await expect(page.getByText("Username: storymaker")).toBeVisible({ timeout: 20000 });
   });
 
   test("login constrains unsafe next targets to the account shell", async ({ page }) => {
@@ -40,7 +40,7 @@ test.describe("Sprint 2 auth", () => {
     await page.locator('input[name="password"]').fill("password123");
     await page.getByRole("button", { name: "Sign in" }).click();
 
-    await expect(page).toHaveURL(/\/app\/account/, { timeout: 20000 });
+    await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 20000 });
     await expect(page.url()).not.toContain("evil.example");
   });
 
@@ -57,7 +57,7 @@ test.describe("Sprint 2 auth", () => {
 
   test("register success reaches the preserved protected destination", async ({ page }) => {
     await mockAppApis(page);
-    await page.goto("/auth/register?next=%2Fapp%2Faccount%3Ftab%3Dbilling");
+    await page.goto("/auth/register?next=%2Fstorytelling%2Faccount");
 
     await page.getByLabel("Username").fill("storymaker");
     await page.getByLabel("Email").fill("storymaker@example.com");
@@ -66,7 +66,7 @@ test.describe("Sprint 2 auth", () => {
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Create account" }).click();
 
-    await expect(page).toHaveURL(/\/app\/account\?tab=billing/, { timeout: 20000 });
+    await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 20000 });
     await expect(page.getByText("Account summary")).toBeVisible({ timeout: 20000 });
   });
 

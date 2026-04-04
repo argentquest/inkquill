@@ -59,6 +59,7 @@ The current repo also has app-split planning documents for the shared-platform p
 - [frontendSprintCommonPlatform.md](/C:/code2025a/inbkandquill2/frontendSprintCommonPlatform.md) - active replacement for Sprint 1 to 3 shared-platform planning
 - [frontendSprintStorytellingApp.md](/C:/code2025a/inbkandquill2/frontendSprintStorytellingApp.md)
 - [frontendSprintCareCircleApp.md](/C:/code2025a/inbkandquill2/frontendSprintCareCircleApp.md)
+- [frontendSprintCareCircleProviders.md](/C:/code2025a/inbkandquill2/frontendSprintCareCircleProviders.md)
 - [frontendSprintChat.md](/C:/code2025a/inbkandquill2/frontendSprintChat.md)
 
 

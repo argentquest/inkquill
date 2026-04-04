@@ -11,19 +11,19 @@ export function AppShellGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const session = useSession();
   const context = resolvePlatformContext(pathname, session);
+  const redirectTarget = `/auth/login?next=${encodeURIComponent(pathname || getDefaultAuthDestination(context.surface_id))}`;
 
   useLayoutEffect(() => {
-    if (session.status === "anonymous") {
-      const next = encodeURIComponent(pathname || getDefaultAuthDestination(context.surface_id));
-      window.location.replace(`/auth/login?next=${next}`);
+    if (session.status === "anonymous" || session.status === "error") {
+      window.location.replace(redirectTarget);
     }
-  }, [context.surface_id, pathname, session.status]);
+  }, [redirectTarget, session.status]);
 
   if (session.status === "loading") {
     return <LoadingState label="Checking session" />;
   }
 
-  if (session.status === "anonymous") {
+  if (session.status === "anonymous" || session.status === "error") {
     return <LoadingState label="Redirecting to login" />;
   }
 

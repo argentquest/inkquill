@@ -4,7 +4,7 @@ export function StatCard({
   detail
 }: {
   label: string;
-  value: string;
+  value: string | number;
   detail?: string;
 }) {
   return (

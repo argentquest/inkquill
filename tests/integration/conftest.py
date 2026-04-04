@@ -46,17 +46,21 @@ async def _drop_database_if_exists(db_name: str) -> None:
     db_name = _validate_db_name(db_name)
     conn = await _admin_connection()
     try:
-        await conn.execute(
-            """
-            SELECT pg_terminate_backend(pid)
-            FROM pg_stat_activity
-            WHERE datname = $1 AND pid <> pg_backend_pid()
-            """,
-            db_name,
-        )
+        await _terminate_database_connections(conn, db_name)
         await conn.execute(f'DROP DATABASE IF EXISTS "{db_name}"')
     finally:
         await conn.close()
+
+
+async def _terminate_database_connections(conn: asyncpg.Connection, db_name: str) -> None:
+    await conn.execute(
+        """
+        SELECT pg_terminate_backend(pid)
+        FROM pg_stat_activity
+        WHERE datname = $1 AND pid <> pg_backend_pid()
+        """,
+        db_name,
+    )
 
 
 async def _clone_database(source_db: str, target_db: str) -> None:
@@ -64,6 +68,8 @@ async def _clone_database(source_db: str, target_db: str) -> None:
     target_db = _validate_db_name(target_db)
     conn = await _admin_connection()
     try:
+        await _terminate_database_connections(conn, source_db)
+        await _terminate_database_connections(conn, target_db)
         await conn.execute(f'CREATE DATABASE "{target_db}" TEMPLATE "{source_db}"')
     finally:
         await conn.close()

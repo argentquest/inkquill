@@ -1,5 +1,5 @@
-import { PlatformRouteBridge } from "@/components/platform/platform-route-bridge";
+import { EditProfileForm } from "./edit-profile-form";
 
-export default function LegacyAccountEditPage() {
-  return <PlatformRouteBridge />;
+export default function StorytellingAccountEditPage() {
+  return <EditProfileForm />;
 }

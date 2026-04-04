@@ -32,8 +32,8 @@ The application features secure user authentication, comprehensive project manag
 
 ## 3. Technology Stack
 
-*   **Backend:** Python 3.11+, FastAPI, Uvicorn, Gunicorn
-*   **AI Orchestration:** Microsoft Semantic Kernel
+*   **Backend:** Python 3.12+, FastAPI, Uvicorn, Gunicorn
+*   **AI Orchestration:** LangChain + LangGraph
 *   **AI Models:** Azure OpenAI Service (Chat Completion & Text Embedding)
 *   **Database:** PostgreSQL (driver: `asyncpg`)
 *   **ORM & Migrations:** SQLAlchemy (asyncio), Alembic
@@ -56,7 +56,7 @@ The application features secure user authentication, comprehensive project manag
 |   |-- `/schemas/`             # Pydantic schemas (user.py, world.py, job_status.py, etc.)
 |   |-- `/crud/`                # Database CRUD operations
 |   |-- `/routers/`             # API & UI endpoint definitions
-|   |-- `/services/`            # Business logic (Semantic Kernel, Context, cost tracking, etc.)
+|   |-- `/services/`            # Business logic (LangGraph/LangChain orchestration, context, cost tracking, etc.)
 |   |-- `/processing/`          # Background task logic (Context ingestion, world import)
 |   |-- `/prompts/`
 |   |-- `/static/`

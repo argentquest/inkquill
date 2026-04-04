@@ -1,10 +1,10 @@
-"""Service helpers for cost tracker service."""
+"""Service helpers and compatibility wrapper for AI cost tracking."""
 
 # /story_app/app/services/cost_tracker_service.py
 
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional, Dict
+from typing import Any, Optional, Dict
 import tiktoken
 
 # --- FIX: Import the new model configuration class ---
@@ -13,7 +13,6 @@ from app.models.ai_model_config import AIModelConfiguration, AIProviderEnum
 from app.crud import ai_cost_log as crud_ai_cost
 from app.schemas.ai_cost_log import AICallLogCreate
 from app.db.database import async_session_local
-from semantic_kernel.functions.function_result import FunctionResult
 from app.services.billing_service import billing_service
 
 logger = logging.getLogger(__name__)
@@ -153,7 +152,7 @@ def _calculate_cost(model_config: AIModelConfiguration, usage_dict: Dict[str, in
         completion_cost = (usage_dict.get("completion_tokens", 0) / 1_000_000) * model_config.user_price_output_usd_pm
         return prompt_cost + completion_cost
 
-def get_usage_from_sk_result(sk_result: FunctionResult) -> Optional[Dict[str, int]]:
+def get_usage_from_sk_result(sk_result: Any) -> Optional[Dict[str, int]]:
     """Extract usage data from Semantic Kernel result with detailed logging"""
     logger.info(f"Attempting to extract usage from SK result. Result exists: {sk_result is not None}")
     
@@ -432,5 +431,166 @@ async def log_ai_streaming_call(
     except Exception as e:
         logger.error(f"Error in log_ai_streaming_call: {e}", exc_info=True)
         return None
+
+
+async def log_conversation_turn(
+    user_id: int,
+    model_config: AIModelConfiguration,
+    prompt_tokens: int,
+    completion_tokens: int,
+    call_type: str,
+    input_prompt: Optional[str] = None,
+    duration_ms: Optional[int] = None,
+    job_id: Optional[str] = None,
+    object_id: Optional[int] = None,
+    db: Optional[AsyncSession] = None,
+) -> Optional[int]:
+    """Compatibility helper for shared conversation billing callers and tests."""
+    usage = {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": prompt_tokens + completion_tokens,
+    }
+    return await log_ai_call(
+        user_id=user_id,
+        model_config=model_config,
+        usage=usage,
+        call_type=call_type,
+        input_prompt=input_prompt,
+        duration_ms=duration_ms,
+        job_id=job_id,
+        object_id=object_id,
+        db=db,
+    )
+
+
+class _PendingAICall:
+    """Lightweight object returned by start_ai_call for compatibility callers."""
+
+    def __init__(self, log_id: Optional[int]):
+        self.id = log_id
+
+
+class CostTrackerService:
+    """Compatibility wrapper around module-level AI cost logging helpers."""
+
+    def __init__(self, db: Optional[AsyncSession] = None):
+        self.db = db
+
+    async def start_ai_call(
+        self,
+        user_id: int,
+        operation_type: str,
+        model_name: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> _PendingAICall:
+        """Create a pending call handle for older streaming callers."""
+        logger.info(
+            "Starting tracked AI call for user %s operation '%s' model '%s' context=%s",
+            user_id,
+            operation_type,
+            model_name,
+            context,
+        )
+        return _PendingAICall(None)
+
+    async def finish_ai_call(
+        self,
+        cost_log_id: Optional[int],
+        output_text: Optional[str],
+        success: bool = True,
+    ) -> Optional[int]:
+        """Finalize a pending tracked call."""
+        logger.info(
+            "Finishing tracked AI call id=%s success=%s output_chars=%s",
+            cost_log_id,
+            success,
+            len(output_text or ""),
+        )
+        return cost_log_id
+
+    async def log_ai_call(self, **kwargs: Any) -> Optional[int]:
+        """Support legacy service-style logging signatures used across services."""
+        db = kwargs.get("db") or self.db
+        user_id = kwargs["user_id"]
+        input_prompt = kwargs.get("input_prompt")
+        duration_ms = kwargs.get("duration_ms")
+        object_id = kwargs.get("object_id")
+        job_id = kwargs.get("job_id")
+
+        model_config = kwargs.get("model_config")
+        if model_config is not None:
+            usage = {
+                "prompt_tokens": kwargs.get("input_tokens", 0),
+                "completion_tokens": kwargs.get("output_tokens", 0),
+                "total_tokens": kwargs.get("input_tokens", 0) + kwargs.get("output_tokens", 0),
+            }
+            return await log_ai_call(
+                user_id=user_id,
+                model_config=model_config,
+                usage=usage,
+                call_type=kwargs.get("operation_type", kwargs.get("call_type", "unknown")),
+                input_prompt=input_prompt,
+                duration_ms=duration_ms,
+                job_id=job_id,
+                object_id=object_id,
+                db=db,
+            )
+
+        model_name = kwargs.get("model_name")
+        provider = kwargs.get("provider")
+        if not model_name:
+            raise ValueError("CostTrackerService.log_ai_call requires either model_config or model_name")
+
+        from app.crud import ai_model_config as ai_model_crud
+
+        if db is None:
+            async with async_session_local() as new_db:
+                model_config = await ai_model_crud.get_default_model_config(new_db)
+                if model_config is None:
+                    logger.warning("No active AI model configuration is available for cost tracking.")
+                    return None
+                usage = {
+                    "prompt_tokens": kwargs.get("prompt_tokens", 0),
+                    "completion_tokens": kwargs.get("completion_tokens", 0),
+                    "total_tokens": kwargs.get("total_tokens", kwargs.get("prompt_tokens", 0) + kwargs.get("completion_tokens", 0)),
+                }
+                return await log_ai_call(
+                    user_id=user_id,
+                    model_config=model_config,
+                    usage=usage,
+                    call_type=kwargs.get("operation_type", kwargs.get("call_type", "unknown")),
+                    input_prompt=input_prompt,
+                    duration_ms=duration_ms,
+                    job_id=job_id,
+                    object_id=object_id,
+                    db=new_db,
+                )
+
+        model_config = await ai_model_crud.get_default_model_config(db)
+        if model_config is None:
+            logger.warning(
+                "No active AI model configuration is available for cost tracking for model '%s' provider '%s'.",
+                model_name,
+                provider,
+            )
+            return None
+
+        usage = {
+            "prompt_tokens": kwargs.get("prompt_tokens", 0),
+            "completion_tokens": kwargs.get("completion_tokens", 0),
+            "total_tokens": kwargs.get("total_tokens", kwargs.get("prompt_tokens", 0) + kwargs.get("completion_tokens", 0)),
+        }
+        return await log_ai_call(
+            user_id=user_id,
+            model_config=model_config,
+            usage=usage,
+            call_type=kwargs.get("operation_type", kwargs.get("call_type", "unknown")),
+            input_prompt=input_prompt,
+            duration_ms=duration_ms,
+            job_id=job_id,
+            object_id=object_id,
+            db=db,
+        )
 
 

@@ -72,6 +72,7 @@ class Settings(BaseSettings):
     # Options: OPENROUTER, OPENAI
     ACTIVE_LLM_PROVIDER: str = Field(default="OPENROUTER", alias="ACTIVE_LLM_PROVIDER")
     DEFAULT_GENERATION_MODEL_NAME: str = Field(default="openai/gpt-4o-mini", alias="DEFAULT_GENERATION_MODEL_NAME")
+    AI_ORCHESTRATION_BACKEND: str = Field(default="LANGGRAPH", alias="AI_ORCHESTRATION_BACKEND")
 
     # --- Local File Storage Configuration ---
     LOCAL_STORAGE_BASE_PATH: str = Field(default="./data/uploads", alias="LOCAL_STORAGE_BASE_PATH")
