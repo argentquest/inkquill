@@ -39,9 +39,9 @@ test.describe("Sprint common platform routes", () => {
     await page.goto("/care-circle-patient");
 
     await expect(page).toHaveURL(/\/care-circle-patient/, { timeout: 30000 });
-    await expect(page.getByRole("heading", { name: "Direct-entry patient access stays separate from family and storytelling." })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Direct-entry patient access stays separate and calm by design." })).toBeVisible({
       timeout: 30000
     });
-    await expect(page.getByText("Patient scope")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Start picture sign-in" })).toBeVisible();
   });
 });

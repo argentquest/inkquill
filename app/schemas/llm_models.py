@@ -1,7 +1,7 @@
 """Pydantic schemas for llm models."""
 
 # /story_app/app/schemas/llm_models.py
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from app.models.ai_model_config import AIProviderEnum, AIModelTypeEnum
 
@@ -27,10 +27,7 @@ class LLMModelRead(BaseModel):
     user_price_input_usd_pm: float
     user_price_output_usd_pm: float
     
-    class Config:
-        from_attributes = True
-
-
+    model_config = ConfigDict(from_attributes=True)
 class LLMModelsResponse(BaseModel):
     """Response containing list of LLM models with metadata"""
     models: list[LLMModelRead]

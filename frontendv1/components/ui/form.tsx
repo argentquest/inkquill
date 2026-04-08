@@ -35,7 +35,7 @@ export function Form<T extends FieldValues>({
 }: FormProps<T>) {
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<T>({
     resolver: zodResolver(schema),
     defaultValues,

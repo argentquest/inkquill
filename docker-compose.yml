@@ -1,95 +1,88 @@
-# /story_app/docker-compose.yml
-
-# --- Background: Docker Compose for Local Development ---
-# Docker Compose is a tool for defining and running multi-container Docker applications.
-# This file defines the services that make up your application (e.g., your FastAPI app,
-# a PostgreSQL database), how they connect, which ports are exposed, which volumes
-# are mounted (for code hot-reloading), and which environment variables are used.
-# Running `docker-compose up` reads this file and starts all defined services.
-# It simplifies setting up a consistent development environment that mirrors
-# some aspects of production containerization.
-
-version: '3.8' # Specify docker-compose version
-
 services:
-  # --- FastAPI Application Service ---
-  app:
-    # Build the Docker image using the Dockerfile in the current directory (.)
-    build: .
-    # Name for the container (optional)
-    container_name: ai_story_app_dev
-    # Environment variables for the application container.
-    # `env_file` loads variables from the specified file (your .env file).
-    env_file:
-      - .env # Load variables from the .env file in the project root
-    # Alternatively, define environment variables directly (less secure for secrets):
-    # environment:
-    #   - POSTGRES_USER=${POSTGRES_USER} # Pass variables from host or .env
-    #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    #   - POSTGRES_SERVER=db # Service name of the database container
-    #   - POSTGRES_PORT=5432
-    #   - POSTGRES_DB=${POSTGRES_DB}
-    #   - AUTH_SECRET_KEY=${AUTH_SECRET_KEY}
-    #   # Add other necessary env vars (Azure credentials might be handled differently for local dev)
-    # Mount volumes:
-    # - Mounts the local './app' directory into '/app/app' inside the container.
-    #   This allows code changes on your host machine to be reflected immediately
-    #   inside the container when using Uvicorn's --reload flag (hot-reloading).
-    volumes:
-      - ./app:/app/app
-    # Port mapping:
-    # - Maps port 8000 on the host machine to port 8000 inside the container
-    #   (where Gunicorn/Uvicorn is listening).
-    ports:
-      - "8000:8000"
-    # Dependencies:
-    # - Ensures the 'db' service (PostgreSQL) is started before the 'app' service.
-    depends_on:
-      - db
-    # Command override (optional):
-    # You can override the CMD in the Dockerfile for development.
-    # For example, use uvicorn directly with --reload for faster development cycles.
-    # Note: Ensure uvicorn is installed in your container image if using this.
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-    # If keeping the Dockerfile CMD (gunicorn), ensure reload works if needed or restart container on changes.
-
-  # --- PostgreSQL Database Service ---
-  db:
-    # Use an official PostgreSQL image from Docker Hub (specify a version)
-    image: postgres:15-alpine
-    # Name for the container (optional)
-    container_name: ai_story_db_dev
-    # Environment variables required by the PostgreSQL image to initialize the database.
-    # These should match the database credentials used by your FastAPI app.
-    # Load them from the same .env file for consistency.
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
-    # environment: # Alternative direct definition
-    #   POSTGRES_USER: ${POSTGRES_USER}
-    #   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    #   POSTGRES_DB: ${POSTGRES_DB}
-    # Mount volumes:
-    # - Creates a named volume 'postgres_data' to persist database data
-    #   even if the container is stopped or removed. This prevents data loss
-    #   during development restarts.
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    # Port mapping (optional):
-    # - Expose the PostgreSQL port (5432) to the host machine if you need to
-    #   connect to the database directly using a tool like DBeaver or psql.
-    #   If only the 'app' container needs to connect, this isn't strictly necessary.
-    ports:
-      - "5432:5432" # Map host port 5432 to container port 5432
-    # Healthcheck (optional but recommended):
-    # Checks if the PostgreSQL server is ready to accept commands.
+    environment:
+      POSTGRES_SERVER: db
+      POSTGRES_PORT: "5432"
+      APP_HOST: 0.0.0.0
+      APP_PORT: "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
-      interval: 5s
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/robots.txt >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontendv1
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-/api/v1}
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-/api/v1}
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      NODE_ENV: production
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000 >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+  gateway:
+    image: nginx:1.27-alpine
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    volumes:
+      - ./deployments/nginx/app.conf:/etc/nginx/conf.d/default.conf:ro
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-inkandquill}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-inkandquill_password}
+      POSTGRES_DB: ${POSTGRES_DB:-inkandquill}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
-# --- Named Volumes Definition ---
-# Define the named volume used by the 'db' service for data persistence.
 volumes:
   postgres_data:
-    driver: local # Use the local driver (standard)

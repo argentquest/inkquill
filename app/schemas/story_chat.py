@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/story_chat.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
@@ -24,10 +24,7 @@ class StoryChatMessageRead(BaseModel):
     target_element_id: Optional[int] = None
     created_at: datetime
     
-    class Config:
-        from_attributes = True
-
-# --- Story Chat Session Schemas ---
+    model_config = ConfigDict(from_attributes=True)
 
 class StoryChatSessionCreate(BaseModel):
     """Schema for creating a story chat session"""
@@ -52,9 +49,7 @@ class StoryChatSessionRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 class StoryChatSessionWithMessages(StoryChatSessionRead):
     """Schema for reading a story chat session with its messages"""
     messages: List[StoryChatMessageRead] = []

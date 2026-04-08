@@ -1,16 +1,23 @@
 """
-Story Brainstorm Plugin for Semantic Kernel
+Story brainstorm plugin metadata for the storytelling runtime.
 
-This plugin handles generating story concepts and three-act structures based on 
+This plugin handles generating story concepts and three-act structures based on
 user preferences from the story brainstorm interview.
 """
 
-from semantic_kernel.functions import kernel_function
 import json
 from typing import Dict, Any, List
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def kernel_function(*, description: str, name: str):
+    """Decorate functions with lightweight metadata for compatibility."""
+    def decorator(func):
+        func._kernel_function = {"description": description, "name": name}
+        return func
+    return decorator
 
 
 class StoryBrainstormPlugin:
@@ -51,7 +58,7 @@ class StoryBrainstormPlugin:
             JSON string containing 15 story concepts with titles and synopses
         """
         # This function will be invoked with the prompt template
-        # The actual prompt rendering is handled by Semantic Kernel
+        # Prompt rendering is handled by the active storytelling runtime.
         return "Story concepts generation initiated"
     
     @kernel_function(
@@ -93,5 +100,5 @@ class StoryBrainstormPlugin:
             JSON string containing three acts with detailed outlines
         """
         # This function will be invoked with the prompt template
-        # The actual prompt rendering is handled by Semantic Kernel
+        # Prompt rendering is handled by the active storytelling runtime.
         return "Three-act structure generation initiated"

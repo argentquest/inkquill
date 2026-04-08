@@ -34,12 +34,12 @@ class WorldCollaborator(Base):
     Represents a user's collaboration relationship with a world.
     Tracks permissions, role, and status.
     """
-    __tablename__ = "world_collaborators"
+    __tablename__ = "storytelling_world_collaborators"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     world_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("worlds.id", ondelete="CASCADE"), 
+        ForeignKey("storytelling_worlds.id", ondelete="CASCADE"), 
         nullable=False, 
         index=True
     )

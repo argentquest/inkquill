@@ -22,7 +22,7 @@ from app.models.world import World
 from app.models.act import Act
 from app.schemas.story import StoryCreate
 from app.crud import story as story_crud
-from app.services.semantic_kernel_setup import generate_story_concepts_function, generate_three_act_structure_function, kernel
+from app.services.langgraph_runtime_setup import generate_story_concepts_function, generate_three_act_structure_function, kernel
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from app.services.ai_model_cache import model_cache
 
@@ -33,7 +33,7 @@ class StoryBrainstormService:
     """Service for managing story brainstorm sessions and AI generation"""
     
     def __init__(self):
-        # Functions are already registered in semantic_kernel_setup.py
+        # Functions are already registered in the shared storytelling runtime setup.
         pass
     
     async def generate_story_concepts(
@@ -72,7 +72,7 @@ class StoryBrainstormService:
             
             logger.info(f"Generating story concepts for user {user.id} with data: {formatted_data}")
             
-            # Generate concepts using Semantic Kernel
+            # Generate concepts using the shared storytelling runtime.
             concepts_json = await self._call_ai_for_concepts(formatted_data, user, db)
             
             # Log the raw response for debugging
@@ -536,7 +536,7 @@ class StoryBrainstormService:
             char1 = interview_data.get('characters', {}).get('character1', {})
             char2 = interview_data.get('characters', {}).get('character2', {})
             
-            # Prepare arguments for the Semantic Kernel function
+            # Prepare arguments for the storytelling runtime function
             function_args = {
                 "genres": ", ".join(interview_data.get('genres', [])),
                 "tone": ", ".join(interview_data.get('tone', [])),
@@ -583,7 +583,7 @@ class StoryBrainstormService:
             char1 = interview_data.get('characters', {}).get('character1', {})
             char2 = interview_data.get('characters', {}).get('character2', {})
             
-            # Prepare arguments for the Semantic Kernel function
+            # Prepare arguments for the storytelling runtime function
             function_args = {
                 "title": concept_data.get('title', ''),
                 "synopsis": concept_data.get('synopsis', ''),
@@ -638,7 +638,7 @@ class StoryBrainstormService:
                 logger.warning("No model configuration found for cost tracking")
                 return
             
-            # Extract usage data from Semantic Kernel result
+            # Extract usage data from the storytelling runtime result
             logger.info(f"Extracting usage data from SK result for {call_type}")
             usage_data = get_usage_from_sk_result(result)
             logger.info(f"Extracted usage data: {usage_data}")

@@ -155,7 +155,7 @@ async def create_new_story(
         await db.commit()
         await db.refresh(created_story)
         logger.info(f"Story '{created_story.title}' (ID: {created_story.id}) created successfully for user ID: {current_user.id} with world_id: {created_story.world_id}")
-        return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(created_story))
+        return ApiResponse.success_response(data=schema_story.StoryRead.model_validate(created_story))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating story '{story.title}' for user '{current_user.username}': {e}", exc_info=True)
@@ -176,7 +176,7 @@ async def list_user_stories(
     stories = await crud_story.get_stories_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
     logger.info(f"Found {len(stories)} stories for user '{current_user.username}'.")
     return ApiResponse.success_response(
-        data=[schema_story.StoryRead.from_orm(s) for s in stories],
+        data=[schema_story.StoryRead.model_validate(s) for s in stories],
         meta=ApiMeta(page=skip // limit + 1 if limit > 0 else 1, limit=limit, total=len(stories))
     )
 
@@ -195,7 +195,7 @@ async def get_single_story(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Story not found or not accessible by the current user."
         )
-    return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(db_story))
+    return ApiResponse.success_response(data=schema_story.StoryRead.model_validate(db_story))
 
 @router.put("/{story_id}", response_model=ApiResponse, name="update_existing_story", summary="Update an existing story.")
 async def update_existing_story(
@@ -245,7 +245,7 @@ async def update_existing_story(
                 logger.error(f"Error checking/sending story completion email: {e}")
                 # Don't fail the update operation if email fails
 
-        return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(updated_story))
+        return ApiResponse.success_response(data=schema_story.StoryRead.model_validate(updated_story))
     except HTTPException:
         raise
     except Exception as e:

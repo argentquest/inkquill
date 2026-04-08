@@ -64,7 +64,7 @@ class UploadedDocument(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     world_id: Mapped[Optional[int]] = mapped_column(
         Integer, 
-        ForeignKey("worlds.id", ondelete="SET NULL"),
+        ForeignKey("storytelling_worlds.id", ondelete="SET NULL"),
         nullable=True, 
         index=True
     )
@@ -73,9 +73,9 @@ class UploadedDocument(Base):
         nullable=True,
         index=True
     )
-    source_character_id: Mapped[Optional[int]] = mapped_column(ForeignKey("characters.id", ondelete="SET NULL"), nullable=True, index=True)
-    source_location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("locations.id", ondelete="SET NULL"), nullable=True, index=True)
-    source_lore_item_id: Mapped[Optional[int]] = mapped_column(ForeignKey("lore_items.id", ondelete="SET NULL"), nullable=True, index=True)
+    source_character_id: Mapped[Optional[int]] = mapped_column(ForeignKey("storytelling_characters.id", ondelete="SET NULL"), nullable=True, index=True)
+    source_location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("storytelling_locations.id", ondelete="SET NULL"), nullable=True, index=True)
+    source_lore_item_id: Mapped[Optional[int]] = mapped_column(ForeignKey("storytelling_lore_items.id", ondelete="SET NULL"), nullable=True, index=True)
 
     # --- Relationships ---
     owner: Mapped["User"] = relationship("User", back_populates="uploaded_documents")

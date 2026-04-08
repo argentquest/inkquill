@@ -52,7 +52,7 @@ NOSTALGIA_TOPICS = [
 
 
 class NostalgiaProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates personalized nostalgic memories using a Large Language Model.

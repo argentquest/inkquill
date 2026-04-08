@@ -11,6 +11,7 @@ class CareCircleFamily(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    join_code: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
     created_by_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -70,6 +71,7 @@ class CareCirclePatientContentCard(Base):
     provider_key: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
+    rendered_html: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     card_kind: Mapped[str] = mapped_column(String(50), default="family", nullable=False)
     display_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

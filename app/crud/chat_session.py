@@ -7,7 +7,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy import desc
 from typing import List, Optional
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app.models.chat_session import ChatSession
 from app.models.chat_message import ChatMessage
@@ -87,7 +87,7 @@ async def update_chat_session(
         setattr(db_session, field, value)
     
     # Update the updated_at timestamp
-    db_session.updated_at = datetime.utcnow()
+    db_session.updated_at = datetime.now(UTC)
     
     await db.commit()
     await db.refresh(db_session)
@@ -141,7 +141,7 @@ async def touch_session_updated_at(
     db_session = result.scalar_one_or_none()
     
     if db_session:
-        db_session.updated_at = datetime.utcnow()
+        db_session.updated_at = datetime.now(UTC)
         await db.commit()
 
 # Create CRUD class for consistency

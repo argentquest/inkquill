@@ -1,11 +1,15 @@
 """
 Referral tracking models for user acquisition and rewards.
 """
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
+
+
+def _naive_utc_now() -> datetime:
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class Referral(Base):
@@ -44,8 +48,8 @@ class Referral(Base):
     first_publish_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     
     # Timestamps
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, onupdate=_naive_utc_now)
     
     # Relationships
     referrer = relationship("User", foreign_keys=[referrer_user_id], backref="referrals_made")
@@ -71,7 +75,7 @@ class ReferralReward(Base):
     coin_amount: Mapped[int] = mapped_column(Integer)
     
     # Tracking
-    awarded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    awarded_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, index=True)
     
     # Relationships
     referral = relationship("Referral", back_populates="rewards")
@@ -101,8 +105,8 @@ class ReferralLimit(Base):
     publish_rewards_count: Mapped[int] = mapped_column(Integer, default=0)
     
     # Timestamps
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, onupdate=_naive_utc_now)
     
     # Relationships
     user = relationship("User", backref="referral_limits")

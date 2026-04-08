@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class FinishPhraseProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Finish the Phrase Puzzle - Idioms & Lyrics completion.

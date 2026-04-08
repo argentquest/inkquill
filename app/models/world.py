@@ -31,7 +31,7 @@ class World(Base):
     A World is owned by a User and can contain Characters, Locations, LoreItems,
     and can be associated with multiple Stories.
     """
-    __tablename__ = "worlds"
+    __tablename__ = "storytelling_worlds"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), index=True, nullable=False, unique=False)

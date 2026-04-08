@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 
 class MemoryLanePhotoProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Shows a vintage-style photo with a warm description.

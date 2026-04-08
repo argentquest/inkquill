@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 interface DialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   children: React.ReactNode;
 }
 
@@ -82,7 +82,7 @@ export function DialogDescription({ children, className }: { children: React.Rea
 
 interface ConfirmDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   title: string;
   description: string;
   confirmLabel?: string;

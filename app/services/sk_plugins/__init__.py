@@ -1,7 +1,7 @@
 # /story_app/app/services/sk_plugins/__init__.py
 
 """
-This package contains modules for setting up various Semantic Kernel plugins.
+This package contains modules for setting up various storytelling runtime plugins.
 Each module is responsible for loading its specific prompts and registering
 its functions with the main kernel instance.
 """

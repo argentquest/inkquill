@@ -4,8 +4,6 @@
 import logging
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from semantic_kernel.contents.chat_history import ChatHistory
-from semantic_kernel.exceptions import ServiceResponseException
 
 from app.models.act import Act
 from app.models.scene import Scene
@@ -13,8 +11,9 @@ from app.crud.act import update_act
 from app.crud.scene import update_scene
 from app.schemas.act import ActUpdate
 from app.schemas.scene import SceneUpdate
-from app.services.sk_kernel_instance import kernel
+from app.services.storytelling_runtime import kernel
 from app.services.sk_constants import STORY_ANALYSIS_PLUGIN_NAME
+from app.services.langgraph_kernel import ServiceResponseException
 from app.services.cost_tracker_service import log_ai_call
 from app.crud.ai_model_config import get_default_model_config
 
@@ -71,7 +70,7 @@ async def generate_ai_summary_for_act(
             
             # Track costs - would need to extract usage from result to properly log
             # For now, skip cost tracking since we don't have token usage data
-            # TODO: Extract usage metadata from semantic kernel result
+            # TODO: Extract usage metadata from storytelling runtime result
             
             logger.info(f"Generated AI summary for act {act.id}: {summary[:100]}...")
             return summary
@@ -138,7 +137,7 @@ async def generate_ai_summary_for_scene(
             
             # Track costs - would need to extract usage from result to properly log
             # For now, skip cost tracking since we don't have token usage data
-            # TODO: Extract usage metadata from semantic kernel result
+            # TODO: Extract usage metadata from storytelling runtime result
             
             logger.info(f"Generated AI summary for scene {scene.id}: {summary[:100]}...")
             return summary

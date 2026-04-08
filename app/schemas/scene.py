@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/scene.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -14,10 +14,7 @@ class SceneStoryClass(BaseModel):
     name: str
     color: str
     
-    class Config:
-        from_attributes = True
-
-# --- Background: Pydantic Schemas for Scene ---
+    model_config = ConfigDict(from_attributes=True)
 # These models define the expected data structure for API requests (input)
 # and responses (output) related to the Scene entity. They provide
 # data validation and serialization for scene attributes.
@@ -94,8 +91,5 @@ class SceneRead(SceneBase):
     # Image URL field for displaying current image
     image_url: Optional[str] = None
 
-    class Config:
-        # Enables compatibility with ORM models (SQLAlchemy).
-        # Allows Pydantic to automatically map data from ORM object attributes.
-        from_attributes = True # Replaces orm_mode = True in Pydantic v1
+    model_config = ConfigDict(from_attributes=True)
 

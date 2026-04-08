@@ -40,8 +40,8 @@ class LoreItemCategoryEnum(str, enum.Enum):
 story_lore_item_association_table = sqlalchemy.Table(
     "story_lore_item_association",
     Base.metadata,
-    Column("story_id", Integer, ForeignKey("stories.id", ondelete="CASCADE"), primary_key=True),
-    Column("lore_item_id", Integer, ForeignKey("lore_items.id", ondelete="CASCADE"), primary_key=True),
+    Column("story_id", Integer, ForeignKey("storytelling_stories.id", ondelete="CASCADE"), primary_key=True),
+    Column("lore_item_id", Integer, ForeignKey("storytelling_lore_items.id", ondelete="CASCADE"), primary_key=True),
     Column("relevance_to_story", Text, nullable=True)
 )
 
@@ -49,7 +49,7 @@ class LoreItem(Base):
     """
     SQLAlchemy ORM Model representing a Lore Item within a World.
     """
-    __tablename__ = "lore_items"
+    __tablename__ = "storytelling_lore_items"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
@@ -68,9 +68,9 @@ class LoreItem(Base):
     image_prompt_definition: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     image_blob_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
 
-    world_id: Mapped[int] = mapped_column(Integer, ForeignKey("worlds.id", ondelete="CASCADE"), nullable=False, index=True)
+    world_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_worlds.id", ondelete="CASCADE"), nullable=False, index=True)
     
-    current_location_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("locations.id", ondelete="SET NULL"), nullable=True)
+    current_location_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_locations.id", ondelete="SET NULL"), nullable=True)
     placement_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     current_image_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("generated_images.id", ondelete="SET NULL"), nullable=True)

@@ -5,7 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class DogPhotoProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Fetches a random picture of a dog from the public Dog API.

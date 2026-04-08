@@ -8,10 +8,7 @@ from sqlalchemy import select, and_
 from typing import List, Dict, Any
 import time
 import logging
-import semantic_kernel as sk
-from semantic_kernel.functions import kernel_function
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
+from app.services.langgraph_kernel import KernelArguments, OpenAIChatPromptExecutionSettings, kernel_function
 
 from app.core.deps import get_db_session, get_current_active_user, get_current_user
 from app.models.user import User
@@ -26,7 +23,7 @@ from app.schemas.ai_text_transform import (
     QuickAIOperation,
     AITextTransformError
 )
-from app.services.sk_kernel_instance import kernel
+from app.services.storytelling_runtime import kernel
 from app.services.ai_model_cache import model_cache
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from app.services.temperature_optimizer import TemperatureOptimizer, TaskType
@@ -323,9 +320,9 @@ async def transform_text(
         # Get usage information from result
         usage = get_usage_from_sk_result(result) or {}
         
-        # If no usage data from semantic kernel, estimate using tiktoken
+        # If no usage data from storytelling runtime, estimate using tiktoken
         if not usage or usage.get('total_tokens', 0) == 0:
-            logger.info("No usage data from semantic kernel, estimating tokens using tiktoken")
+            logger.info("No usage data from storytelling runtime, estimating tokens using tiktoken")
             from app.services.cost_tracker_service import estimate_tokens_for_streaming_call
             usage = estimate_tokens_for_streaming_call(
                 input_text=prompt_content,

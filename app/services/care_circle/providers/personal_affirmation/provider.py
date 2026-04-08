@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 
 class PersonalAffirmationProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a deeply personal affirmation using the recipient's name,

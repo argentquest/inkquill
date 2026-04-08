@@ -1,7 +1,7 @@
 """Blog service for managing blog posts and related operations."""
 import logging
 from typing import List, Optional, Dict, Any
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, func, and_, or_
 from sqlalchemy.orm import selectinload
@@ -115,7 +115,7 @@ class BlogService:
             
             # Update post status and published timestamp
             post.status = BlogPostStatus.PUBLISHED
-            post.published_at = datetime.utcnow()
+            post.published_at = datetime.now(UTC)
             
             await db.commit()
             await db.refresh(post)
@@ -297,13 +297,13 @@ class BlogService:
                 post.status = post_data.status
                 # Update published_at timestamp when publishing
                 if post_data.status == BlogPostStatus.PUBLISHED and post.published_at is None:
-                    post.published_at = datetime.utcnow()
+                    post.published_at = datetime.now(UTC)
             
             # Handle tags update
             if post_data.tags is not None:
                 await self._handle_post_tags(db, post.id, post_data.tags)
             
-            post.updated_at = datetime.utcnow()
+            post.updated_at = datetime.now(UTC)
             
             await db.commit()
             await db.refresh(post)
@@ -337,7 +337,7 @@ class BlogService:
             if post.author_id != current_user.id and not getattr(current_user, 'is_admin', False):
                 return False
             
-            post.deleted_at = datetime.utcnow()
+            post.deleted_at = datetime.now(UTC)
             await db.commit()
             
             logger.info(f"Soft deleted blog post: {post.title} (ID: {post.id})")
@@ -437,9 +437,7 @@ class BlogService:
     ) -> List[BlogPost]:
         """Get trending posts based on weighted algorithm considering views, likes, comments, and recency."""
         try:
-            from datetime import datetime, timedelta
-            
-            cutoff_date = datetime.utcnow() - timedelta(days=days_back)
+            cutoff_date = datetime.now(UTC) - timedelta(days=days_back)
             
             # Weighted trending algorithm:
             # Score = (view_count * 1.0) + (like_count * 2.0) + (comment_count * 3.0) + (recency_boost)

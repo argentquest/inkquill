@@ -49,7 +49,7 @@ TRIVIA_CATEGORIES = [
 
 
 class AiTriviaProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Provides a daily trivia fact and a music suggestion using a Large Language Model.

@@ -2,7 +2,7 @@
 Social Sharing Service with coin rewards and analytics tracking.
 """
 import uuid
-from datetime import datetime, date
+from datetime import UTC, date, datetime
 from typing import Optional, Dict, Any, List
 from urllib.parse import quote_plus
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +25,11 @@ class SocialSharingService:
     # Maximum coins per day per user
     MAX_DAILY_COINS = 10
     COINS_PER_SHARE = 1
+
+    @staticmethod
+    def _naive_utc_now() -> datetime:
+        """Return UTC as a naive datetime for legacy TIMESTAMP WITHOUT TIME ZONE columns."""
+        return datetime.now(UTC).replace(tzinfo=None)
     
     # Social platform configurations (popup dimensions increased by 75%)
     PLATFORM_CONFIGS = {
@@ -196,7 +201,7 @@ class SocialSharingService:
                     current_count = getattr(daily_summary, content_field)
                     setattr(daily_summary, content_field, current_count + 1)
                 
-                daily_summary.updated_at = datetime.utcnow()
+                daily_summary.updated_at = self._naive_utc_now()
                 
                 message = f"Share tracked! You earned {coin_amount} coin. Keep sharing!"
             else:
@@ -323,7 +328,7 @@ class SocialSharingService:
         
         # Daily stats (last 30 days)
         daily_query = select(SocialShareDailySummary).where(
-            SocialShareDailySummary.date >= datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+            SocialShareDailySummary.date >= self._naive_utc_now().replace(hour=0, minute=0, second=0, microsecond=0)
         ).order_by(SocialShareDailySummary.date.desc()).limit(30)
         
         if user_id:

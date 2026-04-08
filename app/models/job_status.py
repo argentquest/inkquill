@@ -47,7 +47,7 @@ class JobStatus(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     
     # Optional foreign key to the world created by or associated with this job
-    world_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("worlds.id", ondelete="SET NULL"), nullable=True)
+    world_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_worlds.id", ondelete="SET NULL"), nullable=True)
 
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

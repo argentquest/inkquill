@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/user.py
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -86,11 +86,7 @@ class UserRead(UserBase):
     refresh_token: Optional[str] = Field(None, description="JWT refresh token")
     token_type: Optional[str] = Field(None, description="Type of the token (e.g., bearer)")
 
-    class Config:
-        # Enables compatibility with ORM models (like SQLAlchemy).
-        # Allows Pydantic to read data directly from ORM object attributes.
-        # Replaces `orm_mode = True` from Pydantic v1.
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UserToken(BaseModel):
     """
@@ -108,8 +104,4 @@ class UserTokenWithDetails(UserToken):
     """
     user: UserRead
 
-    class Config:
-        # Enables compatibility with ORM models (like SQLAlchemy).
-        # Allows Pydantic to read data directly from ORM object attributes.
-        # Replaces `orm_mode = True` from Pydantic v1.
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -4,7 +4,7 @@ export interface DataTableColumn<T> {
   key: string;
   header: string;
   className?: string;
-  render: (row: T) => React.ReactNode;
+  render: (_row: T) => React.ReactNode;
 }
 
 export function DataTable<T>({

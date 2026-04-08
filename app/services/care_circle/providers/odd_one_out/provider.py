@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class OddOneOutProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Odd One Out Logic Game - Categorization puzzle.

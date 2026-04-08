@@ -30,7 +30,7 @@ RECIPE_CATEGORIES = [
 
 
 class SimpleRecipeProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a very simple, nostalgic recipe with 3-4 steps using an LLM.

@@ -14,13 +14,18 @@ from app.models.user import User
 from app.services.interview_validation_service import validation_service
 from app.schemas.base import ApiResponse
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import UTC, datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/api/v1/interview", tags=["interview"])
+
+
+def _naive_utc_now() -> datetime:
+    """Return UTC as a naive datetime for legacy TIMESTAMP WITHOUT TIME ZONE columns."""
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class InterviewSubmissionRequest(BaseModel):
@@ -103,8 +108,8 @@ async def submit_interview(
     db: AsyncSession = Depends(get_db_session)
 ):
     """Submit completed interview responses with comprehensive validation"""
-    
-    logger.info(f"Submitting interview {submission.interview_id} for user {current_user.id}")
+    user_id = current_user.id
+    logger.info(f"Submitting interview {submission.interview_id} for user {user_id}")
     
     # Check if user already has a response for this interview
     # For story_brainstorm interviews, always create new records (allow multiple brainstorm sessions)
@@ -114,22 +119,22 @@ async def submit_interview(
     if submission.interview_id != "story_brainstorm":
         result = await db.execute(
             select(UserInterviewResponse).filter(
-                UserInterviewResponse.user_id == current_user.id,
+                UserInterviewResponse.user_id == user_id,
                 UserInterviewResponse.interview_id == submission.interview_id
             )
         )
         existing_response = result.scalar_one_or_none()
         
         if existing_response:
-            logger.info(f"User {current_user.id} is retaking interview {submission.interview_id}, will update existing response")
+            logger.info(f"User {user_id} is retaking interview {submission.interview_id}, will update existing response")
     else:
-        logger.info(f"User {current_user.id} is creating new story_brainstorm session (multiple sessions allowed)")
+        logger.info(f"User {user_id} is creating new story_brainstorm session (multiple sessions allowed)")
     
     # Build the complete response JSON
     complete_response = {
         "interview_id": submission.interview_id,
-        "user_id": current_user.id,
-        "completed_at": datetime.utcnow().isoformat(),
+        "user_id": user_id,
+        "completed_at": datetime.now(UTC).isoformat(),
         "responses": submission.responses,
         "navigation": submission.navigation,
         "metadata": {
@@ -142,9 +147,9 @@ async def submit_interview(
     # Validate response against schema
     try:
         validation_service.validate_response(complete_response)
-        logger.info(f"Response schema validation passed for user {current_user.id}")
+        logger.info(f"Response schema validation passed for user {user_id}")
     except HTTPException as e:
-        logger.error(f"Response validation failed for user {current_user.id}: {e.detail}")
+        logger.error(f"Response validation failed for user {user_id}: {e.detail}")
         raise
     
     # Cross-validate against questions (optional - warns but doesn't fail)
@@ -160,7 +165,7 @@ async def submit_interview(
                     complete_response, questions_data
                 )
                 if warnings:
-                    logger.warning(f"Cross-validation warnings for user {current_user.id}: {warnings}")
+                    logger.warning(f"Cross-validation warnings for user {user_id}: {warnings}")
                     # Log warnings but don't fail the submission
                     
     except Exception as e:
@@ -170,7 +175,7 @@ async def submit_interview(
     # Sanitize the response data
     try:
         complete_response = validation_service.sanitize_response(complete_response)
-        logger.debug(f"Response data sanitized for user {current_user.id}")
+        logger.debug(f"Response data sanitized for user {user_id}")
     except Exception as e:
         logger.error(f"Error sanitizing response data: {e}")
         # Continue with original data if sanitization fails
@@ -180,7 +185,7 @@ async def submit_interview(
         if existing_response:
             # Update existing response
             existing_response.json_response = json.dumps(complete_response, ensure_ascii=False, indent=2)
-            existing_response.completed_at = datetime.utcnow()
+            existing_response.completed_at = _naive_utc_now()
             interview_response = existing_response
             action = "updated"
         else:
@@ -189,7 +194,7 @@ async def submit_interview(
                 user_id=current_user.id,
                 interview_id=submission.interview_id,
                 json_response=json.dumps(complete_response, ensure_ascii=False, indent=2),
-                completed_at=datetime.utcnow()
+                completed_at=_naive_utc_now()
             )
             db.add(interview_response)
             action = "created"
@@ -197,7 +202,7 @@ async def submit_interview(
         await db.commit()
         await db.refresh(interview_response)
         
-        logger.info(f"Interview {submission.interview_id} successfully {action} for user {current_user.id} with ID {interview_response.id}")
+        logger.info(f"Interview {submission.interview_id} successfully {action} for user {user_id} with ID {interview_response.id}")
         
         return ApiResponse.success_response(
             data=InterviewSubmissionResponse(
@@ -209,7 +214,7 @@ async def submit_interview(
         
     except Exception as e:
         await db.rollback()
-        logger.error(f"Database error saving interview for user {current_user.id}: {e}")
+        logger.error(f"Database error saving interview for user {user_id}: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Error saving interview: {str(e)}"

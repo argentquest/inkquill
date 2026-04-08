@@ -20,11 +20,9 @@ from app.crud import ai_model_config as ai_model_crud
 from app.crud.billing import billing_crud
 from app.schemas.billing import UserTransactionCreate
 from app.schemas.base import ApiResponse
-from app.services.semantic_kernel_setup import kernel
+from app.services.langgraph_runtime_setup import kernel
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
-from semantic_kernel.functions import KernelArguments
+from app.services.langgraph_kernel import KernelArguments, OpenAIChatPromptExecutionSettings, PromptTemplateConfig
 
 logger = logging.getLogger(__name__)
 
@@ -219,7 +217,6 @@ async def analyze_interview(
         
         logger.info("Invoking AI function...")
         # Pass the interview responses as an argument
-        from semantic_kernel.functions import KernelArguments
         arguments = KernelArguments(interview_responses=interview_text)
         result = await welcome_function.invoke(kernel, arguments)
         ai_result = str(result)
@@ -227,7 +224,7 @@ async def analyze_interview(
         
         # Log AI cost tracking and automatically deduct from user account
         try:
-            # First try to extract usage data from Semantic Kernel result
+            # First try to extract usage data from the storytelling runtime result
             usage_data = get_usage_from_sk_result(result)
             logger.info(f"Usage data from SK result: {usage_data}")
             

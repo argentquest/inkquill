@@ -30,7 +30,7 @@ from .lore_item import story_lore_item_association_table
 
 class Story(Base):
     """SQLAlchemy model for story."""
-    __tablename__ = "stories"
+    __tablename__ = "storytelling_stories"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
@@ -40,7 +40,7 @@ class Story(Base):
     
     world_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("worlds.id", ondelete="RESTRICT"),
+        ForeignKey("storytelling_worlds.id", ondelete="RESTRICT"),
         nullable=False,
         index=True
     )

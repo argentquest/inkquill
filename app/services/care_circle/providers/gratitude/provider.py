@@ -45,7 +45,7 @@ GRATITUDE_MODES = [
 
 
 class GratitudeProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a gentle thought of gratitude using a Large Language Model.
@@ -55,8 +55,9 @@ class GratitudeProvider(BaseCareCircleProvider):
     """
 
     async def get_content(self, **kwargs) -> str:
+        patient_profile = kwargs.get("patient_profile")
         cfg = self.patient_config
-        name = getattr(patient_profile, 'preferences', {}).get("recipient_name", "friend")
+        name = getattr(patient_profile, "display_name", "friend") if patient_profile else "friend"
 
         mode = random.choice(GRATITUDE_MODES)
 

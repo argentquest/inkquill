@@ -21,7 +21,7 @@ _daily_cache: dict[tuple, dict] = {}
 
 
 class GridlessCrosswordProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Provides a daily gridless crossword puzzle with 10 word-clue pairs.

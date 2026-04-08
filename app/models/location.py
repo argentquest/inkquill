@@ -37,8 +37,8 @@ if TYPE_CHECKING:
 story_location_association_table = sqlalchemy.Table(
     "story_location_association",
     Base.metadata,
-    Column("story_id", Integer, ForeignKey("stories.id", ondelete="CASCADE"), primary_key=True),
-    Column("location_id", Integer, ForeignKey("locations.id", ondelete="CASCADE"), primary_key=True),
+    Column("story_id", Integer, ForeignKey("storytelling_stories.id", ondelete="CASCADE"), primary_key=True),
+    Column("location_id", Integer, ForeignKey("storytelling_locations.id", ondelete="CASCADE"), primary_key=True),
     Column("significance_to_story", Text, nullable=True)
 )
 
@@ -46,7 +46,7 @@ class Location(Base):
     """
     SQLAlchemy ORM Model representing a Location within a World.
     """
-    __tablename__ = "locations"
+    __tablename__ = "storytelling_locations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
@@ -58,7 +58,7 @@ class Location(Base):
     image_blob_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
 
     scale: Mapped[Optional[LocationScaleEnum]] = mapped_column(Enum(LocationScaleEnum, name="location_scale_enum"), nullable=True)
-    parent_location_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("locations.id", ondelete="SET NULL"), nullable=True, index=True)
+    parent_location_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_locations.id", ondelete="SET NULL"), nullable=True, index=True)
     
     map_x: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     map_y: Mapped[Optional[float]] = mapped_column(Float, nullable=True) 
@@ -77,7 +77,7 @@ class Location(Base):
     importance_rating: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     connected_elements: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
-    world_id: Mapped[int] = mapped_column(Integer, ForeignKey("worlds.id", ondelete="CASCADE"), nullable=False, index=True)
+    world_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_worlds.id", ondelete="CASCADE"), nullable=False, index=True)
 
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -151,10 +151,10 @@ class LocationConnection(Base):
     """
     SQLAlchemy ORM Model representing connections between locations.
     """
-    __tablename__ = "location_connections"
+    __tablename__ = "storytelling_location_connections"
 
-    from_location_id: Mapped[int] = mapped_column(Integer, ForeignKey("locations.id", ondelete="CASCADE"), primary_key=True, index=True)
-    to_location_id: Mapped[int] = mapped_column(Integer, ForeignKey("locations.id", ondelete="CASCADE"), primary_key=True, index=True)
+    from_location_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_locations.id", ondelete="CASCADE"), primary_key=True, index=True)
+    to_location_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_locations.id", ondelete="CASCADE"), primary_key=True, index=True)
     path_description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     reverse_path_description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_bidirectional: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

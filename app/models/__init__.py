@@ -91,4 +91,13 @@ from .cta_content import CTAContent, CTAPosition, CTAStyle
 # forward-referenced relationship strings.
 
 
-from .care_circle import CareCircleFamily, CareCircleFamilyMembership, CareCirclePatientProfile, CareCircleProviderCatalog, CareCirclePatientContentCard
+from .care_circle import (
+    CareCircleFamily,
+    CareCircleFamilyMembership,
+    CareCirclePatientProfile,
+    CareCircleProviderCatalog,
+    CareCirclePatientContentCard,
+    CareCircleProviderRunLog,
+    CareCircleProviderPatientConfig,
+    CareCircleProviderSessionOutput,
+)

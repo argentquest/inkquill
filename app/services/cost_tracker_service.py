@@ -153,7 +153,7 @@ def _calculate_cost(model_config: AIModelConfiguration, usage_dict: Dict[str, in
         return prompt_cost + completion_cost
 
 def get_usage_from_sk_result(sk_result: Any) -> Optional[Dict[str, int]]:
-    """Extract usage data from Semantic Kernel result with detailed logging"""
+    """Extract usage data from storytelling runtime result with detailed logging"""
     logger.info(f"Attempting to extract usage from SK result. Result exists: {sk_result is not None}")
     
     if not sk_result:

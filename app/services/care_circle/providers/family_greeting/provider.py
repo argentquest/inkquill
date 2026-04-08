@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 
 class FamilyGreetingProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a warm, imagined short note 'from' one of the recipient's

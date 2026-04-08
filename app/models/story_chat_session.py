@@ -23,12 +23,12 @@ class StoryChatSession(Base):
     This allows users to have conversations about their story with AI,
     discussing plot, characters, themes, development ideas, etc.
     """
-    __tablename__ = "story_chat_sessions"
+    __tablename__ = "storytelling_story_chat_sessions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
     # Links to story and user
-    story_id: Mapped[int] = mapped_column(Integer, ForeignKey("stories.id", ondelete="CASCADE"), nullable=False, index=True)
+    story_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_stories.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     
     # Session details

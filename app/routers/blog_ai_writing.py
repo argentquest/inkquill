@@ -8,10 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import json 
 import time
-import semantic_kernel as sk
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.functions.function_result import FunctionResult 
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from typing import Dict, Any, Optional, List
 import logging
 
@@ -24,7 +20,7 @@ from app.crud import user as crud_user
 from app.core.deps_ws import get_current_user_from_ws_ticket
 from app.core.config import settings
 from app.services.ai_model_cache import model_cache
-from app.services.sk_kernel_instance import (
+from app.services.storytelling_runtime import (
     kernel,
     generate_act_narrative_only_function,
     generate_scene_narrative_only_function
@@ -36,6 +32,7 @@ from app.services.sk_constants import (
 from app.services.cost_tracker_service import log_ai_streaming_call
 from app.services.blog_prompt_service import BlogPromptService
 from app.services.direct_context import build_document_context
+from app.services.langgraph_kernel import OpenAIChatPromptExecutionSettings, KernelArguments, FunctionResult
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +96,7 @@ blog_writing_manager = BlogWritingContextManager()
 
 
 def extract_text_from_result(result) -> str:
-    """Extract clean text content from Semantic Kernel result."""
+    """Extract clean text content from storytelling runtime result."""
     if not result or not result.value:
         return ""
     

@@ -1,6 +1,6 @@
 """Shared fixtures for isolated, mock-based unit tests."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Callable
 from unittest.mock import AsyncMock, Mock
@@ -39,7 +39,7 @@ def mock_user() -> SimpleNamespace:
         bonus9=False,
         bonus10=False,
         interview_data=None,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
 
 

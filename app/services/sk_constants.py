@@ -1,7 +1,7 @@
 # /story_app/app/services/sk_constants.py
 
 """
-This module defines constants for Semantic Kernel plugin names used throughout the application.
+This module defines constants for storytelling runtime plugin names used throughout the application.
 Centralizing these names helps prevent typos and ensures consistency when registering
 and retrieving plugins and their functions.
 """

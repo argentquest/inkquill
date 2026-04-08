@@ -5,7 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class GentleExerciseProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Provides a simple, low-impact exercise recommendation via static configuration.

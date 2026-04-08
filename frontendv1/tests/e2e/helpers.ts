@@ -33,6 +33,7 @@ const careCirclePatients = [
     id: "1",
     displayName: "Rose Ellis",
     familyName: "Story Maker household",
+    joinCode: "STM111",
     stage: "moderate",
     accessState: "active",
     timezone: "America/Chicago",
@@ -62,6 +63,7 @@ const careCirclePatients = [
     id: "2",
     displayName: "Arthur Bloom",
     familyName: "Story Maker household",
+    joinCode: "STM111",
     stage: "mild",
     accessState: "inactive",
     timezone: "America/New_York",
@@ -96,6 +98,55 @@ const patientAuthCatalog = [
   { key: "boat", label: "Boat", emoji: "⛵" },
   { key: "hat", label: "Hat", emoji: "🎩" }
 ];
+
+const careCircleProviders = [
+  {
+    providerKey: "weather",
+    label: "Weather",
+    icon: "⛅",
+    category: "orientation",
+    enabled: true,
+    displayOrder: 1,
+    patientVisible: true,
+    familyVisible: true
+  },
+  {
+    providerKey: "joke",
+    label: "Daily Joy",
+    icon: "😄",
+    category: "wellbeing",
+    enabled: true,
+    displayOrder: 2,
+    patientVisible: true,
+    familyVisible: true
+  }
+];
+
+const patientProviderConfigs: Record<string, Array<{
+  id: number;
+  patient_id: number;
+  provider_key: string;
+  is_enabled: boolean;
+  custom_parameters: Record<string, unknown>;
+}>> = {
+  "1": [
+    {
+      id: 1,
+      patient_id: 1,
+      provider_key: "weather",
+      is_enabled: true,
+      custom_parameters: {}
+    },
+    {
+      id: 2,
+      patient_id: 1,
+      provider_key: "joke",
+      is_enabled: false,
+      custom_parameters: {}
+    }
+  ],
+  "2": []
+};
 
 function json(body: unknown, status = 200) {
   return {
@@ -151,6 +202,17 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
+    if (url.endsWith("/care-circle/providers")) {
+      await route.fulfill(json({ success: true, data: careCircleProviders }));
+      return;
+    }
+
+    if (/\/care-circle\/family\/patients\/\d+\/provider-configs$/.test(url)) {
+      const patientId = url.split("/").slice(-2)[0];
+      await route.fulfill(json({ success: true, data: patientProviderConfigs[patientId] ?? [] }));
+      return;
+    }
+
     if (/\/care-circle\/family\/patients\/\d+$/.test(url)) {
       const patientId = url.split("/").pop();
       const patient = careCirclePatients.find((entry) => entry.id === patientId);
@@ -159,6 +221,33 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         return;
       }
       await route.fulfill(json({ success: true, data: patient }));
+      return;
+    }
+
+    if (/\/care-circle\/family\/patients\/\d+\/provider-configs\/[^/]+$/.test(url) && method === "PUT") {
+      const parts = url.split("/");
+      const providerKey = parts.at(-1) ?? "";
+      const patientId = parts.at(-3) ?? "";
+      const body = route.request().postDataJSON() as { is_enabled?: boolean; custom_parameters?: Record<string, unknown> };
+      const patientConfigList = patientProviderConfigs[patientId] ?? [];
+      let existing = patientConfigList.find((entry) => entry.provider_key === providerKey);
+
+      if (!existing) {
+        existing = {
+          id: patientConfigList.length + 1,
+          patient_id: Number(patientId),
+          provider_key: providerKey,
+          is_enabled: body.is_enabled ?? true,
+          custom_parameters: body.custom_parameters ?? {}
+        };
+        patientConfigList.push(existing);
+        patientProviderConfigs[patientId] = patientConfigList;
+      } else {
+        existing.is_enabled = body.is_enabled ?? existing.is_enabled;
+        existing.custom_parameters = body.custom_parameters ?? existing.custom_parameters;
+      }
+
+      await route.fulfill(json({ success: true, data: existing }));
       return;
     }
 
@@ -209,7 +298,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         json({
           success: true,
           data: {
-            balance: 120,
+            balance: 25.75,
             currency: "Coins",
             error: null
           }
@@ -380,9 +469,9 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         json({
           success: true,
           data: {
-            interview_id: "intro",
-            interview_title: "New user onboarding",
-            interview_description: "A short shared interview helps the platform tailor your writing workspace.",
+            interview_id: "new_user_onboarding",
+            interview_title: "Welcome! Let's get to know you better",
+            interview_description: "A short shared interview helps the platform tailor your writing workspace before you start drafting.",
             questions: [
               { id: "q1", order: 1, question: "What brings you here?", subtitle: "Tell us the main thing you want to create." },
               { id: "q2", order: 2, question: "What do you want to build?", subtitle: "Choose the flow that fits your first project." }
@@ -398,10 +487,10 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         json({
           success: true,
           data: {
-            interview_id: "intro",
-            status: "ready",
-            completed: true,
-            progress: 100
+            interview_id: "new_user_onboarding",
+            status: "pending",
+            completed: false,
+            progress: 0
           }
         })
       );
@@ -413,11 +502,8 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         json({
           success: true,
           data: {
-            has_completed_onboarding: true,
-            insights: [
-              { label: "Primary goal", value: "Story planning" },
-              { label: "Preferred pace", value: "Guided" }
-            ]
+            has_completed_onboarding: false,
+            insights: []
           }
         })
       );

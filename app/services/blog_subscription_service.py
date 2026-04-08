@@ -2,7 +2,7 @@
 import logging
 import secrets
 import json
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, update, delete, func
@@ -81,7 +81,7 @@ class BlogSubscriptionService:
                 source=source,
                 ip_address=ip_address,
                 user_agent=user_agent,
-                confirmed_at=None if require_confirmation else datetime.utcnow()
+                confirmed_at=None if require_confirmation else datetime.now(UTC)
             )
             
             db.add(subscription)
@@ -132,7 +132,7 @@ class BlogSubscriptionService:
                 .where(BlogSubscription.id == subscription.id)
                 .values(
                     status=SubscriptionStatus.ACTIVE,
-                    confirmed_at=datetime.utcnow(),
+                    confirmed_at=datetime.now(UTC),
                     confirmation_token=None
                 )
             )
@@ -182,7 +182,7 @@ class BlogSubscriptionService:
                 .where(BlogSubscription.id == subscription.id)
                 .values(
                     status=SubscriptionStatus.UNSUBSCRIBED,
-                    unsubscribed_at=datetime.utcnow()
+                    unsubscribed_at=datetime.now(UTC)
                 )
             )
             await db.commit()
@@ -281,7 +281,7 @@ class BlogSubscriptionService:
         """
         try:
             # Build update values
-            update_values = {"updated_at": datetime.utcnow()}
+            update_values = {"updated_at": datetime.now(UTC)}
             
             if frequency is not None:
                 update_values["frequency"] = frequency
@@ -331,7 +331,7 @@ class BlogSubscriptionService:
                 update(BlogSubscription)
                 .where(BlogSubscription.id == subscription_id)
                 .values(
-                    last_sent_at=datetime.utcnow(),
+                    last_sent_at=datetime.now(UTC),
                     total_emails_sent=BlogSubscription.total_emails_sent + 1
                 )
             )
@@ -363,7 +363,7 @@ class BlogSubscriptionService:
                 update(BlogSubscription)
                 .where(BlogSubscription.id == subscription_id)
                 .values(
-                    last_opened_at=datetime.utcnow(),
+                    last_opened_at=datetime.now(UTC),
                     open_count=BlogSubscription.open_count + 1
                 )
             )
@@ -413,7 +413,7 @@ class BlogSubscriptionService:
                 frequency_counts[frequency.value] = result.scalar() or 0
             
             # Recent subscriptions (last 30 days)
-            thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+            thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
             result = await db.execute(
                 select(func.count(BlogSubscription.id))
                 .where(BlogSubscription.created_at >= thirty_days_ago)

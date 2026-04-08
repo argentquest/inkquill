@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class MissingVowelsProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Missing Vowels Puzzle - Recognition-based word puzzle.

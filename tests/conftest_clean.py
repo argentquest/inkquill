@@ -163,7 +163,7 @@ def mock_external_dependencies():
         # Mock Azure services
         m.setattr("app.core.azure_deps.get_blob_service_client", MagicMock())
 
-        # Mock Semantic Kernel
-        m.setattr("app.services.semantic_kernel_setup.get_kernel", MagicMock())
+        # Mock storytelling runtime
+        m.setattr("app.services.langgraph_runtime_setup.get_kernel", MagicMock())
 
         yield m

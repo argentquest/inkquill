@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/ai_text_transform.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 
@@ -12,8 +12,8 @@ class AITextTransformRequest(BaseModel):
     operation_id: int = Field(..., description="ID of the QuickAI prompt to use")
     context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the transformation")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "text": "The cat sat on the mat.",
                 "operation_id": 1,
@@ -24,11 +24,12 @@ class AITextTransformRequest(BaseModel):
                     "metadata": {
                         "story_title": "My Story",
                         "act_title": "Act 1",
-                        "scene_title": "Opening Scene"
-                    }
-                }
+                        "scene_title": "Opening Scene",
+                    },
+                },
             }
         }
+    )
 
 class AITextTransformResponse(BaseModel):
     """Response schema for AI text transformation"""
@@ -40,8 +41,8 @@ class AITextTransformResponse(BaseModel):
     cost_estimate: float = Field(..., description="Estimated cost in USD")
     processing_time: float = Field(..., description="Time taken to process in seconds")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "success": True,
                 "transformed_text": "The sleek black cat gracefully settled upon the well-worn woven mat.",
@@ -49,9 +50,10 @@ class AITextTransformResponse(BaseModel):
                 "operation_used": "Expand with Details",
                 "tokens_used": 45,
                 "cost_estimate": 0.0023,
-                "processing_time": 1.2
+                "processing_time": 1.2,
             }
         }
+    )
 
 class AITextCostEstimateRequest(BaseModel):
     """Request schema for cost estimation"""
@@ -73,18 +75,19 @@ class QuickAIOperation(BaseModel):
     is_active: bool = Field(True, description="Whether this operation is available")
     created_at: datetime = Field(..., description="When this operation was created")
     
-    class Config:
-        from_attributes = True
-        json_schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
                 "id": 1,
                 "title": "Rewrite for Clarity",
                 "description": "Improves readability and clarity",
                 "icon": "fas fa-edit",
                 "is_active": True,
-                "created_at": "2024-01-01T00:00:00Z"
+                "created_at": "2024-01-01T00:00:00Z",
             }
-        }
+        },
+    )
 
 class QuickAIOperationsResponse(BaseModel):
     """Response schema for available operations"""
@@ -98,12 +101,13 @@ class AITextTransformError(BaseModel):
     error_message: str = Field(..., description="Human-readable error message")
     error_code: Optional[str] = Field(None, description="Error code for programmatic handling")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "success": False,
                 "error_type": "RATE_LIMIT_EXCEEDED",
                 "error_message": "You have exceeded the rate limit for AI transformations. Please try again in a few minutes.",
-                "error_code": "RATE_LIMIT_429"
+                "error_code": "RATE_LIMIT_429",
             }
         }
+    )

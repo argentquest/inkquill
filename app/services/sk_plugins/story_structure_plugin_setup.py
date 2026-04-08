@@ -1,10 +1,7 @@
 """Service helpers for story structure plugin setup."""
 
 # app/services/sk_plugins/story_structure_plugin_setup.py
-import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
-from semantic_kernel.prompt_template.input_variable import InputVariable
+from app.services.langgraph_kernel import InputVariable, OpenAIChatPromptExecutionSettings, PromptTemplateConfig
 import logging
 
 from app.core.config import settings # For SCENE_EXTRACTION_MAX_TOKENS and TEMPERATURE
@@ -14,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Plugin Name Constant is now imported.
 
-def register_story_structure_functions(kernel_instance: sk.Kernel, chat_service_id: str, prompt_loader: callable):
+def register_story_structure_functions(kernel_instance, chat_service_id: str, prompt_loader: callable):
     """Provide service support for register story structure functions."""
     logger.info(f"SK_PLUGIN_SETUP ({STORY_STRUCTURE_PLUGIN_NAME}): Registering functions...")
 

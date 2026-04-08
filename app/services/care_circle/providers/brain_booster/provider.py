@@ -34,7 +34,7 @@ QUESTION_TYPES = [
 
 
 class BrainBoosterProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates gentle cognitive exercises using a Large Language Model.

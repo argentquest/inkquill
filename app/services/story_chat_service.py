@@ -20,7 +20,7 @@ from app.schemas.story_chat import (
 )
 from app.services.cost_tracker_service import CostTrackerService
 from app.services.ai_model_cache import model_cache
-from app.services import sk_kernel_instance
+from app.services import storytelling_runtime
 
 logger = logging.getLogger(__name__)
 
@@ -173,7 +173,7 @@ class StoryChatService:
             ai_config = model_cache.default_generation_model
             if not ai_config:
                 raise ValueError("No default AI model configuration available")
-            kernel = sk_kernel_instance.kernel
+            kernel = storytelling_runtime.kernel
             
             # Prepare messages for AI
             messages = await self._prepare_chat_messages(session_id, context)

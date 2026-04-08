@@ -52,7 +52,7 @@ test.describe("Sprint 2 auth", () => {
     await page.locator('input[name="password"]').fill("wrongpass1");
     await page.getByRole("button", { name: "Sign in" }).click();
 
-    await expect(page.getByText("Incorrect username or password")).toBeVisible();
+    await expect(page.getByText("Invalid username or password")).toBeVisible();
   });
 
   test("register success reaches the preserved protected destination", async ({ page }) => {

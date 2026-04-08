@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/lore_item.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
 from datetime import datetime
 
@@ -53,9 +53,7 @@ class LoreItemRead(LoreItemBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-        use_enum_values = True
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 # --- Schemas for Story-LoreItem Association ---
 
@@ -71,8 +69,7 @@ class StoryLoreItemLinkRead(BaseModel):
     relevance_to_story: Optional[str] = None
     lore_item: LoreItemRead 
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class LoreItemInStoryRead(BaseModel):
     """Schema for listing lore items associated with a story, showing their story-specific relevance."""
@@ -86,7 +83,5 @@ class LoreItemInStoryRead(BaseModel):
     image_url: Optional[str] = None
     # --- END FIX ---
 
-    class Config:
-        from_attributes = True
-        use_enum_values = True
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 

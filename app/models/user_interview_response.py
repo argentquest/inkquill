@@ -4,21 +4,25 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Bool
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import json
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, Any, Optional, List
+
+
+def _naive_utc_now() -> datetime:
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class UserInterviewResponse(Base):
     """SQLAlchemy model for user interview response."""
-    __tablename__ = "user_interview_responses"
+    __tablename__ = "storytelling_user_interview_responses"
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     interview_id = Column(String(100), nullable=False, index=True)
     json_response = Column(Text, nullable=False)
-    completed_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=False, default=_naive_utc_now)
+    created_at = Column(DateTime, default=_naive_utc_now)
+    updated_at = Column(DateTime, default=_naive_utc_now, onupdate=_naive_utc_now)
     
     # Relationships
     user = relationship("User", back_populates="interview_responses")
@@ -30,7 +34,7 @@ class UserInterviewResponse(Base):
     def set_response_data(self, data: Dict[str, Any]) -> None:
         """Set the JSON response data"""
         self.json_response = json.dumps(data, ensure_ascii=False, indent=2)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = _naive_utc_now()
     
     def get_selected_genres(self) -> List[str]:
         """Extract selected genres from response"""

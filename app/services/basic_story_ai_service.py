@@ -11,7 +11,7 @@ from app.models.story import Story
 from app.models.user import User
 from app.services.story_service import story_service
 from app.services.ai_model_cache import model_cache
-from app.services.semantic_kernel_setup import kernel
+from app.services.langgraph_runtime_setup import kernel
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class BasicStoryAIService:
         self.kernel = None
     
     async def get_semantic_kernel(self):
-        """Get or initialize Semantic Kernel"""
+        """Get or initialize storytelling runtime"""
         if not self.kernel:
             self.kernel = kernel
         return self.kernel
@@ -81,7 +81,7 @@ class BasicStoryAIService:
                 if not model_config:
                     raise ValueError("No public chat default model available")
             
-            # Get Semantic Kernel
+            # Get storytelling runtime
             kernel = await self.get_semantic_kernel()
             
             # Prepare prompt variables without external document retrieval for Basic Stories

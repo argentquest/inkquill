@@ -105,7 +105,7 @@ def setup_logging(
     # or INFO to see them.
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     
-    # Allow Semantic Kernel to be verbose for debugging purposes
+    # Allow storytelling runtime to be verbose for debugging purposes
     logging.getLogger("semantic_kernel").setLevel(logging.INFO)
     # --- END MODIFICATION ---
 

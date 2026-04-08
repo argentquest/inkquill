@@ -1,8 +1,12 @@
 # Deployment Guide for Context Story Application
 
-This guide provides instructions for deploying the Context Story Application to Azure App Service using various methods.
+This guide now covers two deployment tracks:
+
+1. Docker-based ALM environments for local or VM-hosted `dev`, `test`, `stage`, and `prod`.
+2. Azure App Service deployment for the legacy single-app path.
 
 ## Table of Contents
+- [Docker ALM Environments](#docker-alm-environments)
 - [Prerequisites](#prerequisites)
 - [Azure Resources Setup](#azure-resources-setup)
 - [Deployment Methods](#deployment-methods)
@@ -13,6 +17,142 @@ This guide provides instructions for deploying the Context Story Application to 
 - [Configuration](#configuration)
 - [Post-Deployment](#post-deployment)
 - [Troubleshooting](#troubleshooting)
+
+## Docker ALM Environments
+
+The repository now includes a three-tier Docker layout:
+
+- `backend`: FastAPI application container
+- `frontend`: Next.js React rebuild container
+- `gateway`: Nginx reverse proxy in front of both tiers
+- `db`: PostgreSQL database container
+
+Use the shared base file plus an environment-specific override.
+
+### Environment URLs and Ports
+
+| Environment | Gateway URL | Backend direct | PostgreSQL target |
+|-------------|-------------|----------------|-------------------|
+| Dev | `http://localhost:8080` | `http://localhost:18000` | Docker DB `inkandquill_dev` |
+| Stage | `http://localhost:8081` | `http://localhost:28000` | Docker DB `inkandquill_stage` |
+| Test | `http://localhost:8082` | `http://localhost:38000` | Host DB `${POSTGRES_TEST_DB}` |
+| Prod | `http://localhost:8083` | `http://localhost:48000` | Host DB `${POSTGRES_PROD_DB}` |
+
+### Start Dev
+
+```powershell
+docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+```
+
+### Start Stage
+
+```powershell
+docker compose -p inkandquill-stage -f docker-compose.yml -f docker-compose.stage.yml up --build -d
+```
+
+### Start Test
+
+```powershell
+docker compose -p inkandquill-test -f docker-compose.yml -f docker-compose.test.yml up --build -d
+```
+
+### Start Prod
+
+```powershell
+docker compose -p inkandquill-prod -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
+
+### Stop Dev
+
+```powershell
+docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml down
+```
+
+### Stop Stage
+
+```powershell
+docker compose -p inkandquill-stage -f docker-compose.yml -f docker-compose.stage.yml down
+```
+
+### Stop Test
+
+```powershell
+docker compose -p inkandquill-test -f docker-compose.yml -f docker-compose.test.yml down
+```
+
+### Stop Prod
+
+```powershell
+docker compose -p inkandquill-prod -f docker-compose.yml -f docker-compose.prod.yml down
+```
+
+### Promote Test To Prod
+
+Manual PowerShell promotion:
+
+```powershell
+.\scripts\promote_test_to_prod.ps1
+```
+
+Safe dry run:
+
+```powershell
+.\scripts\promote_test_to_prod.ps1 -WhatIf
+```
+
+The script will:
+
+- build and start the `test` stack unless `-SkipTestDeploy` is used
+- wait for `test` health at `http://localhost:8082/health`
+- run `alembic upgrade head` against the `prod` database unless `-SkipProdMigrations` is used
+- build and start the `prod` stack
+- wait for `prod` health at `http://localhost:8083/health`
+
+### CI/CD Recommendation
+
+The better long-term path is CI/CD using a self-hosted GitHub Actions runner on the Docker host.
+
+- Use `.github/workflows/promote-test-to-prod.yml` as the promotion entry point.
+- Gate it with the GitHub `production` environment for approvals.
+- Keep the PowerShell script as the local/manual fallback and as the command the workflow calls.
+
+### Run Migrations In An Environment
+
+Dev:
+
+```powershell
+docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml run --rm backend alembic upgrade head
+```
+
+Stage:
+
+```powershell
+docker compose -p inkandquill-stage -f docker-compose.yml -f docker-compose.stage.yml run --rm backend alembic upgrade head
+```
+
+Test:
+
+```powershell
+docker compose -p inkandquill-test -f docker-compose.yml -f docker-compose.test.yml run --rm backend alembic upgrade head
+```
+
+Prod:
+
+```powershell
+docker compose -p inkandquill-prod -f docker-compose.yml -f docker-compose.prod.yml run --rm backend alembic upgrade head
+```
+
+### Environment Notes
+
+- Both environments read shared secrets from the repository root `.env`.
+- Each environment overrides its own database name, host ports, and app URL.
+- Nginx routes `/api`, `/ws`, `/ui`, `/static`, `/published`, `/docs`, `/redoc`, and `/openapi.json` to FastAPI.
+- All other routes are sent to the React frontend.
+- Use the gateway URLs for normal browser access so frontend requests stay same-origin with `/api/v1`.
+- `dev` mounts the backend and frontend source trees for hot reload.
+- `stage` uses built container images without source mounts, which is closer to production behavior.
+- `test` and `prod` target the cloned host PostgreSQL databases through `host.docker.internal`.
+- Set `POSTGRES_TEST_DB` and `POSTGRES_PROD_DB` in `.env` if you want names other than the defaults.
 
 ## Prerequisites
 

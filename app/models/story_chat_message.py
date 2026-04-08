@@ -22,12 +22,12 @@ class StoryChatMessage(Base):
     These messages are conversations about story development, plot discussion,
     character analysis, and other story-related topics.
     """
-    __tablename__ = "story_chat_messages"
+    __tablename__ = "storytelling_story_chat_messages"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
     # Session reference
-    session_id: Mapped[int] = mapped_column(Integer, ForeignKey("story_chat_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    session_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_story_chat_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
     
     # Message details
     role: Mapped[str] = mapped_column(String(20), nullable=False)  # 'user' or 'assistant'

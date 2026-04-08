@@ -44,7 +44,7 @@ test.describe("Care Circle DailyNewsletter import", () => {
     await page.goto("/care-circle-family/providers/weather");
 
     await expect(page.getByRole("heading", { name: "Weather" })).toBeVisible();
-    await expect(page.getByText("weather")).toBeVisible();
+    await expect(page.getByText("weather", { exact: true })).toBeVisible();
     await expect(page.getByText("Safe for Direct Display")).toBeVisible();
     await expect(page.getByRole('link', { name: "Back to Providers" })).toBeVisible();
   });

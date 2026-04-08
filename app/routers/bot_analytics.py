@@ -13,7 +13,7 @@ from app.utils.bot_detection import is_bot_request, get_bot_info
 from app.core.config import settings
 from app.schemas.base import ApiResponse
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ async def get_activity_stats(
     """Get activity statistics showing bot vs human traffic"""
     
     # Calculate time window
-    since = datetime.utcnow() - timedelta(hours=hours)
+    since = datetime.now(UTC) - timedelta(hours=hours)
     
     # Get total activity count
     total_query = select(func.count(UserActivity.id)).where(

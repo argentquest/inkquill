@@ -311,7 +311,7 @@ def _rewrite_clue_prompt(word: str, bad_clue: str) -> str:
 # ── Provider ───────────────────────────────────────────────────────────────
 
 class CrosswordProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a daily crossword puzzle.

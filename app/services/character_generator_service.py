@@ -180,8 +180,8 @@ class CharacterGeneratorService:
         """Generate AI content including narrative, quest scenario, and first meeting message"""
         
         try:
-            # Import semantic kernel function and kernel instance
-            from app.services.sk_kernel_instance import kernel, generate_character_backstory_function
+            # Import storytelling runtime function and kernel instance
+            from app.services.storytelling_runtime import kernel, generate_character_backstory_function
             
             # Prepare base character context
             character_context = self._build_character_context(character_data, world)
@@ -192,7 +192,7 @@ class CharacterGeneratorService:
             # 1. Generate backstory/narrative
             try:
                 if generate_character_backstory_function:
-                    from semantic_kernel.functions.kernel_arguments import KernelArguments
+                    from app.services.langgraph_kernel import KernelArguments
                     kernel_args = KernelArguments(**character_context)
                     
                     # Track timing for cost logging
@@ -210,7 +210,7 @@ class CharacterGeneratorService:
                         try:
                             model_config = model_cache.default_generation_model
                             if model_config:
-                                # Extract usage data from Semantic Kernel result
+                                # Extract usage data from storytelling runtime result
                                 usage_data = get_usage_from_sk_result(result)
                                 
                                 # Build full prompt for logging
@@ -664,7 +664,7 @@ class CharacterGeneratorService:
         return "Character Generation Request: " + " | ".join(prompt_parts)
     
     def _parse_sk_result(self, result) -> Dict[str, Any]:
-        """Parse Semantic Kernel result to extract clean text and filter results"""
+        """Parse storytelling runtime result to extract clean text and filter results"""
         try:
             result_str = str(result.value)
             

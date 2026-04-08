@@ -121,11 +121,9 @@ class WorldBuilderService:
             # Format answers for AI prompt
             formatted_answers = self.format_answers_for_prompt(answers)
             
-            # Import semantic kernel components
-            from app.services.sk_kernel_instance import kernel
-            from semantic_kernel.functions.kernel_arguments import KernelArguments
-            from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-            from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
+            # Import storytelling runtime components
+            from app.services.storytelling_runtime import kernel
+            from app.services.langgraph_kernel import KernelArguments, OpenAIChatPromptExecutionSettings, PromptTemplateConfig
             from app.core.config import settings
             
             # Create the world generation prompt
@@ -325,7 +323,7 @@ VISUAL: [visual prompt here]"""
         world_builder_data = {
             "answers": answers,
             "questions_version": "1.0",  # Track version for future updates
-            "completed_at": str(datetime.datetime.utcnow())
+            "completed_at": str(datetime.datetime.now(datetime.UTC))
         }
         
         # Create world data
@@ -372,7 +370,7 @@ VISUAL: [visual prompt here]"""
         world_builder_data = {
             "answers": answers,
             "questions_version": "1.0",
-            "updated_at": str(datetime.datetime.utcnow())
+            "updated_at": str(datetime.datetime.now(datetime.UTC))
         }
         
         # Update world data

@@ -45,7 +45,7 @@ SENSORY_MODES = [
 
 
 class SensoryProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Suggests a simple grounding or sensory activity for the user.

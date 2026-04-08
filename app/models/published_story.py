@@ -22,12 +22,12 @@ class PublishedStory(Base):
     SQLAlchemy ORM Model representing a published story.
     Tracks published stories with their metadata, URL, and stats.
     """
-    __tablename__ = "published_stories"
+    __tablename__ = "storytelling_published_stories"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
     # Foreign keys
-    story_id: Mapped[int] = mapped_column(Integer, ForeignKey("stories.id", ondelete="CASCADE"), nullable=False, index=True)
+    story_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_stories.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     
     # Publishing details

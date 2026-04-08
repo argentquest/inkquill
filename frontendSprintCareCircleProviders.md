@@ -126,13 +126,13 @@ Source configuration also introduces:
 - [x] create a shared `care-circle` provider runtime package in the backend
 - [x] import provider base/helpers from the source repo where still structurally useful
 - [x] normalize provider config loading into `app.core.config` and `.env_template`
-- [ ] add DB-backed provider enablement and patient-visibility update flows
+- [x] add DB-backed provider enablement and patient-visibility update flows
 - [x] build a real provider-backed patient-session assembly service
 - [x] replace seeded patient session highlights with provider-backed content for active patients
 - [x] add family-side provider registry and provider-detail routes in `frontendv1/`
 - [x] expose provider preview or diagnostics on the family patient-detail route
-- [ ] add backend unit tests for provider registry loading, filtering, and failure fallback
-- [ ] add backend integration tests for provider-backed session generation
+- [x] add backend unit tests for provider registry loading, filtering, and failure fallback
+- [x] add backend integration tests for provider-backed session generation
 - [x] add Playwright coverage for family provider controls and provider-backed patient sessions
 - [x] capture provider-management and patient-session runtime behavior in `uiBehaviorCapture.md`
 - [x] verify imported provider env/config mapping before enabling any real external execution path
@@ -153,11 +153,16 @@ Source configuration also introduces:
 
 | Criterion | Verification Method | Evidence |
 |---|---|---|
-| provider execution lives in shared backend services rather than frontend mocks or route-local scripts | Code review confirms imported provider runtime is centralized under backend `care-circle` services and wired through API routes | To be filled during implementation |
-| patient sessions are assembled from real provider runtime output with safe fallback behavior | Backend tests and browser checks confirm patient sessions render provider-backed content and degrade safely on failures | To be filled during implementation |
-| family routes can manage provider visibility and enablement without exposing unsafe controls to patients | Browser verification confirms family provider controls exist and patient routes remain simplified/read-only | To be filled during implementation |
-| provider filtering, ordering, and fallback logic are covered by backend tests | Unit and integration suites pass for provider registry loading, safe filtering, and assembly behavior | To be filled during implementation |
-| provider-backed family and patient flows are covered by Playwright | Targeted care-circle provider browser suite passes locally | To be filled during implementation |
+| provider execution lives in shared backend services rather than frontend mocks or route-local scripts | Code review confirms imported provider runtime is centralized under backend `care-circle` services and wired through API routes | `app/services/care_circle/providers/` contains 38 provider modules, `app/services/care_circle/session_assembler.py` orchestrates execution |
+| patient sessions are assembled from real provider runtime output with safe fallback behavior | Backend tests and browser checks confirm patient sessions render provider-backed content and degrade safely on failures | `tests/unit/care_circle/test_care_circle_providers.py` and `tests/integration/care_circle/test_care_circle_assembly_integration.py` pass; Playwright `sprint-care-circle-import.spec.ts` validates patient flow |
+| family routes can manage provider visibility and enablement without exposing unsafe controls to patients | Browser verification confirms family provider controls exist and patient routes remain simplified/read-only | `frontendv1/app/care-circle-family/providers/` and `frontendv1/tests/e2e/sprint-care-circle-import.spec.ts` confirm controls |
+| provider filtering, ordering, and fallback logic are covered by backend tests | Unit and integration suites pass for provider registry loading, safe filtering, and assembly behavior | `tests/unit/care_circle/test_care_circle_provider_registry_unit.py` and `tests/unit/care_circle/test_care_circle_providers.py` cover filtering and fallback |
+| provider-backed family and patient flows are covered by Playwright | Targeted care-circle provider browser suite passes locally | `frontendv1/tests/e2e/sprint-care-circle-import.spec.ts` includes provider registry and patient session tests |
+
+## Test Results
+
+- **Unit tests**: 66 passed (`.\.venv\Scripts\python.exe -m pytest tests/unit/care_circle/ -q`)
+- **Integration tests**: 10 passed (`.\.venv\Scripts\python.exe -m pytest tests/integration/care_circle/ -q`)
 
 ## Implementation Status
 
@@ -165,5 +170,10 @@ Source configuration also introduces:
 - The `app/services/care_circle/provider_base.py` sandboxed architecture is running.
 - **Provider Architecture Import**: Fully Complete. All 38 usable `DailyNewsletter` providers have been imported into `app/services/care_circle/providers`, purged of their legacy LLM and Toolkits dependencies, and successfully renamed to exactly match the `CamelCaseProvider` specification (e.g. `WordScrambleProvider`).
 - **Tests**: A dedicated dynamic Pytest module `tests/unit/test_all_imported_providers.py` was created to explicitly validate the structure (Base Care Circle inheritance, safety defaults, and extraction payload method) of all 38 imported providers. All 38 pass locally with 0 errors.
+- **Backend Unit Tests**: `tests/unit/care_circle/test_care_circle_provider_registry_unit.py` covers provider catalog CRUD, patient-provider configs, session assembler filtering/fallback, and CRUD async functions.
+- **Backend Integration Tests**: `tests/integration/care_circle/test_care_circle_assembly_integration.py` covers provider registry updates and provider-backed session assembly.
+- **Playwright Coverage**: `frontendv1/tests/e2e/sprint-care-circle-import.spec.ts` covers family patient profiles, patient picture sign-in, family provider registry, and provider details.
 - External dependencies like `python-constraint` and `word-search-generator` have been appended to `requirements.txt`.
-- Next major backend dependency: wiring OpenRouter back up to the provider generation scripts to execute them securely in async jobs.
+- DB-backed provider enablement and patient-visibility flows implemented via `upsert_patient_provider_config` and `update_provider_catalog` in `app/crud/care_circle.py`.
+- Provider patient-safe filtering enforced in `app/services/care_circle/session_assembler.py` via `is_safe_for_patient` property check.
+- Family-only providers (patient_visible=False): `simple_recipe`, `pen_pal_letter`, `world_news`.

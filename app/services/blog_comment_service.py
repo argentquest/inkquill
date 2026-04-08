@@ -1,7 +1,7 @@
 """Blog comment service for managing threaded comments."""
 import logging
 from typing import List, Optional
-from datetime import datetime
+from datetime import UTC, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, and_, func
 from sqlalchemy.orm import selectinload
@@ -198,7 +198,7 @@ class BlogCommentService:
             # Update content
             if comment_data.content:
                 comment.content = comment_data.content
-                comment.updated_at = datetime.utcnow()
+                comment.updated_at = datetime.now(UTC)
             
             await db.commit()
             await db.refresh(comment)
@@ -233,7 +233,7 @@ class BlogCommentService:
             
             # Soft delete
             comment.status = CommentStatus.DELETED
-            comment.deleted_at = datetime.utcnow()
+            comment.deleted_at = datetime.now(UTC)
             
             # Update post comment count
             await db.execute(
@@ -280,7 +280,7 @@ class BlogCommentService:
             
             old_status = comment.status
             comment.status = status
-            comment.updated_at = datetime.utcnow()
+            comment.updated_at = datetime.now(UTC)
             
             # Update post comment count if status changed from/to approved
             if old_status == CommentStatus.APPROVED and status != CommentStatus.APPROVED:

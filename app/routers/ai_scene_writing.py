@@ -7,13 +7,9 @@ from fastapi import (
 )
 from fastapi.websockets import WebSocketState 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select 
-import json
+from sqlalchemy import select
+import json 
 import time
-import semantic_kernel as sk 
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.functions.function_result import FunctionResult
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
 from typing import Dict, Any, Optional, List
 import logging
 
@@ -26,7 +22,7 @@ from app.crud import character as crud_character, location as crud_location, lor
 from app.core.deps_ws import get_current_user_from_ws_ticket
 from app.core.config import settings
 from app.services.ai_model_cache import model_cache
-from app.services.sk_kernel_instance import (
+from app.services.storytelling_runtime import (
     kernel,
     generate_act_narrative_only_function, 
     generate_act_metadata_function,      
@@ -34,6 +30,7 @@ from app.services.sk_kernel_instance import (
 from app.services.cost_tracker_service import log_ai_call, log_ai_streaming_call, get_usage_from_sk_result
 from app.services.temperature_optimizer import TemperatureOptimizer, TaskType
 from app.services.direct_context import build_document_context
+from app.services.langgraph_kernel import OpenAIChatPromptExecutionSettings, KernelArguments, FunctionResult
 from openai import APIError
 from markdownify import markdownify as md
 

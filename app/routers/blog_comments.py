@@ -84,7 +84,7 @@ async def get_post_comments(
     post_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    sort_by: str = Query("newest", regex="^(newest|oldest|popular)$"),
+    sort_by: str = Query("newest", pattern="^(newest|oldest|popular)$"),
     db: AsyncSession = Depends(get_db_session),
     current_user: Optional[User] = Depends(get_current_user)
 ):

@@ -21,13 +21,10 @@ from app.core.config import settings
 # --- FIX: Import the model cache and new dependencies ---
 from app.services.ai_model_cache import model_cache
 from app.models.ai_model_config import AIModelTypeEnum
-from app.services.sk_kernel_instance import kernel
+from app.services.storytelling_runtime import kernel
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from app.services.sk_constants import STORY_ANALYSIS_PLUGIN_NAME
-
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.functions.function_result import FunctionResult
+from app.services.langgraph_kernel import OpenAIChatPromptExecutionSettings, KernelArguments, FunctionResult
 from openai import APIError
 from markdownify import markdownify as md
 from app.core.dependencies_shared import get_act_and_verify_ownership
@@ -225,7 +222,7 @@ async def trigger_ai_review_for_act_content_api(
             )
             logger.info(f"AI Review for Act {db_act.id}: Cost logging completed successfully.")
         else:
-            logger.warning(f"AI Review for Act {db_act.id}: No usage data available from semantic kernel result. Attempting token estimation for cost logging.")
+            logger.warning(f"AI Review for Act {db_act.id}: No usage data available from storytelling runtime result. Attempting token estimation for cost logging.")
             # Fall back to token estimation for cost logging
             from app.services.cost_tracker_service import estimate_tokens_for_streaming_call
             try:

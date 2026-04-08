@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class DailyBlessingProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Provides a simple, warm blessing or prayer each day.

@@ -23,7 +23,7 @@ from app.crud import job_status as crud_job_status
 from app.services.image_service import generate_image_with_active_provider
 from app.core.config import settings
 from app.core.deps import get_db_session
-from app.db.database import async_session_local
+from app.db import database as db_database
 from app.services.storage_service import save_blob
 
 logger = logging.getLogger(__name__)
@@ -97,7 +97,7 @@ class AsyncImageService:
         Process an image generation job asynchronously (detached from HTTP request)
         """
         # Use proper session context manager
-        async with async_session_local() as db_session:
+        async with db_database.async_session_local() as db_session:
             try:
                 # Get job details
                 result = await db_session.execute(

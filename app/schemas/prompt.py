@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/prompt.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -88,11 +88,5 @@ class PromptRead(BaseModel):
     # owner: Optional[UserRead] = None
     # last_updated_by: Optional[UserRead] = None
 
-    class Config:
-        # Enables compatibility with ORM models (SQLAlchemy).
-        # Allows Pydantic to automatically map data from ORM object attributes.
-        from_attributes = True # Replaces orm_mode = True in Pydantic v1
-        # If using Python enums directly as field types, Pydantic v2 handles serialization
-        # to their values by default if the enum inherits from str or int.
-        # use_enum_values = True # This was more for Pydantic v1; v2 is smarter with str/int enums.
+    model_config = ConfigDict(from_attributes=True)
 

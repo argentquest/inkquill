@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class WorldRole(Base):
     """SQLAlchemy model for world role."""
-    __tablename__ = "world_roles"
+    __tablename__ = "storytelling_world_roles"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -26,7 +26,7 @@ class WorldRole(Base):
     # For predefined roles (world_id is None) vs custom roles (world_id is set)
     world_id: Mapped[Optional[int]] = mapped_column(
         Integer, 
-        ForeignKey("worlds.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_worlds.id", ondelete="CASCADE"),
         nullable=True,
         index=True
     )

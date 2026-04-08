@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class WordConnectProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     A word connection puzzle - connect related words.

@@ -2,12 +2,16 @@
 Social Share tracking models for analytics and coin rewards.
 """
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.dialects.postgresql import UUID as Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
+
+
+def _naive_utc_now() -> datetime:
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class SocialShare(Base):
@@ -39,7 +43,7 @@ class SocialShare(Base):
     coin_amount: Mapped[int] = mapped_column(Integer, default=0)
     
     # Timestamps
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, index=True)
     
     # Relationships
     user = relationship("User", back_populates="social_shares")
@@ -78,8 +82,8 @@ class SocialShareDailySummary(Base):
     ai_public_chat_shares: Mapped[int] = mapped_column(Integer, default=0)
     
     # Timestamps
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, onupdate=_naive_utc_now)
     
     # Relationships
     user = relationship("User", back_populates="social_share_summaries")

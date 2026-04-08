@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/chat.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
@@ -32,11 +32,7 @@ class ChatSessionRead(ChatSessionBase):
     created_at: datetime
     updated_at: datetime
     
-    class Config:
-        from_attributes = True
-
-
-# --- Chat Message Schemas ---
+    model_config = ConfigDict(from_attributes=True)
 
 class ChatMessageBase(BaseModel):
     """Base schema for ChatMessage"""
@@ -60,9 +56,7 @@ class ChatMessageRead(ChatMessageBase):
     created_at: datetime
     context_sources: Optional[List[Dict[str, Any]]] = Field(None, description="Context sources used for this response")
     
-    class Config:
-        from_attributes = True
-    
+    model_config = ConfigDict(from_attributes=True)
     @property
     def sources(self) -> List[Dict[str, Any]]:
         """Extract context sources from full_context if available."""

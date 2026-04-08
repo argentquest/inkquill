@@ -4,21 +4,25 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Bool
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import json
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, Any, Optional, List
+
+
+def _naive_utc_now() -> datetime:
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class BrainstormSession(Base):
     """SQLAlchemy model for brainstorm session."""
-    __tablename__ = "brainstorm_sessions"
+    __tablename__ = "storytelling_brainstorm_sessions"
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    interview_response_id = Column(Integer, ForeignKey("user_interview_responses.id"), nullable=False)
+    interview_response_id = Column(Integer, ForeignKey("storytelling_user_interview_responses.id"), nullable=False)
     session_name = Column(String(200), nullable=True)  # Optional user-defined name
     generated_concepts = Column(Text, nullable=False)  # JSON array of story concepts
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=_naive_utc_now)
+    updated_at = Column(DateTime, default=_naive_utc_now, onupdate=_naive_utc_now)
     
     # Relationships
     user = relationship("User", back_populates="brainstorm_sessions")
@@ -32,7 +36,7 @@ class BrainstormSession(Base):
     def set_concepts(self, concepts: List[Dict[str, Any]]) -> None:
         """Set the generated story concepts"""
         self.generated_concepts = json.dumps(concepts, ensure_ascii=False, indent=2)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = _naive_utc_now()
     
     def add_concept(self, concept: Dict[str, Any]) -> None:
         """Add a single concept to the session"""
@@ -54,15 +58,15 @@ class BrainstormSession(Base):
 
 class BrainstormFavorite(Base):
     """SQLAlchemy model for brainstorm favorite."""
-    __tablename__ = "brainstorm_favorites"
+    __tablename__ = "storytelling_brainstorm_favorites"
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    session_id = Column(Integer, ForeignKey("brainstorm_sessions.id"), nullable=False)
+    session_id = Column(Integer, ForeignKey("storytelling_brainstorm_sessions.id"), nullable=False)
     concept_id = Column(String(50), nullable=False)  # ID of the concept within the session
     concept_data = Column(Text, nullable=False)  # JSON copy of the concept for quick access
     is_selected = Column(Boolean, default=False)  # If user selected this for story creation
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=_naive_utc_now)
     
     # Relationships
     user = relationship("User", back_populates="brainstorm_favorites")
@@ -82,15 +86,15 @@ class BrainstormFavorite(Base):
 
 class BrainstormStory(Base):
     """SQLAlchemy model for brainstorm story."""
-    __tablename__ = "brainstorm_stories"
+    __tablename__ = "storytelling_brainstorm_stories"
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    favorite_id = Column(Integer, ForeignKey("brainstorm_favorites.id"), nullable=False)
-    story_id = Column(Integer, ForeignKey("stories.id"), nullable=True)  # Link to created story
+    favorite_id = Column(Integer, ForeignKey("storytelling_brainstorm_favorites.id"), nullable=False)
+    story_id = Column(Integer, ForeignKey("storytelling_stories.id"), nullable=True)  # Link to created story
     title = Column(String(200), nullable=False)
     three_act_structure = Column(Text, nullable=False)  # JSON with act1, act2, act3
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=_naive_utc_now)
     
     # Relationships
     user = relationship("User", back_populates="brainstorm_stories")

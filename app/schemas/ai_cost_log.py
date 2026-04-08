@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/ai_cost_log.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -36,9 +36,7 @@ class AICallLogResponse(BaseModel):
     created_at: datetime
     duration_ms: Optional[int] = None
     
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 class RecentAICostResponse(BaseModel):
     """Response schema for recent AI cost summary."""
     recent_calls: List[AICallLogResponse]

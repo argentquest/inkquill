@@ -3,7 +3,7 @@
 # /story_app/app/services/image_providers/base_provider.py
 
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class ImageGenerationResult(BaseModel):
@@ -15,8 +15,7 @@ class ImageGenerationResult(BaseModel):
     content_type: str = "image/png"
     revised_prompt: Optional[str] = None
     
-    class Config:
-        arbitrary_types_allowed = True # Allows the 'bytes' type
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 class BaseImageProvider(ABC):
     """

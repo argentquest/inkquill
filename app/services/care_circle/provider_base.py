@@ -1,68 +1,294 @@
 """
 Base provider interface for Care Circle.
-Migrated from DailyNewsletter but refactored to return strict JSON
-rather than HTML, and built to fail safely in a React-driven environment.
+
+This restores the DailyNewsletter-style template and theme rendering contract
+while keeping the execution wrapper safe for the React CareCircle frontend.
 """
 
-from typing import Any, Dict, Optional
-import traceback
+from __future__ import annotations
+
+import inspect
+import json
 import logging
+import traceback
+import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 logger = logging.getLogger(__name__)
 
+PROVIDERS_ROOT = Path(__file__).resolve().parent / "providers"
+ROOT_CONFIG_PATH = PROVIDERS_ROOT / "config.json"
+THEMES_DIR = PROVIDERS_ROOT / "themes"
+HTML_CACHE_DIR = Path(__file__).resolve().parents[2] / "logs" / "care_circle_render_cache"
+
+
 class BaseCareCircleProvider:
     """
-    All ported DailyNewsletter providers must inherit from this base class.
-    This ensures that execution is uniform, exceptions are trapped safely,
-    and output is strictly JSON structured for the React frontend.
+    All ported DailyNewsletter providers inherit from this base class.
+
+    Providers return structured JSON data from `_generate_payload`. The base
+    class then binds that payload into the provider template and emits
+    `rendered_html` for the patient UI.
     """
-    
-    # Needs to be overridden by subclasses
+
+    _config_cache: dict | None = None
+    _root_config_cache: dict | None = None
+
     provider_key: str = "base"
     is_safe_for_patient: bool = False
 
     def __init__(self, patient_config: Optional[Dict[str, Any]] = None):
-        """
-        :param patient_config: Optional dictionary containing family-managed preferences
-        """
-        self.patient_config = patient_config or {}
+        merged_config = dict(self.config)
+        merged_config.update(patient_config or {})
+        self.patient_config = merged_config
+        self._template_name = str(self.patient_config.get("template", "default") or "default")
+
+    @property
+    def config(self) -> dict[str, Any]:
+        cls = self.__class__
+        if cls._config_cache is None:
+            config_path = Path(inspect.getfile(cls)).parent / "config.json"
+            if config_path.exists():
+                cls._config_cache = json.loads(config_path.read_text(encoding="utf-8-sig"))
+            else:
+                cls._config_cache = {}
+        return cls._config_cache
+
+    @classmethod
+    def load_root_config(cls) -> dict[str, Any]:
+        if cls._root_config_cache is None:
+            if ROOT_CONFIG_PATH.exists():
+                cls._root_config_cache = json.loads(ROOT_CONFIG_PATH.read_text(encoding="utf-8"))
+            else:
+                cls._root_config_cache = {}
+        return cls._root_config_cache
+
+    @property
+    def template_name(self) -> str:
+        return self._template_name
+
+    @template_name.setter
+    def template_name(self, value: str) -> None:
+        self._template_name = value or "default"
+
+    @property
+    def template_dir(self) -> Path:
+        return Path(inspect.getfile(self.__class__)).parent / "templates"
+
+    @property
+    def provider_theme_dir(self) -> Path:
+        return Path(inspect.getfile(self.__class__)).parent / "themes"
+
+    @property
+    def common(self) -> bool:
+        return bool(self.config.get("common", False))
+
+    @property
+    def difficulty_level(self) -> str:
+        difficulty = self.config.get("difficulty", {})
+        return str(self.patient_config.get("difficulty") or difficulty.get("default") or "easy")
+
+    @property
+    def difficulty_config(self) -> dict[str, Any]:
+        difficulty = self.config.get("difficulty", {})
+        return difficulty.get(self.difficulty_level, {})
+
+    @property
+    def default_theme(self) -> str:
+        root_config = self.load_root_config()
+        return str(self.patient_config.get("theme") or root_config.get("default_theme") or "classic")
+
+    def list_templates(self) -> list[str]:
+        if not self.template_dir.exists():
+            return []
+        return [template.stem for template in self.template_dir.glob("*.html")]
+
+    def get_template_html(self, name: str | None = None) -> str:
+        template_name = name or self.template_name
+        template_path = self.template_dir / f"{template_name}.html"
+        if not template_path.exists():
+            return ""
+        return template_path.read_text(encoding="utf-8")
+
+    @staticmethod
+    def list_themes() -> list[str]:
+        if not THEMES_DIR.exists():
+            return []
+        return [theme.stem for theme in THEMES_DIR.glob("*.css")]
+
+    @staticmethod
+    def get_theme_css(theme_name: str = "classic") -> str:
+        css_path = THEMES_DIR / f"{theme_name}.css"
+        if not css_path.exists():
+            return ""
+        return css_path.read_text(encoding="utf-8")
+
+    def get_provider_theme_css(self, theme_name: str = "classic") -> str:
+        css_path = self.provider_theme_dir / f"{theme_name}.css"
+        if not css_path.exists():
+            return ""
+        return css_path.read_text(encoding="utf-8")
+
+    def get_combined_theme_css(self, theme_name: str = "classic") -> str:
+        css_parts = [self.get_theme_css(theme_name), self.get_provider_theme_css(theme_name)]
+        return "\n\n".join(part for part in css_parts if part.strip())
+
+    def _common_dir(self) -> Path:
+        return HTML_CACHE_DIR / self.provider_key
+
+    def _common_html_path(self, theme_name: str = "classic") -> Path:
+        date_str = datetime.date.today().strftime("%Y%m%d")
+        return self._common_dir() / f"common_{date_str}_{theme_name}.html"
+
+    def _load_common_html_cache(self, theme_name: str = "classic") -> str | None:
+        path = self._common_html_path(theme_name)
+        if not path.exists():
+            return None
+        try:
+            return path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+
+    def _save_common_html_cache(self, html: str, theme_name: str = "classic") -> None:
+        path = self._common_html_path(theme_name)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(html, encoding="utf-8")
+
+    def _build_template_context(
+        self,
+        payload: dict[str, Any],
+        patient_profile: Any,
+    ) -> dict[str, Any]:
+        context = dict(payload)
+        patient_name = getattr(patient_profile, "display_name", "Friend")
+        prefs = getattr(patient_profile, "preferences", {}) or {}
+
+        context.setdefault("patient_name", patient_name)
+        context.setdefault("recipient_name", patient_name)
+        context.setdefault("preferences", prefs)
+
+        if self.provider_key == "daily_quote":
+            quote = str(payload.get("text", "")).strip().strip('"')
+            author = str(payload.get("subheading", "")).strip()
+            if author.startswith("-"):
+                author = author[1:].strip()
+            context.setdefault("quote", quote)
+            context.setdefault("author", author or "Unknown")
+
+        if self.provider_key == "weather":
+            city = payload.get("city") or str(payload.get("subheading", "")).replace(" Weather", "").strip()
+            if not city:
+                city = prefs.get("city_for_weather", "Unknown")
+
+            weather = payload.get("weather")
+            if not weather:
+                temperature = payload.get("temperature")
+                condition = payload.get("condition")
+                if temperature and condition:
+                    weather = f"{temperature}°F and {condition}"
+                else:
+                    weather = payload.get("text", "")
+
+            context.setdefault("city", city)
+            context.setdefault("weather", weather)
+
+        return context
+
+    def render_template(
+        self,
+        payload: dict[str, Any],
+        patient_profile: Any,
+        name: str | None = None,
+        theme: str | None = None,
+    ) -> str:
+        template_name = name or self.template_name
+        theme_name = theme or self.default_theme
+        template_path = self.template_dir / f"{template_name}.html"
+
+        if not template_path.exists():
+            return ""
+
+        if self.common:
+            cached = self._load_common_html_cache(theme_name)
+            if cached is not None:
+                return cached
+
+        environment = Environment(
+            loader=FileSystemLoader(str(self.template_dir)),
+            autoescape=select_autoescape(["html"]),
+        )
+        template = environment.get_template(f"{template_name}.html")
+        context = self._build_template_context(payload, patient_profile)
+        try:
+            html = template.render(**context)
+        except Exception as exc:
+            logger.warning(
+                "Template render failed for provider %s template %s: %s",
+                self.provider_key,
+                template_name,
+                exc,
+            )
+            return ""
+
+        theme_css = self.get_combined_theme_css(theme_name)
+        if theme_css:
+            html = f"<style>\n{theme_css}\n</style>\n{html}"
+
+        if self.common:
+            self._save_common_html_cache(html, theme_name)
+
+        return html
 
     async def execute(self, patient_profile: Any) -> Dict[str, Any]:
-        """
-        Public execution wrapper. Wraps the core generation logic
-        in a safety net so no LLM failure takes down the patient dashboard.
-        """
         try:
-            logger.info(f"Executing provider {self.provider_key} for patient {patient_profile.id}")
+            logger.info("Executing provider %s for patient %s", self.provider_key, patient_profile.id)
             result = await self._generate_payload(patient_profile)
+            if not isinstance(result, dict):
+                result = {"content": result}
+
+            rendered_html = result.get("rendered_html")
+            if not isinstance(rendered_html, str) or not rendered_html.strip():
+                rendered_html = self.render_template(result, patient_profile)
+
+            if rendered_html:
+                result["rendered_html"] = rendered_html
+
             return {
                 "success": True,
                 "provider_key": self.provider_key,
-                "data": result
+                "data": result,
             }
-        except Exception as e:
-            logger.error(f"Provider {self.provider_key} failed: {str(e)}")
+        except Exception as exc:
+            logger.error("Provider %s failed: %s", self.provider_key, str(exc))
             logger.error(traceback.format_exc())
-            return self._build_fallback_payload(patient_profile, error=str(e))
+            return self._build_fallback_payload(patient_profile, error=str(exc))
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
-        """
-        To be implemented by the specific provider.
-        Must return a structured dict representing the content map.
-        """
+        if self.__class__.get_content is not BaseCareCircleProvider.get_content:
+            result = await self.get_content(patient_profile=patient_profile)
+            if isinstance(result, dict):
+                return result
+            return {"content": result}
         raise NotImplementedError("Subclasses must implement _generate_payload")
 
+    async def get_content(self, **kwargs: Any) -> Dict[str, Any] | Any:
+        raise NotImplementedError("Subclasses must implement _generate_payload or get_content")
+
     def _build_fallback_payload(self, patient_profile: Any, error: str) -> Dict[str, Any]:
-        """
-        A safe fallback payload returned when the provider crashes or LLM key expires.
-        Ensures the UI can gracefully show an empty state instead of breaking.
-        """
+        fallback_data = {
+            "text": "Content temporarily unavailable.",
+            "type": "error_state",
+        }
+        rendered_html = self.render_template(fallback_data, patient_profile)
+        if rendered_html:
+            fallback_data["rendered_html"] = rendered_html
+
         return {
             "success": False,
             "provider_key": self.provider_key,
             "error_detail": error,
-            "data": {
-                "text": "Content temporarily unavailable.",
-                "type": "error_state"
-            }
+            "data": fallback_data,
         }

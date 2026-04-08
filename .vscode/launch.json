@@ -2,7 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: FastAPI (Uvicorn --reload)",
+            "name": "Backend: Use This (stable debug)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--host", "localhost",
+                "--port", "8000",
+                "--log-level", "debug"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Backend: Optional (reload, less stable)",
             "type": "debugpy",
             "request": "launch",
             "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
@@ -21,25 +39,7 @@
             "stopOnEntry": false
         },
         {
-            "name": "Python: FastAPI (Uvicorn --stable-debug)",
-            "type": "debugpy",
-            "request": "launch",
-            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-            "module": "uvicorn",
-            "args": [
-                "app.main:app",
-                "--host", "localhost",
-                "--port", "8000",
-                "--log-level", "debug"
-            ],
-            "jinja": true,
-            "cwd": "${workspaceFolder}",
-            "envFile": "${workspaceFolder}/.env",
-            "console": "integratedTerminal",
-            "stopOnEntry": false
-        },
-        {
-            "name": "Frontend: Next.js dev",
+            "name": "Frontend: Use This (Next.js dev)",
             "type": "node-terminal",
             "request": "launch",
             "command": "npm run dev -- --port 3001",
@@ -48,18 +48,18 @@
     ],
     "compounds": [
         {
-            "name": "Full Stack: Backend + Frontend",
+            "name": "Full Stack: Use This (stable backend + frontend)",
             "configurations": [
-                "Python: FastAPI (Uvicorn --reload)",
-                "Frontend: Next.js dev"
+                "Backend: Use This (stable debug)",
+                "Frontend: Use This (Next.js dev)"
             ],
             "stopAll": true
         },
         {
-            "name": "Full Stack: Stable Backend + Frontend",
+            "name": "Full Stack: Optional (reload backend + frontend)",
             "configurations": [
-                "Python: FastAPI (Uvicorn --stable-debug)",
-                "Frontend: Next.js dev"
+                "Backend: Optional (reload, less stable)",
+                "Frontend: Use This (Next.js dev)"
             ],
             "stopAll": true
         }

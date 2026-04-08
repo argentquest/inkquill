@@ -167,7 +167,7 @@ def mock_external_dependencies(request):
         # Mock storage client lookup for non-integration tests
         m.setattr("app.core.storage_deps.get_blob_service_client", MagicMock(), raising=False)
 
-        # Mock Semantic Kernel
-        m.setattr("app.services.semantic_kernel_setup.get_kernel", MagicMock(), raising=False)
+        # Mock storytelling runtime
+        m.setattr("app.services.langgraph_runtime_setup.get_kernel", MagicMock(), raising=False)
 
         yield m

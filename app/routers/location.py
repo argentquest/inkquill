@@ -113,7 +113,7 @@ async def create_new_location_for_world(
         )
         await db.commit()
         await db.refresh(created_location)
-        return ApiResponse.success_response(data=LocationRead.from_orm(created_location))
+        return ApiResponse.success_response(data=LocationRead.model_validate(created_location))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating location '{location_in.name}': {e}", exc_info=True)
@@ -138,7 +138,7 @@ async def list_locations_in_world(
     
     response_locations = []
     for loc in locations_from_db:
-        loc_read = LocationRead.from_orm(loc)
+        loc_read = LocationRead.model_validate(loc)
         path_to_check = loc.current_image.blob_path if loc.current_image else loc.image_blob_path
         loc_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
         response_locations.append(loc_read)
@@ -151,7 +151,7 @@ async def get_single_location(
     blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Handle GET /{location_id}."""
-    loc_read = LocationRead.from_orm(db_location)
+    loc_read = LocationRead.model_validate(db_location)
     path_to_check = db_location.current_image.blob_path if db_location.current_image else db_location.image_blob_path
     loc_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     return ApiResponse.success_response(data=loc_read)
@@ -188,7 +188,7 @@ async def update_existing_location(
         )
         await db.commit()
         await db.refresh(updated_location)
-        return ApiResponse.success_response(data=LocationRead.from_orm(updated_location))
+        return ApiResponse.success_response(data=LocationRead.model_validate(updated_location))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error updating location ID {db_location.id}: {e}", exc_info=True)
@@ -228,7 +228,7 @@ async def list_images_for_location(
     images = await crud_generated_image.get_images_for_element(
         db, element_type="location", element_id=location.id
     )
-    return ApiResponse.success_response(data=[GeneratedImageRead.from_orm(image) for image in images])
+    return ApiResponse.success_response(data=[GeneratedImageRead.model_validate(image) for image in images])
 
 @router_locations.post("/{location_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_location(
@@ -249,7 +249,7 @@ async def set_current_image_for_location(
     await db.commit()
     await db.refresh(location)
     
-    location_read = LocationRead.from_orm(location)
+    location_read = LocationRead.model_validate(location)
     location_read.image_url = await _check_and_get_image_url(blob_service_client, location.image_blob_path)
 
     return ApiResponse.success_response(data=location_read)
@@ -304,7 +304,7 @@ async def list_locations_for_story_endpoint(
         loc_obj = loc_data.get("location")
         if not loc_obj: continue
         
-        loc_read = LocationInStoryRead.from_orm(loc_obj)
+        loc_read = LocationInStoryRead.model_validate(loc_obj)
         loc_read.significance_to_story = loc_data.get('significance_to_story')
         
         path_to_check = loc_obj.current_image.blob_path if loc_obj.current_image else loc_obj.image_blob_path

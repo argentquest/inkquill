@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/story_class.py
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from datetime import datetime
 from typing import Optional
 import re
@@ -14,13 +14,15 @@ class StoryClassBase(BaseModel):
     description: Optional[str] = Field(None, max_length=500, description="Description of what this class represents")
     color: str = Field(..., min_length=7, max_length=7, description="Hex color code (e.g., #FF5733)")
 
-    @validator('color')
+    @field_validator("color")
+    @classmethod
     def validate_hex_color(cls, v):
         if not re.match(r'^#[0-9A-Fa-f]{6}$', v):
             raise ValueError('Color must be a valid hex color code (e.g., #FF5733)')
         return v.upper()  # Normalize to uppercase
 
-    @validator('name')
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v):
         if not v.strip():
             raise ValueError('Name cannot be empty or just whitespace')
@@ -38,7 +40,8 @@ class StoryClassUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
     color: Optional[str] = Field(None, min_length=7, max_length=7)
 
-    @validator('color')
+    @field_validator("color")
+    @classmethod
     def validate_hex_color(cls, v):
         if v is not None:
             if not re.match(r'^#[0-9A-Fa-f]{6}$', v):
@@ -46,7 +49,8 @@ class StoryClassUpdate(BaseModel):
             return v.upper()
         return v
 
-    @validator('name')
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v):
         if v is not None:
             if not v.strip():
@@ -62,8 +66,7 @@ class StoryClass(StoryClassBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class StoryClassInDB(StoryClass):
@@ -79,5 +82,4 @@ class StoryClassOption(BaseModel):
     color: str
     description: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

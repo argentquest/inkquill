@@ -104,7 +104,7 @@ async def create_new_lore_item_for_world(
         )
         await db.commit()
         await db.refresh(created_item)
-        return ApiResponse.success_response(data=LoreItemRead.from_orm(created_item))
+        return ApiResponse.success_response(data=LoreItemRead.model_validate(created_item))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating lore item '{lore_item_in.title}': {e}", exc_info=True)
@@ -132,7 +132,7 @@ async def list_lore_items_in_world(
 
     response_items = []
     for item in lore_items_db:
-        item_read = LoreItemRead.from_orm(item)
+        item_read = LoreItemRead.model_validate(item)
         path_to_check = item.current_image.blob_path if item.current_image else item.image_blob_path
         item_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
         response_items.append(item_read)
@@ -145,7 +145,7 @@ async def get_single_lore_item(
     blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Handle GET /{lore_item_id}."""
-    item_read = LoreItemRead.from_orm(db_lore_item)
+    item_read = LoreItemRead.model_validate(db_lore_item)
     path_to_check = db_lore_item.current_image.blob_path if db_lore_item.current_image else db_lore_item.image_blob_path
     item_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     return ApiResponse.success_response(data=item_read)
@@ -170,7 +170,7 @@ async def update_existing_lore_item(
         )
         await db.commit()
         await db.refresh(updated_item)
-        return ApiResponse.success_response(data=LoreItemRead.from_orm(updated_item))
+        return ApiResponse.success_response(data=LoreItemRead.model_validate(updated_item))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error updating lore item ID {db_lore_item.id}: {e}", exc_info=True)
@@ -209,7 +209,7 @@ async def list_images_for_lore_item(
     images = await crud_generated_image.get_images_for_element(
         db, element_type="lore_item", element_id=lore_item.id
     )
-    return ApiResponse.success_response(data=[GeneratedImageRead.from_orm(image) for image in images])
+    return ApiResponse.success_response(data=[GeneratedImageRead.model_validate(image) for image in images])
 
 @router_lore_items.post("/{lore_item_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_lore_item(
@@ -230,7 +230,7 @@ async def set_current_image_for_lore_item(
     await db.commit()
     await db.refresh(lore_item)
     
-    item_read = LoreItemRead.from_orm(lore_item)
+    item_read = LoreItemRead.model_validate(lore_item)
     item_read.image_url = await _check_and_get_image_url(blob_service_client, lore_item.image_blob_path)
 
     return ApiResponse.success_response(data=item_read)
@@ -285,7 +285,7 @@ async def list_lore_items_for_story_endpoint(
         item_obj = item_data.get("lore_item")
         if not item_obj: continue
 
-        item_read = LoreItemInStoryRead.from_orm(item_obj)
+        item_read = LoreItemInStoryRead.model_validate(item_obj)
         item_read.relevance_to_story = item_data.get('relevance_to_story')
         
         path_to_check = item_obj.current_image.blob_path if item_obj.current_image else item_obj.image_blob_path

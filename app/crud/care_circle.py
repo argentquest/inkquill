@@ -1,4 +1,7 @@
 import json
+import string
+from secrets import choice
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import func, select
@@ -10,6 +13,7 @@ from app.models.care_circle import (
     CareCirclePatientContentCard,
     CareCirclePatientProfile,
     CareCircleProviderCatalog,
+    CareCircleProviderPatientConfig,
 )
 from app.models.user import User
 
@@ -29,7 +33,9 @@ PATIENT_AUTH_CATALOG = [
 ]
 PATIENT_AUTH_KEYS = {item["key"] for item in PATIENT_AUTH_CATALOG}
 
-DAILY_NEWSLETTER_PROVIDER_CATALOG = [
+PROVIDER_INVENTORY_CONFIG_PATH = Path(__file__).resolve().parent.parent / "services" / "care_circle" / "providers" / "config.json"
+
+DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "weather", "label": "Weather", "icon": "☀️", "category": "core", "display_order": 1, "patient_visible": True, "family_visible": True},
     {"provider_key": "joke", "label": "Daily Joy", "icon": "😄", "category": "wellbeing", "display_order": 2, "patient_visible": True, "family_visible": True},
     {"provider_key": "nostalgia", "label": "Time Machine", "icon": "🕰️", "category": "memory", "display_order": 3, "patient_visible": True, "family_visible": True},
@@ -44,7 +50,7 @@ DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "gentle_exercise", "label": "Gentle Exercise", "icon": "🤼", "category": "wellbeing", "display_order": 12, "patient_visible": True, "family_visible": True},
     {"provider_key": "daily_affirmation", "label": "Affirmation", "icon": "💛", "category": "core", "display_order": 13, "patient_visible": True, "family_visible": True},
     {"provider_key": "nature_scene", "label": "Nature Scene", "icon": "🌿", "category": "memory", "display_order": 14, "patient_visible": True, "family_visible": True},
-    {"provider_key": "simple_recipe", "label": "Simple Recipe", "icon": "🍳", "category": "lifestyle", "display_order": 15, "patient_visible": False, "family_visible": True},
+    {"provider_key": "simple_recipe", "label": "Simple Recipe", "icon": "🍳", "category": "lifestyle", "display_order": 15, "patient_visible": True, "family_visible": True},
     {"provider_key": "this_day_history", "label": "On This Day", "icon": "📅", "category": "memory", "display_order": 16, "patient_visible": True, "family_visible": True},
     {"provider_key": "riddle", "label": "Daily Riddle", "icon": "🤔", "category": "games", "display_order": 17, "patient_visible": True, "family_visible": True},
     {"provider_key": "missing_vowels", "label": "Missing Vowels", "icon": "🔤", "category": "games", "display_order": 18, "patient_visible": True, "family_visible": True},
@@ -54,14 +60,22 @@ DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "song_of_the_day", "label": "Song of the Day", "icon": "🎵", "category": "memory", "display_order": 22, "patient_visible": True, "family_visible": True},
     {"provider_key": "complete_the_duo", "label": "Complete the Duo", "icon": "🤝", "category": "games", "display_order": 23, "patient_visible": True, "family_visible": True},
     {"provider_key": "spot_the_difference", "label": "Spot the Difference", "icon": "🔍", "category": "games", "display_order": 24, "patient_visible": True, "family_visible": True},
-    {"provider_key": "pen_pal_letter", "label": "Pen Pal Letter", "icon": "✉️", "category": "wellbeing", "display_order": 25, "patient_visible": False, "family_visible": True},
+    {"provider_key": "pen_pal_letter", "label": "Pen Pal Letter", "icon": "✉️", "category": "wellbeing", "display_order": 25, "patient_visible": True, "family_visible": True},
     {"provider_key": "gridless_crossword", "label": "Gridless Crossword", "icon": "📝", "category": "games", "display_order": 26, "patient_visible": True, "family_visible": True},
-    {"provider_key": "world_news", "label": "World News", "icon": "🌍", "category": "core", "display_order": 27, "patient_visible": False, "family_visible": True},
+    {"provider_key": "world_news", "label": "World News", "icon": "🌍", "category": "core", "display_order": 27, "patient_visible": True, "family_visible": True},
     {"provider_key": "hobby_spotlight", "label": "Hobby Spotlight", "icon": "🎨", "category": "lifestyle", "display_order": 28, "patient_visible": True, "family_visible": True},
     {"provider_key": "family_greeting", "label": "Family Greeting", "icon": "👨‍👩‍👧", "category": "core", "display_order": 29, "patient_visible": True, "family_visible": True},
     {"provider_key": "local_history", "label": "Local History", "icon": "🏛️", "category": "memory", "display_order": 30, "patient_visible": True, "family_visible": True},
     {"provider_key": "personal_affirmation", "label": "Personal Affirmation", "icon": "💪", "category": "wellbeing", "display_order": 31, "patient_visible": True, "family_visible": True},
     {"provider_key": "activity_suggestion", "label": "Activity Suggestion", "icon": "🌟", "category": "wellbeing", "display_order": 32, "patient_visible": True, "family_visible": True},
+    {"provider_key": "animal_friend", "label": "Animal Friend", "icon": "🐾", "category": "memory", "display_order": 33, "patient_visible": True, "family_visible": True},
+    {"provider_key": "bingo", "label": "Bingo", "icon": "🎲", "category": "games", "display_order": 34, "patient_visible": True, "family_visible": True},
+    {"provider_key": "color_match", "label": "Color Match", "icon": "🎨", "category": "games", "display_order": 35, "patient_visible": True, "family_visible": True},
+    {"provider_key": "crossword", "label": "Crossword", "icon": "🧩", "category": "games", "display_order": 36, "patient_visible": True, "family_visible": True},
+    {"provider_key": "daily_blessing", "label": "Daily Blessing", "icon": "🕊️", "category": "wellbeing", "display_order": 37, "patient_visible": True, "family_visible": True},
+    {"provider_key": "memory_lane_photo", "label": "Memory Lane Photo", "icon": "📷", "category": "memory", "display_order": 38, "patient_visible": True, "family_visible": True},
+    {"provider_key": "simple_math", "label": "Simple Math", "icon": "➕", "category": "games", "display_order": 39, "patient_visible": True, "family_visible": True},
+    {"provider_key": "word_connect", "label": "Word Connect", "icon": "🔗", "category": "games", "display_order": 40, "patient_visible": True, "family_visible": True},
 ]
 
 DEFAULT_PATIENTS = [
@@ -104,12 +118,18 @@ DEFAULT_PATIENTS = [
 ]
 
 
-def _patient_to_dict(patient: CareCirclePatientProfile, family_name: str, highlights: list[CareCirclePatientContentCard] | None = None) -> dict[str, Any]:
+def _patient_to_dict(
+    patient: CareCirclePatientProfile,
+    family_name: str,
+    family_join_code: str,
+    highlights: list[CareCirclePatientContentCard] | None = None,
+) -> dict[str, Any]:
     preferences = patient.preferences or {}
     return {
         "id": str(patient.id),
         "displayName": patient.display_name,
         "familyName": family_name,
+        "joinCode": family_join_code,
         "stage": patient.stage,
         "accessState": patient.access_state,
         "timezone": patient.timezone,
@@ -122,6 +142,7 @@ def _patient_to_dict(patient: CareCirclePatientProfile, family_name: str, highli
             {
                 "title": card.title,
                 "body": card.body,
+                "renderedHtml": card.rendered_html,
                 "kind": card.card_kind,
                 "providerKey": card.provider_key,
                 "displayOrder": card.display_order,
@@ -131,26 +152,68 @@ def _patient_to_dict(patient: CareCirclePatientProfile, family_name: str, highli
     }
 
 
-async def ensure_provider_catalog_seeded(db: AsyncSession) -> None:
-    count = await db.scalar(select(func.count(CareCircleProviderCatalog.id)))
-    if count and count > 0:
-        return
+def _normalize_join_code(join_code: str) -> str:
+    return "".join(ch for ch in join_code.upper().strip() if ch in string.ascii_uppercase + string.digits)
 
-    for item in DAILY_NEWSLETTER_PROVIDER_CATALOG:
-        db.add(CareCircleProviderCatalog(**item, enabled=True, source_app="daily_newsletter"))
+
+async def _generate_unique_join_code(db: AsyncSession) -> str:
+    alphabet = string.ascii_uppercase + string.digits
+    while True:
+        candidate = "".join(choice(alphabet) for _ in range(6))
+        existing = await db.scalar(
+            select(CareCircleFamily.id).where(CareCircleFamily.join_code == candidate)
+        )
+        if existing is None:
+            return candidate
+
+
+def _load_provider_catalog_inventory() -> list[dict[str, Any]]:
+    if PROVIDER_INVENTORY_CONFIG_PATH.exists():
+        raw_inventory = json.loads(PROVIDER_INVENTORY_CONFIG_PATH.read_text(encoding="utf-8"))
+        providers = raw_inventory.get("providers", [])
+        normalized: list[dict[str, Any]] = []
+        for item in providers:
+            normalized.append(
+                {
+                    "provider_key": item["name"],
+                    "label": item["label"],
+                    "icon": item.get("icon"),
+                    "category": item.get("category", "core"),
+                    "enabled": bool(item.get("enabled", True)),
+                    "display_order": int(item.get("order", 0)),
+                    "patient_visible": bool(item.get("patient_visible", True)),
+                    "family_visible": bool(item.get("family_visible", True)),
+                }
+            )
+        return normalized
+    return DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG
+
+
+async def ensure_provider_catalog_seeded(db: AsyncSession) -> None:
+    provider_catalog = _load_provider_catalog_inventory()
+    existing_rows = (
+        await db.execute(select(CareCircleProviderCatalog))
+    ).scalars().all()
+    existing_map = {row.provider_key: row for row in existing_rows}
+
+    for item in provider_catalog:
+        existing = existing_map.get(item["provider_key"])
+        if existing:
+            existing.label = item["label"]
+            existing.icon = item["icon"]
+            existing.category = item["category"]
+            existing.display_order = item["display_order"]
+            existing.family_visible = item["family_visible"]
+            continue
+
+        db.add(CareCircleProviderCatalog(**item, source_app="daily_newsletter"))
     await db.commit()
 
 
-async def _seed_default_family_state(db: AsyncSession, user: User) -> CareCircleFamily:
-    family = CareCircleFamily(
-        name=f"{user.display_name or user.username} household",
-        created_by_user_id=user.id,
-    )
-    db.add(family)
-    await db.flush()
-
-    db.add(CareCircleFamilyMembership(family_id=family.id, user_id=user.id, role="owner", is_primary=True))
-
+async def _seed_patients_for_family(
+    db: AsyncSession, family: CareCircleFamily, user: User
+) -> None:
+    """Seed default patients for a family that has no patients."""
     for patient_data in DEFAULT_PATIENTS:
         patient = CareCirclePatientProfile(
             family_id=family.id,
@@ -167,9 +230,26 @@ async def _seed_default_family_state(db: AsyncSession, user: User) -> CareCircle
         db.add(patient)
         await db.flush()
         for highlight in patient_data["highlights"]:
-            db.add(CareCirclePatientContentCard(patient_id=patient.id, **highlight, is_active=True))
-
+            db.add(CareCirclePatientContentCard(
+                patient_id=patient.id, **highlight, is_active=True
+            ))
     await db.commit()
+
+
+async def _seed_default_family_state(db: AsyncSession, user: User) -> CareCircleFamily:
+    family = CareCircleFamily(
+        name=f"{user.display_name or user.username} household",
+        join_code=await _generate_unique_join_code(db),
+        created_by_user_id=user.id,
+    )
+    db.add(family)
+    await db.flush()
+
+    db.add(CareCircleFamilyMembership(
+        family_id=family.id, user_id=user.id, role="owner", is_primary=True
+    ))
+
+    await _seed_patients_for_family(db, family, user)
     await db.refresh(family)
     return family
 
@@ -181,6 +261,15 @@ async def get_or_create_family_for_user(db: AsyncSession, user: User) -> CareCir
     if membership:
         family = await db.get(CareCircleFamily, membership.family_id)
         if family:
+            # Ensure patients are seeded for existing families (handles families created before patient seeding was added)
+            patient_count = await db.scalar(
+                select(func.count(CareCirclePatientProfile.id)).where(CareCirclePatientProfile.family_id == family.id)
+            )
+            if not patient_count or patient_count == 0:
+                await _seed_patients_for_family(db, family, user)
+            if not family.join_code:
+                family.join_code = await _generate_unique_join_code(db)
+                await db.commit()
             return family
     return await _seed_default_family_state(db, user)
 
@@ -195,7 +284,7 @@ async def list_family_patients(db: AsyncSession, user: User) -> list[dict[str, A
             .order_by(CareCirclePatientProfile.id.asc())
         )
     ).scalars().all()
-    return [_patient_to_dict(patient, family.name) for patient in patients]
+    return [_patient_to_dict(patient, family.name, family.join_code) for patient in patients]
 
 
 async def get_family_patient_detail(db: AsyncSession, user: User, patient_id: int) -> dict[str, Any] | None:
@@ -215,7 +304,51 @@ async def get_family_patient_detail(db: AsyncSession, user: User, patient_id: in
             .order_by(CareCirclePatientContentCard.display_order.asc(), CareCirclePatientContentCard.id.asc())
         )
     ).scalars().all()
-    return _patient_to_dict(patient, family.name, highlights)
+    return _patient_to_dict(patient, family.name, family.join_code, highlights)
+
+
+async def update_family_patient_detail(
+    db: AsyncSession,
+    user: User,
+    patient_id: int,
+    payload: dict[str, Any],
+) -> dict[str, Any] | None:
+    family = await get_or_create_family_for_user(db, user)
+    patient = await db.scalar(
+        select(CareCirclePatientProfile).where(
+            CareCirclePatientProfile.id == patient_id,
+            CareCirclePatientProfile.family_id == family.id,
+        )
+    )
+    if not patient:
+        return None
+
+    normalized_join_code = _normalize_join_code(payload["joinCode"])
+    existing_join_code_owner = await db.scalar(
+        select(CareCircleFamily).where(
+            CareCircleFamily.join_code == normalized_join_code,
+            CareCircleFamily.id != family.id,
+        )
+    )
+    if existing_join_code_owner:
+        raise ValueError("Join code is already assigned to another family")
+
+    patient.display_name = payload["displayName"].strip()
+    patient.stage = payload["stage"].strip()
+    patient.access_state = payload["accessState"].strip()
+    patient.timezone = payload["timezone"].strip()
+    patient.delivery_time = payload["deliveryTime"] or None
+    patient.delivery_days = payload["days"]
+    patient.auth_image_keys = payload["authImageKeys"]
+    patient.preferences = {
+        "family_members": payload["familyMembers"],
+        "preference_tags": payload["preferences"],
+    }
+    family.name = payload["familyName"].strip()
+    family.join_code = normalized_join_code
+
+    await db.commit()
+    return await get_family_patient_detail(db, user, patient_id)
 
 
 async def list_provider_catalog(db: AsyncSession) -> list[dict[str, Any]]:
@@ -276,7 +409,12 @@ async def authenticate_patient_by_images(db: AsyncSession, selected_keys: list[s
                     .order_by(CareCirclePatientContentCard.display_order.asc(), CareCirclePatientContentCard.id.asc())
                 )
             ).scalars().all()
-            return _patient_to_dict(patient, family.name if family else "Care Circle", highlights)
+            return _patient_to_dict(
+                patient,
+                family.name if family else "Care Circle",
+                family.join_code if family and family.join_code else "",
+                highlights,
+            )
     return None
 
 
@@ -292,4 +430,66 @@ async def get_patient_session(db: AsyncSession, patient_id: int) -> dict[str, An
             .order_by(CareCirclePatientContentCard.display_order.asc(), CareCirclePatientContentCard.id.asc())
         )
     ).scalars().all()
-    return _patient_to_dict(patient, family.name if family else "Care Circle", highlights)
+    return _patient_to_dict(
+        patient,
+        family.name if family else "Care Circle",
+        family.join_code if family and family.join_code else "",
+        highlights,
+    )
+
+
+async def get_patient_provider_configs(
+    db: AsyncSession, patient_id: int
+) -> list[dict[str, Any]]:
+    """List all provider configs for a patient."""
+    configs = (
+        await db.execute(
+            select(CareCircleProviderPatientConfig).where(
+                CareCircleProviderPatientConfig.patient_id == patient_id
+            )
+        )
+    ).scalars().all()
+    return [
+        {
+            "id": c.id,
+            "patient_id": c.patient_id,
+            "provider_key": c.provider_key,
+            "is_enabled": c.is_enabled,
+            "custom_parameters": c.custom_parameters or {},
+        }
+        for c in configs
+    ]
+
+
+async def upsert_patient_provider_config(
+    db: AsyncSession,
+    patient_id: int,
+    provider_key: str,
+    is_enabled: bool,
+    custom_parameters: dict | None = None,
+) -> CareCircleProviderPatientConfig:
+    """Insert or update a per-patient provider config."""
+    existing = await db.scalar(
+        select(CareCircleProviderPatientConfig).where(
+            CareCircleProviderPatientConfig.patient_id == patient_id,
+            CareCircleProviderPatientConfig.provider_key == provider_key,
+        )
+    )
+    if existing:
+        existing.is_enabled = is_enabled
+        if custom_parameters is not None:
+            existing.custom_parameters = custom_parameters
+        await db.commit()
+        await db.refresh(existing)
+        return existing
+    else:
+        new_config = CareCircleProviderPatientConfig(
+            patient_id=patient_id,
+            provider_key=provider_key,
+            is_enabled=is_enabled,
+            custom_parameters=custom_parameters or {},
+        )
+        db.add(new_config)
+        await db.commit()
+        await db.refresh(new_config)
+        return new_config

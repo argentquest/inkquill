@@ -19,12 +19,12 @@ class StoryRating(Base):
     SQLAlchemy ORM Model representing ratings/likes for published stories.
     Each user can rate a story once with a value between 1-5.
     """
-    __tablename__ = "story_ratings"
+    __tablename__ = "storytelling_story_ratings"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
     # Foreign keys
-    published_story_id: Mapped[int] = mapped_column(Integer, ForeignKey("published_stories.id", ondelete="CASCADE"), nullable=False, index=True)
+    published_story_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_published_stories.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     
     # Rating value (1-5 stars)

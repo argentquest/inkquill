@@ -1,13 +1,9 @@
-"""
-Story Brainstorm Plugin Setup for Semantic Kernel
+"""Story Brainstorm prompt registration for the LangGraph runtime."""
 
-This module registers the story brainstorm functions with the Semantic Kernel.
-"""
-
-from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
 import logging
 
 from app.core.config import settings
+from app.services.langgraph_kernel import OpenAIChatPromptExecutionSettings, PromptTemplateConfig
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +12,7 @@ STORY_BRAINSTORM_PLUGIN_NAME = "StoryBrainstormPlugin"
 
 
 def setup_story_brainstorm_plugin(kernel_instance, chat_service_id: str):
-    """Register story brainstorm functions with the kernel"""
+    """Register story brainstorm functions with the compatibility kernel."""
     
     # Load prompt templates
     import os
@@ -31,9 +27,6 @@ def setup_story_brainstorm_plugin(kernel_instance, chat_service_id: str):
     three_acts_prompt_file = os.path.join(prompts_dir, 'three_act_structure_generation.txt')
     with open(three_acts_prompt_file, 'r', encoding='utf-8') as f:
         THREE_ACTS_PROMPT = f.read()
-    
-    # Setup execution settings
-    from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
     
     # Story concepts generation function
     try:

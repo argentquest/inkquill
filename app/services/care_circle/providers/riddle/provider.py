@@ -51,7 +51,7 @@ RIDDLE_STYLES = [
 
 
 class RiddleProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates simple, easy-to-guess riddles using a Large Language Model.

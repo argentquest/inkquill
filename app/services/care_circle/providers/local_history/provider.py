@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class LocalHistoryProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a warm, positive historical fact about the recipient's area.

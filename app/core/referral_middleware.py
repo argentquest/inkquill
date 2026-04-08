@@ -41,9 +41,9 @@ class ReferralTrackingMiddleware(BaseHTTPMiddleware):
         # Check for referral parameter in query string
         ref_code = request.query_params.get("ref")
         
-        logger.info(f"🔍 MIDDLEWARE DEBUG: Processing request {request.url}")
-        logger.info(f"🔍 MIDDLEWARE DEBUG: Query params: {dict(request.query_params)}")
-        logger.info(f"🔍 MIDDLEWARE DEBUG: Referral code from URL: {ref_code}")
+        logger.info("Referral middleware processing request %s", request.url)
+        logger.info("Referral middleware query params: %s", dict(request.query_params))
+        logger.info("Referral middleware referral code from URL: %s", ref_code)
         
         if ref_code:
             # Store in request state for later use
@@ -65,7 +65,7 @@ class ReferralTrackingMiddleware(BaseHTTPMiddleware):
             logger.info(f"Set referral cookie for code: {ref_code}")
             
             # Track the referral immediately
-            logger.info(f"🔍 MIDDLEWARE DEBUG: Attempting to track referral for code: {ref_code}")
+            logger.info("Referral middleware attempting to track referral for code: %s", ref_code)
             try:
                 # Get IP and user agent
                 ip_address = request.client.host
@@ -78,7 +78,10 @@ class ReferralTrackingMiddleware(BaseHTTPMiddleware):
                 async for db in get_db_session():
                     try:
                         referrer_user_id = int(ref_code)
-                        logger.info(f"🔍 MIDDLEWARE DEBUG: Calling track_referral_visit with referrer_user_id: {referrer_user_id}")
+                        logger.info(
+                            "Referral middleware calling track_referral_visit with referrer_user_id: %s",
+                            referrer_user_id,
+                        )
                         
                         result = await referral_service.track_referral_visit(
                             db=db,
@@ -93,21 +96,21 @@ class ReferralTrackingMiddleware(BaseHTTPMiddleware):
                             referral_url=str(request.url)
                         )
                         
-                        logger.info(f"🔍 MIDDLEWARE DEBUG: Track result: {result}")
+                        logger.info("Referral middleware track result: %s", result)
                         
                         if result:
-                            logger.info(f"🔍 MIDDLEWARE DEBUG: Successfully tracked referral {result.id}")
+                            logger.info("Referral middleware successfully tracked referral %s", result.id)
                         else:
-                            logger.warning(f"🔍 MIDDLEWARE DEBUG: Failed to track referral")
+                            logger.warning("Referral middleware failed to track referral")
                             
                     except ValueError:
-                        logger.error(f"🔍 MIDDLEWARE DEBUG: Invalid referral code: {ref_code}")
+                        logger.error("Referral middleware invalid referral code: %s", ref_code)
                     except Exception as e:
-                        logger.error(f"🔍 MIDDLEWARE DEBUG: Error tracking referral: {e}")
+                        logger.error("Referral middleware error tracking referral: %s", e)
                     break
                         
             except Exception as e:
-                logger.error(f"🔍 MIDDLEWARE DEBUG: Exception during referral tracking: {e}")
+                logger.error("Referral middleware exception during referral tracking: %s", e)
             
         else:
             # Check for existing referral cookie

@@ -1,6 +1,6 @@
 """CRUD operations for forum posts."""
 from typing import List, Optional
-from datetime import datetime
+from datetime import UTC, datetime
 from sqlalchemy import select, func, desc, and_, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
@@ -153,7 +153,7 @@ async def update_forum_post(
     # Track edits
     if "content" in update_data:
         db_post.edit_count += 1
-        db_post.edited_at = datetime.utcnow()
+        db_post.edited_at = datetime.now(UTC)
         db_post.edited_by_id = user_id
     
     for field, value in update_data.items():
@@ -185,7 +185,7 @@ async def delete_forum_post(
         await db.delete(db_post)
     else:
         db_post.is_deleted = True
-        db_post.deleted_at = datetime.utcnow()
+        db_post.deleted_at = datetime.now(UTC)
         db_post.deleted_by_id = user_id
         db_post.deletion_reason = deletion_reason
     
@@ -225,7 +225,7 @@ async def vote_on_post(
             # Change vote type
             old_type = vote.vote_type
             vote.vote_type = vote_type
-            vote.updated_at = datetime.utcnow()
+            vote.updated_at = datetime.now(UTC)
             
             if old_type == VoteType.UPVOTE:
                 db_post.upvote_count -= 1

@@ -196,12 +196,12 @@ class StoryGenerationService:
     async def _generate_story_outline(self, world: World, elements: Dict[str, List[Any]], request: StoryGenerationRequest, ai_model_config: AIModelConfiguration) -> Dict[str, Any]:
         """Generate story outline using AI."""
         try:
-            # Import semantic kernel functions
-            from app.services import sk_kernel_instance
+            # Import storytelling runtime functions
+            from app.services import storytelling_runtime
             
-            kernel = sk_kernel_instance.kernel
+            kernel = storytelling_runtime.kernel
             if not kernel:
-                return {"success": False, "error": "Semantic Kernel not available"}
+                return {"success": False, "error": "Storytelling runtime not available"}
             
             # Prepare input context
             characters_text = self._format_elements_for_ai(elements["characters"], "character")
@@ -209,17 +209,17 @@ class StoryGenerationService:
             lore_items_text = self._format_elements_for_ai(elements["lore_items"], "lore_item")
             
             # Get the story generation function using the exported reference
-            generate_function = sk_kernel_instance.generate_story_structure_function
+            generate_function = storytelling_runtime.generate_story_structure_function
             if not generate_function:
                 logger.error("GenerateStoryStructure function not available in exported functions")
                 
                 # Check available exported functions
                 available_functions = []
                 for name, func in [
-                    ('review_act_content_function', sk_kernel_instance.review_act_content_function),
-                    ('generate_act_narrative_only_function', sk_kernel_instance.generate_act_narrative_only_function),
-                    ('generate_story_structure_function', sk_kernel_instance.generate_story_structure_function),
-                    ('extract_scenes_from_act_function', sk_kernel_instance.extract_scenes_from_act_function)
+                    ('review_act_content_function', storytelling_runtime.review_act_content_function),
+                    ('generate_act_narrative_only_function', storytelling_runtime.generate_act_narrative_only_function),
+                    ('generate_story_structure_function', storytelling_runtime.generate_story_structure_function),
+                    ('extract_scenes_from_act_function', storytelling_runtime.extract_scenes_from_act_function)
                 ]:
                     if func is not None:
                         available_functions.append(name)
@@ -265,7 +265,7 @@ class StoryGenerationService:
             logger.info(f"  story_tone: {request.story_tone}")
             logger.info(f"  primary_conflict_type: {request.primary_conflict_type}")
             
-            # Use direct AI client call instead of Semantic Kernel for dynamic model support
+            # Use direct AI client call instead of storytelling runtime for dynamic model support
             logger.info("Starting AI function invocation with dynamic model...")
             try:
                 response_text = await self._call_ai_directly(
@@ -702,7 +702,7 @@ class StoryGenerationService:
         
         try:
             if ai_model_config.provider.value in {"OPENROUTER", "OPENAI"}:
-                from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+                from app.services.langgraph_kernel import OpenAIChatCompletion
                 
                 new_service = OpenAIChatCompletion(
                     service_id=chat_service_id,
@@ -757,7 +757,7 @@ class StoryGenerationService:
             with open(story_gen_file, 'r', encoding='utf-8') as f:
                 prompt_template = f.read()
             
-            # Replace Semantic Kernel variables with actual values
+            # Replace storytelling runtime variables with actual values
             system_prompt = prompt_template.replace('{{$world_name}}', world_name)
             system_prompt = system_prompt.replace('{{$world_description}}', world_description)
             system_prompt = system_prompt.replace('{{$story_genre}}', story_genre)

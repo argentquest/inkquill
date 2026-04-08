@@ -35,6 +35,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
 from fastapi.templating import Jinja2Templates
 from contextlib import asynccontextmanager
+import asyncio
 import sqlalchemy
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -46,9 +47,11 @@ from app.core.middleware import LoggingContextMiddleware, UserActivityMiddleware
 from app.core.referral_middleware import ReferralTrackingMiddleware
 from app.core.security_middleware import SecurityHeadersMiddleware
 from app.db.database import engine
-
-# --- Service imports ---
-from app.services import sk_kernel_instance
+from app.services.ai_orchestration import (
+    get_ai_orchestration_backend,
+    orchestration_backend_is_semantic_kernel,
+)
+from app.services import storytelling_runtime
 
 # --- API Router imports ---
 from app.routers import (
@@ -152,10 +155,17 @@ async def lifespan(app_instance: FastAPI):
     await model_cache.load_models_from_db()
     logger.info("Lifespan: AI Model Cache loaded from database.")
     
-    if sk_kernel_instance.kernel and sk_kernel_instance.review_act_content_function:
-        logger.info("Lifespan: Semantic Kernel instance and key functions appear to be available.")
+    orchestration_backend = get_ai_orchestration_backend()
+    if orchestration_backend_is_semantic_kernel():
+        if storytelling_runtime.kernel and storytelling_runtime.review_act_content_function:
+            logger.info("Lifespan: Storytelling runtime and key functions appear to be available.")
+        else:
+            logger.error("Lifespan: Semantic-kernel backend is enabled, but the storytelling runtime or required functions are unavailable.")
     else:
-        logger.error("Lifespan: CRITICAL - Semantic Kernel instance or essential functions NOT available. Check sk_kernel_instance.py logs.")
+        logger.info(
+            "Lifespan: Skipping semantic-kernel-specific startup checks because AI_ORCHESTRATION_BACKEND='%s'.",
+            orchestration_backend,
+        )
     
     try:
         async with engine.connect() as connection:
@@ -165,14 +175,20 @@ async def lifespan(app_instance: FastAPI):
         logger.critical(f"Lifespan: CRITICAL - PostgreSQL database connection FAILED: {e_db}", exc_info=True)
     
     logger.info("Lifespan: Application startup sequence complete.")
-    yield
-    
-    # --- Shutdown logic ---
-    logger.info("Lifespan: Application shutdown sequence initiated.")
-    if engine:
-        await engine.dispose()
-        logger.info("Lifespan: Database engine disposed.")
-    logger.info("Lifespan: Application shutdown sequence complete.")
+    try:
+        yield
+    except (asyncio.CancelledError, KeyboardInterrupt):
+        logger.info("Lifespan: Shutdown signal received.")
+    finally:
+        # --- Shutdown logic ---
+        logger.info("Lifespan: Application shutdown sequence initiated.")
+        if engine:
+            try:
+                await engine.dispose()
+                logger.info("Lifespan: Database engine disposed.")
+            except Exception as e:
+                logger.warning(f"Lifespan: Error disposing database engine: {e}")
+        logger.info("Lifespan: Application shutdown sequence complete.")
 
 
 app = FastAPI(

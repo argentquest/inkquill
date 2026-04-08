@@ -1,9 +1,7 @@
 """Service helpers for story analysis plugin setup."""
 
 # app/services/sk_plugins/story_analysis_plugin_setup.py
-import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
+from app.services.langgraph_kernel import OpenAIChatPromptExecutionSettings, PromptTemplateConfig
 import logging
 
 from app.core.config import settings
@@ -13,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Plugin Name Constant is now imported, no local definition needed.
 
-def register_story_analysis_functions(kernel_instance: sk.Kernel, chat_service_id: str, prompt_loader: callable):
+def register_story_analysis_functions(kernel_instance, chat_service_id: str, prompt_loader: callable):
     """Provide service support for register story analysis functions."""
     logger.info(f"SK_PLUGIN_SETUP ({STORY_ANALYSIS_PLUGIN_NAME}): Registering functions...")
 

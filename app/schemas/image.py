@@ -1,7 +1,7 @@
 """Pydantic schemas for image."""
 
 # /story_app/app/schemas/image.py
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -27,6 +27,5 @@ class GeneratedImageRead(BaseModel):
         """
         return build_storage_url("generated-images", self.blob_path)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 

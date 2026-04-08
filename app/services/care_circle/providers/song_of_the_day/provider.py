@@ -8,7 +8,7 @@ from typing import Any, Dict
 
 
 class SongOfTheDayProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Curates a daily song recommendation.

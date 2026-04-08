@@ -86,7 +86,7 @@ async def get_threads(
     story_id: Optional[int] = None,
     user_id: Optional[int] = None,
     status: Optional[ThreadStatus] = None,
-    order_by: str = Query("recent", regex="^(recent|popular|updated)$"),
+    order_by: str = Query("recent", pattern="^(recent|popular|updated)$"),
     skip: int = 0,
     limit: int = 20,
     db: AsyncSession = Depends(get_db_session)

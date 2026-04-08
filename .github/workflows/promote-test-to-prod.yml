@@ -1,0 +1,31 @@
+name: Promote Test To Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_test_deploy:
+        description: "Skip rebuilding the test stack before promotion"
+        required: false
+        default: false
+        type: boolean
+      skip_prod_migrations:
+        description: "Skip alembic upgrade on prod before deploy"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  promote:
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Promote test to prod
+        shell: pwsh
+        run: |
+          $args = @()
+          if ("${{ inputs.skip_test_deploy }}" -eq "true") { $args += "-SkipTestDeploy" }
+          if ("${{ inputs.skip_prod_migrations }}" -eq "true") { $args += "-SkipProdMigrations" }
+          ./scripts/promote_test_to_prod.ps1 @args

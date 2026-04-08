@@ -8,7 +8,7 @@ from pathlib import Path
 from app.core.config import settings
 from app.crud import document as crud_document
 from app.crud import job_status as crud_job_status
-from app.db.database import async_session_local
+from app.db import database as db_database
 from app.models.job_status import JobStateEnum
 from app.models.uploaded_document import DocumentStatus
 from app.processing.text_extraction import extract_text_from_file_path
@@ -25,7 +25,7 @@ def _save_to_local_storage(blob_path: str, data: bytes) -> None:
 
 async def process_uploaded_document_task(job_id: str, db_document_id: int, file_path_on_disk: str) -> None:
     """Process uploaded document task."""
-    async with async_session_local() as db:
+    async with db_database.async_session_local() as db:
         try:
             await crud_job_status.update_job_status(db, job_id, JobStateEnum.RUNNING, "Extracting document text...")
             document = await crud_document.get_document_record(db, db_document_id)

@@ -78,7 +78,7 @@ async def published_stories_gallery(
     request: Request,
     page: int = Query(1, ge=1),
     search: Optional[str] = None,
-    sort_by: str = Query("recent", regex="^(recent|popular|rating|title)$"),
+    sort_by: str = Query("recent", pattern="^(recent|popular|rating|title)$"),
     db: AsyncSession = Depends(get_db_session),
     current_user: Optional[User] = Depends(get_current_user)
 ):

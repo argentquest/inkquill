@@ -18,14 +18,14 @@ class StoryComment(Base):
     """
     SQLAlchemy ORM Model representing comments on published stories.
     """
-    __tablename__ = "story_comments"
+    __tablename__ = "storytelling_story_comments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
     # Foreign keys
-    published_story_id: Mapped[int] = mapped_column(Integer, ForeignKey("published_stories.id", ondelete="CASCADE"), nullable=False, index=True)
+    published_story_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_published_stories.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    parent_comment_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("story_comments.id", ondelete="CASCADE"), nullable=True, index=True)
+    parent_comment_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_story_comments.id", ondelete="CASCADE"), nullable=True, index=True)
     
     # Comment content
     content: Mapped[str] = mapped_column(Text, nullable=False)

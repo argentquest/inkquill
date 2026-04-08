@@ -145,8 +145,8 @@ async def get_my_author_stats(
         draft_count = draft_count_result.scalar() or 0
         
         # Get recent engagement (last 30 days)
-        from datetime import datetime, timedelta
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        from datetime import UTC, datetime, timedelta
+        thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
         
         recent_likes_result = await db.execute(
             select(func.count(BlogLike.id))

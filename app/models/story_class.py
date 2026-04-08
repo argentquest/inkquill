@@ -10,13 +10,13 @@ from app.db.database import Base
 
 class StoryClass(Base):
     """SQLAlchemy model for story class."""
-    __tablename__ = "story_classes"
+    __tablename__ = "storytelling_story_classes"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, index=True)
     description = Column(String(500), nullable=True)
     color = Column(String(7), nullable=False)  # Hex color code like #FF5733
-    world_id = Column(Integer, ForeignKey("worlds.id", ondelete="CASCADE"), nullable=False, index=True)
+    world_id = Column(Integer, ForeignKey("storytelling_worlds.id", ondelete="CASCADE"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

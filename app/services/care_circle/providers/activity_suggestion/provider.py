@@ -7,7 +7,7 @@ from typing import Any, Dict
 
 
 class ActivitySuggestionProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Suggests one of the recipient's favourite activities in a warm,

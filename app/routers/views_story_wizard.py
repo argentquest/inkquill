@@ -10,7 +10,7 @@ from typing import Optional, Dict, Any
 import logging
 import json
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 # --- Core Application Imports ---
 from app.core.deps import get_db_session, get_current_active_user
@@ -37,7 +37,7 @@ async def story_wizard_health():
         templates_status = "OK"
         
         # Test imports
-        from app.services.semantic_kernel_setup import kernel
+        from app.services.langgraph_runtime_setup import kernel
         kernel_status = "OK" if kernel else "Not available"
         
         return {
@@ -84,8 +84,8 @@ async def story_wizard_page(
         # Store session with expiry
         wizard_sessions[session_id] = {
             "user_id": current_user.id,
-            "created_at": datetime.utcnow(),
-            "expires_at": datetime.utcnow() + timedelta(days=1),
+            "created_at": datetime.now(UTC),
+            "expires_at": datetime.now(UTC) + timedelta(days=1),
             "phase": 1,
             "step": 1,
             "conversation": [],
@@ -167,7 +167,7 @@ async def story_wizard_chat(
         session = wizard_sessions[session_id]
         
         # Check session expiry
-        if datetime.utcnow() > session["expires_at"]:
+        if datetime.now(UTC) > session["expires_at"]:
             del wizard_sessions[session_id]
             raise HTTPException(
                 status_code=status.HTTP_410_GONE,
@@ -185,7 +185,7 @@ async def story_wizard_chat(
         session["conversation"].append({
             "role": "user",
             "content": message,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(UTC).isoformat()
         })
 
         # Generate AI response using the story wizard prompt
@@ -197,7 +197,7 @@ async def story_wizard_chat(
         session["conversation"].append({
             "role": "assistant",
             "content": ai_response,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(UTC).isoformat()
         })
 
         # Extract and update story data

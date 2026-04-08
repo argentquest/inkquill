@@ -4,8 +4,12 @@
 
 from sqlalchemy import Column, Integer, String, Boolean, Text, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime
+from datetime import datetime, UTC
 from app.db.database import Base
+
+
+def _naive_utc_now() -> datetime:
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class ChatSample(Base):
@@ -18,8 +22,8 @@ class ChatSample(Base):
     category: Mapped[str] = mapped_column(String(50), nullable=True)  # e.g., "characters", "locations", "lore"
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_naive_utc_now, onupdate=_naive_utc_now, nullable=False)
 
     def __repr__(self):
         return f"<ChatSample(id={self.id}, title='{self.title}', category='{self.category}')>"

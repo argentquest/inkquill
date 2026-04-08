@@ -1,6 +1,6 @@
 """CRUD operations for forum threads."""
 from typing import List, Optional
-from datetime import datetime
+from datetime import UTC, datetime
 from sqlalchemy import select, func, desc, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
@@ -171,7 +171,7 @@ async def update_forum_thread(
     for field, value in update_data.items():
         setattr(db_thread, field, value)
     
-    db_thread.updated_at = datetime.utcnow()
+    db_thread.updated_at = datetime.now(UTC)
     
     await db.commit()
     await db.refresh(db_thread)
@@ -198,7 +198,7 @@ async def delete_forum_thread(
         await db.delete(db_thread)
     else:
         db_thread.is_deleted = True
-        db_thread.deleted_at = datetime.utcnow()
+        db_thread.deleted_at = datetime.now(UTC)
         db_thread.deleted_by_id = user_id
     
     await db.commit()
@@ -261,7 +261,7 @@ async def update_thread_last_post(
     """Update thread's last post information."""
     db_thread = await db.get(ForumThread, thread_id)
     if db_thread:
-        db_thread.last_post_at = datetime.utcnow()
+        db_thread.last_post_at = datetime.now(UTC)
         db_thread.last_post_by_id = user_id
         db_thread.post_count += 1
         await db.commit()

@@ -1,7 +1,7 @@
 """Blog analytics service for tracking and reporting."""
 import logging
 from typing import List, Optional, Dict, Any
-from datetime import datetime, date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, desc
 from decimal import Decimal
@@ -220,7 +220,7 @@ class BlogAnalyticsService:
         """Get trending blog posts."""
         try:
             # Calculate date range
-            now = datetime.utcnow()
+            now = datetime.now(UTC)
             if time_period == "day":
                 since_date = now - timedelta(days=1)
             elif time_period == "week":

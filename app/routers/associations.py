@@ -308,9 +308,9 @@ async def get_all_story_associations(
     )
     
     return ApiResponse.success_response(data={
-        "characters": [StoryCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
-        "locations": [StoryLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
-        "lore_items": [StoryLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
+        "characters": [StoryCharacterAssociationRead.model_validate(assoc) for assoc in char_result.scalars().all()],
+        "locations": [StoryLocationAssociationRead.model_validate(assoc) for assoc in loc_result.scalars().all()],
+        "lore_items": [StoryLoreItemAssociationRead.model_validate(assoc) for assoc in lore_result.scalars().all()]
     })
 
 # === ACT ASSOCIATIONS ===
@@ -403,9 +403,9 @@ async def get_all_act_associations(
     )
     
     return ApiResponse.success_response(data={
-        "characters": [ActCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
-        "locations": [ActLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
-        "lore_items": [ActLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
+        "characters": [ActCharacterAssociationRead.model_validate(assoc) for assoc in char_result.scalars().all()],
+        "locations": [ActLocationAssociationRead.model_validate(assoc) for assoc in loc_result.scalars().all()],
+        "lore_items": [ActLoreItemAssociationRead.model_validate(assoc) for assoc in lore_result.scalars().all()]
     })
 
 @router.get("/scene/{scene_id}/all")
@@ -451,9 +451,9 @@ async def get_all_scene_associations(
     )
     
     return ApiResponse.success_response(data={
-        "characters": [SceneCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
-        "locations": [SceneLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
-        "lore_items": [SceneLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
+        "characters": [SceneCharacterAssociationRead.model_validate(assoc) for assoc in char_result.scalars().all()],
+        "locations": [SceneLocationAssociationRead.model_validate(assoc) for assoc in loc_result.scalars().all()],
+        "lore_items": [SceneLoreItemAssociationRead.model_validate(assoc) for assoc in lore_result.scalars().all()]
     })
 
 # === LOCATION ASSOCIATIONS ===

@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/job_status.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 from app.models.job_status import JobTypeEnum, JobStateEnum
@@ -21,6 +21,4 @@ class JobStatusRead(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-        use_enum_values = True
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)

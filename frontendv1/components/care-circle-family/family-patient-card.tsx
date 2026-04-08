@@ -28,9 +28,9 @@ export function FamilyPatientCard({ patient }: { patient: CareCirclePatientRecor
         <p className="text-sm text-ink-700">Family circle: {patient.familyMembers.join(", ")}</p>
         <a
           className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-          href={`/care-circle-family/patients/${patient.id}`}
+          href={`/care-circle-family/patients/${patient.id}?edit=1`}
         >
-          Open patient
+          Open and edit patient
         </a>
       </div>
     </article>

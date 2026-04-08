@@ -13,13 +13,13 @@ type ThemeMode = "light" | "dark";
 
 interface ThemeContextValue {
   theme: ThemeMode;
-  setTheme: (theme: ThemeMode) => void;
+  setTheme: (_theme: ThemeMode) => void;
   toggleTheme: () => void;
 }
 
 interface SessionContextValue extends SessionState {
   refreshSession: () => Promise<void>;
-  setAuthenticated: (user: SessionUser) => void;
+  setAuthenticated: (_user: SessionUser) => void;
   setAnonymous: () => void;
 }
 
@@ -40,8 +40,8 @@ interface CookieConsentContextValue {
 
 interface ToastContextValue {
   toasts: ToastMessage[];
-  pushToast: (toast: Omit<ToastMessage, "id">) => void;
-  dismissToast: (id: string) => void;
+  pushToast: (_toast: Omit<ToastMessage, "id">) => void;
+  dismissToast: (_id: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -50,6 +50,49 @@ const BalanceContext = createContext<BalanceContextValue | undefined>(undefined)
 const MaintenanceContext = createContext<MaintenanceContextValue | undefined>(undefined);
 const CookieConsentContext = createContext<CookieConsentContextValue | undefined>(undefined);
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
+
+const fallbackThemeContext: ThemeContextValue = {
+  theme: "light",
+  setTheme: () => undefined,
+  toggleTheme: () => undefined
+};
+
+const fallbackSessionContext: SessionContextValue = {
+  status: "anonymous",
+  user: null,
+  error: null,
+  refreshSession: async () => undefined,
+  setAuthenticated: () => undefined,
+  setAnonymous: () => undefined
+};
+
+const fallbackBalanceContext: BalanceContextValue = {
+  balance: 0,
+  currency: "Coins",
+  error: "Balance unavailable",
+  loading: false,
+  refreshBalance: async () => undefined
+};
+
+const fallbackMaintenanceContext: MaintenanceContextValue = {
+  enabled: false,
+  message: null,
+  updated_at: null,
+  end_time: null,
+  loading: false,
+  refreshMaintenance: async () => undefined
+};
+
+const fallbackCookieConsentContext: CookieConsentContextValue = {
+  accepted: false,
+  accept: () => undefined
+};
+
+const fallbackToastContext: ToastContextValue = {
+  toasts: [],
+  pushToast: () => undefined,
+  dismissToast: () => undefined
+};
 
 function useCreateQueryClient() {
   return useMemo(
@@ -107,8 +150,13 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme(theme === "light" ? "dark" : "light");
-  }, [setTheme, theme]);
+    setThemeState((currentTheme) => {
+      const nextTheme = currentTheme === "light" ? "dark" : "light";
+      document.documentElement.dataset.theme = nextTheme;
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      return nextTheme;
+    });
+  }, []);
 
   const pushToast = useCallback((toast: Omit<ToastMessage, "id">) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -234,34 +282,26 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   );
 }
 
-function useRequiredContext<T>(context: React.Context<T | undefined>, name: string) {
-  const value = useContext(context);
-  if (!value) {
-    throw new Error(`${name} must be used within AppProviders`);
-  }
-  return value;
-}
-
 export function useTheme() {
-  return useRequiredContext(ThemeContext, "useTheme");
+  return useContext(ThemeContext) ?? fallbackThemeContext;
 }
 
 export function useSession() {
-  return useRequiredContext(SessionContext, "useSession");
+  return useContext(SessionContext) ?? fallbackSessionContext;
 }
 
 export function useBalance() {
-  return useRequiredContext(BalanceContext, "useBalance");
+  return useContext(BalanceContext) ?? fallbackBalanceContext;
 }
 
 export function useMaintenance() {
-  return useRequiredContext(MaintenanceContext, "useMaintenance");
+  return useContext(MaintenanceContext) ?? fallbackMaintenanceContext;
 }
 
 export function useCookieConsent() {
-  return useRequiredContext(CookieConsentContext, "useCookieConsent");
+  return useContext(CookieConsentContext) ?? fallbackCookieConsentContext;
 }
 
 export function useToasts() {
-  return useRequiredContext(ToastContext, "useToasts");
+  return useContext(ToastContext) ?? fallbackToastContext;
 }

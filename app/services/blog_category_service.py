@@ -20,7 +20,7 @@ class BlogCategoryService:
     ) -> BlogCategory:
         """Create a new blog category."""
         try:
-            category = BlogCategory(**category_data.dict())
+            category = BlogCategory(**category_data.model_dump())
             db.add(category)
             await db.commit()
             await db.refresh(category)
@@ -101,7 +101,7 @@ class BlogCategoryService:
                 return None
             
             # Update fields
-            update_data = category_data.dict(exclude_unset=True)
+            update_data = category_data.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 setattr(category, field, value)
             

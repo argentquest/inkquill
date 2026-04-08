@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class WordScrambleProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Word Scramble Puzzle - With safety net.

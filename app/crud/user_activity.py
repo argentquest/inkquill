@@ -6,7 +6,7 @@ from sqlalchemy import select, func, and_, or_, distinct
 from app.models.user_activity import UserActivity
 from app.schemas.user_activity import UserActivityCreate, UserActivityFilter, UserActivityBulkCreate
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 import logging
 from uuid import UUID
 from fastapi import Request
@@ -262,7 +262,7 @@ async def delete_old_activities(
     Delete user activities older than the specified number of days.
     Returns the number of deleted records.
     """
-    cutoff_date = datetime.utcnow() - timedelta(days=days_to_keep)
+    cutoff_date = datetime.now(UTC) - timedelta(days=days_to_keep)
     
     stmt = select(UserActivity).where(UserActivity.created_at < cutoff_date)
     result = await db.execute(stmt)

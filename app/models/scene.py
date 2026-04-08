@@ -23,7 +23,7 @@ class Scene(Base):
     """
     SQLAlchemy ORM Model representing a Scene within an Act.
     """
-    __tablename__ = "scenes"
+    __tablename__ = "storytelling_scenes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
@@ -37,11 +37,11 @@ class Scene(Base):
     mood: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     image_prompt_definition: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Custom image generation prompt
 
-    act_id: Mapped[int] = mapped_column(Integer, ForeignKey("acts.id", ondelete="CASCADE"), nullable=False)
+    act_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_acts.id", ondelete="CASCADE"), nullable=False)
 
     story_class_id: Mapped[Optional[int]] = mapped_column(
         Integer,
-        ForeignKey("story_classes.id", ondelete="SET NULL"),
+        ForeignKey("storytelling_story_classes.id", ondelete="SET NULL"),
         nullable=True,
         index=True
     )

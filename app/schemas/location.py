@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/location.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -90,8 +90,7 @@ class LocationRead(LocationBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # --- Schemas for Story-Location Association ---
 
@@ -107,8 +106,7 @@ class StoryLocationLinkRead(BaseModel):
     significance_to_story: Optional[str] = None
     location: LocationRead # Nested full location details
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class LocationInStoryRead(BaseModel):
     """Schema for listing locations associated with a story, showing their story-specific significance."""
@@ -123,8 +121,7 @@ class LocationInStoryRead(BaseModel):
     # --- FIX: Add the image_url field here as well ---
     image_url: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Schemas for Location Connections ---
@@ -154,8 +151,7 @@ class LocationConnectionRead(LocationConnectionBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class LocationConnectionWithLocations(BaseModel):
     """Schema for location connections that includes full location details."""
@@ -172,6 +168,4 @@ class LocationConnectionWithLocations(BaseModel):
     from_location: LocationRead
     to_location: LocationRead
 
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)

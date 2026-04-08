@@ -1,7 +1,7 @@
 """Blog schemas for request/response models."""
 from datetime import datetime, date
 from typing import List, Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from decimal import Decimal
 
 from app.models.blog_post import BlogPostStatus
@@ -42,8 +42,7 @@ class BlogCategoryRead(BlogCategoryBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Blog Tag Schemas
@@ -65,8 +64,7 @@ class BlogTagRead(BlogTagBase):
     usage_count: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Blog Post Schemas
@@ -87,9 +85,10 @@ class BlogPostBase(BaseModel):
 
 class BlogPostCreate(BlogPostBase):
     """Pydantic schema for blog post create."""
-    tags: Optional[List[str]] = Field(None, max_items=10)
+    tags: Optional[List[str]] = Field(None, max_length=10)
     
-    @validator('tags')
+    @field_validator("tags")
+    @classmethod
     def validate_tags(cls, v):
         if v:
             for tag in v:
@@ -111,9 +110,10 @@ class BlogPostUpdate(BaseModel):
     allow_comments: Optional[bool] = None
     status: Optional[BlogPostStatus] = None
     is_featured: Optional[bool] = None
-    tags: Optional[List[str]] = Field(None, max_items=10)
+    tags: Optional[List[str]] = Field(None, max_length=10)
     
-    @validator('tags')
+    @field_validator("tags")
+    @classmethod
     def validate_tags(cls, v):
         if v:
             for tag in v:
@@ -140,8 +140,7 @@ class BlogPostRead(BlogPostBase):
     category: Optional[BlogCategoryRead] = None
     tags: List[BlogTagRead] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class BlogPostSummary(BaseModel):
@@ -161,8 +160,7 @@ class BlogPostSummary(BaseModel):
     published_at: Optional[datetime]
     reading_time_minutes: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Blog Comment Schemas
@@ -198,16 +196,14 @@ class BlogCommentRead(BlogCommentBase):
     author: Optional['UserRead'] = None
     replies: List['BlogCommentRead'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class BlogCommentWithReplies(BlogCommentRead):
     """Blog comment with nested replies for hierarchical display."""
     replies: List['BlogCommentWithReplies'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Blog Analytics Schemas
@@ -223,8 +219,7 @@ class BlogAnalyticsRead(BaseModel):
     bounce_rate: Decimal
     social_shares: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class BlogAuthorStatsRead(BaseModel):
@@ -271,8 +266,7 @@ class BlogAuthorProfileRead(BlogAuthorProfileBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Import UserRead to avoid circular imports

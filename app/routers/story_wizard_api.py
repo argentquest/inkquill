@@ -11,15 +11,16 @@ from datetime import datetime
 
 from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
-from app.services.semantic_kernel_setup import kernel, load_prompt_from_file
+from app.services.langgraph_runtime_setup import kernel, load_prompt_from_file
 from app.services.ai_model_cache import model_cache
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result
 from app.crud import user as crud_user
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-from semantic_kernel.prompt_template.prompt_template_config import PromptTemplateConfig
-from semantic_kernel.prompt_template.input_variable import InputVariable
-import semantic_kernel as sk
+from app.services.langgraph_kernel import (
+    InputVariable,
+    KernelArguments,
+    OpenAIChatPromptExecutionSettings,
+    PromptTemplateConfig,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ async def process_wizard_message(
             for msg in conversation[-6:]  # Last 3 exchanges
         ])
         
-        # Prepare arguments for Semantic Kernel
+        # Prepare arguments for the storytelling runtime
         arguments = KernelArguments(
             phase_name=phase_info["name"],
             step=current_step,
@@ -365,7 +366,7 @@ async def _extract_story_information(
         return current_data
 
 async def _ensure_story_wizard_functions():
-    """Ensure Story Wizard functions are registered in Semantic Kernel"""
+    """Ensure Story Wizard functions are registered in the storytelling runtime."""
     if not kernel.plugins.get("StoryWizard"):
         try:
             # Register Chat Response function
@@ -552,7 +553,7 @@ async def _generate_simple_wizard_response(
     
     try:
         # Load your original full prompt from file
-        from app.services.semantic_kernel_setup import load_prompt_from_file
+        from app.services.langgraph_runtime_setup import load_prompt_from_file
         full_prompt_template = load_prompt_from_file("story_wizard_chat.txt")
         
         # Replace template variables with actual values

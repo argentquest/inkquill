@@ -20,18 +20,18 @@ if TYPE_CHECKING:
 
 class StoryCharacterAssociation(Base):
     """SQLAlchemy model for story character association."""
-    __tablename__ = "story_character_associations"
+    __tablename__ = "storytelling_story_character_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     story_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("stories.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_stories.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
     character_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("characters.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_characters.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
@@ -55,18 +55,18 @@ class StoryCharacterAssociation(Base):
 
 class StoryLocationAssociation(Base):
     """SQLAlchemy model for story location association."""
-    __tablename__ = "story_location_associations"
+    __tablename__ = "storytelling_story_location_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     story_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("stories.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_stories.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
     location_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("locations.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_locations.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
@@ -90,18 +90,18 @@ class StoryLocationAssociation(Base):
 
 class StoryLoreItemAssociation(Base):
     """SQLAlchemy model for story lore item association."""
-    __tablename__ = "story_lore_item_associations"
+    __tablename__ = "storytelling_story_lore_item_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     story_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("stories.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_stories.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
     lore_item_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("lore_items.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_lore_items.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )

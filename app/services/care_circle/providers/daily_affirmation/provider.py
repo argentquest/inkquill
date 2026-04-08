@@ -5,7 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class DailyAffirmationProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Fetches a daily POSITIVE affirmation from an external public API.

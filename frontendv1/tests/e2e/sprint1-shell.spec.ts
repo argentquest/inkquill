@@ -38,7 +38,7 @@ test.describe("Sprint 1 shell", () => {
     await expect(page).toHaveURL(/\/storytelling\/account/, { timeout: 30000 });
     await expect(page.getByText("Maintenance Mode")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Maintenance is active" })).toBeVisible();
-    await expect(page.getByText("Planned maintenance window", { exact: true })).toBeVisible();
+    await expect(page.getByText("Scheduled maintenance", { exact: true })).toBeVisible();
   });
 
   test("theme toggle and cookie consent persist across reload", async ({ page }) => {

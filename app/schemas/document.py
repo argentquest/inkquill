@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/document.py
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field, computed_field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 import enum
@@ -56,7 +56,5 @@ class UploadedDocumentRead(UploadedDocumentBase):
             return None
         return build_storage_url("documents", self.blob_storage_path)
 
-    class Config:
-        from_attributes = True 
-        use_enum_values = True 
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 

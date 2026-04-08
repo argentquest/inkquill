@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/user_activity.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 from uuid import UUID
@@ -35,9 +35,7 @@ class UserActivityResponse(UserActivityBase):
     user_id: Optional[int]
     created_at: datetime
     
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 class UserActivityFilter(BaseModel):
     """Schema for filtering user activities."""
     user_id: Optional[int] = None

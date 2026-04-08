@@ -1,7 +1,7 @@
 """Pydantic schemas for ai model config."""
 
 # /story_app/app/schemas/ai_model_config.py
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 # These imports are correct because they point to a different module.
@@ -23,6 +23,4 @@ class AIModelConfigurationRead(BaseModel):
     model_name: str
     is_public_chat_default: Optional[bool] = None 
 
-    class Config:
-        from_attributes = True
-        use_enum_values = True # Ensures enum members are returned as strings
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)

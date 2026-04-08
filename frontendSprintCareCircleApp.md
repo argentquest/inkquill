@@ -129,9 +129,20 @@ Provider groups identified in the source app:
 Required follow-up backend import tasks:
 
 - [x] import the provider registry and provider configuration shape into this repo's backend
-- [ ] decide which providers become `care-circle-patient` daily-session cards versus family-only tools
-- [ ] import provider template or rendering strategy where still relevant
+- [x] decide which providers become `care-circle-patient` daily-session cards versus family-only tools
+- [x] import provider template or rendering strategy where still relevant
 - [x] add backend tests for provider selection, ordering, and patient-safe filtering
+
+## Provider Classification Summary
+
+**Patient-Session Cards** (patient_visible=True): All providers except family-only below are available for patient daily sessions.
+
+**Family-Only Tools** (patient_visible=False):
+- `simple_recipe` - Recipe content (may require cooking facilities/abilities)
+- `pen_pal_letter` - Letter writing activity
+- `world_news` - External news content
+
+**Provider Safety**: All providers in `app/services/care_circle/providers/` inherit from `BaseCareCircleProvider` and implement `is_safe_for_patient = True` by default. The session assembler enforces patient-safe filtering via the `is_safe_for_patient` property check before including providers in patient sessions.
 
 ## DailyNewsletter Environment Notes
 

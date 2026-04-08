@@ -18,7 +18,7 @@ SCENE_THEMES = [
 
 
 class NatureSceneProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Generates a calming nature scene: AI text description followed by

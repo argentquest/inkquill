@@ -25,7 +25,7 @@ _SEASON_MAP = {
 
 
 class PenPalLetterProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Pen Pal Letter — a warm fictional letter from an old friend.

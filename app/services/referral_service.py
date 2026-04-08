@@ -2,7 +2,7 @@
 Referral tracking and reward service.
 """
 import logging
-from datetime import datetime, date
+from datetime import UTC, date, datetime
 from typing import Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, func
@@ -35,6 +35,11 @@ DAILY_LIMITS = {
 
 class ReferralService:
     """Service for managing referrals and rewards."""
+
+    @staticmethod
+    def _naive_utc_now() -> datetime:
+        """Return UTC as a naive datetime for legacy TIMESTAMP WITHOUT TIME ZONE columns."""
+        return datetime.now(UTC).replace(tzinfo=None)
     
     async def track_referral_visit(
         self,
@@ -148,7 +153,7 @@ class ReferralService:
             # Update the referral
             referral.referred_user_id = registered_user_id
             referral.is_converted = True
-            referral.converted_at = datetime.utcnow()
+            referral.converted_at = self._naive_utc_now()
             
             # Update the referred user
             user_result = await db.execute(
@@ -201,11 +206,11 @@ class ReferralService:
             # Update the referral based on action
             if action == 'first_story' and not referral.has_created_story:
                 referral.has_created_story = True
-                referral.first_story_at = datetime.utcnow()
+                referral.first_story_at = self._naive_utc_now()
                 await self._try_award_reward(db, referral, 'first_story')
             elif action == 'first_publish' and not referral.has_published_story:
                 referral.has_published_story = True
-                referral.first_publish_at = datetime.utcnow()
+                referral.first_publish_at = self._naive_utc_now()
                 await self._try_award_reward(db, referral, 'first_publish')
             else:
                 logger.info(f"Action {action} already completed or invalid for user {user_id}")

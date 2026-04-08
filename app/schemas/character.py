@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/character.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
@@ -31,7 +31,7 @@ class CharacterBase(BaseModel):
     
     # Character generator fields
     core_motivation: Optional[str] = Field(None, max_length=255, description="Character's primary motivation (legacy)")
-    core_motivations: Optional[List[str]] = Field(None, max_items=3, description="Character's primary motivations (1-3)")
+    core_motivations: Optional[List[str]] = Field(None, max_length=3, description="Character's primary motivations (1-3)")
     physical_attributes: Optional[Dict[str, Any]] = Field(None, description="Physical characteristics (hair color, eye color, etc.)")
     key_relationships: Optional[Dict[str, Any]] = Field(None, description="Key relationships with other characters")
     genre: Optional[str] = Field(None, max_length=100, description="Genre context for character generation")
@@ -95,8 +95,7 @@ class CharacterRead(CharacterBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class StoryCharacterLinkCreate(BaseModel):
     """Schema for linking a character to a story and defining their role."""
@@ -110,8 +109,7 @@ class StoryCharacterLinkRead(BaseModel):
     role_in_story: Optional[str] = None
     character: CharacterRead
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class CharacterInStoryRead(BaseModel):
     """Schema for listing characters associated with a story, showing their role."""
@@ -123,8 +121,7 @@ class CharacterInStoryRead(BaseModel):
     # --- FIX: Add the image_url field here as well ---
     image_url: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # Character Generation Schemas
 class PhysicalAttributes(BaseModel):
@@ -145,7 +142,7 @@ class CharacterGeneratorInput(BaseModel):
     gender: Optional[str] = Field(None, description="Character gender")
     species: Optional[str] = Field(None, description="Character species")
     personality_traits: Optional[List[str]] = Field(None, description="Selected personality traits")
-    core_motivations: Optional[List[str]] = Field(None, max_items=3, description="Primary motivations (1-3)")
+    core_motivations: Optional[List[str]] = Field(None, max_length=3, description="Primary motivations (1-3)")
     physical_attributes: Optional[PhysicalAttributes] = Field(None, description="Physical characteristics")
     key_relationships: Optional[List[KeyRelationship]] = Field(None, description="Key relationships")
     genre: Optional[str] = Field(None, description="Selected genre")

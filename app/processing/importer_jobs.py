@@ -26,10 +26,14 @@ from app.core.config import settings
 
 # --- New imports for dynamic model handling ---
 from app.services.ai_model_cache import model_cache
-from app.services.sk_kernel_instance import kernel
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatPromptExecutionSettings
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.exceptions import KernelInvokeException, FunctionExecutionException, ServiceResponseException
+from app.services.storytelling_runtime import kernel
+from app.services.langgraph_kernel import (
+    FunctionExecutionException,
+    KernelArguments,
+    KernelInvokeException,
+    OpenAIChatPromptExecutionSettings,
+    ServiceResponseException,
+)
 from app.services.cost_tracker_service import log_ai_call, get_usage_from_sk_result, estimate_tokens_for_streaming_call
 from app.services.ai_client_factory import AIClientFactory
 from app.models.ai_model_config import AIProviderEnum
@@ -38,8 +42,6 @@ from app.schemas.document import UploadedDocumentCreate
 from app.models.uploaded_document import SourceElementTypeEnum
 from app.crud import document as crud_document
 from app.processing.document_processing import process_uploaded_document_task
-import time
-
 logger = logging.getLogger(__name__)
 
 def _load_extraction_prompt() -> str:
@@ -61,7 +63,7 @@ def _load_extraction_prompt() -> str:
 
 async def _call_ai_for_world_extraction(model_config, prompt_text, input_text, job_id):
     """
-    Call AI for world extraction using Semantic Kernel or direct OpenAI-compatible APIs.
+    Call AI for world extraction using storytelling runtime or direct OpenAI-compatible APIs.
     Forces JSON mode for structured extraction.
     
     Args:
@@ -78,7 +80,7 @@ async def _call_ai_for_world_extraction(model_config, prompt_text, input_text, j
     if model_config.provider in [AIProviderEnum.OPENROUTER, AIProviderEnum.OPENAI]:
         extract_world_elements_from_text_function = kernel.plugins.get("WorldGenerationPlugin", {}).get("ExtractWorldElementsFromText")
         if not extract_world_elements_from_text_function:
-            raise RuntimeError("ExtractWorldElementsFromText function not available in Semantic Kernel")
+            raise RuntimeError("ExtractWorldElementsFromText function not available in storytelling runtime")
         
         exec_settings = OpenAIChatPromptExecutionSettings(
             service_id="chat_service",
@@ -306,7 +308,7 @@ async def import_world_from_book_task(job_id: str, book_title: str, user_id: int
                 )
                 logger.info(f"JOB_ID: {job_id} - Cost logging completed successfully.")
             else:
-                logger.warning(f"JOB_ID: {job_id} - No usage data available from semantic kernel result. Attempting token estimation for cost logging.")
+                logger.warning(f"JOB_ID: {job_id} - No usage data available from storytelling runtime result. Attempting token estimation for cost logging.")
                 try:
                     estimated_usage = estimate_tokens_for_streaming_call(
                         input_text=f"Book Title: {book_title}",

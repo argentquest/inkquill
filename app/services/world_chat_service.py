@@ -5,7 +5,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, Any, Optional, Tuple
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 import json
 
 # Core imports
@@ -15,7 +15,8 @@ from app.services.direct_context import build_document_context, build_structured
 from app.services.cost_tracker_service import CostTrackerService
 from app.services.ai_client_factory import AIClientFactory
 from app.services.temperature_optimizer import TemperatureOptimizer, TaskType
-from app.services import semantic_kernel_setup
+from app.services import langgraph_runtime_setup
+from app.services.langgraph_kernel import KernelArguments, LangGraphKernel as Kernel
 from app.core.config import settings
 from app.crud import chat_session as chat_session_crud
 from app.crud import chat_message as chat_message_crud
@@ -29,10 +30,6 @@ from app.schemas.chat import (
     ChatMessageRead
 )
 
-# Semantic Kernel imports
-from semantic_kernel import Kernel
-from semantic_kernel.functions import KernelArguments
-
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +41,7 @@ class WorldChatService:
         self.blob_service_client = blob_service_client
         self.context_loader = WorldContextLoader(db, blob_service_client)
         self.cost_tracker = CostTrackerService(db)
-        # Use the global kernel from semantic_kernel_setup
+        # Use the shared storytelling runtime kernel.
     
     async def create_chat_session(self, world_id: int, user_id: int) -> int:
         """Create a new chat session with auto-generated title"""
@@ -180,7 +177,7 @@ class WorldChatService:
             return SendMessageResponse(
                 user_message=ChatMessageRead.model_validate(user_message),
                 ai_response=ChatMessageRead.model_validate(ai_message),
-                session_updated_at=datetime.utcnow(),
+                session_updated_at=datetime.now(UTC),
                 call_stats=AICallStats(**call_stats) if call_stats else None
             )
             
@@ -231,7 +228,7 @@ class WorldChatService:
                 "context_sources": context_sources,
                 "conversation_history": conversation_context,
                 "element_context": element_context,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(UTC).isoformat()
             }
             
             # Debug: Log context sizes
@@ -449,11 +446,11 @@ INSTRUCTIONS:
 Remember: You can suggest new characters, locations, lore items, or story developments that would enhance the world."""
     
     async def _get_configured_kernel(self, ai_model_config: Optional[Any]) -> Kernel:
-        """Get a configured Semantic Kernel instance"""
+        """Get a configured storytelling runtime instance."""
         try:
-            # Use the global kernel from semantic_kernel_setup
+            # Use the shared storytelling runtime kernel.
             # In a more sophisticated implementation, you could configure model-specific settings here
-            kernel = semantic_kernel_setup.kernel
+            kernel = langgraph_runtime_setup.kernel
             
             # Register the world chat plugin
             await self._register_world_chat_plugin(kernel)

@@ -16,7 +16,7 @@ from typing import Any, Dict
 
 
 class SpotTheDifferenceProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Spot the Difference — two near-identical word lists.

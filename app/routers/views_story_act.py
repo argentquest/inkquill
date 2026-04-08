@@ -109,7 +109,7 @@ async def list_stories_ui(
         
         stories_for_template = []
         for story_item in stories_db:
-            story_read = StoryRead.from_orm(story_item)
+            story_read = StoryRead.model_validate(story_item)
             path_to_check = story_item.current_image.blob_path if story_item.current_image else story_item.image_blob_path
             story_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
             stories_for_template.append(story_read)
@@ -131,7 +131,7 @@ async def list_stories_ui(
                     
                     stories_for_template = []
                     for story_item in stories_db:
-                        story_read = StoryRead.from_orm(story_item)
+                        story_read = StoryRead.model_validate(story_item)
                         path_to_check = story_item.current_image.blob_path if story_item.current_image else story_item.image_blob_path
                         story_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
                         stories_for_template.append(story_read)
@@ -374,7 +374,7 @@ async def story_detail_ui(
     for char_data in linked_characters_raw:
         char_obj = char_data.get("character")
         if not char_obj: continue
-        char_read = CharacterInStoryRead.from_orm(char_obj)
+        char_read = CharacterInStoryRead.model_validate(char_obj)
         char_read.role_in_story = char_data.get('role_in_story')
         path_to_check = char_obj.current_image.blob_path if char_obj.current_image else char_obj.image_blob_path
         char_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
@@ -384,7 +384,7 @@ async def story_detail_ui(
     for loc_data in linked_locations_raw:
         loc_obj = loc_data.get("location")
         if not loc_obj: continue
-        loc_read = LocationInStoryRead.from_orm(loc_obj)
+        loc_read = LocationInStoryRead.model_validate(loc_obj)
         loc_read.significance_to_story = loc_data.get('significance_to_story')
         path_to_check = loc_obj.current_image.blob_path if loc_obj.current_image else loc_obj.image_blob_path
         loc_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
@@ -394,7 +394,7 @@ async def story_detail_ui(
     for lore_data in linked_lore_items_raw:
         lore_obj = lore_data.get("lore_item")
         if not lore_obj: continue
-        lore_read = LoreItemInStoryRead.from_orm(lore_obj)
+        lore_read = LoreItemInStoryRead.model_validate(lore_obj)
         lore_read.relevance_to_story = lore_data.get('relevance_to_story')
         path_to_check = lore_obj.current_image.blob_path if lore_obj.current_image else lore_obj.image_blob_path
         lore_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)

@@ -103,7 +103,7 @@ async def create_new_character_for_world(
     )
     await db.commit()
     await db.refresh(new_char)
-    return ApiResponse.success_response(data=CharacterRead.from_orm(new_char))
+    return ApiResponse.success_response(data=CharacterRead.model_validate(new_char))
 
 @router_world_characters.get("/", response_model=ApiResponse, name="list_characters_for_world_api")
 async def list_characters_in_world(
@@ -126,7 +126,7 @@ async def list_characters_in_world(
     
     response_characters = []
     for char in characters_from_db:
-        char_read = CharacterRead.from_orm(char)
+        char_read = CharacterRead.model_validate(char)
         path_to_check = char.current_image.blob_path if char.current_image else char.image_blob_path
         char_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
         response_characters.append(char_read)
@@ -139,7 +139,7 @@ async def get_single_character(
     blob_service_client: LocalStorageClient = Depends(get_blob_service_client)
 ):
     """Handle GET /{character_id}."""
-    char_read = CharacterRead.from_orm(db_character)
+    char_read = CharacterRead.model_validate(db_character)
     path_to_check = db_character.current_image.blob_path if db_character.current_image else db_character.image_blob_path
     char_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     return ApiResponse.success_response(data=char_read)
@@ -163,7 +163,7 @@ async def update_existing_character(
     )
     await db.commit()
     await db.refresh(updated_char)
-    return ApiResponse.success_response(data=CharacterRead.from_orm(updated_char))
+    return ApiResponse.success_response(data=CharacterRead.model_validate(updated_char))
 
 @router_characters.delete("/{character_id}", status_code=status.HTTP_204_NO_CONTENT, name="delete_existing_character")
 async def delete_existing_character(
@@ -195,7 +195,7 @@ async def list_images_for_character(
         db, element_type="character", element_id=character.id
     )
     logger.info(f"API: Found {len(images)} images for character ID: {character.id}")
-    return ApiResponse.success_response(data=[GeneratedImageRead.from_orm(image) for image in images])
+    return ApiResponse.success_response(data=[GeneratedImageRead.model_validate(image) for image in images])
 
 @router_characters.post("/{character_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_character(
@@ -216,7 +216,7 @@ async def set_current_image_for_character(
     await db.commit()
     await db.refresh(character)
     
-    character_read = CharacterRead.from_orm(character)
+    character_read = CharacterRead.model_validate(character)
     character_read.image_url = await _check_and_get_image_url(blob_service_client, character.image_blob_path)
 
     return ApiResponse.success_response(data=character_read)
@@ -276,7 +276,7 @@ async def list_characters_for_story_endpoint(
         if not char_obj:
             continue
 
-        char_read = CharacterInStoryRead.from_orm(char_obj)
+        char_read = CharacterInStoryRead.model_validate(char_obj)
         char_read.role_in_story = char_data.get('role_in_story')
         
         path_to_check = char_obj.current_image.blob_path if char_obj.current_image else char_obj.image_blob_path

@@ -23,6 +23,7 @@ from app.crud import world as crud_world
 from app.crud import story as crud_story
 from app.schemas.story_generation import StoryGenerationRequest, StoryGenerationResponse
 from app.core.config import settings
+from app.services.ai_orchestration import orchestration_backend_is_semantic_kernel
 from app.core.storage_deps import LocalStorageClient
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ async def create_new_world(
         created_world = await crud_world.create_world(db=db, world_in=world_in, user_id=current_user.id)
         await db.commit()
         await db.refresh(created_world)
-        return ApiResponse.success_response(data=WorldRead.from_orm(created_world))
+        return ApiResponse.success_response(data=WorldRead.model_validate(created_world))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error creating world '{world_in.name}' for user '{current_user.username}': {e}", exc_info=True)
@@ -76,7 +77,7 @@ async def list_my_worlds(
     logger.info(f"User '{current_user.username}' listing their worlds (skip: {skip}, limit: {limit}).")
     worlds = await crud_world.get_worlds_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
     return ApiResponse.success_response(
-        data=[WorldRead.from_orm(w) for w in worlds],
+        data=[WorldRead.model_validate(w) for w in worlds],
         meta=ApiMeta(page=skip // limit + 1 if limit > 0 else 1, limit=limit, total=len(worlds))
     )
 
@@ -103,7 +104,7 @@ async def get_single_world(
 ):
     """Handle GET /{world_id}."""
     logger.info(f"User (from dependency context) viewing world ID: {db_world.id} ('{db_world.name}')")
-    world_read = WorldRead.from_orm(db_world)
+    world_read = WorldRead.model_validate(db_world)
     world_read.image_url = await _check_and_get_image_url(blob_service_client, db_world.image_blob_path)
     return ApiResponse.success_response(data=world_read)
 
@@ -120,7 +121,7 @@ async def update_existing_world(
         updated_world = await crud_world.update_world(db=db, db_world=db_world, world_in=world_in)
         await db.commit()
         await db.refresh(updated_world)
-        return ApiResponse.success_response(data=WorldRead.from_orm(updated_world))
+        return ApiResponse.success_response(data=WorldRead.model_validate(updated_world))
     except Exception as e:
         await db.rollback()
         logger.error(f"Error updating world ID {db_world.id} by user '{current_user.username}': {e}", exc_info=True)
@@ -164,7 +165,7 @@ async def list_stories_for_world(
     stories = await crud_story.get_stories_by_world_id(
         db, world_id=db_world.id, user_id=current_user.id, skip=skip, limit=limit
     )
-    return ApiResponse.success_response(data=[StoryRead.from_orm(s) for s in stories])
+    return ApiResponse.success_response(data=[StoryRead.model_validate(s) for s in stories])
 
 # --- FIX: Add image management endpoints for Worlds ---
 @router.get("/{world_id}/images", response_model=ApiResponse)
@@ -176,7 +177,7 @@ async def list_images_for_world(
     images = await crud_generated_image.get_images_for_element(
         db, element_type="world", element_id=world.id
     )
-    return ApiResponse.success_response(data=[GeneratedImageRead.from_orm(img) for img in images])
+    return ApiResponse.success_response(data=[GeneratedImageRead.model_validate(img) for img in images])
 
 @router.post("/{world_id}/set-current-image/{image_id}", response_model=ApiResponse)
 async def set_current_image_for_world(
@@ -197,7 +198,7 @@ async def set_current_image_for_world(
     await db.commit()
     await db.refresh(world)
 
-    world_read = WorldRead.from_orm(world)
+    world_read = WorldRead.model_validate(world)
     world_read.image_url = await _check_and_get_image_url(blob_service_client, world.image_blob_path)
     return ApiResponse.success_response(data=world_read)
 # --- END FIX ---
@@ -250,9 +251,9 @@ async def generate_story_from_world(
         )
 
 @router.post("/dev/reload-kernel")
-async def reload_semantic_kernel(current_user: User = Depends(get_current_active_user)):
+async def reload_storytelling_runtime(current_user: User = Depends(get_current_active_user)):
     """
-    Development endpoint to reload the Semantic Kernel without restarting the server.
+    Development endpoint to reload the storytelling runtime without restarting the server.
     Only available in development environment.
     """
     if settings.APP_ENV != "development":
@@ -260,12 +261,18 @@ async def reload_semantic_kernel(current_user: User = Depends(get_current_active
             status_code=status.HTTP_404_NOT_FOUND,
             detail="This endpoint is only available in development mode"
         )
+
+    if not orchestration_backend_is_semantic_kernel():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Storytelling runtime reload is unavailable because AI_ORCHESTRATION_BACKEND is not SEMANTIC_KERNEL"
+        )
     
     try:
-        from app.services.sk_kernel_instance import reload_kernel
+        from app.services.storytelling_runtime import reload_kernel
         reload_kernel()
         logger.info(f"Kernel reloaded successfully by user '{current_user.username}'")
-        return {"success": True, "message": "Semantic Kernel reloaded successfully"}
+        return {"success": True, "message": "Storytelling runtime reloaded successfully"}
     except Exception as e:
         logger.error(f"Error reloading kernel: {e}", exc_info=True)
         raise HTTPException(

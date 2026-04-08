@@ -20,18 +20,18 @@ if TYPE_CHECKING:
 
 class SceneCharacterAssociation(Base):
     """SQLAlchemy model for scene character association."""
-    __tablename__ = "scene_character_associations"
+    __tablename__ = "storytelling_scene_character_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     scene_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("scenes.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_scenes.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
     character_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("characters.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_characters.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
@@ -55,18 +55,18 @@ class SceneCharacterAssociation(Base):
 
 class SceneLocationAssociation(Base):
     """SQLAlchemy model for scene location association."""
-    __tablename__ = "scene_location_associations"
+    __tablename__ = "storytelling_scene_location_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     scene_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("scenes.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_scenes.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
     location_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("locations.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_locations.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
@@ -90,18 +90,18 @@ class SceneLocationAssociation(Base):
 
 class SceneLoreItemAssociation(Base):
     """SQLAlchemy model for scene lore item association."""
-    __tablename__ = "scene_lore_item_associations"
+    __tablename__ = "storytelling_scene_lore_item_associations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     scene_id: Mapped[int] = mapped_column(
         Integer, 
-        ForeignKey("scenes.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_scenes.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )
     lore_item_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("lore_items.id", ondelete="CASCADE"),
+        ForeignKey("storytelling_lore_items.id", ondelete="CASCADE"),
         nullable=False,
         index=True
     )

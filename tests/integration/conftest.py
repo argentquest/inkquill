@@ -11,6 +11,7 @@ from uuid import uuid4
 import asyncpg
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import text
 from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -229,12 +230,20 @@ def app_instance(test_db_url, integration_temp_root):
     async def ensure_all_tables():
         async with test_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            await conn.execute(
+                text(
+                    """
+                    ALTER TABLE care_circle_patient_content_cards
+                    ADD COLUMN IF NOT EXISTS rendered_html TEXT
+                    """
+                )
+            )
 
     run_async(ensure_all_tables())
 
     app_main.engine = test_engine
-    app_main.sk_kernel_instance.kernel = SimpleNamespace(plugins={})
-    app_main.sk_kernel_instance.review_act_content_function = object()
+    app_main.storytelling_runtime.kernel = SimpleNamespace(plugins={})
+    app_main.storytelling_runtime.review_act_content_function = object()
     app_main.app.dependency_overrides[get_email_service] = lambda: FakeEmailService()
     app_main.app.state.test_session_factory = test_session_factory
     app_main.app.state.test_db_url = test_db_url

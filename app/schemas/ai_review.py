@@ -1,7 +1,7 @@
 """Pydantic schemas for ai review."""
 
 # /story_app/app/schemas/ai_review.py
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 
 class AISuggestion(BaseModel):
@@ -18,10 +18,7 @@ class AISuggestion(BaseModel):
     explanation: Optional[str] = Field(None, description="Brief reasoning for the suggestion.")
     severity: Optional[str] = Field(None, description="Perceived impact of addressing this suggestion (e.g., High, Medium, Low).")
 
-    class Config:
-        from_attributes = True
-
-
+    model_config = ConfigDict(from_attributes=True)
 class MetricDetail(BaseModel):
     """
     Pydantic model for the detail of a single metric, including its rating and justification.
@@ -29,10 +26,7 @@ class MetricDetail(BaseModel):
     rating: int = Field(..., ge=1, le=5, description="Rating on a scale of 1 to 5 (5 being excellent).")
     justification: str = Field(..., description="Brief justification for the assigned rating.")
 
-    class Config:
-        from_attributes = True
-
-
+    model_config = ConfigDict(from_attributes=True)
 class OptionalMetricDetail(BaseModel):
     """
     Pydantic model for optional metrics that may not apply to all content.
@@ -41,10 +35,7 @@ class OptionalMetricDetail(BaseModel):
     rating: Optional[int] = Field(None, ge=1, le=5, description="Rating on a scale of 1 to 5 (5 being excellent), or null if not applicable.")
     justification: str = Field(..., description="Brief justification for the assigned rating or explanation of why not applicable.")
 
-    class Config:
-        from_attributes = True
-
-
+    model_config = ConfigDict(from_attributes=True)
 class AIReviewMetrics(BaseModel):
     """
     Pydantic model for the collection of AI-generated metrics for writing quality.
@@ -62,10 +53,7 @@ class AIReviewMetrics(BaseModel):
     tension_conflict_development: Optional[OptionalMetricDetail] = None
     overall_storytelling_effectiveness_of_act: MetricDetail
 
-    class Config:
-        from_attributes = True
-
-
+    model_config = ConfigDict(from_attributes=True)
 class ActAIReviewResponse(BaseModel):
     """
     Pydantic model for the overall JSON response structure from the AI Act Review endpoint.
@@ -75,5 +63,4 @@ class ActAIReviewResponse(BaseModel):
     message: Optional[str] = Field(None, description="An optional message providing overall feedback or status of the review process.")
     # rendered_prompt_debug: Optional[str] = Field(None, description="DEBUG: The fully rendered prompt sent to the AI. For debug purposes only.") # Example if you decide to send it back
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

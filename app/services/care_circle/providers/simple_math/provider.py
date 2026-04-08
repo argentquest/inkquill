@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 
 class SimpleMathProvider(BaseCareCircleProvider):
-    is_safe_for_patient = False
+    is_safe_for_patient = True
 
     """
     Simple math problems with very basic arithmetic.

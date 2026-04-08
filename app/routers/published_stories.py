@@ -96,7 +96,7 @@ async def list_published_stories(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     search: Optional[str] = None,
-    sort_by: str = Query("recent", regex="^(recent|popular|rating|title)$"),
+    sort_by: str = Query("recent", pattern="^(recent|popular|rating|title)$"),
     is_featured: Optional[bool] = None,
     db: AsyncSession = Depends(get_db_session)
 ):

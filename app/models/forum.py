@@ -68,8 +68,8 @@ class ForumThread(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
     # Optional associations with world elements
-    world_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("worlds.id", ondelete="SET NULL"), nullable=True)
-    story_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("stories.id", ondelete="SET NULL"), nullable=True)
+    world_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_worlds.id", ondelete="SET NULL"), nullable=True)
+    story_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_stories.id", ondelete="SET NULL"), nullable=True)
     
     # Metadata
     view_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -136,8 +136,8 @@ class ForumPost(Base):
     parent_post_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("forum_posts.id", ondelete="CASCADE"), nullable=True)
     
     # Optional references to world elements
-    character_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("characters.id", ondelete="SET NULL"), nullable=True)
-    location_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("locations.id", ondelete="SET NULL"), nullable=True)
+    character_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_characters.id", ondelete="SET NULL"), nullable=True)
+    location_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("storytelling_locations.id", ondelete="SET NULL"), nullable=True)
     
     # Voting
     upvote_count: Mapped[int] = mapped_column(Integer, default=0)

@@ -1,3 +1,5 @@
+"use client";
+
 import { Footer } from "@/components/shell/footer";
 import { TopNav } from "@/components/shell/top-nav";
 

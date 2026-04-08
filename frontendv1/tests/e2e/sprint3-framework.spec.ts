@@ -21,9 +21,9 @@ test.describe("Sprint 3 framework routes", () => {
 
     await expect(page).toHaveURL(/\/storytelling\/billing/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: "Your balance, packages, and transaction history live in one route." })).toBeVisible({ timeout: 20000 });
-    await expect(page.getByText("2555.0000")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "120" })).toBeVisible();
     await expect(page.getByRole("table", { name: "Billing transactions" })).toBeVisible();
-    await expect(page.getByText("Starter Pack")).toBeVisible();
+    await expect(page.getByText("Starter")).toBeVisible();
   });
 
   test("referrals route loads stats and history", async ({ page }) => {
@@ -32,7 +32,7 @@ test.describe("Sprint 3 framework routes", () => {
 
     await expect(page).toHaveURL(/\/storytelling\/referrals/, { timeout: 30000 });
     await expect(page.getByText("Track invitations, conversions, and earned coins from one route.")).toBeVisible({ timeout: 20000 });
-    await expect(page.getByText("40%")).toBeVisible();
+    await expect(page.getByText("50%")).toBeVisible();
     await expect(page.getByRole("table", { name: "Referral history" })).toBeVisible();
   });
 

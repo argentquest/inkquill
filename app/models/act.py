@@ -32,7 +32,7 @@ class Act(Base):
     """
     SQLAlchemy ORM Model representing an Act within a Story.
     """
-    __tablename__ = "acts"
+    __tablename__ = "storytelling_acts"
 
     # --- Table Columns ---
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -56,13 +56,13 @@ class Act(Base):
     # --- Story Class Assignment ---
     story_class_id: Mapped[Optional[int]] = mapped_column(
         Integer,
-        ForeignKey("story_classes.id", ondelete="SET NULL"),
+        ForeignKey("storytelling_story_classes.id", ondelete="SET NULL"),
         nullable=True,
         index=True
     )
     # --- End Story Class Assignment ---
 
-    story_id: Mapped[int] = mapped_column(Integer, ForeignKey("stories.id", ondelete="CASCADE"), nullable=False)
+    story_id: Mapped[int] = mapped_column(Integer, ForeignKey("storytelling_stories.id", ondelete="CASCADE"), nullable=False)
     
     current_image_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("generated_images.id", ondelete="SET NULL"), nullable=True)
     

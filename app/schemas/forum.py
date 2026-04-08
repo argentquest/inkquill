@@ -1,7 +1,7 @@
 """Pydantic schemas for forum functionality."""
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.models.forum import ThreadStatus, VoteType
 
@@ -39,11 +39,7 @@ class ForumCategoryResponse(ForumCategoryBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-
-
-# Forum Thread Schemas
+    model_config = ConfigDict(from_attributes=True)
 class ForumThreadBase(BaseModel):
     """Base schema for forum threads."""
     title: str = Field(..., min_length=1, max_length=255)
@@ -88,21 +84,14 @@ class ForumThreadListResponse(BaseModel):
     is_locked: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
-
+    model_config = ConfigDict(from_attributes=True)
 class ForumThreadDetailResponse(ForumThreadListResponse):
     """Schema for detailed thread responses."""
     updated_at: datetime
     is_subscribed: Optional[bool] = False
     posts: Optional[List["ForumPostResponse"]] = []
 
-    class Config:
-        from_attributes = True
-
-
-# Forum Post Schemas
+    model_config = ConfigDict(from_attributes=True)
 class ForumPostBase(BaseModel):
     """Base schema for forum posts."""
     content: str = Field(..., min_length=1)
@@ -153,11 +142,7 @@ class ForumPostResponse(BaseModel):
     updated_at: datetime
     replies: Optional[List["ForumPostResponse"]] = []
 
-    class Config:
-        from_attributes = True
-
-
-# Vote Schemas
+    model_config = ConfigDict(from_attributes=True)
 class ForumVoteCreate(BaseModel):
     """Schema for creating/updating a vote."""
     post_id: int
@@ -170,11 +155,7 @@ class ForumVoteResponse(BaseModel):
     vote_type: VoteType
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
-
-# Subscription Schemas
+    model_config = ConfigDict(from_attributes=True)
 class ForumSubscriptionUpdate(BaseModel):
     """Schema for updating subscription preferences."""
     notify_email: Optional[bool] = None
@@ -189,11 +170,7 @@ class ForumSubscriptionResponse(BaseModel):
     notify_in_app: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
-
-# User Forum Stats
+    model_config = ConfigDict(from_attributes=True)
 class UserForumStats(BaseModel):
     """Schema for user forum statistics."""
     user_id: int
@@ -203,10 +180,6 @@ class UserForumStats(BaseModel):
     total_karma: int
     joined_date: datetime
 
-    class Config:
-        from_attributes = True
-
-
-# Allow forward references
+    model_config = ConfigDict(from_attributes=True)
 ForumThreadDetailResponse.model_rebuild()
 ForumPostResponse.model_rebuild()

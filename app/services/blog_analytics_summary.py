@@ -1,6 +1,6 @@
 """Blog analytics summary service."""
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Dict, Any, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
@@ -35,7 +35,7 @@ class BlogAnalyticsSummaryService:
             Dictionary with analytics summary
         """
         try:
-            end_date = datetime.utcnow()
+            end_date = datetime.now(UTC)
             start_date = end_date - timedelta(days=days)
             
             # Build base queries
@@ -82,7 +82,7 @@ class BlogAnalyticsSummaryService:
                 "subscriptions": subscriptions_summary,
                 "top_posts": top_posts,
                 "recent_activity": recent_activity,
-                "generated_at": datetime.utcnow().isoformat()
+                "generated_at": datetime.now(UTC).isoformat()
             }
             
         except Exception as e:
@@ -336,7 +336,7 @@ class BlogAnalyticsSummaryService:
     ) -> List[Dict[str, Any]]:
         """Get recent activity."""
         try:
-            end_date = datetime.utcnow()
+            end_date = datetime.now(UTC)
             start_date = end_date - timedelta(days=days)
             
             activities = []
@@ -423,7 +423,7 @@ class BlogAnalyticsSummaryService:
     ) -> Dict[str, Any]:
         """Get detailed engagement metrics."""
         try:
-            end_date = datetime.utcnow()
+            end_date = datetime.now(UTC)
             start_date = end_date - timedelta(days=days)
             
             # Base query for posts

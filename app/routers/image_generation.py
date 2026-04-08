@@ -305,19 +305,19 @@ async def generate_and_save_image_task(
     prompt: str
 ):
     """Generate and save image task."""
-    from app.db.database import async_session_local
+    from app.db import database as db_database
     from app.core.config import settings
     from app.models.generated_image import GeneratedImage
 
     logger.info(f"JOB_ID: {job_id} - Starting image generation for {element_type} ID: {element_id}")
     
-    async with async_session_local() as db:
+    async with db_database.async_session_local() as db:
         await crud_job_status.update_job_status(db, job_id, state="RUNNING", status_message="Generating image with AI provider...")
 
     generation_result = await generate_image_with_active_provider(prompt, user_id)
     
     if not generation_result:
-        async with async_session_local() as db:
+        async with db_database.async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="FAILED", result_message="AI image generation service failed.")
         return
 
@@ -327,11 +327,11 @@ async def generate_and_save_image_task(
     blob_name = ""
 
     try:
-        async with async_session_local() as db:
+        async with db_database.async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="RUNNING", status_message="Uploading image to storage...")
 
         image_uuid_for_path = uuid.uuid4()
-        async with async_session_local() as db:
+        async with db_database.async_session_local() as db:
             element: Any = None
             world_id_for_path: Union[int, str] = "unknown_world"
 
@@ -386,7 +386,7 @@ async def generate_and_save_image_task(
 
         image_url = await _save_generated_image_bytes(blob_name, image_bytes, content_type)
         
-        async with async_session_local() as db:
+        async with db_database.async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="RUNNING", status_message="Updating database record...")
             
             new_image_record = GeneratedImage(
@@ -457,7 +457,7 @@ async def generate_and_save_image_task(
 
     except (ValueError, PermissionError) as auth_err:
         logger.error(f"JOB_ID: {job_id} - Failed due to invalid data or permissions. Error: {auth_err}", exc_info=True)
-        async with async_session_local() as db:
+        async with db_database.async_session_local() as db:
             await crud_job_status.update_job_status(db, job_id, state="FAILED", result_message=f"Authorization or value error: {str(auth_err)[:200]}")
     except Exception as e:
         logger.error(f"JOB_ID: {job_id} - Failed during image save/upload. Error: {e}", exc_info=True)

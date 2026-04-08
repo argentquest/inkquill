@@ -17,15 +17,13 @@ from app.crud import scene as crud_scene
 # from app.crud import act as crud_act # Not directly used in this task after act_id is passed
 from app.schemas.scene import SceneCreate # For validation if desired, though not strictly used for direct creation here
 
-# --- Semantic Kernel Imports ---
-from app.services.semantic_kernel_setup import (
+# --- Storytelling Runtime Imports ---
+from app.services.langgraph_runtime_setup import (
     kernel,
     extract_scenes_from_act_function, 
     SCENE_EXTRACTION_SYSTEM_PROMPT # This is the system prompt string for the SK function
 )
-from semantic_kernel.functions.kernel_arguments import KernelArguments
-from semantic_kernel.contents.chat_message_content import ChatMessageContent 
-from semantic_kernel.functions.function_result import FunctionResult
+from app.services.langgraph_kernel import KernelArguments, FunctionResult
 from openai import APIError 
 
 logger = logging.getLogger(__name__)
@@ -65,14 +63,14 @@ async def generate_and_save_scenes_for_act_task(
                 logger.error(f"Scene extraction SK function (ExtractScenesFromAct) not available. Cannot process Act ID: {db_act_id}.")
                 return
 
-            # The SCENE_EXTRACTION_SYSTEM_PROMPT is now loaded from file in semantic_kernel_setup.py
+            # The scene extraction prompt is loaded from the shared runtime setup.
             # and is part of the extract_scenes_from_act_function's definition.
             # We only need to pass the act_content_to_analyze.
             kernel_args = KernelArguments(
                 # scene_extraction_system_prompt is part of the function's definition
                 act_content_to_analyze=act_content_markdown
             )
-            logger.info(f"Invoking Semantic Kernel function 'ExtractScenesFromAct' for Act ID: {db_act_id}.")
+            logger.info(f"Invoking storytelling runtime function 'ExtractScenesFromAct' for Act ID: {db_act_id}.")
             
             llm_json_string: Optional[str] = None
             try:
@@ -81,13 +79,8 @@ async def generate_and_save_scenes_for_act_task(
                 if sk_result and sk_result.value:
                     actual_content_object = sk_result.value
                     if isinstance(actual_content_object, list) and actual_content_object:
-                        if isinstance(actual_content_object[0], ChatMessageContent):
-                            llm_json_string = actual_content_object[0].content
-                        else: 
-                            llm_json_string = str(actual_content_object[0])
-                    elif isinstance(actual_content_object, ChatMessageContent):
-                        llm_json_string = actual_content_object.content
-                    else: 
+                        llm_json_string = str(actual_content_object[0])
+                    else:
                         llm_json_string = str(actual_content_object)
                 
                 logger.info(f"LLM response string received for scene extraction (Act ID {db_act_id}). Length: {len(llm_json_string) if llm_json_string else 0}")
@@ -98,7 +91,7 @@ async def generate_and_save_scenes_for_act_task(
                 # Potentially update act status to error here if you had such a field for acts
                 return
             except Exception as e_sk:
-                logger.error(f"Error invoking Semantic Kernel for scene extraction (Act ID {db_act_id}): {e_sk}", exc_info=True)
+                logger.error(f"Error invoking storytelling runtime for scene extraction (Act ID {db_act_id}): {e_sk}", exc_info=True)
                 return
 
             if not llm_json_string or not llm_json_string.strip():

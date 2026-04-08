@@ -2,7 +2,7 @@
 
 # /story_app/app/schemas/act.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 
@@ -97,7 +97,5 @@ class ActRead(BaseModel):
     # Include nested story class information if available
     # story_class: Optional['StoryClassOption'] = None  # Removed to fix Pydantic forward reference issue
 
-    class Config:
-        # Enable ORM mode for compatibility with SQLAlchemy models.
-        from_attributes = True # Replaces orm_mode = True in Pydantic v1
+    model_config = ConfigDict(from_attributes=True)
 

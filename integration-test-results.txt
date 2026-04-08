@@ -1,0 +1,427 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.4.0, pluggy-1.6.0 -- C:\code2025a\inbkandquill2\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\code2025a\inbkandquill2
+configfile: pytest.ini
+plugins: anyio-4.13.0, langsmith-0.3.45, asyncio-1.0.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 36 items
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics PASSED [  2%]
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow PASSED [  5%]
+tests/integration/blog/test_blog_media_and_integration_endpoints.py::test_blog_media_endpoints_use_local_storage_and_cleanup PASSED [  8%]
+tests/integration/blog/test_blog_media_and_integration_endpoints.py::test_blog_integration_endpoints_link_storytelling_content PASSED [ 11%]
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow PASSED [ 13%]
+tests/integration/blog/test_public_and_published_integration.py::test_public_world_chat_endpoints_with_mocked_ai PASSED [ 16%]
+tests/integration/blog/test_public_and_published_integration.py::test_published_story_endpoints_persist_ratings_and_comments PASSED [ 19%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_family_provider_registry_update PASSED [ 22%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_provider_registry_update_404_for_unknown_provider PASSED [ 25%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_provider_backed_session_assembly PASSED [ 27%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_patient_provider_configs_empty_for_new_patient PASSED [ 30%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_patient_provider_config_upsert_creates_new PASSED [ 33%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_patient_provider_config_upsert_updates_existing PASSED [ 36%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_patient_provider_config_list_shows_all_configs PASSED [ 38%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_patient_provider_config_404_for_unknown_patient PASSED [ 41%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_provider_registry_includes_all_seed_providers PASSED [ 44%]
+tests/integration/care_circle/test_care_circle_assembly_integration.py::test_patient_session_includes_highlights_with_provider_keys PASSED [ 47%]
+tests/integration/shared/test_additional_backend_surface_integration.py::test_dashboard_and_model_catalog_endpoints_work_with_real_db PASSED [ 50%]
+tests/integration/shared/test_additional_backend_surface_integration.py::test_basic_story_interview_welcome_and_importer_endpoints PASSED [ 52%]
+tests/integration/shared/test_auth_users_integration.py::test_cookie_login_works_for_seeded_admin_and_new_user PASSED [ 55%]
+tests/integration/shared/test_auth_users_integration.py::test_register_token_refresh_and_read_current_user PASSED [ 58%]
+tests/integration/shared/test_auth_users_integration.py::test_admin_can_list_all_users PASSED [ 61%]
+tests/integration/shared/test_auth_users_integration.py::test_user_can_update_current_profile PASSED [ 63%]
+tests/integration/shared/test_billing_referrals_integration.py::test_billing_and_referral_endpoints_with_real_db_state PASSED [ 66%]
+tests/integration/shared/test_billing_referrals_integration.py::test_admin_billing_endpoints_can_inspect_and_adjust_accounts PASSED [ 69%]
+tests/integration/shared/test_billing_referrals_integration.py::test_shared_conversation_cost_logging_records_ai_log_and_billing_transaction PASSED [ 72%]
+tests/integration/shared/test_remaining_backend_endpoints.py::test_prompt_and_story_class_endpoints_work_with_real_db PASSED [ 75%]
+tests/integration/shared/test_remaining_backend_endpoints.py::test_admin_cta_and_maintenance_endpoints_work_for_admins PASSED [ 77%]
+tests/integration/shared/test_remaining_backend_endpoints.py::test_social_and_bot_analytics_endpoints_use_real_db_and_mockable_flows PASSED [ 80%]
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships PASSED [ 83%]
+tests/integration/story/test_chat_endpoints_integration.py::test_world_chat_endpoints_with_mocked_ai PASSED [ 86%]
+tests/integration/story/test_chat_endpoints_integration.py::test_story_chat_session_endpoints_with_mocked_stream PASSED [ 88%]
+tests/integration/story/test_world_builder_integration.py::test_world_builder_endpoints_with_mocked_generation PASSED [ 91%]
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow PASSED [ 94%]
+tests/integration/story/test_world_story_flow_integration.py::test_world_crud_flow_persists_data PASSED [ 97%]
+tests/integration/story/test_world_story_flow_integration.py::test_story_act_scene_publish_flow_uses_real_database PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\pydantic\_internal\_config.py:323: 2 warnings
+tests/integration/blog/test_blog_backend_extended_integration.py: 56 warnings
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\pydantic\fields.py:1064: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warn('`max_items` is deprecated and will be removed, use `max_length` instead', DeprecationWarning)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\pydantic\_internal\_generate_schema.py:2353: PydanticDeprecatedSince211: The `__get_pydantic_core_schema__` method of the `BaseModel` class is deprecated. If you are calling `super().__get_pydantic_core_schema__` when overriding the method on a Pydantic model, consider using `handler(source)` instead. However, note that overriding this method on models can lead to unexpected side effects. Deprecated in Pydantic V2.11 to be removed in V3.0.
+    schema = annotation_get_schema(source, get_inner_schema)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\schemas\story_class.py:17: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('color')
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\schemas\story_class.py:23: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('name')
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\schemas\story_class.py:41: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('color')
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\schemas\story_class.py:49: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('name')
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\forum_thread.py:89: DeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    order_by: str = Query("recent", regex="^(recent|popular|updated)$"),
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\published_stories.py:99: DeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_by: str = Query("recent", regex="^(recent|popular|rating|title)$"),
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\schemas\blog.py:92: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('tags')
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\schemas\blog.py:116: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('tags')
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\blog_comments.py:87: DeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_by: str = Query("newest", regex="^(newest|oldest|popular)$"),
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\views_published_stories.py:81: DeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_by: str = Query("recent", regex="^(recent|popular|rating|title)$"),
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py:1384: RuntimeWarning: coroutine 'Connection._cancel' was never awaited
+    def __getattr__(self, key: str) -> Any:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\passlib\handlers\argon2.py:716: DeprecationWarning: Accessing argon2.__version__ is deprecated and will be removed in a future release. Use importlib.metadata directly to query for argon2-cffi's packaging metadata.
+    _argon2_cffi.__version__, max_version)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_category_service.py:23: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    category = BlogCategory(**category_data.dict())
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_service.py:118: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    post.published_at = datetime.utcnow()
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\blog_author_profile.py:149: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_subscription_service.py:135: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    confirmed_at=datetime.utcnow(),
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_subscription_service.py:284: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    update_values = {"updated_at": datetime.utcnow()}
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_subscription_service.py:416: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_search_service.py:239: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    since_date = datetime.utcnow() - timedelta(days=days)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\blog_analytics.py:69: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\blog_analytics.py:141: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    BlogView.created_at >= datetime.utcnow() - timedelta(hours=2)
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_analytics_summary.py:38: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    end_date = datetime.utcnow()
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_analytics_summary.py:339: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    end_date = datetime.utcnow()
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_analytics_summary.py:85: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "generated_at": datetime.utcnow().isoformat()
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_analytics_summary.py:426: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    end_date = datetime.utcnow()
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\routers\blog_analytics.py:459: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    end_date = datetime.utcnow()
+
+tests/integration/blog/test_blog_backend_extended_integration.py::test_blog_author_profile_tags_subscriptions_search_seo_and_analytics
+  C:\code2025a\inbkandquill2\app\services\blog_subscription_service.py:185: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    unsubscribed_at=datetime.utcnow()
+
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_service.py:306: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    post.updated_at = datetime.utcnow()
+
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_comment_service.py:201: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    comment.updated_at = datetime.utcnow()
+
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_comment_service.py:283: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    comment.updated_at = datetime.utcnow()
+
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_comment_service.py:236: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    comment.deleted_at = datetime.utcnow()
+
+tests/integration/blog/test_blog_integration.py::test_blog_category_post_comment_and_engagement_flow
+  C:\code2025a\inbkandquill2\app\services\blog_service.py:340: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    post.deleted_at = datetime.utcnow()
+
+tests/integration/blog/test_blog_media_and_integration_endpoints.py: 1 warning
+tests/integration/blog/test_public_and_published_integration.py: 2 warnings
+tests/integration/shared/test_additional_backend_surface_integration.py: 1 warning
+tests/integration/shared/test_remaining_backend_endpoints.py: 2 warnings
+tests/integration/story/test_batch_association_graph_integration.py: 1 warning
+tests/integration/story/test_chat_endpoints_integration.py: 2 warnings
+tests/integration/story/test_world_content_integration.py: 1 warning
+tests/integration/story/test_world_story_flow_integration.py: 2 warnings
+  C:\code2025a\inbkandquill2\app\routers\world.py:62: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=WorldRead.from_orm(created_world))
+
+tests/integration/blog/test_blog_media_and_integration_endpoints.py::test_blog_integration_endpoints_link_storytelling_content
+tests/integration/blog/test_public_and_published_integration.py::test_published_story_endpoints_persist_ratings_and_comments
+tests/integration/shared/test_additional_backend_surface_integration.py::test_dashboard_and_model_catalog_endpoints_work_with_real_db
+tests/integration/shared/test_remaining_backend_endpoints.py::test_social_and_bot_analytics_endpoints_use_real_db_and_mockable_flows
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+tests/integration/story/test_chat_endpoints_integration.py::test_story_chat_session_endpoints_with_mocked_stream
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+tests/integration/story/test_world_story_flow_integration.py::test_story_act_scene_publish_flow_uses_real_database
+  C:\code2025a\inbkandquill2\app\routers\story.py:158: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=schema_story.StoryRead.from_orm(created_story))
+
+tests/integration/blog/test_blog_media_and_integration_endpoints.py::test_blog_integration_endpoints_link_storytelling_content
+tests/integration/blog/test_public_and_published_integration.py::test_public_world_chat_endpoints_with_mocked_ai
+tests/integration/shared/test_additional_backend_surface_integration.py::test_dashboard_and_model_catalog_endpoints_work_with_real_db
+tests/integration/story/test_chat_endpoints_integration.py::test_world_chat_endpoints_with_mocked_ai
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\character.py:106: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=CharacterRead.from_orm(new_char))
+
+tests/integration/blog/test_blog_media_and_integration_endpoints.py::test_blog_integration_endpoints_link_storytelling_content
+tests/integration/blog/test_public_and_published_integration.py::test_public_world_chat_endpoints_with_mocked_ai
+tests/integration/shared/test_additional_backend_surface_integration.py::test_dashboard_and_model_catalog_endpoints_work_with_real_db
+tests/integration/story/test_chat_endpoints_integration.py::test_world_chat_endpoints_with_mocked_ai
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\location.py:116: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=LocationRead.from_orm(created_location))
+
+tests/integration/blog/test_blog_media_and_integration_endpoints.py::test_blog_integration_endpoints_link_storytelling_content
+tests/integration/blog/test_public_and_published_integration.py::test_public_world_chat_endpoints_with_mocked_ai
+tests/integration/shared/test_additional_backend_surface_integration.py::test_dashboard_and_model_catalog_endpoints_work_with_real_db
+tests/integration/story/test_chat_endpoints_integration.py::test_world_chat_endpoints_with_mocked_ai
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\lore_item.py:107: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=LoreItemRead.from_orm(created_item))
+
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow
+  C:\code2025a\inbkandquill2\app\crud\forum_thread.py:264: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_thread.last_post_at = datetime.utcnow()
+
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow
+  C:\code2025a\inbkandquill2\app\crud\forum_post.py:156: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_post.edited_at = datetime.utcnow()
+
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow
+  C:\code2025a\inbkandquill2\app\crud\forum_thread.py:174: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_thread.updated_at = datetime.utcnow()
+
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow
+  C:\code2025a\inbkandquill2\app\crud\forum_post.py:188: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_post.deleted_at = datetime.utcnow()
+
+tests/integration/blog/test_forum_integration.py::test_forum_category_thread_post_flow
+  C:\code2025a\inbkandquill2\app\crud\forum_thread.py:201: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_thread.deleted_at = datetime.utcnow()
+
+tests/integration/blog/test_public_and_published_integration.py::test_public_world_chat_endpoints_with_mocked_ai
+tests/integration/story/test_chat_endpoints_integration.py::test_world_chat_endpoints_with_mocked_ai
+  C:\code2025a\inbkandquill2\app\crud\chat_session.py:144: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_session.updated_at = datetime.utcnow()
+
+tests/integration/blog/test_public_and_published_integration.py::test_public_world_chat_endpoints_with_mocked_ai
+tests/integration/story/test_chat_endpoints_integration.py::test_world_chat_endpoints_with_mocked_ai
+  C:\code2025a\inbkandquill2\app\services\world_chat_service.py:183: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    session_updated_at=datetime.utcnow(),
+
+tests/integration/shared/test_additional_backend_surface_integration.py::test_basic_story_interview_welcome_and_importer_endpoints
+  <frozen importlib._bootstrap>:530: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.15; use exec_module() instead
+
+tests/integration/shared/test_additional_backend_surface_integration.py::test_basic_story_interview_welcome_and_importer_endpoints
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\reportlab\lib\rl_safe_eval.py:11: DeprecationWarning: ast.NameConstant is deprecated and will be removed in Python 3.14; use ast.Constant instead
+    haveNameConstant = hasattr(ast,'NameConstant')
+
+tests/integration/shared/test_additional_backend_surface_integration.py::test_basic_story_interview_welcome_and_importer_endpoints
+  C:\code2025a\inbkandquill2\app\routers\interview.py:132: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "completed_at": datetime.utcnow().isoformat(),
+
+tests/integration/shared/test_additional_backend_surface_integration.py::test_basic_story_interview_welcome_and_importer_endpoints
+  C:\code2025a\inbkandquill2\app\routers\interview.py:192: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    completed_at=datetime.utcnow()
+
+tests/integration/shared/test_additional_backend_surface_integration.py: 5 warnings
+tests/integration/shared/test_billing_referrals_integration.py: 6 warnings
+tests/integration/shared/test_remaining_backend_endpoints.py: 3 warnings
+  C:\code2025a\inbkandquill2\.venv\Lib\site-packages\sqlalchemy\sql\schema.py:3624: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/integration/shared/test_remaining_backend_endpoints.py::test_social_and_bot_analytics_endpoints_use_real_db_and_mockable_flows
+  C:\code2025a\inbkandquill2\app\services\social_sharing_service.py:199: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    daily_summary.updated_at = datetime.utcnow()
+
+tests/integration/shared/test_remaining_backend_endpoints.py::test_social_and_bot_analytics_endpoints_use_real_db_and_mockable_flows
+  C:\code2025a\inbkandquill2\app\services\social_sharing_service.py:326: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    SocialShareDailySummary.date >= datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+tests/integration/shared/test_remaining_backend_endpoints.py::test_social_and_bot_analytics_endpoints_use_real_db_and_mockable_flows
+  C:\code2025a\inbkandquill2\app\routers\bot_analytics.py:56: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    since = datetime.utcnow() - timedelta(hours=hours)
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:311: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "characters": [StoryCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:312: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "locations": [StoryLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:313: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "lore_items": [StoryLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:406: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "characters": [ActCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:407: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "locations": [ActLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:408: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "lore_items": [ActLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:454: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "characters": [SceneCharacterAssociationRead.from_orm(assoc) for assoc in char_result.scalars().all()],
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:455: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "locations": [SceneLocationAssociationRead.from_orm(assoc) for assoc in loc_result.scalars().all()],
+
+tests/integration/story/test_batch_association_graph_integration.py::test_batch_endpoints_and_graph_relationships
+  C:\code2025a\inbkandquill2\app\routers\associations.py:456: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    "lore_items": [SceneLoreItemAssociationRead.from_orm(assoc) for assoc in lore_result.scalars().all()]
+
+tests/integration/story/test_world_builder_integration.py::test_world_builder_endpoints_with_mocked_generation
+  C:\code2025a\inbkandquill2\app\services\world_builder_service.py:328: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "completed_at": str(datetime.datetime.utcnow())
+
+tests/integration/story/test_world_builder_integration.py::test_world_builder_endpoints_with_mocked_generation
+  C:\code2025a\inbkandquill2\app\services\world_builder_service.py:375: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "updated_at": str(datetime.datetime.utcnow())
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\character.py:129: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    char_read = CharacterRead.from_orm(char)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\location.py:141: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    loc_read = LocationRead.from_orm(loc)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\lore_item.py:135: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    item_read = LoreItemRead.from_orm(item)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\character.py:142: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    char_read = CharacterRead.from_orm(db_character)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\location.py:154: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    loc_read = LocationRead.from_orm(db_location)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\lore_item.py:148: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    item_read = LoreItemRead.from_orm(db_lore_item)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\character.py:166: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=CharacterRead.from_orm(updated_char))
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\location.py:191: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=LocationRead.from_orm(updated_location))
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\lore_item.py:173: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=LoreItemRead.from_orm(updated_item))
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\character.py:279: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    char_read = CharacterInStoryRead.from_orm(char_obj)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\location.py:307: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    loc_read = LocationInStoryRead.from_orm(loc_obj)
+
+tests/integration/story/test_world_content_integration.py::test_world_content_crud_and_story_link_flow
+  C:\code2025a\inbkandquill2\app\routers\lore_item.py:288: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    item_read = LoreItemInStoryRead.from_orm(item_obj)
+
+tests/integration/story/test_world_story_flow_integration.py::test_world_crud_flow_persists_data
+  C:\code2025a\inbkandquill2\app\routers\world.py:79: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    data=[WorldRead.from_orm(w) for w in worlds],
+
+tests/integration/story/test_world_story_flow_integration.py::test_world_crud_flow_persists_data
+  C:\code2025a\inbkandquill2\app\routers\world.py:106: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    world_read = WorldRead.from_orm(db_world)
+
+tests/integration/story/test_world_story_flow_integration.py::test_world_crud_flow_persists_data
+  C:\code2025a\inbkandquill2\app\routers\world.py:123: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    return ApiResponse.success_response(data=WorldRead.from_orm(updated_world))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+====================== 36 passed, 198 warnings in 30.45s ======================
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

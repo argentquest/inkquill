@@ -1,0 +1,62 @@
+{
+  "providers": [
+    {"name": "weather", "label": "Weather", "icon": "☀️", "enabled": true, "order": 1, "category": "core", "patient_visible": true, "family_visible": true},
+    {"name": "joke", "label": "Daily Joy", "icon": "😄", "enabled": true, "order": 2, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "nostalgia", "label": "Time Machine", "icon": "🕰️", "enabled": true, "order": 3, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "puzzle", "label": "Puzzle", "icon": "🧩", "enabled": true, "order": 4, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "brain_booster", "label": "Brain Booster", "icon": "🧠", "enabled": true, "order": 5, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "sensory", "label": "Sensory", "icon": "🎵", "enabled": true, "order": 6, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "ai_trivia", "label": "AI Trivia", "icon": "💡", "enabled": true, "order": 7, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "daily_quote", "label": "Daily Quote", "icon": "✨", "enabled": true, "order": 8, "category": "core", "patient_visible": true, "family_visible": true},
+    {"name": "dog_photo", "label": "Furry Friend", "icon": "🐶", "enabled": true, "order": 9, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "cat_fact", "label": "Cat Fact", "icon": "🐱", "enabled": true, "order": 10, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "gratitude", "label": "Gratitude", "icon": "🙏", "enabled": true, "order": 11, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "gentle_exercise", "label": "Gentle Exercise", "icon": "🤼", "enabled": true, "order": 12, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "daily_affirmation", "label": "Affirmation", "icon": "💛", "enabled": true, "order": 13, "category": "core", "patient_visible": true, "family_visible": true},
+    {"name": "nature_scene", "label": "Nature Scene", "icon": "🌿", "enabled": true, "order": 14, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "simple_recipe", "label": "Simple Recipe", "icon": "🍳", "enabled": true, "order": 15, "category": "lifestyle", "patient_visible": true, "family_visible": true},
+    {"name": "this_day_history", "label": "On This Day", "icon": "📅", "enabled": true, "order": 16, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "riddle", "label": "Daily Riddle", "icon": "🤔", "enabled": true, "order": 17, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "missing_vowels", "label": "Missing Vowels", "icon": "🔤", "enabled": true, "order": 18, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "finish_phrase", "label": "Finish the Phrase", "icon": "💬", "enabled": true, "order": 19, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "odd_one_out", "label": "Odd One Out", "icon": "🎯", "enabled": true, "order": 20, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "word_scramble", "label": "Word Scramble", "icon": "🔀", "enabled": true, "order": 21, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "song_of_the_day", "label": "Song of the Day", "icon": "🎵", "enabled": true, "order": 22, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "complete_the_duo", "label": "Complete the Duo", "icon": "🤝", "enabled": true, "order": 23, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "spot_the_difference", "label": "Spot the Difference", "icon": "🔍", "enabled": true, "order": 24, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "pen_pal_letter", "label": "Pen Pal Letter", "icon": "✉️", "enabled": true, "order": 25, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "gridless_crossword", "label": "Gridless Crossword", "icon": "📝", "enabled": true, "order": 26, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "world_news", "label": "World News", "icon": "🌍", "enabled": true, "order": 27, "category": "core", "patient_visible": true, "family_visible": true},
+    {"name": "hobby_spotlight", "label": "Hobby Spotlight", "icon": "🎨", "enabled": true, "order": 28, "category": "lifestyle", "patient_visible": true, "family_visible": true},
+    {"name": "family_greeting", "label": "Family Greeting", "icon": "👨‍👩‍👧", "enabled": true, "order": 29, "category": "core", "patient_visible": true, "family_visible": true},
+    {"name": "local_history", "label": "Local History", "icon": "🏛️", "enabled": true, "order": 30, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "personal_affirmation", "label": "Personal Affirmation", "icon": "💪", "enabled": true, "order": 31, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "activity_suggestion", "label": "Activity Suggestion", "icon": "🌟", "enabled": true, "order": 32, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "animal_friend", "label": "Animal Friend", "icon": "🐾", "enabled": true, "order": 33, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "bingo", "label": "Bingo", "icon": "🎲", "enabled": true, "order": 34, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "color_match", "label": "Color Match", "icon": "🎨", "enabled": true, "order": 35, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "crossword", "label": "Crossword", "icon": "🧩", "enabled": true, "order": 36, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "daily_blessing", "label": "Daily Blessing", "icon": "🕊️", "enabled": true, "order": 37, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "memory_lane_photo", "label": "Memory Lane Photo", "icon": "📷", "enabled": true, "order": 38, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "simple_math", "label": "Simple Math", "icon": "➕", "enabled": true, "order": 39, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "word_connect", "label": "Word Connect", "icon": "🔗", "enabled": true, "order": 40, "category": "games", "patient_visible": true, "family_visible": true}
+  ],
+  "default_theme": "classic",
+  "assembly": {
+    "default_mode": "linear",
+    "page": {
+      "width_in": 8.5,
+      "height_in": 11,
+      "margin_in": 0.5,
+      "content_padding_px": 24
+    },
+    "grid": {
+      "columns": 8,
+      "rows": 10,
+      "gap_in": 0.04,
+      "default_provider_width": 4,
+      "default_provider_height": 2,
+      "max_pages": 1
+    }
+  }
+}

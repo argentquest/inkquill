@@ -1,7 +1,7 @@
 """Blog analytics API endpoints."""
 import logging
 import ipaddress
-from datetime import datetime, date, timedelta
+from datetime import UTC, datetime, date, timedelta
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -66,7 +66,7 @@ async def track_view(
         referrer = request.headers.get("referer", "")
         
         # Check for duplicate view (same IP within 1 hour)
-        one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+        one_hour_ago = datetime.now(UTC) - timedelta(hours=1)
         
         duplicate_check = await db.execute(
             select(BlogView).where(
@@ -138,7 +138,7 @@ async def track_read_time(
                 and_(
                     BlogView.post_id == post_id,
                     BlogView.ip_address == client_ip,
-                    BlogView.created_at >= datetime.utcnow() - timedelta(hours=2)
+                    BlogView.created_at >= datetime.now(UTC) - timedelta(hours=2)
                 )
             )
             .order_by(desc(BlogView.created_at))
@@ -456,7 +456,7 @@ async def get_trending_analytics(
     """Get trending posts analytics."""
     try:
         # Date range for trending calculation
-        end_date = datetime.utcnow()
+        end_date = datetime.now(UTC)
         start_date = end_date - timedelta(days=days)
         
         # Get posts with recent activity

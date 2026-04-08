@@ -232,11 +232,11 @@ class BlogSearchService:
     ) -> List[BlogPost]:
         """Get trending posts based on recent engagement."""
         try:
-            from datetime import datetime, timedelta
+            from datetime import UTC, datetime, timedelta
             
             # Calculate trending based on recent views and likes
             # This is a simplified version - could be enhanced with more sophisticated ranking
-            since_date = datetime.utcnow() - timedelta(days=days)
+            since_date = datetime.now(UTC) - timedelta(days=days)
             
             trending_query = (
                 select(BlogPost)

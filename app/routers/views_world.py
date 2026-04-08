@@ -84,7 +84,7 @@ async def _enrich_elements_with_image_urls(
     """
     enriched_list = []
     for element in elements:
-        element_read = schema.from_orm(element)
+        element_read = schema.model_validate(element)
         path_to_check = None
         if hasattr(element, 'current_image') and element.current_image and element.current_image.blob_path:
             path_to_check = element.current_image.blob_path
@@ -192,7 +192,7 @@ async def world_detail_ui(
     )
     
     # Convert documents to read schema
-    world_documents = [UploadedDocumentRead.from_orm(doc) for doc in documents_db]
+    world_documents = [UploadedDocumentRead.model_validate(doc) for doc in documents_db]
     
     return templates.TemplateResponse(
         "pages/world_detail.html", 
@@ -274,7 +274,7 @@ async def view_character_ui(
     db_world = await get_world_for_ui_and_verify_ownership(db_character.world_id, db, current_user)
     
     # Get character with image URL
-    character_read = CharacterRead.from_orm(db_character)
+    character_read = CharacterRead.model_validate(db_character)
     path_to_check = db_character.current_image.blob_path if db_character.current_image else db_character.image_blob_path
     character_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     
@@ -381,7 +381,7 @@ async def view_location_ui(
     db_world = await get_world_for_ui_and_verify_ownership(db_location.world_id, db, current_user)
     
     # Get location with image URL
-    location_read = LocationRead.from_orm(db_location)
+    location_read = LocationRead.model_validate(db_location)
     path_to_check = db_location.current_image.blob_path if db_location.current_image else db_location.image_blob_path
     location_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     
@@ -483,7 +483,7 @@ async def view_lore_item_ui(
     db_world = await get_world_for_ui_and_verify_ownership(db_lore_item.world_id, db, current_user)
     
     # Get lore item with image URL
-    lore_item_read = LoreItemRead.from_orm(db_lore_item)
+    lore_item_read = LoreItemRead.model_validate(db_lore_item)
     path_to_check = db_lore_item.current_image.blob_path if db_lore_item.current_image else db_lore_item.image_blob_path
     lore_item_read.image_url = await _check_and_get_image_url(blob_service_client, path_to_check)
     
@@ -759,7 +759,7 @@ async def create_generated_character(
         
         result = CharacterGeneratorResult(
             success=True,
-            character=CharacterRead.from_orm(character),
+            character=CharacterRead.model_validate(character),
             redirect_url=str(request.url_for('ui_edit_character_form', character_id=character.id))
         )
         return result.dict()
