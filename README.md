@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI Storytelling Assistant with Worlds & Context
 
 ## 1. Overview
@@ -131,3 +132,7 @@ The application features secure user authentication, comprehensive project manag
     pytest
     ```
     *(Note: This suite may require separate test database configuration as defined in `tests/conftest.py`).*
+=======
+# inkquill
+Ink And Quill V2
+>>>>>>> ee565c8 (Initial commit)
