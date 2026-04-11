@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class SimpleMathProvider(BaseCareCircleProvider):
+    provider_key = "simple_math"
     is_safe_for_patient = True
 
     """

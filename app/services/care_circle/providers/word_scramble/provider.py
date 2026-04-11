@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class WordScrambleProvider(BaseCareCircleProvider):
+    provider_key = "word_scramble"
     is_safe_for_patient = True
 
     """

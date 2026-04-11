@@ -36,6 +36,7 @@ RECIPE_CATEGORIES = [
 
 
 class SimpleRecipeProvider(BaseCareCircleProvider):
+    provider_key = "simple_recipe"
     is_safe_for_patient = True
 
     """
@@ -56,8 +57,10 @@ class SimpleRecipeProvider(BaseCareCircleProvider):
             prompt = (
                 f"Think of {category['label']} from the {era}. "
                 f"It should use common ingredients everyone has at home. "
+                f"Avoid exotic, expensive, or hard-to-find ingredients. "
                 f"The steps should be very short and easy to follow (3-4 steps max). "
                 f"Each step should be one short sentence. "
+                f"Ensure all steps are safe and simple — no sharp knives, hot oil, or complex techniques. "
                 f'Return as JSON: {{"name": "...", "ingredients": "...", "steps": "..."}}'
             )
             data, llm_response = await generate_json_with_usage(

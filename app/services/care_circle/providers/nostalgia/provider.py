@@ -58,6 +58,7 @@ NOSTALGIA_TOPICS = [
 
 
 class NostalgiaProvider(BaseCareCircleProvider):
+    provider_key = "nostalgia"
     is_safe_for_patient = True
 
     """
@@ -109,7 +110,9 @@ class NostalgiaProvider(BaseCareCircleProvider):
                 f"Write a happy memory from the {era} for {name}. "
                 f"{topic['hint']} "
                 f"{context_str} "
-                f"Keep it to 2 short sentences. Make it feel cozy and familiar."
+                f"Keep it to 2 short sentences. Make it feel cozy and familiar. "
+                f"Avoid any memories of loss, hardship, war, illness, or distressing events. "
+                f"Focus only on warm, joyful, universally positive experiences."
             )
             llm_response = await generate_text_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT

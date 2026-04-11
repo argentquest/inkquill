@@ -14,6 +14,7 @@ from typing import Any, Dict
 
 
 class SongOfTheDayProvider(BaseCareCircleProvider):
+    provider_key = "song_of_the_day"
     is_safe_for_patient = True
 
     """
@@ -82,7 +83,8 @@ class SongOfTheDayProvider(BaseCareCircleProvider):
                 fact_prompt = (
                     f"Write a 1-sentence, warm memory about the song "
                     f"'{song_title}' by {singer}. "
-                    f"Make it feel nostalgic and comforting."
+                    f"Make it feel nostalgic and comforting. "
+                    f"Avoid any memories of loss, hardship, or distressing events."
                 )
                 llm_response = await generate_text_with_usage(
                     fact_prompt, system=DEMENTIA_SYSTEM_PROMPT

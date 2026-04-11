@@ -22,6 +22,7 @@ from typing import Any, Dict
 
 
 class SpotTheDifferenceProvider(BaseCareCircleProvider):
+    provider_key = "spot_the_difference"
     is_safe_for_patient = True
 
     """
@@ -40,6 +41,8 @@ class SpotTheDifferenceProvider(BaseCareCircleProvider):
                 "Write two lists (List A and List B), each with exactly 5 short, familiar words.\n"
                 "The lists must be identical EXCEPT one word is different between them.\n"
                 "Use only simple, familiar words: animals, food, colours, flowers, household items.\n"
+                "Avoid obscure, complex, or uncommon words.\n"
+                "The changed word must be clearly different from the original (not just a spelling variation).\n"
                 "Return ONLY valid JSON in this exact format:\n"
                 '{"list_a": ["Word1","Word2","Word3","Word4","Word5"], '
                 '"list_b": ["Word1","Word2","Word3","Word4","Word5"], '

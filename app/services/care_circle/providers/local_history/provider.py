@@ -12,6 +12,7 @@ from typing import Any, Dict
 
 
 class LocalHistoryProvider(BaseCareCircleProvider):
+    provider_key = "local_history"
     is_safe_for_patient = True
 
     """
@@ -69,7 +70,8 @@ class LocalHistoryProvider(BaseCareCircleProvider):
                 f"{context_str} "
                 f"Focus on something cheerful — a famous landmark, a lovely "
                 f"tradition, or something the town is proud of. "
-                f"Make it feel like a proud, happy memory."
+                f"Make it feel like a proud, happy memory. "
+                f"Avoid wars, disasters, controversial events, or anything distressing."
             )
             llm_response = await generate_text_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT

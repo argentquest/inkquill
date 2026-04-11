@@ -51,6 +51,7 @@ GRATITUDE_MODES = [
 
 
 class GratitudeProvider(BaseCareCircleProvider):
+    provider_key = "gratitude"
     is_safe_for_patient = True
 
     """
@@ -72,7 +73,9 @@ class GratitudeProvider(BaseCareCircleProvider):
                 f"Write one gentle gratitude thought for {name}. "
                 f"{mode['instruction']} "
                 f"Keep it to 1-2 short sentences. "
-                f"Do NOT ask a question that tests memory."
+                f"Do NOT ask a question that tests memory. "
+                f"Do not mention illness, health problems, or care situations. "
+                f"Keep the tone positive, warm, and uplifting."
             )
             llm_response = await generate_text_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT

@@ -5,6 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class DogPhotoProvider(BaseCareCircleProvider):
+    provider_key = "dog_photo"
     is_safe_for_patient = True
 
     """

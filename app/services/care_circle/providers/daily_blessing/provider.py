@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class DailyBlessingProvider(BaseCareCircleProvider):
+    provider_key = "daily_blessing"
     is_safe_for_patient = True
 
     """

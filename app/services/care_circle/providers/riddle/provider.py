@@ -57,6 +57,7 @@ RIDDLE_STYLES = [
 
 
 class RiddleProvider(BaseCareCircleProvider):
+    provider_key = "riddle"
     is_safe_for_patient = True
 
     """
@@ -75,6 +76,8 @@ class RiddleProvider(BaseCareCircleProvider):
             prompt = (
                 f"{style['instruction']} "
                 f"The riddle must feel fun and easy — never frustrating. "
+                f"Use only common, well-known objects or animals — avoid obscure vocabulary. "
+                f"The answer must be something almost everyone would recognize. "
                 f"Example style: {style['example']}. "
                 'Return as JSON: {"question": "...", "answer": "..."}'
             )

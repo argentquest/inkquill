@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class OddOneOutProvider(BaseCareCircleProvider):
+    provider_key = "odd_one_out"
     is_safe_for_patient = True
 
     """

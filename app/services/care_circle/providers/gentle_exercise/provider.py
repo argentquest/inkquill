@@ -5,6 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class GentleExerciseProvider(BaseCareCircleProvider):
+    provider_key = "gentle_exercise"
     is_safe_for_patient = True
 
     """

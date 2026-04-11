@@ -31,6 +31,7 @@ _SEASON_MAP = {
 
 
 class PenPalLetterProvider(BaseCareCircleProvider):
+    provider_key = "pen_pal_letter"
     is_safe_for_patient = True
 
     """
@@ -102,7 +103,8 @@ class PenPalLetterProvider(BaseCareCircleProvider):
                 f"a sight, smell, or simple pleasure.\n"
                 f"Reference one warm shared memory from the {era}.\n"
                 f"{context_str}\n"
-                f"End with one gentle question inviting a happy recollection.\n"
+                f"End with one gentle, simple question inviting a happy recollection. "
+                f"The question must be easy to answer and not require detailed memory.\n"
                 f"Tone: warm, familiar, simple, nostalgic. "
                 f"Do NOT mention illness, care homes, or memory problems.\n"
                 f"Start with 'Dear {name},' and sign off "

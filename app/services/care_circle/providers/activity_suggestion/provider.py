@@ -13,6 +13,7 @@ from typing import Any, Dict
 
 
 class ActivitySuggestionProvider(BaseCareCircleProvider):
+    provider_key = "activity_suggestion"
     is_safe_for_patient = True
 
     """
@@ -78,6 +79,8 @@ class ActivitySuggestionProvider(BaseCareCircleProvider):
                 f"enjoy {activity} today. "
                 f"Make it feel warm, inviting, and easy — like a lovely "
                 f"treat, not a task. "
+                f"Do not use medical, clinical, or health-related language. "
+                f"Do not ask questions that require memory recall or testing knowledge. "
                 f"{context_str}"
             )
             llm_response = await generate_text_with_usage(

@@ -432,12 +432,51 @@ def generate_pdf_via_playwright(html_path: Path, pdf_path: Path):
     print(result.stdout.strip())
 
 
+# ── per-provider HTML file ─────────────────────────────────────────────────────
+def save_provider_html(result: ProviderResult, run_ts: str, patient_name: str, out_dir: Path) -> Path | None:
+    if not result.rendered_html:
+        return None
+    safe_name = patient_name.lower().replace(" ", "_")
+    filename = f"{run_ts}_{safe_name}_{result.key}.html"
+    path = out_dir / filename
+    # Wrap with minimal chrome so it's a valid standalone file
+    wrapped = f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8">
+<title>{result.label} - {patient_name}</title>
+</head>
+<body style="margin:0;padding:16px;font-family:Georgia,serif;">
+{result.rendered_html}
+</body>
+</html>"""
+    path.write_text(wrapped, encoding="utf-8")
+    return path
+
+
 # ── main ───────────────────────────────────────────────────────────────────────
 async def main():
+    from datetime import datetime
+    import shutil
+
+    # Clear stale render cache so providers don't return each other's cached HTML
+    cache_dir = ROOT / "app" / "logs" / "care_circle_render_cache"
+    if cache_dir.exists():
+        shutil.rmtree(cache_dir)
+        print(f"Cleared render cache: {cache_dir}")
+
     print("Installing LLM patches...")
     _install_patches()
 
-    print(f"Running {len(ALL_PROVIDER_KEYS)} providers for Margaret Thompson...\n")
+    run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    patient_name = MockPatient.display_name
+
+    # Output dirs
+    desktop = Path.home() / "Desktop"
+    out_dir = desktop if desktop.exists() else ROOT / "logs"
+    provider_html_dir = out_dir / f"care_circle_{run_ts}"
+    provider_html_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"Running {len(ALL_PROVIDER_KEYS)} providers for {patient_name}...\n")
     results: list[ProviderResult] = []
 
     for key in ALL_PROVIDER_KEYS:
@@ -446,6 +485,12 @@ async def main():
         tag = {"llm_ok": "OK", "static": "--", "fallback_internal": "FB",
                "fallback_exception": "XX", "load_error": "ER"}.get(r.status, "?")
         print(f"{tag} {r.status:<22} {r.elapsed_s:5.2f}s  tokens={r.tokens}")
+
+        # Save individual provider HTML
+        html_file = save_provider_html(r, run_ts, patient_name, provider_html_dir)
+        if html_file:
+            print(f"    -> {html_file.name}")
+
         results.append(r)
 
     print("\n" + "=" * 60)
@@ -457,20 +502,17 @@ async def main():
     print("=" * 60)
 
     today = date.today().isoformat()
-    desktop = Path.home() / "Desktop"
-    out_dir = desktop if desktop.exists() else ROOT / "logs"
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    html_path = ROOT / "logs" / f"care_circle_test_{today}.html"
-    pdf_path  = out_dir / f"care_circle_test_{today}.pdf"
-    html_path.parent.mkdir(parents=True, exist_ok=True)
+    assembled_html_path = provider_html_dir / f"{run_ts}_assembled.html"
+    pdf_path = out_dir / f"care_circle_test_{run_ts}.pdf"
 
-    print(f"\nAssembling HTML -> {html_path}")
+    print(f"\nAssembling HTML -> {assembled_html_path}")
     html_content = _build_html(results, today)
-    html_path.write_text(html_content, encoding="utf-8")
+    assembled_html_path.write_text(html_content, encoding="utf-8")
 
     print(f"Rendering PDF   -> {pdf_path}")
-    generate_pdf_via_playwright(html_path, pdf_path)
+    generate_pdf_via_playwright(assembled_html_path, pdf_path)
+    print(f"\nProvider HTML files saved to: {provider_html_dir}")
     print("Done.")
 
 

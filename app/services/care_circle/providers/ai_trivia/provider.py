@@ -55,6 +55,7 @@ TRIVIA_CATEGORIES = [
 
 
 class AiTriviaProvider(BaseCareCircleProvider):
+    provider_key = "ai_trivia"
     is_safe_for_patient = True
 
     """
@@ -83,6 +84,8 @@ class AiTriviaProvider(BaseCareCircleProvider):
                 f"Also suggest one song by {singer} or a similar artist "
                 f"to listen to today. "
                 f"Keep each to 1 short sentence. "
+                f"Use only well-known, positive, and uplifting facts. "
+                f"Avoid obscure, distressing, or controversial topics. "
                 f'Return as JSON: {{"trivia": "...", "music": "..."}}'
             )
             data, llm_response = await generate_json_with_usage(

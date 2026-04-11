@@ -40,6 +40,7 @@ QUESTION_TYPES = [
 
 
 class BrainBoosterProvider(BaseCareCircleProvider):
+    provider_key = "brain_booster"
     is_safe_for_patient = True
 
     """
@@ -67,6 +68,8 @@ class BrainBoosterProvider(BaseCareCircleProvider):
                 f"who grew up in the {era}. "
                 f"Use this type: {qt['label']} ({qt['example']}). "
                 f"The activity must feel easy and fun, never like a test. "
+                f"Avoid topics that could trigger negative or distressing memories. "
+                f"Use only common knowledge that most people would recognize. "
                 f"Return as JSON: "
                 f'{{"type": "{qt["key"]}", "prompt": "...", {answer_field}}}'
             )

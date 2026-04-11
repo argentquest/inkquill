@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class ColorMatchProvider(BaseCareCircleProvider):
+    provider_key = "color_match"
     is_safe_for_patient = True
 
     """

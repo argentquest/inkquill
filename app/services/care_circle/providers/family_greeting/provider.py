@@ -13,6 +13,7 @@ from typing import Any, Dict
 
 
 class FamilyGreetingProvider(BaseCareCircleProvider):
+    provider_key = "family_greeting"
     is_safe_for_patient = True
 
     """
@@ -73,6 +74,9 @@ class FamilyGreetingProvider(BaseCareCircleProvider):
                 f"2 sentences only. "
                 f"Make it feel warm, caring, and full of love. "
                 f"Write in first person as {sender}. "
+                f"Do not mention illness, health problems, or care situations. "
+                f"Avoid complex references or anything that could cause confusion. "
+                f"Keep it simple, positive, and uplifting. "
                 f"{context_str}"
             )
             llm_response = await generate_text_with_usage(

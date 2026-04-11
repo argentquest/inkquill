@@ -12,6 +12,7 @@ from typing import Any, Dict
 
 
 class HobbySpotlightProvider(BaseCareCircleProvider):
+    provider_key = "hobby_spotlight"
     is_safe_for_patient = True
 
     """
@@ -64,7 +65,9 @@ class HobbySpotlightProvider(BaseCareCircleProvider):
                 f"of {hobby}. "
                 f"{context_str} "
                 f"Make it feel personal, cozy, and joyful. "
-                f"Do not ask questions. Just describe how lovely {hobby} is."
+                f"Do not ask questions. Just describe how lovely {hobby} is. "
+                f"Do not mention illness, health problems, or care situations. "
+                f"Keep the content simple and universally understandable."
             )
             llm_response = await generate_text_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT

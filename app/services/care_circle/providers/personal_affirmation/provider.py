@@ -13,6 +13,7 @@ from typing import Any, Dict
 
 
 class PersonalAffirmationProvider(BaseCareCircleProvider):
+    provider_key = "personal_affirmation"
     is_safe_for_patient = True
 
     """
@@ -57,7 +58,8 @@ class PersonalAffirmationProvider(BaseCareCircleProvider):
                 f"Write a personal, loving affirmation for {name}. "
                 f"2 short sentences only. "
                 f"{context_str} "
-                f"Make it feel warm, specific, and uplifting."
+                f"Make it feel warm, specific, and uplifting. "
+                f"Do not mention illness, health problems, or care situations."
             )
             llm_response = await generate_text_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT

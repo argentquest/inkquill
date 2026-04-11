@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class MissingVowelsProvider(BaseCareCircleProvider):
+    provider_key = "missing_vowels"
     is_safe_for_patient = True
 
     """

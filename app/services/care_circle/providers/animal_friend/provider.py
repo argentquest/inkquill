@@ -7,6 +7,7 @@ from typing import Any, Dict
 
 
 class AnimalFriendProvider(BaseCareCircleProvider):
+    provider_key = "animal_friend"
     is_safe_for_patient = True
 
     """

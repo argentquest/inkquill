@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class FinishPhraseProvider(BaseCareCircleProvider):
+    provider_key = "finish_phrase"
     is_safe_for_patient = True
 
     """

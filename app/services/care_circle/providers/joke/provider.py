@@ -5,6 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class JokeProvider(BaseCareCircleProvider):
+    provider_key = "joke"
     is_safe_for_patient = True
 
     """

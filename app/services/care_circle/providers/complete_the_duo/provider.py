@@ -18,6 +18,7 @@ from typing import Any, Dict
 
 
 class CompleteTheDuoProvider(BaseCareCircleProvider):
+    provider_key = "complete_the_duo"
     is_safe_for_patient = True
 
     """

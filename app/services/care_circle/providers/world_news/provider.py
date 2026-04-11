@@ -25,6 +25,7 @@ from typing import Any, Dict
 
 
 class WorldNewsProvider(BaseCareCircleProvider):
+    provider_key = "world_news"
     is_safe_for_patient = True
 
     """3 top world-news headlines with brief, easy-to-read summaries."""

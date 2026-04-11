@@ -65,6 +65,7 @@ def _render_word_pair(across: str, down: str, clues: dict, grid: list) -> str:
 
 
 class PuzzleProvider(BaseCareCircleProvider):
+    provider_key = "puzzle"
     is_safe_for_patient = True
 
     """

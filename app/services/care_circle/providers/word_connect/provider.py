@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 
 class WordConnectProvider(BaseCareCircleProvider):
+    provider_key = "word_connect"
     is_safe_for_patient = True
 
     """

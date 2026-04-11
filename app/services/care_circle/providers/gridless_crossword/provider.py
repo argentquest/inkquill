@@ -27,6 +27,7 @@ _daily_cache: dict[tuple, dict] = {}
 
 
 class GridlessCrosswordProvider(BaseCareCircleProvider):
+    provider_key = "gridless_crossword"
     is_safe_for_patient = True
 
     """
@@ -155,8 +156,10 @@ The first letter of each answer must spell: {secret_word}
 
 REQUIREMENTS:
 - Each word must be {min_len}-{max_len} letters long
-- Each clue should be clear and solvable for older adults
+- Use only common, well-known words — avoid obscure or complex vocabulary
+- Each clue should be clear, unambiguous, and solvable for older adults
 - Clues should be 1-2 sentences describing the word
+- Each clue must have only one correct answer
 - Return ONLY a JSON object with this exact format:
 {{"words": [{{"word": "XXXXX", "clue": "Clue text..."}}, ...]}}
 

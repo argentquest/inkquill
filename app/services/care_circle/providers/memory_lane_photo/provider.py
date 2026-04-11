@@ -7,6 +7,7 @@ from typing import Any, Dict
 
 
 class MemoryLanePhotoProvider(BaseCareCircleProvider):
+    provider_key = "memory_lane_photo"
     is_safe_for_patient = True
 
     """
@@ -17,6 +18,7 @@ class MemoryLanePhotoProvider(BaseCareCircleProvider):
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         """
         Get a vintage photo with description.
+        Uses pre-configured vintage photos from Unsplash (no external API call).
         
         Returns:
             dict with photo data
@@ -59,28 +61,7 @@ class MemoryLanePhotoProvider(BaseCareCircleProvider):
             },
         ])
         
-        fallback_description = cfg.get(
-            "fallback_description",
-            "A warm and happy memory from times gone by."
-        )
-        
-        try:
-            # Try to get a random vintage photo from Unsplash
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    "https://source.unsplash.com/600x400/?vintage,portrait",
-                    follow_redirects=True,
-                    timeout=10.0
-                )
-                if response.status_code == 200:
-                    return {
-                        "image_url": str(response.url),
-                        "description": random.choice(fallback_photos)["description"]
-                    }
-        except Exception:
-            pass
-        
-        # Fallback to static content
+        # Use static fallback photos directly (source.unsplash.com is deprecated)
         photo = random.choice(fallback_photos)
         return {
             "image_url": photo["image_url"],

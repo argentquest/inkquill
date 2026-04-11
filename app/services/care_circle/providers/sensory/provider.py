@@ -8,12 +8,6 @@ from app.services.care_circle.llm_helpers import (
     generate_json_with_usage,
     generate_text_with_usage,
 )
-from app.services.care_circle.llm_helpers import (
-    DEMENTIA_SYSTEM_PROMPT,
-    generate_image_url_with_usage,
-    generate_json_with_usage,
-    generate_text_with_usage,
-)
 from typing import Any, Dict
 
 
@@ -57,6 +51,7 @@ SENSORY_MODES = [
 
 
 class SensoryProvider(BaseCareCircleProvider):
+    provider_key = "sensory"
     is_safe_for_patient = True
 
     """
@@ -113,7 +108,9 @@ class SensoryProvider(BaseCareCircleProvider):
                 f"sense of {mode['key']}. "
                 f"{mode['prompt_hint']} "
                 f"{extra_str} "
-                f"Keep it to 1 short sentence. Be specific and gentle."
+                f"Keep it to 1 short sentence. Be specific and gentle. "
+                f"Avoid anything potentially overwhelming or overstimulating. "
+                f"Ensure the activity is accessible for someone who may be seated."
             )
             llm_response = await generate_text_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT

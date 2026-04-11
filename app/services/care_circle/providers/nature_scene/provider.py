@@ -24,6 +24,7 @@ SCENE_THEMES = [
 
 
 class NatureSceneProvider(BaseCareCircleProvider):
+    provider_key = "nature_scene"
     is_safe_for_patient = True
 
     """
@@ -46,7 +47,8 @@ class NatureSceneProvider(BaseCareCircleProvider):
             text_prompt = (
                 f"Describe this peaceful scene in 2 short, warm sentences: {theme}. "
                 "Mention one colour and one gentle sound or smell. "
-                "Make it feel like a cozy, happy moment."
+                "Make it feel like a cozy, happy moment. "
+                "Avoid storms, darkness, isolation, or anything that could feel lonely or distressing."
             )
             text_resp = await generate_text_with_usage(
                 text_prompt, system=DEMENTIA_SYSTEM_PROMPT

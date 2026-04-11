@@ -5,6 +5,7 @@ from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
 
 class CatFactProvider(BaseCareCircleProvider):
+    provider_key = "cat_fact"
     is_safe_for_patient = True
 
     """
