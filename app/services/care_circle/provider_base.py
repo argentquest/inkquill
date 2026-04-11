@@ -277,6 +277,27 @@ class BaseCareCircleProvider:
     async def get_content(self, **kwargs: Any) -> Dict[str, Any] | Any:
         raise NotImplementedError("Subclasses must implement _generate_payload or get_content")
 
+    def log_llm_response(
+        self,
+        llm_response: Any,
+        *,
+        prompt: str = "",
+        system_prompt: str = "",
+    ) -> None:
+        """Log token usage from an LLMResponse for debugging and cost tracking."""
+        try:
+            tokens = getattr(llm_response, "total_tokens", 0)
+            model = getattr(llm_response, "model", "unknown")
+            logger.debug(
+                "Provider %s LLM call — model=%s tokens=%s prompt_len=%d",
+                self.provider_key,
+                model,
+                tokens,
+                len(prompt),
+            )
+        except Exception:
+            pass
+
     def _build_fallback_payload(self, patient_profile: Any, error: str) -> Dict[str, Any]:
         fallback_data = {
             "text": "Content temporarily unavailable.",

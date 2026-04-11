@@ -13,6 +13,12 @@ import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.llm_helpers import (
+    DEMENTIA_SYSTEM_PROMPT,
+    generate_image_url_with_usage,
+    generate_json_with_usage,
+    generate_text_with_usage,
+)
 from typing import Any, Dict
 
 

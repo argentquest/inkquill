@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pip install -r requirements.txt --prefer-binary 2>&1 | Select-Object -Last 15\")",
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\alembic.exe upgrade head 2>&1\")",
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit tests\\\\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py -q 2>&1\")",
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit tests\\\\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py -q 2>&1 | Select-Object -Last 30\")",
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit tests\\\\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py -q 2>&1 | Select-Object -Last 20\")",
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\integration\\\\story\\\\test_world_story_flow_integration.py tests\\\\integration\\\\shared\\\\test_billing_referrals_integration.py tests\\\\integration\\\\shared\\\\test_additional_backend_surface_integration.py -q 2>&1 | grep -E 'UndefinedColumn|column .* does not exist|Error|FAILED' | sort -u | head -30\")",
+      "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit tests\\\\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py -q 2>&1 | Select-Object -Last 25\")",
+      "Bash(cat frontendv1/app/care-circle-family/providers/[providerKey]/page.tsx)",
+      "Bash(cat frontendv1/app/api/admin/care-circle/templates/[providerKey]/route.ts)",
+      "Bash(npm run:*)",
+      "Bash(.venv/Scripts/python.exe scripts/seed_care_circle_test_families.py)",
+      "Bash(.venv/Scripts/python.exe -c ':*)",
+      "Bash(ls \"c:/Code/inkandquill/inkquill/logs/\"*.pdf)",
+      "Bash(grep -rn \"prefs\\\\.get\" c:/Code/inkandquill/inkquill/app/services/care_circle/providers/*/provider.py)",
+      "Bash(grep -rh \"prefs\\\\.get\\(\" c:/Code/inkandquill/inkquill/app/services/care_circle/providers/*/provider.py)",
+      "Bash(.venv/Scripts/python.exe -c \"from playwright.sync_api import sync_playwright; print\\('playwright ok'\\)\")",
+      "Bash(npx playwright:*)",
+      "Bash(where chromium:*)",
+      "Bash(where chrome:*)",
+      "Bash(where \"Google Chrome\")",
+      "Read(//c/Users/WGDEVES/AppData/Local/**)"
+    ]
+  }
+}

@@ -9,7 +9,7 @@
 .PARAMETER BackupFile
     Path to the .sql dump file. Required.
 
-.PARAMETER Host
+.PARAMETER DbHost
     Target host. Default: localhost (mapped to host.docker.internal inside Docker).
 
 .PARAMETER Port
@@ -38,7 +38,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$BackupFile,
 
-    [string]$Host     = "localhost",
+    [string]$DbHost   = "localhost",
     [int]$Port        = 5432,
     [string]$User,
     [string]$Password,
@@ -103,12 +103,12 @@ if ([string]::IsNullOrWhiteSpace($Database)) { throw "-Database is required (or 
 $BackupFile = Resolve-Path $BackupFile
 if (-not (Test-Path $BackupFile)) { throw "Backup file not found: $BackupFile" }
 
-$DockerHost  = if ($Host -in @("localhost", "127.0.0.1", "::1")) { "host.docker.internal" } else { $Host }
+$DockerHost  = if ($DbHost -in @("localhost", "127.0.0.1", "::1")) { "host.docker.internal" } else { $DbHost }
 $BackupFileRel = (Resolve-Path $BackupFile).Path.Replace($RepoRoot, "").TrimStart('\').TrimStart('/')
 
 Write-Host ""
 Write-Host "Backup file : $BackupFile"
-Write-Host "Target host : ${Host}:${Port}"
+Write-Host "Target host : ${DbHost}:${Port}"
 Write-Host "Target DB   : $Database"
 Write-Host "User        : $User"
 Write-Host ""

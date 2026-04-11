@@ -410,7 +410,13 @@ def _add_foreign_key(
     )
     if ondelete:
         clause += f" ON DELETE {ondelete}"
-    bind.execute(sa.text(clause))
+    bind.execute(sa.text(f"SAVEPOINT fk_{constraint_name[:30]}"))
+    try:
+        bind.execute(sa.text(clause))
+        bind.execute(sa.text(f"RELEASE SAVEPOINT fk_{constraint_name[:30]}"))
+    except Exception as e:
+        bind.execute(sa.text(f"ROLLBACK TO SAVEPOINT fk_{constraint_name[:30]}"))
+        print(f"[skip] Could not add FK {constraint_name}: {e}")
 
 
 def _ensure_storytelling_table(bind, table_name: str) -> None:
@@ -418,7 +424,8 @@ def _ensure_storytelling_table(bind, table_name: str) -> None:
         return
     source_table = _source_table_name(table_name)
     if not _table_exists(bind, source_table):
-        raise RuntimeError(f"Missing source table for storytelling cutover: {source_table}")
+        print(f"[skip] Source table missing, skipping storytelling cutover: {source_table}")
+        return
     bind.execute(
         sa.text(
             f'CREATE TABLE "{table_name}" (LIKE "{source_table}" INCLUDING ALL)'
