@@ -83,6 +83,11 @@ class Settings(BaseSettings):
     DEFAULT_GENERATION_MODEL_NAME: str = Field(default="openai/gpt-4o-mini", alias="DEFAULT_GENERATION_MODEL_NAME")
     AI_ORCHESTRATION_BACKEND: str = Field(default="LANGGRAPH", alias="AI_ORCHESTRATION_BACKEND")
 
+    # --- Scheduler Server Configuration ---
+    SCHEDULER_PORT: int = Field(default=8001, alias="SCHEDULER_PORT")
+    SCHEDULER_ENABLED: bool = Field(default=True, alias="SCHEDULER_ENABLED")
+    SCHEDULER_MISFIRE_GRACE_TIME: int = Field(default=300, alias="SCHEDULER_MISFIRE_GRACE_TIME")
+
     # --- Local File Storage Configuration ---
     LOCAL_STORAGE_BASE_PATH: str = Field(default="./data/uploads", alias="LOCAL_STORAGE_BASE_PATH")
     LOCAL_STORAGE_DOCUMENTS_PATH: str = Field(default="documents", alias="LOCAL_STORAGE_DOCUMENTS_PATH")

@@ -1,138 +1,77 @@
-<<<<<<< HEAD
-# AI Storytelling Assistant with Worlds & Context
+# Ink And Quill
 
-## 1. Overview
+Ink And Quill is a full-stack AI storytelling platform built around a FastAPI backend and an in-progress React frontend rebuild. It helps users create and manage worlds, stories, scenes, prompts, and related creative content while using AI-assisted workflows for drafting, refinement, and context-aware generation.
 
-The AI Storytelling Assistant is a web application built with FastAPI, designed to help users craft and develop structured stories. It leverages Large Language Models (LLMs) via Azure OpenAI Service for content generation and refinement.
+## Overview
 
-A key feature is the integrated World-Building toolkit, allowing users to define detailed **Worlds** with unique **Characters**, **Locations**, and **Lore Items**. These world elements, along with user-uploaded documents, form a rich knowledge base for **direct context assembly**, enabling the AI to provide deeply context-aware and factually grounded assistance.
+The platform combines structured story authoring with world-building tools such as characters, locations, and lore items. Those assets, along with uploaded documents, can be used as context for AI-assisted writing and chat flows.
 
-The application features secure user authentication, comprehensive project management, asynchronous job processing with real-time status feedback, and a powerful "Import World from Book Title" feature.
+The repository is currently backend-first in its delivery approach. The active frontend rebuild lives in `frontendv1/`, while the backend continues to provide the stable API surface and supporting business logic that the React client will consume.
 
-## 2. Core Features
+## Core Capabilities
 
-*   **User Authentication:** Secure registration and login using JWTs stored in HttpOnly cookies.
-*   **World-Building Toolkit:**
-    *   **Worlds:** Create, read, update, and delete unique fictional Worlds that serve as containers for all your lore.
-    *   **Characters, Locations, & Lore Items:** Define detailed world elements with descriptions, traits, and other metadata.
-    *   **AI-Powered World Import:** Generate a foundational world structure (characters, locations, lore) by simply providing the title of a classic book.
-*   **Project Management:**
-    *   **Stories:** Create and manage distinct story projects, each of which **must** be associated with a World.
-    *   **Acts & Scenes:** Structure your narratives logically using acts and scenes with rich text editing capabilities.
-    *   **World Element Linking:** Explicitly link characters, locations, and lore from your World to a specific Story to provide the AI with highly relevant context.
-*   **Prompt Library:** A personal and shared library for creating, managing, and reusing prompts to instruct the AI effectively.
-*   **Context System & Asynchronous Job Processing:**
-    *   **World Element Context:** When a world element is created or updated, a background job automatically generates a descriptive text summary, embeds it, and indexes it into Azure AI Search, making your lore instantly available to the AI.
-    *   **User Document Uploads:** Upload your own documents (PDF, DOCX, TXT) and associate them with a World to expand the AI's knowledge base.
-    *   **Job Status Tracking:** All long-running background tasks (like document ingestion or world imports) are tracked, providing real-time status updates to the user.
-*   **AI-Assisted Content Generation:**
-    *   **Interactive Editors:** Dedicated editors for Acts and Scenes with real-time AI assistance via WebSockets.
-    *   **Context-Aware AI:** The Context system automatically retrieves relevant information from your world elements and documents to inform the AI's creative process.
-    *   **Cost & Latency Tracking:** Every call to an AI service is logged to a database table, recording token usage, calculated cost, and round-trip time for monitoring and analysis.
-*   **Publishing:** Compile a finished story into a single, shareable HTML file.
+- User authentication and session management
+- Story, act, and scene authoring flows
+- World-building with characters, locations, and lore items
+- Prompt management and AI-assisted writing workflows
+- Document upload and context ingestion pipelines
+- Background job processing and status tracking
+- Billing, admin, blog, forum, and community-oriented routes
+- Story publishing and related content delivery features
 
-## 3. Technology Stack
+## Technology Stack
 
-*   **Backend:** Python 3.12+, FastAPI, Uvicorn, Gunicorn
-*   **AI Orchestration:** LangChain + LangGraph
-*   **AI Models:** Azure OpenAI Service (Chat Completion & Text Embedding)
-*   **Database:** PostgreSQL (driver: `asyncpg`)
-*   **ORM & Migrations:** SQLAlchemy (asyncio), Alembic
-*   **Vector Search / Context Store:** Azure AI Search
-*   **Storage:** Azure Blob Storage
-*   **Authentication:** JWT (via `python-jose`), Password Hashing (`passlib[bcrypt]`)
-*   **Frontend:** Jinja2 Templating, Vanilla JavaScript (Fetch, WebSockets), Bootstrap 5, Quill.js
-*   **Validation & Settings:** Pydantic
-*   **Key SDKs:** `openai`, `azure-identity`, `azure-storage-blob`, `azure-search-documents`
-*   **Content Processing:** `tiktoken`, `PyMuPDF`, `python-docx`, `markdownify`
+- Backend: Python, FastAPI, SQLAlchemy, Alembic
+- Database: PostgreSQL
+- AI integrations: Azure OpenAI, LangChain, LangGraph
+- Search and storage: Azure AI Search, Azure Blob Storage
+- Frontend rebuild: Next.js 15, React 19, Tailwind CSS, React Query, React Hook Form, Zod
+- Testing: Pytest for backend, Playwright for frontend browser verification
+- Deployment: Docker and environment-based configuration
 
-## 4. Project Structure
+## Repository Structure
 
-`/story_app/`
-|
-|-- `/app/`
-|   |-- `/core/`                # Config, security, logging, shared dependencies & utilities
-|   |-- `/db/`                  # SQLAlchemy setup
-|   |-- `/models/`              # SQLAlchemy ORM models (user.py, world.py, job_status.py, etc.)
-|   |-- `/schemas/`             # Pydantic schemas (user.py, world.py, job_status.py, etc.)
-|   |-- `/crud/`                # Database CRUD operations
-|   |-- `/routers/`             # API & UI endpoint definitions
-|   |-- `/services/`            # Business logic (LangGraph/LangChain orchestration, context, cost tracking, etc.)
-|   |-- `/processing/`          # Background task logic (Context ingestion, world import)
-|   |-- `/prompts/`
-|   |-- `/static/`
-|   |-- `/templates/`
-|   |-- `main.py`               # FastAPI application entry point
-|
-|-- `/alembic/`                 # Database migrations
-|-- `/logs/`                    # Log files (gitignored)
-|-- `.env`                      # Local environment variables (GITIGNORED)
-|-- `Dockerfile` & `docker-compose.yml`
-|-- `requirements.txt`
-|-- `README.md`                 # This file
+```text
+app/           FastAPI application code: routers, services, models, schemas, CRUD, templates, static assets
+alembic/       Database migration configuration
+migrations/    Migration assets used by the project
+frontendv1/    Active React frontend rebuild workspace
+tests/         Unit and integration test suites
+docs/          Supporting documentation
+plans/         Planning and implementation notes
+```
 
-## 5. Local Development Setup
+## Local Development
 
-#### Prerequisites
-*   Python 3.11+
-*   PostgreSQL Server (can be run via Docker)
-*   Azure Subscription with access to: Azure OpenAI, Azure AI Search, and Azure Blob Storage.
+### Backend
 
-#### Step-by-Step Guide
-1.  **Clone the Repository:**
-    ```bash
-    git clone <your-repo-url>
-    cd story_app
-    ```
+1. Create and activate the virtual environment.
+2. Install dependencies with `pip install -r requirements.txt`.
+3. Copy `.env_template` to `.env` and fill in the required settings.
+4. Run migrations with `alembic upgrade head`.
+5. Start the app with `.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`.
 
-2.  **Set up Virtual Environment:**
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # On macOS/Linux
-    # .\.venv\Scripts\activate    # On Windows
-    ```
+The backend is typically available at `http://localhost:8000`, with Swagger docs at `http://localhost:8000/docs`.
 
-3.  **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+### Frontend
 
-4.  **Configure Environment Variables:**
-    *   Copy the `.env_template` file to a new file named `.env`.
-    *   Open `.env` and fill in all required values for your PostgreSQL database and Azure services (endpoints, keys, deployment names).
-    *   The `AUTH_SECRET_KEY` should be a long, random string.
-    *   You can adjust `LOG_LEVEL_CONSOLE` (e.g., to `DEBUG`) for more detailed output during development.
+The active frontend workspace is `frontendv1/`.
 
-5.  **Set Up the Database:**
-    *   Ensure your PostgreSQL server is running.
-    *   Create the database with the name you specified in your `.env` file (e.g., `devstory2`).
-    *   Run the Alembic migrations to create all necessary tables:
-        ```bash
-        alembic upgrade head
-        ```
+1. Install dependencies in `frontendv1/`.
+2. Run the development server with `npm run dev`.
+3. Build the frontend with `npm run build`.
 
-## 6. Running the Application
+## Testing
 
-1.  **Activate your virtual environment.**
-2.  **Start the FastAPI Server** from the project root directory:
-    ```bash
-    .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-    ```
-    Using the project interpreter matters on Windows. If you start `uvicorn` from a global Python install instead of `.venv`, imports like `sqlalchemy` can fail even when they are present in `requirements.txt`.
-3.  **Monitor the Startup Logs:** Watch the terminal for logs from `app.main` and `app.core.config`. They will confirm that your settings have been loaded correctly.
-4.  **Access the Application:**
-    *   **UI:** Open your browser to `http://localhost:8000/`.
-    *   **API Docs (Swagger):** `http://localhost:8000/docs`.
+Common project test commands are documented in `AGENTS.md`. The standard workflows include:
 
-## 7. Testing
+- Backend unit tests
+- Backend unit plus integration tests
+- Backend coverage checks
+- Frontend production build
+- Frontend Playwright end-to-end tests
 
-*   **Diagnostic Scripts:** The `app/` directory contains several `maintest_*.py` and `test_*.py` scripts useful for standalone checks of infrastructure components (database, storage, AI services). These are run manually and are separate from the formal test suite.
-*   **Formal Test Suite:** The `tests/` directory contains a `pytest`-based suite. To run it:
-    ```bash
-    pytest
-    ```
-    *(Note: This suite may require separate test database configuration as defined in `tests/conftest.py`).*
-=======
-# inkquill
-Ink And Quill V2
->>>>>>> ee565c8 (Initial commit)
+## Notes
+
+- `README.md` has been aligned with the current repository direction and cleaned of merge-conflict markers.
+- Planning docs such as `frontendAll.md`, `reacttools.md`, and the sprint markdown files describe the React rebuild in more detail.

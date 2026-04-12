@@ -1,37 +1,46 @@
 # Puzzle Provider
 
-## Overview
-Multi-faceted puzzle provider. Randomly dispatches to one of three mini-puzzle sub-generators: word search, fill-in-the-blank, or word-pair intersect. Each result includes a pre-rendered `puzzle_content` HTML field so the template can render it without needing complex logic.
+## Purpose
+Fun word search and fill-in-the-blank puzzles to enjoy.
 
-## Category
-Games / Multi-Puzzle
+## Runtime Contract
+- Provider key: `puzzle`
+- Registry category: `games`
+- Registry order: `4`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - Static content only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Uses Python's `random.choice()` to select between three puzzle types:
-  1. **Word Search**: Uses `word_search_generator` library to generate word search puzzles
-  2. **Fill-in-the-Blank**: Selects from pre-configured phrase/answer pairs
-  3. **Word Pair**: Selects from pre-configured intersecting word pairs with clues
-- Each puzzle type includes pre-rendered HTML content
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: `_get_fill_in_the_blank`, `_get_word_pair`, `_get_word_search`
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Word search: Generated programmatically using `word_search_generator` library
-- Fill-in-the-blank: Pre-configured prompts
-- Word pair: Pre-configured word pairs with clues
+## Inputs Used At Runtime
+- Patient preference keys read: `favorite_activities`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `filler_words`, `grid_size`, `min_custom_words`
 
-## Configuration
-- `default_words`: Default words for word search
-- `grid_size`: Word search grid size (default: 10)
-- `fill_in_the_blank_prompts`: Array of phrase/answer objects
-- `word_pairs`: Array of word pair objects with clues
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- `word_search_generator` library
+## Output Shape
+- Observed payload fields returned by the provider: `across`, `answer`, `answer_length`, `clues`, `down`, `grid`, `instruction`, `phrase`, `puzzle_content`, `title`, `type`, `words`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content
-- All puzzles are pre-vetted or programmatically generated
-- Multiple puzzle types for variety
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Add deterministic seeding so the same patient and date can reproduce the same puzzle when a session is regenerated.
+- Split the three puzzle modes into smaller tested helpers with explicit payload schemas to make template changes safer.
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

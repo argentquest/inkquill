@@ -1,54 +1,46 @@
 # Nature Scene Provider
 
-## Overview
-Generates a calming nature scene: AI text description followed by an AI image generated from that same description. The image prompt is derived directly from the generated text so the image and description always match.
+## Purpose
+Peaceful nature scenes with calming descriptions.
 
-## Category
-Memory / Visual Relaxation
+## Runtime Contract
+- Provider key: `nature_scene`
+- Registry category: `memory`
+- Registry order: `14`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content and AI image generation**
+## How It Works Today
+Combines remote source data with Care Circle LLM helpers before returning the final payload.
 
-### How AI is Used
-- **Step 1**: Uses `generate_text_with_usage()` to generate a descriptive nature scene (2 short, warm sentences)
-- **Step 2**: Uses `generate_text_with_usage()` to convert the description into an image generation prompt
-- **Step 3**: Uses `generate_image_url_with_usage()` to generate an image from the prompt
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: `remote image service`
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `descriptions`, `image_height`, `image_width`
 
-**Text Description Prompt:**
-```
-Describe this peaceful scene in 2 short, warm sentences: {theme}.
-Mention one colour and one gentle sound or smell.
-Make it feel like a cozy, happy moment.
-```
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-**Image Prompt Conversion:**
-```
-Turn this into a short image generation prompt (15 words max),
-no people, peaceful outdoor scene: "{description}"
-```
+## Output Shape
+- Observed payload fields returned by the provider: `description`, `image_url`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraints on length and tone
-   - Image prompt derived from text ensures consistency
-   - Multiple fallback layers for reliability
-2. **Improvements**:
-   - Add explicit instruction to avoid potentially distressing imagery
-   - Consider adding a constraint to ensure seasonal appropriateness
-   - Add validation for image URL response
-3. **Safety**: Has comprehensive fallbacks for both text and image generation
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Configuration
-- `descriptions`: Array of fallback descriptions
-- `image_width`, `image_height`: Dimensions for fallback images
-
-## External Dependencies
-- Image generation service (via `generate_image_url_with_usage`)
-
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
-- Fallback to picsum.photos for image generation failure
+## Improvement Opportunities
+- Persist or cache generated image URLs if the same daily content should stay stable across repeated patient-session refreshes.
+- Add output validation for image dimensions and caption length before handing the payload to the template.
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

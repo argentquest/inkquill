@@ -4,67 +4,44 @@ Delivers a fun fact card about a different country from a large curated pool.
 Static provider — no LLM or external calls required.
 """
 
-import random
+import json
 import logging
-from typing import Any, Dict
+import random
+from pathlib import Path
+from typing import Any, Dict, List
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 
 logger = logging.getLogger(__name__)
 
+# Path to external data file
+_DATA_FILE = Path(__file__).resolve().parents[3] / "data" / "country_spotlight.json"
 
-COUNTRIES = [
-    {"country": "Italy", "flag": "🇮🇹", "capital": "Rome", "fun_fact": "Italy is home to more UNESCO World Heritage Sites than any other country in the world — over 50!"},
-    {"country": "Japan", "flag": "🇯🇵", "capital": "Tokyo", "fun_fact": "Japan has over 6,800 islands, and its oldest company, Kongo Gumi, was a construction firm founded in the year 578 AD."},
-    {"country": "Brazil", "flag": "🇧🇷", "capital": "Brasília", "fun_fact": "The Amazon rainforest in Brazil produces about 20% of the world's oxygen and is home to one in ten of all species on Earth."},
-    {"country": "Australia", "flag": "🇦🇺", "capital": "Canberra", "fun_fact": "Australia is the only continent that is also a single country, and it is home to the world's largest coral reef system, the Great Barrier Reef."},
-    {"country": "France", "flag": "🇫🇷", "capital": "Paris", "fun_fact": "France is the world's most visited country, welcoming around 90 million tourists each year. The Eiffel Tower was built in just 2 years!"},
-    {"country": "Egypt", "flag": "🇪🇬", "capital": "Cairo", "fun_fact": "The ancient Egyptians invented many things we still use today, including paper (papyrus), toothpaste, and the 365-day calendar."},
-    {"country": "Canada", "flag": "🇨🇦", "capital": "Ottawa", "fun_fact": "Canada has more lakes than all other countries in the world combined — over 2 million freshwater lakes!"},
-    {"country": "India", "flag": "🇮🇳", "capital": "New Delhi", "fun_fact": "India invented the game of chess, the number zero, and the decimal system. It also has the world's largest film industry by number of films produced."},
-    {"country": "Switzerland", "flag": "🇨🇭", "capital": "Bern", "fun_fact": "Switzerland has four official languages — German, French, Italian, and Romansh — and has been at peace with all nations for over 200 years."},
-    {"country": "Kenya", "flag": "🇰🇪", "capital": "Nairobi", "fun_fact": "Kenya is home to the Great Rift Valley and the Masai Mara, where millions of wildebeest make the world's greatest wildlife migration every year."},
-    {"country": "Iceland", "flag": "🇮🇸", "capital": "Reykjavík", "fun_fact": "Iceland has no army and is considered one of the world's most peaceful countries. You can see the Northern Lights there from September to March!"},
-    {"country": "Mexico", "flag": "🇲🇽", "capital": "Mexico City", "fun_fact": "Mexico is where chocolate was first made — the ancient Aztecs used cocoa beans as currency and drank chocolate as a sacred beverage."},
-    {"country": "New Zealand", "flag": "🇳🇿", "capital": "Wellington", "fun_fact": "New Zealand was the first country in the world to give women the right to vote, way back in 1893!"},
-    {"country": "Netherlands", "flag": "🇳🇱", "capital": "Amsterdam", "fun_fact": "The Netherlands has about 23 million bicycles for a population of 17 million people — there are more bikes than people!"},
-    {"country": "Greece", "flag": "🇬🇷", "capital": "Athens", "fun_fact": "Greece has over 6,000 islands, though only about 200 are inhabited. Athens is considered the birthplace of democracy, philosophy, and the Olympic Games."},
-    {"country": "Norway", "flag": "🇳🇴", "capital": "Oslo", "fun_fact": "Norway has so many fjords that its coastline, if straightened out, would stretch halfway around the Earth. It also invented the paper clip!"},
-    {"country": "Argentina", "flag": "🇦🇷", "capital": "Buenos Aires", "fun_fact": "Argentina is the birthplace of the tango dance, and it has the largest glacier outside of Antarctica — the Perito Moreno Glacier."},
-    {"country": "Thailand", "flag": "🇹🇭", "capital": "Bangkok", "fun_fact": "Thailand is the world's largest exporter of rice and has over 40,000 Buddhist temples. The word 'Thai' means 'free' in the Thai language."},
-    {"country": "Ireland", "flag": "🇮🇪", "capital": "Dublin", "fun_fact": "Ireland is called the Emerald Isle because of its lush green landscape. Halloween is believed to have originated from the ancient Celtic festival of Samhain in Ireland."},
-    {"country": "Peru", "flag": "🇵🇪", "capital": "Lima", "fun_fact": "Peru is home to Machu Picchu, the famous Inca citadel, and the potato — which was first cultivated in Peru thousands of years ago."},
-    {"country": "Portugal", "flag": "🇵🇹", "capital": "Lisbon", "fun_fact": "Portugal is the oldest nation-state in Europe, with borders that have been unchanged since 1139. Cork from Portuguese trees provides the stoppers for most of the world's wine bottles."},
-    {"country": "South Africa", "flag": "🇿🇦", "capital": "Pretoria", "fun_fact": "South Africa has three capital cities — Pretoria, Cape Town, and Bloemfontein — and is the only country in Africa that produces wine commercially."},
-    {"country": "Scotland", "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "capital": "Edinburgh", "fun_fact": "Scotland's national animal is the unicorn! Scottish people also invented the telephone (Alexander Graham Bell), the television (John Logie Baird), and penicillin (Alexander Fleming)."},
-    {"country": "China", "flag": "🇨🇳", "capital": "Beijing", "fun_fact": "China invented paper, printing, gunpowder, and the compass — four inventions that changed the course of world history."},
-    {"country": "Russia", "flag": "🇷🇺", "capital": "Moscow", "fun_fact": "Russia is the largest country in the world — it covers 11 time zones! It also has Lake Baikal, the world's deepest and oldest freshwater lake."},
-    {"country": "Morocco", "flag": "🇲🇦", "capital": "Rabat", "fun_fact": "Morocco is home to the University of al-Qarawiyyin in Fez, founded in 859 AD — the oldest continuously operating university in the world."},
-    {"country": "Denmark", "flag": "🇩🇰", "capital": "Copenhagen", "fun_fact": "Denmark is home to LEGO, the world's most popular toy brand! The word 'LEGO' comes from the Danish phrase 'leg godt', meaning 'play well'."},
-    {"country": "Colombia", "flag": "🇨🇴", "capital": "Bogotá", "fun_fact": "Colombia is the only country in South America with coastlines on both the Pacific Ocean and the Caribbean Sea. It produces over half of the world's emeralds."},
-    {"country": "Turkey", "flag": "🇹🇷", "capital": "Ankara", "fun_fact": "Turkey is where the world's first cathedral was built, and the city of Istanbul is the only city in the world that spans two continents — Europe and Asia."},
-    {"country": "Jamaica", "flag": "🇯🇲", "capital": "Kingston", "fun_fact": "Jamaica was the first Caribbean country to compete in the Winter Olympics, and it is the birthplace of reggae music, made famous by Bob Marley."},
-    {"country": "Finland", "flag": "🇫🇮", "capital": "Helsinki", "fun_fact": "Finland has the most saunas per person in the world — about one sauna for every three people! It is also home to Santa Claus's official village in Lapland."},
-    {"country": "Spain", "flag": "🇪🇸", "capital": "Madrid", "fun_fact": "Spain is home to La Tomatina, the famous annual tomato-throwing festival, and flamenco — a passionate dance and musical tradition born in Andalusia."},
-    {"country": "Vietnam", "flag": "🇻🇳", "capital": "Hanoi", "fun_fact": "Vietnam has over 3,000 km of coastline and is one of the world's leading producers of coffee. Ha Long Bay, with its stunning emerald waters, is a UNESCO World Heritage Site."},
-    {"country": "Austria", "flag": "🇦🇹", "capital": "Vienna", "fun_fact": "Austria gave the world Wolfgang Amadeus Mozart, who composed his first piece of music at age five! Vienna is famous as a city of classical music."},
-    {"country": "Ghana", "flag": "🇬🇭", "capital": "Accra", "fun_fact": "Ghana was the first sub-Saharan country to gain independence in 1957 and is one of the world's largest producers of cocoa and gold."},
-    {"country": "Sweden", "flag": "🇸🇪", "capital": "Stockholm", "fun_fact": "Sweden gave us IKEA, Spotify, Minecraft, and Volvo — plus the tradition of 'fika', a daily coffee-and-cake break that is a beloved national institution."},
-    {"country": "Israel", "flag": "🇮🇱", "capital": "Jerusalem", "fun_fact": "Israel is home to the Dead Sea — the lowest point on Earth's surface — where the water is so salty that you float effortlessly without trying."},
-    {"country": "Cuba", "flag": "🇨🇺", "capital": "Havana", "fun_fact": "Cuba is known as the 'Pearl of the Caribbean' and is the largest island in the Caribbean. It is famous for its salsa music, colourful classic cars, and hand-rolled cigars."},
-    {"country": "Hungary", "flag": "🇭🇺", "capital": "Budapest", "fun_fact": "Hungary invented the Rubik's Cube — that colourful puzzle that stumped the world in the 1980s! Budapest was formed by joining three cities in 1873."},
-    {"country": "Philippines", "flag": "🇵🇭", "capital": "Manila", "fun_fact": "The Philippines is an archipelago of over 7,600 islands and is home to the world's smallest primate — the Philippine tarsier, which is small enough to fit in your hand."},
-    {"country": "Czech Republic", "flag": "🇨🇿", "capital": "Prague", "fun_fact": "The Czech Republic has the highest beer consumption per capita in the world. Prague's old town has been almost perfectly preserved since medieval times."},
-    {"country": "Nepal", "flag": "🇳🇵", "capital": "Kathmandu", "fun_fact": "Nepal is home to 8 of the world's 10 highest mountains, including Mount Everest — the tallest peak on Earth at 8,849 metres above sea level."},
-    {"country": "Tanzania", "flag": "🇹🇿", "capital": "Dodoma", "fun_fact": "Tanzania is home to Kilimanjaro, Africa's highest mountain, and the Serengeti — where over a million wildebeest roam in one of the greatest wildlife spectacles on Earth."},
-    {"country": "Poland", "flag": "🇵🇱", "capital": "Warsaw", "fun_fact": "Poland gave the world Marie Curie, the first woman to win a Nobel Prize — and she won it twice! Poland is also famous for its pierogi dumplings and amber jewellery."},
-    {"country": "Ecuador", "flag": "🇪🇨", "capital": "Quito", "fun_fact": "Ecuador is named after the Equator, which runs right through it! It is home to the Galápagos Islands, where Darwin developed his theory of evolution."},
-    {"country": "Belgium", "flag": "🇧🇪", "capital": "Brussels", "fun_fact": "Belgium invented French fries (despite the name!), waffles, and some of the world's finest chocolates. It also produces over 1,000 different varieties of beer."},
-    {"country": "Bhutan", "flag": "🇧🇹", "capital": "Thimphu", "fun_fact": "Bhutan is the only country in the world that measures its success by 'Gross National Happiness' rather than economic output. Plastic bags are completely banned there."},
-    {"country": "Croatia", "flag": "🇭🇷", "capital": "Zagreb", "fun_fact": "Croatia invented the necktie — the word 'cravat' comes from 'Croat'. It also has the beautiful Plitvice Lakes, where turquoise waterfalls cascade between 16 terraced lakes."},
-    {"country": "Ethiopia", "flag": "🇪🇹", "capital": "Addis Ababa", "fun_fact": "Ethiopia is the birthplace of coffee — legend says a goat herder discovered the plant after his goats ate it and became energetic. It uses a unique 13-month calendar!"},
-    {"country": "Sri Lanka", "flag": "🇱🇰", "capital": "Colombo", "fun_fact": "Sri Lanka is the world's largest exporter of cinnamon and is shaped like a teardrop in the Indian Ocean. It has over 1,500 species of flowering plants."},
-]
+# Lazy-loaded country pool
+_countries_cache: List[Dict[str, str]] = []
+
+
+def _load_countries() -> List[Dict[str, str]]:
+    """Load country data from external JSON file with fallback."""
+    global _countries_cache
+    if _countries_cache:
+        return _countries_cache
+
+    try:
+        if _DATA_FILE.exists():
+            _countries_cache = json.loads(_DATA_FILE.read_text(encoding="utf-8"))
+            if _countries_cache:
+                return _countries_cache
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning("Failed to load country data from %s: %s", _DATA_FILE, exc)
+
+    # Minimal fallback
+    _countries_cache = [
+        {"country": "Italy", "flag": "🇮🇹", "capital": "Rome", "fun_fact": "Italy is home to more UNESCO World Heritage Sites than any other country in the world!"},
+        {"country": "Japan", "flag": "🇯🇵", "capital": "Tokyo", "fun_fact": "Japan has over 6,800 islands!"},
+        {"country": "Canada", "flag": "🇨🇦", "capital": "Ottawa", "fun_fact": "Canada has more lakes than all other countries in the world combined!"},
+    ]
+    return _countries_cache
 
 
 class CountrySpotlightProvider(BaseCareCircleProvider):
@@ -73,12 +50,13 @@ class CountrySpotlightProvider(BaseCareCircleProvider):
 
     """
     Delivers a fun fact card about a world country from a curated pool of 50 entries.
-    Pure static provider — no external calls required.
+    Pure static provider — data loaded from external JSON file.
     """
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        pool = cfg.get("countries", COUNTRIES)
+        # Allow config override, otherwise load from external data file
+        pool = cfg.get("countries") or _load_countries()
         entry = random.choice(pool)
         return {
             "country": entry["country"],

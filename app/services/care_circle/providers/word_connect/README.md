@@ -1,30 +1,44 @@
 # Word Connect Provider
 
-## Overview
-A word connection puzzle - connect related words. Shows pairs of related words, user identifies the connection.
+## Purpose
+Implements the `word_connect` Care Circle provider and renders it through the shared base provider contract.
 
-## Category
-Games / Word Puzzles
+## Runtime Contract
+- Provider key: `word_connect`
+- Registry category: `games`
+- Registry order: `40`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - Static content only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Uses Python's `random.sample()` to select 4 word pairs from a pre-configured list
-- Each pair has two related words and their connection description
-- All content is static and pre-configured
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Pre-configured word pairs with connections (e.g., Sun-Sky "Both are in the sky", Cat-Meow "Cats say meow")
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `word_pairs`
 
-## Configuration
-- `word_pairs`: Array of word pair objects with `word1`, `word2`, and `connection` fields
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- None
+## Output Shape
+- Observed payload fields returned by the provider: `instruction`, `pairs`, `title`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content
-- All word pairs are pre-vetted and familiar
-- Simple, recognition-based gameplay suitable for dementia care
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

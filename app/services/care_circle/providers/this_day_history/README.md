@@ -1,42 +1,45 @@
-# This Day History Provider
+# On This Day Provider
 
-## Overview
-Fetches a historical event that occurred on today's calendar date. Prefers events spanning the 1950s-1970s and utilizes an LLM to rewrite the Wikipedia summary into a softer, memory-care friendly tone.
+## Purpose
+Historical events that happened on this day.
 
-## Category
-Memory / History
+## Runtime Contract
+- Provider key: `this_day_history`
+- Registry category: `memory`
+- Registry order: `16`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content (partial)**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Fetches historical events from Wikimedia's On This Day API
-- Uses `generate_text_with_usage()` to rewrite the event into a warm, memory-care friendly tone
-- Prefers events from the 1950s-1970s era
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-Rewrite this historical event to be one short, warm sentence for an 88-year-old: '{text} (Year: {year})'
-```
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `fallback`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint (one short sentence)
-   - Target audience specified (88-year-old)
-   - Era preference (1950s-1970s)
-2. **Improvements**:
-   - Add explicit instruction to avoid potentially distressing historical events
-   - Consider adding a constraint to focus on positive or neutral events
-   - Add validation for output length and tone
-3. **Safety**: Falls back to original event text if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `fallback`: Static fallback message
+## Output Shape
+- Observed payload fields returned by the provider: `day`, `event`, `month`, `year`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- Wikimedia On This Day API: `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/{month}/{day}`
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to original event text on LLM failure
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.

@@ -1,46 +1,45 @@
 # Local History Provider
 
-## Overview
-Generates a warm, positive historical fact about the recipient's area. Prefers hometown (where they grew up) over city_for_weather. Enriches the prompt with era of youth, nationality/background, and life roles so the fact feels personally relevant.
+## Purpose
+A warm and cheerful fact about your home town.
 
-## Category
-Memory / Local History
+## Runtime Contract
+- Provider key: `local_history`
+- Registry category: `memory`
+- Registry order: `30`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `False`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_text_with_usage()` to generate a warm historical fact
-- The LLM generates 2 short sentences about the location's history
-- The prompt is enriched with patient preferences (era, nationality, life roles)
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: No. This provider renders per execution and does not participate in the shared daily HTML cache.
+- Difficulty metadata status: No difficulty metadata is declared for this provider.
 
-### Prompt Analysis
-```
-Write one warm, positive historical fact about {location}.
-2 short sentences only.
-{context_str}
-Focus on something cheerful — a famous landmark, a lovely tradition, or something the town is proud of.
-Make it feel like a proud, happy memory.
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `city_for_weather`, `era_of_youth`, `hometown`, `life_roles`, `nationality_or_background`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: No provider-specific config keys are read at runtime beyond the merged base config object.
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint (2 short sentences only)
-   - Explicit instruction for positive, cheerful content
-   - Personalized with patient preferences
-2. **Improvements**:
-   - Add explicit instruction to avoid controversial or distressing historical events
-   - Consider adding a constraint to ensure factual accuracy
-   - Add validation for output length and tone
-3. **Safety**: Has fallback content if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `fallback_text`: Static fallback text
+## Output Shape
+- Observed payload fields returned by the provider: `fact`, `location`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

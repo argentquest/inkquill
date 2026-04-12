@@ -69,13 +69,34 @@ class RiddleProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
+        diff_config = self.difficulty_config
+        difficulty = self.difficulty_level
 
-        style = random.choice(RIDDLE_STYLES)
+        # Filter riddle styles based on difficulty type preference
+        difficulty_type = diff_config.get("type", "object")
+        if difficulty_type == "object":
+            allowed_styles = ["what_am_i", "animal_riddle", "household_object"]
+        elif difficulty_type == "mixed":
+            allowed_styles = ["what_am_i", "finish_me", "animal_riddle", "household_object"]
+        else:  # abstract
+            allowed_styles = ["finish_me", "knock_knock"]
+
+        applicable_styles = [s for s in RIDDLE_STYLES if s["key"] in allowed_styles]
+        style = random.choice(applicable_styles) if applicable_styles else random.choice(RIDDLE_STYLES)
+
+        # Adjust prompt based on difficulty
+        hint_text = ""
+        if diff_config.get("hint_available", True):
+            hint_text = (
+                f"Include a gentle hint in the question if possible. "
+                f"The riddle type is: {difficulty_type}."
+            )
 
         try:
             prompt = (
                 f"{style['instruction']} "
-                f"The riddle must feel fun and easy — never frustrating. "
+                f"{hint_text} "
+                f"The riddle must feel fun and {'easy' if difficulty == 'easy' else 'engaging'} — never frustrating. "
                 f"Use only common, well-known objects or animals — avoid obscure vocabulary. "
                 f"The answer must be something almost everyone would recognize. "
                 f"Example style: {style['example']}. "
@@ -90,6 +111,10 @@ class RiddleProvider(BaseCareCircleProvider):
                 system_prompt=DEMENTIA_SYSTEM_PROMPT,
             )
             if data.get("question") and data.get("answer"):
+                # Add difficulty metadata to the response
+                data["difficulty"] = difficulty
+                data["hint_available"] = diff_config.get("hint_available", True)
+                data["auto_reveal_answer"] = diff_config.get("auto_reveal_answer", False)
                 return data
         except Exception as e:
             app_logger.error(f"LLM Error (riddle): {e}")
@@ -98,4 +123,8 @@ class RiddleProvider(BaseCareCircleProvider):
             "riddles",
             [{"question": "What has hands but can't clap?", "answer": "A clock"}],
         )
-        return random.choice(riddles)
+        result = random.choice(riddles)
+        result["difficulty"] = difficulty
+        result["hint_available"] = diff_config.get("hint_available", True)
+        result["auto_reveal_answer"] = diff_config.get("auto_reveal_answer", False)
+        return result

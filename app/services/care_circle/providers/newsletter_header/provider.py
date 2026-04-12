@@ -20,7 +20,7 @@ class NewsletterHeaderProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        prefs = getattr(patient_profile, "preferences", {}) or {}
+        prefs = self.get_patient_preferences(patient_profile)
 
         patient_name = getattr(patient_profile, "display_name", "Friend")
 

@@ -52,7 +52,7 @@ class BrainBoosterProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        prefs = self.get_patient_preferences(patient_profile)
         era = prefs.get("era_of_youth", "1950s")
 
         qt = random.choice(QUESTION_TYPES)

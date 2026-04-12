@@ -1,43 +1,46 @@
 # Song of the Day Provider
 
-## Overview
-Curates a daily song recommendation. Selects a song from the user's favourite singers, attempts to locate album art from TheAudioDB, and uses an LLM to write a nostalgic, warm fact about the track.
+## Purpose
+Classic songs from the era you love.
 
-## Category
-Memory / Music
+## Runtime Contract
+- Provider key: `song_of_the_day`
+- Registry category: `memory`
+- Registry order: `22`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content (partial)**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_text_with_usage()` to generate a warm memory fact about the song
-- Album art fetched from TheAudioDB API (no AI)
-- Song selection is from pre-configured artist data
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-Write a 1-sentence, warm memory about the song '{song_title}' by {singer}.
-Make it feel nostalgic and comforting.
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `favorite_singer`, `favorite_singers`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `artists`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint (1 sentence)
-   - Specific song and artist context
-   - Nostalgic tone requirement
-2. **Improvements**:
-   - Add explicit instruction to avoid potentially distressing memories
-   - Consider adding a constraint to ensure factual accuracy about the song
-   - Add validation for output length
-3. **Safety**: Has fallback text if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `artists`: Array of artist objects with `name`, `songs`, and `era`
+## Output Shape
+- Observed payload fields returned by the provider: `album`, `artist`, `fact`, `image`, `song`, `year`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- TheAudioDB API: `https://www.theaudiodb.com/api/v1/json/2/search.php?s={singer}`
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Add explicit response validation for album art and metadata so broken or partial upstream results do not degrade the card.
+- Consider caching artist lookups by day to avoid repeating the same remote calls for common providers.
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

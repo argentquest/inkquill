@@ -1,32 +1,45 @@
 # Missing Vowels Provider
 
-## Overview
-Missing Vowels Puzzle - Recognition-based word puzzle. Strips vowels (A, E, I, O, U) from familiar words, letting the brain fill in the shapes. This taps into recognition memory rather than recall, making it accessible for dementia care.
+## Purpose
+Fill in the missing vowels to solve the puzzle.
 
-## Category
-Games / Word Puzzles
+## Runtime Contract
+- Provider key: `missing_vowels`
+- Registry category: `games`
+- Registry order: `18`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - Static content only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Builds a personalized word pool from family members, favorite activities, and default words
-- Strips vowels from a randomly selected word
-- Uses Python's `random.choice()` for word selection
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Family member names from patient preferences
-- Favorite activities from patient preferences
-- Default word bank from configuration
+## Inputs Used At Runtime
+- Patient preference keys read: `family_members`, `favorite_activities`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `words`
 
-## Configuration
-- `words`: Array of default words for the puzzle
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- None
+## Output Shape
+- Observed payload fields returned by the provider: `answer`, `hint`, `instruction`, `puzzle`, `title`, `type`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content
-- Recognition-based gameplay suitable for dementia care
-- Personalized word pool increases familiarity and success rate
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

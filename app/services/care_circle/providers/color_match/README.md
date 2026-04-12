@@ -1,31 +1,44 @@
 # Color Match Provider
 
-## Overview
-A simple color matching game. Shows a color and the user guesses which familiar object has that color.
+## Purpose
+Implements the `color_match` Care Circle provider and renders it through the shared base provider contract.
 
-## Category
-Games / Visual Recognition
+## Runtime Contract
+- Provider key: `color_match`
+- Registry category: `games`
+- Registry order: `35`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - Static content only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Uses Python's `random.choice()` to select a color puzzle from a pre-configured list
-- Each puzzle contains a color, the correct object, and multiple choice options
-- All content is static and deterministic
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Pre-configured color-to-object mappings (familiar items for elderly)
-- Examples: Red-Apple, Yellow-Sunflower, Blue-Sky, Green-Grass, etc.
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `color_pairs`
 
-## Configuration
-- `color_pairs`: Array of color puzzle objects with `color`, `object`, and `options` fields
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- None
+## Output Shape
+- Observed payload fields returned by the provider: `answer`, `color`, `instruction`, `options`, `title`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content
-- All content is pre-vetted and familiar to elderly users
-- Simple, recognition-based gameplay suitable for dementia care
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

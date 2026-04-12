@@ -3,36 +3,89 @@ Weather provider adapted for Care Circle patient sessions.
 Fetches real weather from wttr.in and generates a warm message.
 """
 
-import httpx
-import urllib.parse
+from __future__ import annotations
+
 import logging
-from typing import Any, Dict
+import time
+import urllib.parse
+from typing import Any
+
+import httpx
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 
 logger = logging.getLogger(__name__)
 
+
 class WeatherProvider(BaseCareCircleProvider):
     provider_key = "weather"
     is_safe_for_patient = True
 
-    async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
-        """
-        Implementation of the weather fetch logic.
-        """
-        # In a real environment, preferences are a parsed JSON dict off the patient_profile
-        prefs = getattr(patient_profile, "preferences", {}) or {}
-        city = prefs.get("city_for_weather", self.patient_config.get("default_city", "Unknown"))
-        recipient_name = getattr(patient_profile, "display_name", "Friend")
+    _weather_cache: dict[str, tuple[float, dict[str, Any]]] = {}
+    CACHE_TTL_SECONDS = 900
+
+    @classmethod
+    def _load_cached_weather(cls, city: str) -> dict[str, Any] | None:
+        cached = cls._weather_cache.get(city.lower())
+        if not cached:
+            return None
+        expires_at, payload = cached
+        if time.time() >= expires_at:
+            cls._weather_cache.pop(city.lower(), None)
+            return None
+        return dict(payload)
+
+    @classmethod
+    def _save_cached_weather(cls, city: str, payload: dict[str, Any]) -> None:
+        cls._weather_cache[city.lower()] = (
+            time.time() + cls.CACHE_TTL_SECONDS,
+            dict(payload),
+        )
+
+    @staticmethod
+    def _build_weather_payload(
+        *,
+        city: str,
+        recipient_name: str,
+        temperature: str,
+        condition: str,
+    ) -> dict[str, Any]:
+        weather_summary = f"{temperature}\u00b0F and {condition}"
+        return {
+            "text": f"Good morning, {recipient_name}! It is {weather_summary} in {city} today.",
+            "subheading": f"{city} Weather",
+            "type": "weather",
+            "city": city,
+            "temperature": temperature,
+            "condition": condition,
+            "weather": weather_summary,
+        }
+
+    async def _generate_payload(self, patient_profile: Any) -> dict[str, Any]:
+        prefs = self.get_patient_preferences(patient_profile)
+        city = str(
+            prefs.get("city_for_weather")
+            or self.patient_config.get("default_city")
+            or "Unknown"
+        ).strip()
+        recipient_name = self.get_recipient_name(patient_profile)
         fallback_msg = self.patient_config.get("fallback", "Weather currently unavailable.")
-        
+
         if not city or city == "Unknown":
             return {
                 "text": "Weather unavailable. Please set a city in the Family portal.",
                 "subheading": "Update Profile",
                 "type": "weather",
-                "city": "Unknown"
+                "city": "Unknown",
             }
+
+        cached_payload = self._load_cached_weather(city)
+        if cached_payload is not None:
+            cached_payload["text"] = (
+                f"Good morning, {recipient_name}! It is "
+                f"{cached_payload['temperature']}\u00b0F and {cached_payload['condition']} in {city} today."
+            )
+            return cached_payload
 
         try:
             city_encoded = urllib.parse.quote(city)
@@ -42,31 +95,28 @@ class WeatherProvider(BaseCareCircleProvider):
                 resp = await client.get(url, headers={"Accept": "application/json"})
                 resp.raise_for_status()
                 data = resp.json()
-                
-                current = data.get("current_condition", [{}])[0]
-                temp_f = current.get("temp_F", "--")
-                desc = current.get("weatherDesc", [{}])[0].get("value", "Clear")
-                
-                raw_weather = f"{temp_f}°F and {desc}"
-                
-                # NOTE: For Sprint 02, we bypass LLM direct invocation here until
-                # the OpenRouter client logic is refactored for Care Circle async jobs.
-                # Returning the formatted string matching what the LLM *would* construct.
-                generated_msg = f"Good morning, {recipient_name}! It is {raw_weather} in {city} today."
-                
-                return {
-                    "text": generated_msg,
-                    "subheading": f"{city} Weather",
-                    "type": "weather",
-                    "temperature": temp_f,
-                    "condition": desc
-                }
 
-        except Exception as e:
-            logger.warning(f"Weather fetch failed for city {city}: {e}")
+            current = data.get("current_condition", [{}])[0]
+            temp_f = str(current.get("temp_F", "")).strip()
+            desc = str(current.get("weatherDesc", [{}])[0].get("value", "")).strip()
+
+            if not temp_f or not desc:
+                raise ValueError("Weather response missing temperature or condition")
+
+            payload = self._build_weather_payload(
+                city=city,
+                recipient_name=recipient_name,
+                temperature=temp_f,
+                condition=desc,
+            )
+            self._save_cached_weather(city, payload)
+            return payload
+
+        except Exception as exc:
+            logger.warning("Weather fetch failed for city %s: %s", city, exc)
             return {
                 "text": fallback_msg,
                 "subheading": "Weather",
                 "type": "weather",
-                "city": city
+                "city": city,
             }

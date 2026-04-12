@@ -7,13 +7,13 @@ while keeping the execution wrapper safe for the React CareCircle frontend.
 
 from __future__ import annotations
 
+import datetime
 import inspect
 import json
 import logging
 import traceback
-import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -40,9 +40,17 @@ class BaseCareCircleProvider:
     provider_key: str = "base"
     is_safe_for_patient: bool = False
 
-    def __init__(self, patient_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, patient_config: Optional[dict[str, Any]] = None):
+        patient_config = patient_config or {}
         merged_config = dict(self.config)
-        merged_config.update(patient_config or {})
+        difficulty = merged_config.get("difficulty", {})
+        difficulty_level = str(
+            patient_config.get("difficulty") or difficulty.get("default") or "easy"
+        )
+        difficulty_config = difficulty.get(difficulty_level, {})
+        if isinstance(difficulty_config, dict):
+            merged_config.update(difficulty_config)
+        merged_config.update(patient_config)
         self.patient_config = merged_config
         self._template_name = str(self.patient_config.get("template", "default") or "default")
 
@@ -101,6 +109,30 @@ class BaseCareCircleProvider:
         root_config = self.load_root_config()
         return str(self.patient_config.get("theme") or root_config.get("default_theme") or "classic")
 
+    @staticmethod
+    def get_raw_patient_preferences(patient_profile: Any) -> dict[str, Any]:
+        raw_preferences = getattr(patient_profile, "preferences", {}) or {}
+        return raw_preferences if isinstance(raw_preferences, dict) else {}
+
+    @classmethod
+    def get_patient_preferences(cls, patient_profile: Any) -> dict[str, Any]:
+        raw_preferences = cls.get_raw_patient_preferences(patient_profile)
+        normalized = dict(raw_preferences)
+        nested_preferences = raw_preferences.get("preferences")
+        if isinstance(nested_preferences, dict):
+            normalized.update(nested_preferences)
+        normalized.pop("preferences", None)
+        return normalized
+
+    @classmethod
+    def get_recipient_name(cls, patient_profile: Any, default: str = "Friend") -> str:
+        raw_preferences = cls.get_raw_patient_preferences(patient_profile)
+        return str(
+            raw_preferences.get("recipient_name")
+            or getattr(patient_profile, "display_name", default)
+            or default
+        )
+
     def list_templates(self) -> list[str]:
         if not self.template_dir.exists():
             return []
@@ -115,9 +147,28 @@ class BaseCareCircleProvider:
 
     @staticmethod
     def list_themes() -> list[str]:
+        """List all available theme names from the shared themes directory."""
         if not THEMES_DIR.exists():
             return []
         return [theme.stem for theme in THEMES_DIR.glob("*.css")]
+
+    def list_provider_themes(self) -> list[str]:
+        """List theme names available from this provider's themes directory."""
+        if not self.provider_theme_dir.exists():
+            return []
+        # Map provider CSS names to theme names
+        theme_map = {
+            "master_online": "classic",
+            "master_print": "grid_print",
+        }
+        themes = []
+        for css_file in self.provider_theme_dir.glob("*.css"):
+            stem = css_file.stem
+            if stem in theme_map:
+                themes.append(theme_map[stem])
+            else:
+                themes.append(stem)
+        return themes
 
     @staticmethod
     def get_theme_css(theme_name: str = "classic") -> str:
@@ -127,10 +178,36 @@ class BaseCareCircleProvider:
         return css_path.read_text(encoding="utf-8")
 
     def get_provider_theme_css(self, theme_name: str = "classic") -> str:
-        css_path = self.provider_theme_dir / f"{theme_name}.css"
-        if not css_path.exists():
+        """
+        Load provider-specific theme CSS.
+
+        Provider theme files are conventionally named master_online.css (for
+        screen/online rendering) and master_print.css (for print layouts).
+        This method maps any theme name to the appropriate provider file.
+        """
+        # Map theme names to provider CSS files
+        # Most providers use master_online.css for all online themes
+        if not self.provider_theme_dir.exists():
             return ""
-        return css_path.read_text(encoding="utf-8")
+
+        # Try exact theme name first (e.g., classic.css, high_contrast.css)
+        css_path = self.provider_theme_dir / f"{theme_name}.css"
+        if css_path.exists():
+            return css_path.read_text(encoding="utf-8")
+
+        # Fall back to master_online.css for online/print themes
+        if theme_name in ("classic", "high_contrast", "soft_pastel"):
+            online_path = self.provider_theme_dir / "master_online.css"
+            if online_path.exists():
+                return online_path.read_text(encoding="utf-8")
+
+        # Fall back to master_print.css for print themes
+        if theme_name in ("grid_print",):
+            print_path = self.provider_theme_dir / "master_print.css"
+            if print_path.exists():
+                return print_path.read_text(encoding="utf-8")
+
+        return ""
 
     def get_combined_theme_css(self, theme_name: str = "classic") -> str:
         css_parts = [self.get_theme_css(theme_name), self.get_provider_theme_css(theme_name)]
@@ -163,8 +240,8 @@ class BaseCareCircleProvider:
         patient_profile: Any,
     ) -> dict[str, Any]:
         context = dict(payload)
-        patient_name = getattr(patient_profile, "display_name", "Friend")
-        prefs = getattr(patient_profile, "preferences", {}) or {}
+        patient_name = self.get_recipient_name(patient_profile)
+        prefs = self.get_patient_preferences(patient_profile)
 
         context.setdefault("patient_name", patient_name)
         context.setdefault("recipient_name", patient_name)
@@ -188,7 +265,7 @@ class BaseCareCircleProvider:
                 temperature = payload.get("temperature")
                 condition = payload.get("condition")
                 if temperature and condition:
-                    weather = f"{temperature}°F and {condition}"
+                    weather = f"{temperature}\u00b0F and {condition}"
                 else:
                     weather = payload.get("text", "")
 
@@ -242,7 +319,7 @@ class BaseCareCircleProvider:
 
         return html
 
-    async def execute(self, patient_profile: Any) -> Dict[str, Any]:
+    async def execute(self, patient_profile: Any) -> dict[str, Any]:
         try:
             logger.info("Executing provider %s for patient %s", self.provider_key, patient_profile.id)
             result = await self._generate_payload(patient_profile)
@@ -266,7 +343,7 @@ class BaseCareCircleProvider:
             logger.error(traceback.format_exc())
             return self._build_fallback_payload(patient_profile, error=str(exc))
 
-    async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
+    async def _generate_payload(self, patient_profile: Any) -> dict[str, Any]:
         if self.__class__.get_content is not BaseCareCircleProvider.get_content:
             result = await self.get_content(patient_profile=patient_profile)
             if isinstance(result, dict):
@@ -274,7 +351,7 @@ class BaseCareCircleProvider:
             return {"content": result}
         raise NotImplementedError("Subclasses must implement _generate_payload")
 
-    async def get_content(self, **kwargs: Any) -> Dict[str, Any] | Any:
+    async def get_content(self, **kwargs: Any) -> dict[str, Any] | Any:
         raise NotImplementedError("Subclasses must implement _generate_payload or get_content")
 
     def log_llm_response(
@@ -289,7 +366,7 @@ class BaseCareCircleProvider:
             tokens = getattr(llm_response, "total_tokens", 0)
             model = getattr(llm_response, "model", "unknown")
             logger.debug(
-                "Provider %s LLM call — model=%s tokens=%s prompt_len=%d",
+                "Provider %s LLM call - model=%s tokens=%s prompt_len=%d",
                 self.provider_key,
                 model,
                 tokens,
@@ -298,7 +375,7 @@ class BaseCareCircleProvider:
         except Exception:
             pass
 
-    def _build_fallback_payload(self, patient_profile: Any, error: str) -> Dict[str, Any]:
+    def _build_fallback_payload(self, patient_profile: Any, error: str) -> dict[str, Any]:
         fallback_data = {
             "text": "Content temporarily unavailable.",
             "type": "error_state",

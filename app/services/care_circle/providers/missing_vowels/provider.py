@@ -21,29 +21,36 @@ class MissingVowelsProvider(BaseCareCircleProvider):
         """
         Generate a personalized 'Missing Vowels' puzzle.
 
-        Constructs a word pool from the user's family members and favorite 
-        activities, falling back to static default words. Strips vowels 
-        from a selected word.
+        Constructs a word pool from the user's family members and favorite
+        activities, falling back to static default words. Strips vowels
+        from a selected word. Difficulty config controls word length and hints.
 
         Returns:
-            dict: Containing puzzle 'type', 'title', 'instruction', the 
+            dict: Containing puzzle 'type', 'title', 'instruction', the
                   blanked 'puzzle' string, the 'answer', and a length 'hint'.
         """
         cfg = self.patient_config
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        diff_config = self.difficulty_config
+        prefs = self.get_patient_preferences(patient_profile)
+
+        # Get difficulty-based word length constraints
+        min_length = diff_config.get("min_word_length", 4)
+        max_length = diff_config.get("max_word_length", 10)
+        show_vowel_count = diff_config.get("show_vowel_count", True)
+        show_consonants = diff_config.get("show_consonants", True)
 
         # Build personalized word pool from profile + defaults
         word_pool = []
 
         # Add family member names (very familiar)
         family = prefs.get("family_members", [])
-        word_pool.extend([name.upper() for name in family if len(name) >= 4])
+        word_pool.extend([name.upper() for name in family if len(name) >= min_length])
 
         # Add words from hobbies/activities
         activities = prefs.get("favorite_activities", [])
         for activity in activities:
             words = activity.upper().split()
-            word_pool.extend([w for w in words if len(w) >= 4])
+            word_pool.extend([w for w in words if len(w) >= min_length])
 
         # Add engineering/Quebec-themed defaults from config
         default_words = cfg.get("words", [
@@ -53,20 +60,34 @@ class MissingVowelsProvider(BaseCareCircleProvider):
         ])
         word_pool.extend(default_words)
 
-        # Filter to good puzzle words (4-10 letters, has vowels)
+        # Filter to good puzzle words based on difficulty length constraints
         vowels = "AEIOU"
         valid_words = [
             w for w in word_pool
-            if 4 <= len(w) <= 10 and any(c in vowels for c in w)
+            if min_length <= len(w) <= max_length and any(c in vowels for c in w)
         ]
 
+        if not valid_words:
+            valid_words = [w for w in default_words if min_length <= len(w) <= max_length]
         if not valid_words:
             valid_words = default_words
 
         word = random.choice(valid_words)
-        puzzle_word = " ".join(
-            ["_" if letter in vowels else letter for letter in word]
-        )
+
+        # Build puzzle display based on difficulty settings
+        if show_consonants:
+            puzzle_word = " ".join(
+                ["_" if letter in vowels else letter for letter in word]
+            )
+        else:
+            puzzle_word = " ".join(["_" for letter in word])
+
+        # Build hint based on difficulty
+        hint_parts = [f"It has {len(word)} letters"]
+        if show_vowel_count:
+            vowel_count = sum(1 for c in word if c in vowels)
+            hint_parts.append(f"{vowel_count} vowels missing")
+        hint = ". ".join(hint_parts)
 
         return {
             "type": "missing_vowels",
@@ -75,5 +96,7 @@ class MissingVowelsProvider(BaseCareCircleProvider):
                            "Can you guess the word?",
             "puzzle": puzzle_word,
             "answer": word,
-            "hint": f"It has {len(word)} letters"
+            "hint": hint,
+            "difficulty": self.difficulty_level,
+            "show_vowel_count": show_vowel_count,
         }

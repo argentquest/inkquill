@@ -1,31 +1,45 @@
 # Odd One Out Provider
 
-## Overview
-Odd One Out Logic Game - Categorization puzzle. Engages categorization skills without requiring writing - the user can just point to or circle the answer. Three items from one category plus one from a different category, shuffled randomly.
+## Purpose
+Find the item that does not belong.
 
-## Category
-Games / Logic Puzzles
+## Runtime Contract
+- Provider key: `odd_one_out`
+- Registry category: `games`
+- Registry order: `20`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - Static content only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Uses Python's `random.choice()` and `random.sample()` to select categories and items
-- Picks two different categories, selects 3 items from main category and 1 from odd category
-- Shuffles items randomly
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Pre-configured categories with item lists
-- Family member names can be added as a category if available
+## Inputs Used At Runtime
+- Patient preference keys read: `family_members`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `categories`
 
-## Configuration
-- `categories`: Dictionary of category names to item arrays
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- None
+## Output Shape
+- Observed payload fields returned by the provider: `answer`, `explanation`, `instruction`, `items`, `title`, `type`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content
-- Recognition-based gameplay suitable for dementia care
-- Simple pointing/circling interaction
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

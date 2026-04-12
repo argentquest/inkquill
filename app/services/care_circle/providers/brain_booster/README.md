@@ -1,46 +1,46 @@
 # Brain Booster Provider
 
-## Overview
-Generates gentle cognitive exercises using a Large Language Model. Rotates across four question types — phrase completion, either/or, name three, and true/false — to keep content fresh day to day.
+## Purpose
+Simple cognitive prompts to keep your mind engaged.
 
-## Category
-Games / Cognitive Exercises
+## Runtime Contract
+- Provider key: `brain_booster`
+- Registry category: `games`
+- Registry order: `5`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_json_with_usage()` to generate thinking activities
-- Returns JSON with `type`, `prompt`, and optionally `answer` fields
-- Content is personalized based on the patient's era of youth
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-Create one fun, gentle thinking activity for someone who grew up in the {era}.
-Use this type: {qt['label']} ({qt['example']}).
-The activity must feel easy and fun, never like a test.
-Return as JSON: {"type": "{qt["key"]}", "prompt": "...", {answer_field}}
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `era_of_youth`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `prompts`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear instruction that activity must feel "easy and fun, never like a test"
-   - Rotates across multiple question types for variety
-   - Era-based personalization
-2. **Improvements**:
-   - Add explicit instruction to avoid topics that could trigger negative memories
-   - Consider adding a constraint to ensure answers are common knowledge
-   - Add validation for JSON response structure
-3. **Safety**: Has fallback content from configuration if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `prompts`: Array of fallback prompts organized by type
+## Output Shape
+- Observed payload fields returned by the provider: `answer`, `prompt`, `type`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
-- Designed to be recognition-based rather than recall-based
+## Improvement Opportunities
+- Add payload-schema validation for `type`, `prompt`, and `answer` so malformed LLM JSON cannot leak into the patient card.
+- If the difficulty config is meant to matter, wire it into question-type selection or prompt shaping; today it is dead metadata.
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

@@ -79,15 +79,20 @@ class PuzzleProvider(BaseCareCircleProvider):
 
     def _get_word_search(self, words: list = None) -> dict:
         cfg = self.patient_config
+        diff_config = self.difficulty_config
         if not words:
             words = cfg.get(
                 "default_words",
                 ["SPRING", "FLOWERS", "SUNSHINE", "GARDEN", "PICNIC"],
             )
-        grid_size = cfg.get("grid_size", 10)
-        puzzle = WordSearch(",".join(words), level=1, size=grid_size)
+        # Use difficulty-based grid size if available, otherwise fall back to config
+        grid_size = diff_config.get("grid_size", cfg.get("grid_size", 10))
+        word_count = diff_config.get("word_count", 5)
+        selected_words = words[:word_count] if len(words) > word_count else words
+        puzzle = WordSearch(",".join(selected_words), level=1, size=grid_size)
         word_strs = [str(w) for w in puzzle.words]
         grid = puzzle.puzzle
+        show_word_list = diff_config.get("show_word_list", True)
         return {
             "type": "word_search",
             "title": "Daily Word Search",
@@ -95,8 +100,9 @@ class PuzzleProvider(BaseCareCircleProvider):
                 "Find the hidden words. "
                 "They only go across (\u2192) or down (\u2193)."
             ),
-            "words": word_strs,
+            "words": word_strs if show_word_list else [],
             "grid": grid,
+            "show_word_list": show_word_list,
             "puzzle_content": _render_word_search(word_strs, grid),
         }
 
@@ -163,12 +169,22 @@ class PuzzleProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        puzzle_types = [
-            self._get_word_search,
-            self._get_fill_in_the_blank,
-            self._get_word_pair,
+        diff_config = self.difficulty_config
+
+        # Filter puzzle types based on difficulty config
+        allowed_types = diff_config.get("puzzle_types", ["fill_in_the_blank", "word_pair", "word_search"])
+        all_puzzle_types = {
+            "word_search": self._get_word_search,
+            "fill_in_the_blank": self._get_fill_in_the_blank,
+            "word_pair": self._get_word_pair,
+        }
+        puzzle_funcs = [
+            func for name, func in all_puzzle_types.items() if name in allowed_types
         ]
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        if not puzzle_funcs:
+            puzzle_funcs = list(all_puzzle_types.values())
+
+        prefs = self.get_patient_preferences(patient_profile)
         custom_words = None
         if prefs.get("favorite_activities"):
             custom_words = [
@@ -180,7 +196,14 @@ class PuzzleProvider(BaseCareCircleProvider):
             if len(custom_words) < min_words:
                 filler = cfg.get("filler_words", ["JOY", "PEACE", "LOVE"])
                 custom_words.extend(filler)
-        selected_func = random.choice(puzzle_types)
+
+        selected_func = random.choice(puzzle_funcs)
         if selected_func == self._get_word_search and custom_words:
-            return self._get_word_search(custom_words[:6])
-        return selected_func()
+            result = self._get_word_search(custom_words[:6])
+        else:
+            result = selected_func()
+
+        # Add difficulty metadata
+        result["difficulty"] = self.difficulty_level
+        result["show_word_list"] = diff_config.get("show_word_list", True)
+        return result

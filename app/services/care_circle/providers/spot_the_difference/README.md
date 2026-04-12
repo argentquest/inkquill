@@ -1,47 +1,44 @@
 # Spot the Difference Provider
 
-## Overview
-Spot the Difference (Text Version) provider. Two lists of 5 familiar words — identical except one item is swapped. The reader identifies which word changed between List A and List B. LLM generates the lists; falls back to static pairs from config.
+## Purpose
+Find the one word that changed between the two lists.
 
-## Category
-Games / Visual Recognition
+## Runtime Contract
+- Provider key: `spot_the_difference`
+- Registry category: `games`
+- Registry order: `24`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_json_with_usage()` to generate two word lists with one difference
-- Returns JSON with `list_a`, `list_b`, `changed_in_a`, and `changed_in_b` fields
-- Falls back to static word sets from configuration if LLM fails
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: No difficulty metadata is declared for this provider.
 
-### Prompt Analysis
-```
-Create a simple 'Spot the Difference' word puzzle for an elderly person.
-Write two lists (List A and List B), each with exactly 5 short, familiar words.
-The lists must be identical EXCEPT one word is different between them.
-Use only simple, familiar words: animals, food, colours, flowers, household items.
-Return ONLY valid JSON in this exact format:
-{"list_a": ["Word1","Word2","Word3","Word4","Word5"], "list_b": [...], "changed_in_a": "original word", "changed_in_b": "replacement word"}
-```
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `fallback_sets`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint on word types (simple, familiar words)
-   - Explicit JSON format requirement
-   - Specific list size requirement (5 words each)
-2. **Improvements**:
-   - Add explicit instruction to avoid obscure or complex words
-   - Consider adding a constraint to ensure the changed word is clearly different
-   - Add validation for JSON response structure
-3. **Safety**: Has fallback word sets from configuration if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `fallback_sets`: Array of fallback word set objects with `list_a`, `list_b`, `changed_in_a`, `changed_in_b`
+## Output Shape
+- Observed payload fields returned by the provider: `changed_in_a`, `changed_in_b`, `instruction`, `list_a`, `list_b`, `title`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.

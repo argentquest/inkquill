@@ -1,32 +1,46 @@
 # Animal Friend Provider
 
-## Overview
-Shows a friendly animal photo with a warm fact. Uses the Dog CEO API to fetch random dog photos and provides warm, friendly content about animals.
+## Purpose
+Implements the `animal_friend` Care Circle provider and renders it through the shared base provider contract.
 
-## Category
-Memory / Animal Interaction
+## Runtime Contract
+- Provider key: `animal_friend`
+- Registry category: `memory`
+- Registry order: `33`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - External API only**
+## How It Works Today
+Fetches remote content directly and falls back to config or embedded static content when the remote call fails.
 
-### How Content is Generated
-- Fetches random dog photos from the public Dog CEO API (`https://dog.ceo/api/breeds/image/random`)
-- Uses static warm facts about animals from configuration
-- No LLM or AI-generated text content
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: `Dog CEO API`
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- **Images**: Dog CEO API (free, public API)
-- **Facts**: Pre-configured warm facts about animals (dogs, cats, birds, fish, bunnies, butterflies, horses, dolphins)
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `warm_facts`
 
-## Configuration
-- `fallback`: Default fallback message
-- `warm_facts`: Array of warm animal facts for elderly users
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- Dog CEO API: `https://dog.ceo/api/breeds/image/random`
+## Output Shape
+- Observed payload fields returned by the provider: `animal`, `fact`, `image_url`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content to review
-- Falls back gracefully to static content on API failure
-- Content is pre-vetted and appropriate for dementia care
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Clarify or rename the remote source path if the provider intentionally uses dog imagery for a generic animal card; right now the implementation reads more like a dog provider.
+- Add an image reachability fallback so a dead remote image URL does not leave the card visually empty.
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

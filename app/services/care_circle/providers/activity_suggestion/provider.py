@@ -23,8 +23,8 @@ class ActivitySuggestionProvider(BaseCareCircleProvider):
     """
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
-        name = getattr(patient_profile, 'preferences', {}).get("recipient_name", "friend")
+        prefs = self.get_patient_preferences(patient_profile)
+        name = self.get_recipient_name(patient_profile, default="friend")
         cfg = self.patient_config
 
         activities = prefs.get("favorite_activities", [])

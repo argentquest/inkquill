@@ -37,7 +37,7 @@ class SongOfTheDayProvider(BaseCareCircleProvider):
         artists_list = cfg.get("artists", [])
 
         # Use favorite_singers list; fall back to legacy favorite_singer str
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        prefs = self.get_patient_preferences(patient_profile)
         singers = prefs.get("favorite_singers") or []
         if not singers and prefs.get("favorite_singer"):
             singers = [prefs["favorite_singer"]]

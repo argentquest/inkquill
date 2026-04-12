@@ -1,34 +1,44 @@
 # Cat Fact Provider
 
-## Overview
-Fetches a random cat fact from an external public API. Also provides a placeholder image URL for rendering in templates.
+## Purpose
+Interesting cat facts with a cute photo.
 
-## Category
-Memory / Animal Facts
+## Runtime Contract
+- Provider key: `cat_fact`
+- Registry category: `memory`
+- Registry order: `10`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - External API only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Fetches cat facts from the Ninja Cat Fact API (`https://catfact.ninja/fact`)
-- Provides cat images from the Cataas API (`https://cataas.com/cat`)
-- No LLM or AI-generated text content
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- **Facts**: Cat Fact Ninja API (free, public API)
-- **Images**: Cataas API (free, public cat image API)
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `api_url`, `fallback`
 
-## Configuration
-- `api_url`: Cat fact API endpoint (default: "https://catfact.ninja/fact")
-- `image_api`: Cat image API endpoint (default: "https://cataas.com/cat")
-- `fallback`: Static fallback fact
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- Cat Fact Ninja: `https://catfact.ninja/fact`
-- Cataas: `https://cataas.com/cat`
+## Output Shape
+- Observed payload fields returned by the provider: `fact`, `image_url`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content to review
-- Falls back gracefully to static content on API failure
-- Content is generally safe and lighthearted
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.

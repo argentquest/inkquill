@@ -1,56 +1,46 @@
 # Gridless Crossword Provider
 
-## Overview
-A daily gridless crossword puzzle with 10 clues - first letters spell a secret word. Uses LLM to generate themed word-clue pairs.
+## Purpose
+Builds a crossword-style clue set where answer initials spell a secret word, using LLM generation with a static fallback.
 
-## Category
-Games / Word Puzzles
+## Runtime Contract
+- Provider key: `gridless_crossword`
+- Registry category: `games`
+- Registry order: `26`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_json_with_usage()` to generate word-clue pairs
-- The LLM generates 10 words with clues, where first letters spell a secret word
-- Content is themed based on day of week
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: `_get_fallback`
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Yes. Runtime logic references the shared difficulty helpers.
 
-### Prompt Analysis
-```
-Generate 10 word-clue pairs for a word puzzle.
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `day_categories`, `fallback_words`, `secret_words`
 
-THEME: {category} ({hint})
-SECRET WORD: {secret_word}
-The first letter of each answer must spell: {secret_word}
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-REQUIREMENTS:
-- Each word must be {min_len}-{max_len} letters long
-- Each clue should be clear and solvable for older adults
-- Clues should be 1-2 sentences describing the word
-- Return ONLY a JSON object with this exact format:
-{"words": [{"word": "XXXXX", "clue": "Clue text..."}, ...]}
-```
+## Output Shape
+- Observed payload fields returned by the provider: `answers`, `clues`, `instruction`, `secret_word`, `title`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear JSON output format requirement
-   - Word length constraints for difficulty control
-   - Themed content based on day of week
-2. **Improvements**:
-   - Add explicit instruction to avoid obscure or complex words
-   - Consider adding a constraint to ensure clues are unambiguous
-   - Add validation for JSON response structure and word/letter constraints
-3. **Safety**: Has fallback words from configuration if LLM fails
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Configuration
-- `day_categories`: Maps day of week to theme category
-- `secret_words`: Maps category to secret words
-- `fallback_words`: Array of fallback word-clue pairs
-
-## External Dependencies
-- None (uses LLM only)
-
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
-- Difficulty settings control word length
+## Improvement Opportunities
+- Add payload-schema validation for clues, answers, and secret-word length before rendering.
+- Persist daily generated puzzles or seed them deterministically so common-provider caching is backed by stable content generation.
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.

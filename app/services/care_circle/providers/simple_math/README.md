@@ -1,31 +1,44 @@
 # Simple Math Provider
 
-## Overview
-Simple math problems with very basic arithmetic. Designed for elderly users - single digit numbers only.
+## Purpose
+Implements the `simple_math` Care Circle provider and renders it through the shared base provider contract.
 
-## Category
-Games / Math Puzzles
+## Runtime Contract
+- Provider key: `simple_math`
+- Registry category: `games`
+- Registry order: `39`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - Static content only**
+## How It Works Today
+Builds the payload from local config, curated in-code data, or deterministic helper logic without calling external services.
 
-### How Content is Generated
-- Uses Python's `random.randint()` to generate numbers based on difficulty level
-- Randomly chooses addition or subtraction
-- For subtraction, ensures positive result by swapping numbers if needed
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Yes. Runtime logic references the shared difficulty helpers.
 
-### Content Sources
-- Programmatically generated math problems
-- Difficulty levels: easy (1-5), medium (1-9), hard (10-20)
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: No provider-specific config keys are read at runtime beyond the merged base config object.
 
-## Configuration
-- None required (difficulty level controls number ranges)
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- None
+## Output Shape
+- Observed payload fields returned by the provider: `answer`, `instruction`, `problem`, `title`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content
-- Simple, recognition-based gameplay suitable for dementia care
-- Difficulty levels ensure appropriate challenge
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Add or expand focused unit tests around the provider payload contract so future template or config changes are easier to validate.

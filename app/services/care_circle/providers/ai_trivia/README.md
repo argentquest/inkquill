@@ -1,48 +1,46 @@
 # AI Trivia Provider
 
-## Overview
-Provides a daily trivia fact and a music suggestion using a Large Language Model. Rotates across six trivia categories (daily life, inventions, entertainment, nature/seasons, food/drink, sport/leisure) for day-to-day variety.
+## Purpose
+AI-generated trivia questions from your era.
 
-## Category
-Games / Trivia
+## Runtime Contract
+- Provider key: `ai_trivia`
+- Registry category: `games`
+- Registry order: `7`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_json_with_usage()` to generate trivia facts and music suggestions
-- Returns JSON with `trivia` and `music` fields
-- Content is personalized based on the patient's era of youth and favorite singers
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-{category['hint']} Focus on the {era}.
-Also suggest one song by {singer} or a similar artist to listen to today.
-Keep each to 1 short sentence.
-Return as JSON: {"trivia": "...", "music": "..."}
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `era_of_youth`, `favorite_singer`, `favorite_singers`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `default_era`, `default_singer`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear JSON output format requirement
-   - Category hints guide the LLM toward appropriate content
-   - Era-based personalization adds relevance
-2. **Improvements**:
-   - Add explicit instruction to avoid obscure or potentially distressing historical facts
-   - Consider adding a constraint to ensure trivia is positive/uplifting
-   - Add validation for the JSON response structure
-3. **Safety**: Has fallback content for both trivia and music if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `default_era`: Fallback era when not specified in preferences (default: "1950s")
-- `default_singer`: Fallback singer when none specified (default: "Frank Sinatra")
-- `fallback_trivia`: Static trivia fallback
-- `fallback_music`: Static music fallback
+## Output Shape
+- Observed payload fields returned by the provider: `music`, `trivia`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

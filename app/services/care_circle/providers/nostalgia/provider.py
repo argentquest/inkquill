@@ -72,10 +72,10 @@ class NostalgiaProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        prefs = self.get_patient_preferences(patient_profile)
         default_era = cfg.get("default_era", "1950s")
         era = prefs.get("era_of_youth", default_era) or default_era
-        name = getattr(patient_profile, 'preferences', {}).get("recipient_name", "friend")
+        name = self.get_recipient_name(patient_profile, default="friend")
 
         nationality = prefs.get("nationality_or_background", "")
         hometown = prefs.get("hometown", "")

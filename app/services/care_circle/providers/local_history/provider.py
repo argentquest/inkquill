@@ -24,7 +24,7 @@ class LocalHistoryProvider(BaseCareCircleProvider):
     """
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        prefs = self.get_patient_preferences(patient_profile)
         cfg = self.patient_config
 
         # Prefer hometown (birthplace) over current weather city

@@ -1,52 +1,45 @@
 # Pen Pal Letter Provider
 
-## Overview
-Generates a warm, fictional short letter (80–100 words) written as if from an old dear friend. Addressed to the resident by name, mentions the current season, a nostalgic shared memory, and ends with one gentle question to spark a happy recollection.
+## Purpose
+A warm letter from an old friend, just for you.
 
-## Category
-Wellbeing / Personal Connection
+## Runtime Contract
+- Provider key: `pen_pal_letter`
+- Registry category: `wellbeing`
+- Registry order: `25`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `False`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_text_with_usage()` to generate a warm pen pal letter
-- Personalized with resident's name, era, activities, hometown, life roles, pets, favourite foods and TV shows
-- Falls back to static letters from config if LLM is unavailable
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: No. This provider renders per execution and does not participate in the shared daily HTML cache.
+- Difficulty metadata status: No difficulty metadata is declared for this provider.
 
-### Prompt Analysis
-```
-Write a short, warm pen pal letter (80–100 words) to {name}.
-Write it AS IF you are {friend_name}, an old dear friend from the {era}.
-Mention something lovely about the current season ({season}) — a sight, smell, or simple pleasure.
-Reference one warm shared memory from the {era}.
-{context_str}
-End with one gentle question inviting a happy recollection.
-Tone: warm, familiar, simple, nostalgic.
-Do NOT mention illness, care homes, or memory problems.
-Start with 'Dear {name},' and sign off 'With love, {friend_name}'
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `era_of_youth`, `favorite_activities`, `favourite_foods`, `favourite_tv_shows`, `hobbies`, `hometown`, `life_roles`, `pets`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `fallback_letters`, `friend_names`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Explicit instruction to avoid mentioning illness, care homes, or memory problems
-   - Clear word count constraint (80-100 words)
-   - Rich personalization from patient preferences
-   - Specific format requirements (greeting and sign-off)
-2. **Improvements**:
-   - Consider adding a constraint to ensure the question is simple and answerable
-   - Add validation for output length and format
-3. **Safety**: Has fallback letters from configuration if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `friend_names`: Array of friend names to use
-- `fallback_letters`: Array of fallback letter templates with placeholders
+## Output Shape
+- Observed payload fields returned by the provider: `friend_name`, `letter`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
-- Explicit safety constraints in prompt
+## Improvement Opportunities
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

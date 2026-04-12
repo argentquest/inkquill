@@ -1,46 +1,46 @@
 # Simple Recipe Provider
 
-## Overview
-Generates a very simple, nostalgic recipe with 3-4 steps using an LLM. Rotates across five recipe categories (baked treat, warm drink, simple dessert, soup/stew, light snack) to keep content fresh day to day.
+## Purpose
+Generates a short recipe card tailored to familiar foods and simple preparation steps.
 
-## Category
-Lifestyle / Cooking
+## Runtime Contract
+- Provider key: `simple_recipe`
+- Registry category: `lifestyle`
+- Registry order: `15`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_json_with_usage()` to generate a simple recipe
-- Rotates across five recipe categories for variety
-- Returns JSON with `name`, `ingredients`, and `steps` fields
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-Think of {category['label']} from the {era}.
-It should use common ingredients everyone has at home.
-The steps should be very short and easy to follow (3-4 steps max).
-Each step should be one short sentence.
-Return as JSON: {"name": "...", "ingredients": "...", "steps": "..."}
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `era_of_youth`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: No provider-specific config keys are read at runtime beyond the merged base config object.
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint on steps (3-4 steps max, one short sentence each)
-   - Era-based personalization
-   - JSON output format requirement
-2. **Improvements**:
-   - Add explicit instruction to avoid complex or hard-to-find ingredients
-   - Consider adding a constraint to ensure steps are safe and simple
-   - Add validation for JSON response structure
-3. **Safety**: Has fallback recipes from configuration if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `recipes`: Array of fallback recipe objects with `name`, `ingredients`, and `steps`
+## Output Shape
+- Observed payload fields returned by the provider: `ingredients`, `steps`, `title`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

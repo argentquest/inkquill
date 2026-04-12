@@ -44,8 +44,8 @@ class PenPalLetterProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        name = getattr(patient_profile, 'preferences', {}).get("recipient_name", "Dear Friend")
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
+        name = self.get_recipient_name(patient_profile, default="Dear Friend")
+        prefs = self.get_patient_preferences(patient_profile)
         era = prefs.get("era_of_youth", "1950s")
 
         # Prefer favorite_activities over the old 'interests' field

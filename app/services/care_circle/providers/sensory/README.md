@@ -1,46 +1,46 @@
 # Sensory Provider
 
-## Overview
-Suggests a simple grounding or sensory activity for the user. Rotates across all five senses (hearing, touch, smell, taste, sight). Personalises with favourite singers, foods, pets, hometown, and mobility level when available.
+## Purpose
+Gentle sensory suggestions to engage your senses calmly.
 
-## Category
-Wellbeing / Sensory Activities
+## Runtime Contract
+- Provider key: `sensory`
+- Registry category: `wellbeing`
+- Registry order: `6`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `False`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_text_with_usage()` to generate a simple sensory activity suggestion
-- Rotates across five sensory modes for variety
-- Content is personalized based on patient preferences (favourite singers, foods, pets, hometown, mobility level)
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: No. This provider renders per execution and does not participate in the shared daily HTML cache.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-Suggest one simple sensory activity for {name} using the sense of {mode['key']}.
-{mode['prompt_hint']}
-{extra_str}
-Keep it to 1 short sentence. Be specific and gentle.
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `favorite_singer`, `favorite_singers`, `favourite_foods`, `hometown`, `mobility_level`, `pets`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `default_singer`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint (1 short sentence)
-   - Sense-specific prompt hints guide appropriate content
-   - Personalized with patient preferences
-2. **Improvements**:
-   - Add explicit instruction to avoid potentially overwhelming sensory suggestions
-   - Consider adding a constraint to ensure activities are accessible for seated patients
-   - Add validation for output length and tone
-3. **Safety**: Has fallback suggestions from configuration if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `default_singer`: Fallback singer (default: "Frank Sinatra")
-- `suggestions`: Array of fallback suggestions
+## Output Shape
+- Observed payload fields returned by the provider: `sensory`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

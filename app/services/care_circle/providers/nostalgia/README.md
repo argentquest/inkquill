@@ -1,47 +1,46 @@
-# Nostalgia Provider
+# Time Machine Provider
 
-## Overview
-Generates personalized nostalgic memories using a Large Language Model. Rotates across six topic areas (food, music/dance, neighbourhood, fashion, entertainment, school/work) to bring different warm memories each day. Personalises with nationality, hometown, life roles, favourite foods and TV shows when available.
+## Purpose
+Warm memories from your youth to cherish and enjoy.
 
-## Category
-Memory / Nostalgia
+## Runtime Contract
+- Provider key: `nostalgia`
+- Registry category: `memory`
+- Registry order: `3`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `False`
 
-## AI Usage
-**Yes - LLM-generated content**
+## How It Works Today
+Uses Care Circle LLM helpers with the dementia-safe system prompt, then falls back to local/static data if generation fails.
 
-### How AI is Used
-- Uses `generate_text_with_usage()` to generate a happy memory from a specific era
-- Rotates across six nostalgia topics for variety
-- Content is personalized based on patient preferences (nationality, hometown, life roles, favourite foods, TV shows)
+- Care Circle LLM helpers used: `generate_image_url_with_usage`, `generate_json_with_usage`, `generate_text_with_usage`
+- External sources used: No external API or feed dependency is used at runtime.
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: No. This provider renders per execution and does not participate in the shared daily HTML cache.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Prompt Analysis
-```
-Write a happy memory from the {era} for {name}.
-{topic['hint']}
-{context_str}
-Keep it to 2 short sentences. Make it feel cozy and familiar.
-```
+## Inputs Used At Runtime
+- Patient preference keys read: `era_of_youth`, `favourite_foods`, `favourite_tv_shows`, `hometown`, `life_roles`, `nationality_or_background`
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `default_era`, `facts`
 
-### Prompt Recommendations
-1. **Strengths**: 
-   - Clear constraint (2 short sentences)
-   - Topic-specific hints guide appropriate content
-   - Rich personalization from patient preferences
-2. **Improvements**:
-   - Add explicit instruction to avoid potentially distressing memories
-   - Consider adding a constraint to ensure universally positive content
-   - Add validation for output length and tone
-3. **Safety**: Has fallback content from era-specific facts if LLM fails
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## Configuration
-- `default_era`: Fallback era when not specified (default: "1950s")
-- `facts`: Era-specific fallback facts
-- `fallback`: General fallback text
+## Output Shape
+- Observed payload fields returned by the provider: `nostalgia`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## External Dependencies
-- None (uses LLM only)
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- Uses dementia-care appropriate system prompt
-- Falls back gracefully to static content on LLM failure
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Validate and coerce the generated JSON shape before returning it so templates are protected from malformed or partial model output.
+- Normalize patient preference access through a shared helper; the provider layer currently mixes raw `preferences` and nested `preferences.preferences` access patterns.

@@ -64,8 +64,8 @@ class SensoryProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        prefs = getattr(patient_profile, 'preferences', {}).get("preferences", {})
-        name = getattr(patient_profile, 'preferences', {}).get("recipient_name", "friend")
+        prefs = self.get_patient_preferences(patient_profile)
+        name = self.get_recipient_name(patient_profile, default="friend")
 
         default_singer = cfg.get("default_singer", "Frank Sinatra")
         singers = prefs.get("favorite_singers") or []

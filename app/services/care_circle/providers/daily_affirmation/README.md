@@ -1,30 +1,45 @@
-# Daily Affirmation Provider
+# Affirmation Provider
 
-## Overview
-Fetches a daily positive affirmation from an external public API.
+## Purpose
+Positive affirmation to start your day with hope.
 
-## Category
-Core / Wellbeing
+## Runtime Contract
+- Provider key: `daily_affirmation`
+- Registry category: `core`
+- Registry order: `13`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - External API only**
+## How It Works Today
+Fetches remote content directly and falls back to config or embedded static content when the remote call fails.
 
-### How Content is Generated
-- Fetches affirmations from the affirmations.dev API (`https://www.affirmations.dev/`)
-- No LLM or AI-generated text content
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: `affirmations.dev API`
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Affirmations.dev API (free, public API)
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `api_url`, `fallback`
 
-## Configuration
-- `api_url`: Affirmation API endpoint (default: "https://www.affirmations.dev/")
-- `fallback`: Static fallback affirmation (default: "You are loved. You are enough. You matter.")
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- Affirmations.dev: `https://www.affirmations.dev/`
+## Output Shape
+- Observed payload fields returned by the provider: `affirmation`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content to review
-- Falls back gracefully to static content on API failure
-- Content is positive and appropriate for dementia care
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Add short-lived caching and stricter response normalization around the external source so repeated patient-session refreshes do not depend on identical live third-party calls.

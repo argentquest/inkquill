@@ -676,7 +676,7 @@ async def test_word_scramble_with_family_names():
 
 @pytest.mark.asyncio
 async def test_word_scramble_three_letter_word():
-    """3-letter words scramble all letters."""
+    """3-letter words scramble all letters. With default easy difficulty, hint shows first letter."""
     from app.services.care_circle.providers.word_scramble.provider import WordScrambleProvider
 
     import random
@@ -688,7 +688,40 @@ async def test_word_scramble_three_letter_word():
     assert result["success"] is True
     data = result["data"]
     assert data["answer"] == "DAM"
-    assert data["hint"] is None  # 3-letter words have no hint
+    # With default easy difficulty, show_first_letter=True and hint_available=True
+    assert data["hint"] is not None
+    assert "D" in data["hint"]
+
+
+@pytest.mark.asyncio
+async def test_word_scramble_hard_difficulty_no_hint():
+    """Hard difficulty (from config.json) disables hints."""
+    from app.services.care_circle.providers.word_scramble.provider import WordScrambleProvider
+
+    import random
+    hard_config = {
+        "words": ["DAM"],
+        "difficulty": {
+            "default": "hard",
+            "easy": {"min_word_length": 4, "max_word_length": 5, "hint_available": True, "show_first_letter": True},
+            "medium": {"min_word_length": 6, "max_word_length": 7, "hint_available": True, "show_first_letter": False},
+            "hard": {"min_word_length": 3, "max_word_length": 12, "hint_available": False, "show_first_letter": False},
+        },
+    }
+    with patch.object(random, "choice", return_value="DAM"):
+        # Override the class-level config cache so difficulty is read from our dict
+        WordScrambleProvider._config_cache = hard_config
+        try:
+            provider = WordScrambleProvider(patient_config={"words": ["DAM"], "difficulty": "hard"})
+            patient = MockPatientProfile(id=1, display_name="Test", preferences={"preferences": {}})
+            result = await provider.execute(patient)
+        finally:
+            WordScrambleProvider._config_cache = None
+
+    assert result["success"] is True
+    data = result["data"]
+    assert data["answer"] == "DAM"
+    assert data["hint"] is None  # hard difficulty: no hint
 
 
 @pytest.mark.asyncio

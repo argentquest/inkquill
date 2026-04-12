@@ -1,31 +1,45 @@
-# Dog Photo Provider
+# Furry Friend Provider
 
-## Overview
-Fetches a random picture of a dog from the public Dog API. Attempts to parse the specific dog breed from the URL structure to provide context alongside the image.
+## Purpose
+A cheerful dog photo to brighten your day.
 
-## Category
-Memory / Animal Photos
+## Runtime Contract
+- Provider key: `dog_photo`
+- Registry category: `memory`
+- Registry order: `9`
+- Globally enabled in root catalog: `True`
+- Patient visible in root catalog: `True`
+- Patient-safe class flag: `True`
+- Common HTML cache: `True`
 
-## AI Usage
-**No - External API only**
+## How It Works Today
+Fetches remote content directly and falls back to config or embedded static content when the remote call fails.
 
-### How Content is Generated
-- Fetches random dog photos from the Dog CEO API (`https://dog.ceo/api/breeds/image/random`)
-- Extracts breed name from URL path structure
-- No LLM or AI-generated text content
+- Care Circle LLM helpers used: No Care Circle LLM helper is called.
+- External sources used: `Dog CEO API`
+- Internal helper generators: No dedicated helper generators; the provider returns directly from `_generate_payload`/`get_content`.
+- Daily common-cache behavior: Yes. Because `common` is true in `config.json`, rendered HTML is cached per day and theme by the base provider.
+- Difficulty metadata status: Not currently. `config.json` declares difficulty metadata, but `provider.py` does not read `self.difficulty_config`.
 
-### Content Sources
-- Dog CEO API (free, public API)
+## Inputs Used At Runtime
+- Patient preference keys read: No patient preference keys are read by this provider.
+- Direct patient-profile attributes read: No direct patient-profile attributes beyond preference data are read.
+- Provider config keys read: `api_url`, `default_caption`
 
-## Configuration
-- `api_url`: Dog photo API endpoint (default: "https://dog.ceo/api/breeds/image/random")
-- `default_caption`: Default caption for photos
+## Render Assets
+- Templates present: `default`
+- Provider-specific themes present: `master_online`, `master_print`
+- Root theme support: The base provider can also prepend shared CSS from `app/services/care_circle/providers/themes/`.
 
-## External Dependencies
-- Dog CEO API: `https://dog.ceo/api/breeds/image/random`
+## Output Shape
+- Observed payload fields returned by the provider: `breed`, `caption`, `image_url`
+- Rendering path: `BaseCareCircleProvider.execute()` wraps the payload, renders `templates/default.html` when no `rendered_html` is provided, and returns `success`, `provider_key`, and `data`.
 
-## Patient Safety
-- `is_safe_for_patient = True`
-- No AI-generated content to review
-- Falls back gracefully to static content on API failure
-- Content is generally safe and uplifting
+## Review Notes
+- This README was regenerated from the live provider implementation, root provider catalog config, and the shared base-provider contract.
+- Session assembly loads this provider through `app.services.care_circle.session_assembler.get_provider_class()` and mounts it only when the catalog entry is enabled, patient-visible, and the provider class is marked patient-safe.
+- The React family admin and template tooling surface this provider through the Care Circle provider registry and template studio endpoints.
+
+## Improvement Opportunities
+- Either wire `difficulty_config` into runtime generation or remove the unused difficulty metadata from `config.json` so the docs and implementation do not drift.
+- Add short-lived caching and stricter response normalization around the external source so repeated patient-session refreshes do not depend on identical live third-party calls.
