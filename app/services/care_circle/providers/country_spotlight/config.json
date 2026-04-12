@@ -1,0 +1,9 @@
+{
+    "name": "Country Spotlight",
+    "description": "A fun fact card about a different country from around the world.",
+    "technical_summary": "Static provider. Randomly selects one of 50 curated country fact cards from the built-in pool.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": false
+}

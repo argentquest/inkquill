@@ -104,7 +104,7 @@ def _build_image_client():
 async def generate_text_with_usage(
     prompt: str,
     system: str | None = None,
-    max_tokens: int = 512,
+    max_tokens: int = 4096,
     temperature: float = 0.9,
 ) -> LLMResponse:
     """Call the LLM and return an LLMResponse whose `.content` is the text reply."""
@@ -136,7 +136,7 @@ async def generate_text_with_usage(
 async def generate_json_with_usage(
     prompt: str,
     system: str | None = None,
-    max_tokens: int = 1024,
+    max_tokens: int = 4096,
     temperature: float = 0.9,
 ) -> Tuple[dict[str, Any], LLMResponse]:
     """Call the LLM, parse JSON from the response, return (dict, LLMResponse).

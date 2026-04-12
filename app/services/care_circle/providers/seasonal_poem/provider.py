@@ -136,7 +136,7 @@ class SeasonalPoemProvider(BaseCareCircleProvider):
                 '{"title": "...", "lines": "line1\\nline2\\nline3\\nline4"}'
             )
             data, llm_response = await generate_json_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=128
+                prompt, system=DEMENTIA_SYSTEM_PROMPT
             )
             self.log_llm_response(llm_response, prompt=prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT)
             if data.get("title") and data.get("lines"):

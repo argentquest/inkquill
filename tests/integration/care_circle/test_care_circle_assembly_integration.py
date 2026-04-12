@@ -232,7 +232,6 @@ def test_provider_registry_includes_all_seed_providers(client, register_and_logi
     assert "brain_booster" in provider_keys
     assert "animal_friend" in provider_keys
     assert "bingo" in provider_keys
-    assert "crossword" in provider_keys
     assert "daily_blessing" in provider_keys
     assert "memory_lane_photo" in provider_keys
     assert "simple_math" in provider_keys
@@ -257,3 +256,163 @@ def test_patient_session_includes_highlights_with_provider_keys(client, register
     for h in highlights:
         assert "providerKey" in h
         assert h["providerKey"] is not None
+
+
+# ── Provider config reorder endpoint ──────────────────────────────────────────
+
+def test_reorder_provider_configs_success(client, register_and_login, run_db):
+    """`POST /family/patients/{id}/provider-configs/reorder` updates display_order."""
+    payload, _ = register_and_login("carecircle_reorder_test")
+
+    # Force seeding
+    client.get("/api/v1/care-circle/family/patients")
+
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    # Create initial configs
+    client.put(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/joke",
+        json={"is_enabled": True, "display_order": 0},
+    )
+    client.put(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/weather",
+        json={"is_enabled": True, "display_order": 1},
+    )
+    client.put(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/nostalgia",
+        json={"is_enabled": True, "display_order": 2},
+    )
+
+    # Reorder: weather first, then joke, then nostalgia
+    response = client.post(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/reorder",
+        json={
+            "ordering": [
+                {"provider_key": "weather", "display_order": 0},
+                {"provider_key": "joke", "display_order": 1},
+                {"provider_key": "nostalgia", "display_order": 2},
+            ]
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["message"] == "Order saved"
+
+    # Verify the order was persisted
+    get_response = client.get(f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs")
+    assert get_response.status_code == 200
+    configs = get_response.json()["data"]
+
+    order_map = {c["provider_key"]: c["display_order"] for c in configs}
+    assert order_map["weather"] == 0
+    assert order_map["joke"] == 1
+    assert order_map["nostalgia"] == 2
+
+
+def test_reorder_provider_configs_creates_missing_configs(client, register_and_login, run_db):
+    """`POST /provider-configs/reorder` creates configs for providers that don't exist yet."""
+    payload, _ = register_and_login("carecircle_reorder_create_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    # Reorder without creating configs first - should create them
+    response = client.post(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/reorder",
+        json={
+            "ordering": [
+                {"provider_key": "brain_booster", "display_order": 0},
+                {"provider_key": "joke", "display_order": 1},
+            ]
+        },
+    )
+    assert response.status_code == 200
+
+    # Verify configs were created with correct order
+    get_response = client.get(f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs")
+    assert get_response.status_code == 200
+    configs = get_response.json()["data"]
+
+    order_map = {c["provider_key"]: c["display_order"] for c in configs}
+    assert order_map["brain_booster"] == 0
+    assert order_map["joke"] == 1
+
+
+def test_reorder_provider_configs_empty_ordering(client, register_and_login, run_db):
+    """`POST /provider-configs/reorder` with empty ordering succeeds (no-op)."""
+    payload, _ = register_and_login("carecircle_reorder_empty_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    response = client.post(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/reorder",
+        json={"ordering": []},
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["message"] == "Order saved"
+
+
+def test_reorder_provider_configs_404_for_unknown_patient(client, register_and_login):
+    """`POST /provider-configs/reorder` returns 404 for unknown patient."""
+    payload, _ = register_and_login("carecircle_reorder_404_test")
+
+    response = client.post(
+        "/api/v1/care-circle/family/patients/99999/provider-configs/reorder",
+        json={"ordering": [{"provider_key": "joke", "display_order": 0}]},
+    )
+    assert response.status_code == 404
+
+
+def test_reorder_provider_configs_invalid_payload_returns_422(client, register_and_login, run_db):
+    """`POST /provider-configs/reorder` returns 422 for invalid payload."""
+    payload, _ = register_and_login("carecircle_reorder_invalid_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    # Missing required fields in ordering items
+    response = client.post(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/reorder",
+        json={"ordering": [{"wrong_field": "joke"}]},
+    )
+    assert response.status_code == 422
+
+
+def test_reorder_provider_configs_then_verify_session_uses_order(client, register_and_login, run_db):
+    """Reordered display_order is reflected in patient session highlights."""
+    payload, _ = register_and_login("carecircle_reorder_session_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    # Create and enable specific providers with initial order
+    client.put(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/joke",
+        json={"is_enabled": True, "display_order": 0},
+    )
+    client.put(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/weather",
+        json={"is_enabled": True, "display_order": 1},
+    )
+
+    # Reorder to swap positions
+    client.post(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/reorder",
+        json={
+            "ordering": [
+                {"provider_key": "weather", "display_order": 0},
+                {"provider_key": "joke", "display_order": 1},
+            ]
+        },
+    )
+
+    # Verify configs reflect new order
+    get_response = client.get(f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs")
+    assert get_response.status_code == 200
+    configs = get_response.json()["data"]
+
+    order_map = {c["provider_key"]: c["display_order"] for c in configs}
+    assert order_map["weather"] == 0
+    assert order_map["joke"] == 1

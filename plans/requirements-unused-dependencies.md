@@ -102,7 +102,6 @@ These packages are actively imported and used in the `app/` codebase.
 ### Puzzle & Game Generation
 | Package | Usage |
 |---------|-------|
-| **`python-constraint`** | Used in [`app/services/care_circle/providers/crossword/provider.py`](app/services/care_circle/providers/crossword/provider.py:29) for CSP solving |
 | **`word-search-generator`** | Used in [`app/services/care_circle/providers/puzzle/provider.py`](app/services/care_circle/providers/puzzle/provider.py:2) for word search puzzles |
 
 ### Testing

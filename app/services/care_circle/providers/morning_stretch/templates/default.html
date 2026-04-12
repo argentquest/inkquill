@@ -1,0 +1,10 @@
+<div class="section section--morning_stretch">
+  <h2 class="section__title">🧘 Morning Stretch</h2>
+  <h3 class="section__subtitle">{{ title }}</h3>
+  <p class="section__body section__body--italic">{{ description }}</p>
+  <ol class="section__list mt-md">
+    {% for step in steps %}
+    <li class="section__list-item">{{ step }}</li>
+    {% endfor %}
+  </ol>
+</div>

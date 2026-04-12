@@ -87,7 +87,7 @@ class SongOfTheDayProvider(BaseCareCircleProvider):
                     f"Avoid any memories of loss, hardship, or distressing events."
                 )
                 llm_response = await generate_text_with_usage(
-                    fact_prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=64
+                    fact_prompt, system=DEMENTIA_SYSTEM_PROMPT
                 )
                 self.log_llm_response(
                     llm_response,

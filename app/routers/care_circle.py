@@ -12,6 +12,7 @@ from app.schemas.care_circle import (
     CareCirclePatientLoginRequest,
     CareCirclePatientUpdateRequest,
     CareCircleProviderPatientConfigUpdate,
+    CareCircleProviderReorderRequest,
 )
 
 router = APIRouter(prefix="/care-circle", tags=["care-circle"])
@@ -186,12 +187,38 @@ async def upsert_patient_provider_config(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
 
     config = await care_circle_crud.upsert_patient_provider_config(
-        db, patient_id, provider_key, payload.is_enabled, payload.custom_parameters
+        db, patient_id, provider_key, payload.is_enabled, payload.custom_parameters,
+        display_order=payload.display_order,
     )
     return ApiResponse.success_response(data={
         "id": config.id,
         "patient_id": config.patient_id,
         "provider_key": config.provider_key,
         "is_enabled": config.is_enabled,
+        "display_order": config.display_order,
         "custom_parameters": config.custom_parameters or {},
     })
+
+
+@router.post("/family/patients/{patient_id}/provider-configs/reorder", response_model=ApiResponse)
+async def reorder_patient_provider_configs(
+    patient_id: int,
+    payload: CareCircleProviderReorderRequest,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Bulk-update display_order for a patient's provider configs."""
+    family = await care_circle_crud.get_or_create_family_for_user(db, current_user)
+    patient = await db.scalar(
+        select(CareCirclePatientProfile).where(
+            CareCirclePatientProfile.id == patient_id,
+            CareCirclePatientProfile.family_id == family.id,
+        )
+    )
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+
+    await care_circle_crud.reorder_patient_provider_configs(
+        db, patient_id, [item.model_dump() for item in payload.ordering]
+    )
+    return ApiResponse.success_response(data={"message": "Order saved"})

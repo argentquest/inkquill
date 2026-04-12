@@ -51,7 +51,7 @@ class NatureSceneProvider(BaseCareCircleProvider):
                 "time of day, or sensory detail (colour, sound, smell). "
                 "Reply with only the scene description — one short phrase, no quotes, no explanation."
             )
-            theme_resp = await generate_text_with_usage(theme_prompt, max_tokens=60, temperature=1.0)
+            theme_resp = await generate_text_with_usage(theme_prompt, temperature=1.0)
             if theme_resp.content and len(theme_resp.content) > 5:
                 theme = theme_resp.content.strip().rstrip(".")
         except Exception as e:
@@ -67,7 +67,7 @@ class NatureSceneProvider(BaseCareCircleProvider):
                 "Avoid storms, darkness, isolation, or anything that could feel lonely or distressing."
             )
             text_resp = await generate_text_with_usage(
-                text_prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=256
+                text_prompt, system=DEMENTIA_SYSTEM_PROMPT
             )
             self.log_llm_response(
                 text_resp, prompt=text_prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT
@@ -96,7 +96,7 @@ class NatureSceneProvider(BaseCareCircleProvider):
                 f"Turn this into a short image generation prompt (15 words max), "
                 f"no people, peaceful outdoor scene: \"{description}\""
             )
-            ip_resp = await generate_text_with_usage(ip_prompt, max_tokens=60)
+            ip_resp = await generate_text_with_usage(ip_prompt)
             if ip_resp.content and len(ip_resp.content) > 5:
                 image_prompt = (
                     ip_resp.content.strip('"').strip()

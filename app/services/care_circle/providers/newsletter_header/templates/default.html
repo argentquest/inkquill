@@ -1,0 +1,135 @@
+<style>
+.newsletter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 60%, #4a9fd4 100%);
+    color: #ffffff;
+    border-radius: 14px 14px 0 0;
+    padding: 28px 36px;
+    margin-bottom: 0;
+    box-shadow: 0 4px 16px rgba(30, 58, 95, 0.25);
+    gap: 20px;
+}
+
+.newsletter-header__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.newsletter-header__logo-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    font-family: 'Verdana', sans-serif;
+}
+
+.newsletter-header__tagline {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-family: 'Georgia', serif;
+    line-height: 1.2;
+}
+
+.newsletter-header__divider {
+    width: 1px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.newsletter-header__patient {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 8px;
+}
+
+.newsletter-header__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.65;
+    font-family: 'Verdana', sans-serif;
+}
+
+.newsletter-header__name {
+    font-size: 30px;
+    font-weight: 800;
+    font-family: 'Georgia', serif;
+    line-height: 1.15;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.newsletter-header__family {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.82;
+    font-family: 'Verdana', sans-serif;
+    margin-top: 2px;
+}
+
+.newsletter-header__date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.newsletter-header__date-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.65;
+    font-family: 'Verdana', sans-serif;
+}
+
+.newsletter-header__date {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Verdana', sans-serif;
+    opacity: 0.92;
+    white-space: nowrap;
+}
+
+.newsletter-header__accent-bar {
+    height: 5px;
+    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%);
+    border-radius: 0 0 4px 4px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+</style>
+
+<div class="newsletter-header">
+    <div class="newsletter-header__brand">
+        <span class="newsletter-header__logo-text">Care Circle</span>
+        <span class="newsletter-header__tagline">Daily Newsletter</span>
+    </div>
+
+    <div class="newsletter-header__divider"></div>
+
+    <div class="newsletter-header__patient">
+        <span class="newsletter-header__label">Prepared for</span>
+        <span class="newsletter-header__name">{{ patient_name }}</span>
+        {% if family_name %}
+        <span class="newsletter-header__family">{{ family_name }} Family</span>
+        {% endif %}
+    </div>
+
+    <div class="newsletter-header__date-block">
+        <span class="newsletter-header__date-label">Generated on</span>
+        <span class="newsletter-header__date">{{ generated_at }}</span>
+    </div>
+</div>
+<div class="newsletter-header__accent-bar"></div>

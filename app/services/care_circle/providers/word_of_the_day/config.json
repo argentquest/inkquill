@@ -1,0 +1,9 @@
+{
+    "name": "Word of the Day",
+    "description": "A vocabulary enrichment card with a word, its meaning, and an example sentence.",
+    "technical_summary": "Static provider. Randomly selects one of 40 curated positive, accessible words from the built-in pool.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": false
+}

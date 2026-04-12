@@ -170,6 +170,230 @@
             "Nose",
             "Ear",
             "Window"
+        ],
+        "pets": [
+            "Dog",
+            "Cat",
+            "Hamster",
+            "Parrot",
+            "Tractor"
+        ],
+        "jewelry": [
+            "Ring",
+            "Necklace",
+            "Bracelet",
+            "Earring",
+            "Screwdriver"
+        ],
+        "dairy": [
+            "Milk",
+            "Cheese",
+            "Yogurt",
+            "Butter",
+            "Bread"
+        ],
+        "citrus": [
+            "Lemon",
+            "Lime",
+            "Orange",
+            "Grapefruit",
+            "Apple"
+        ],
+        "berries": [
+            "Strawberry",
+            "Blueberry",
+            "Raspberry",
+            "Blackberry",
+            "Watermelon"
+        ],
+        "root_vegetables": [
+            "Carrot",
+            "Potato",
+            "Turnip",
+            "Beet",
+            "Tomato"
+        ],
+        "pasta": [
+            "Spaghetti",
+            "Penne",
+            "Fusilli",
+            "Macaroni",
+            "Rice"
+        ],
+        "nuts": [
+            "Almond",
+            "Walnut",
+            "Pecan",
+            "Cashew",
+            "Raisin"
+        ],
+        "herbs": [
+            "Basil",
+            "Thyme",
+            "Rosemary",
+            "Sage",
+            "Pepper"
+        ],
+        "spices": [
+            "Cinnamon",
+            "Nutmeg",
+            "Clove",
+            "Ginger",
+            "Sugar"
+        ],
+        "fast_food": [
+            "Burger",
+            "Fries",
+            "Pizza",
+            "Hotdog",
+            "Salad"
+        ],
+        "seafood": [
+            "Salmon",
+            "Tuna",
+            "Shrimp",
+            "Crab",
+            "Chicken"
+        ],
+        "breakfast": [
+            "Egg",
+            "Bacon",
+            "Toast",
+            "Cereal",
+            "Steak"
+        ],
+        "writing": [
+            "Pen",
+            "Pencil",
+            "Marker",
+            "Chalk",
+            "Spoon"
+        ],
+        "lighting": [
+            "Lamp",
+            "Candle",
+            "Torch",
+            "Bulb",
+            "Mirror"
+        ],
+        "bedroom": [
+            "Bed",
+            "Pillow",
+            "Blanket",
+            "Sheet",
+            "Oven"
+        ],
+        "bathroom": [
+            "Towel",
+            "Soap",
+            "Shampoo",
+            "Toothbrush",
+            "Fork"
+        ],
+        "office": [
+            "Desk",
+            "Computer",
+            "Printer",
+            "Phone",
+            "Refrigerator"
+        ],
+        "garage": [
+            "Drill",
+            "Saw",
+            "Pliers",
+            "Wrench",
+            "Television"
+        ],
+        "winter": [
+            "Snow",
+            "Ice",
+            "Frost",
+            "Sleet",
+            "Sand"
+        ],
+        "spring": [
+            "Bloom",
+            "Bud",
+            "Sprout",
+            "Grow",
+            "Freeze"
+        ],
+        "gems": [
+            "Ruby",
+            "Diamond",
+            "Emerald",
+            "Sapphire",
+            "Glass"
+        ],
+        "metals": [
+            "Gold",
+            "Silver",
+            "Copper",
+            "Bronze",
+            "Wood"
+        ],
+        "fabrics": [
+            "Cotton",
+            "Silk",
+            "Wool",
+            "Linen",
+            "Paper"
+        ],
+        "shapes": [
+            "Circle",
+            "Square",
+            "Triangle",
+            "Rectangle",
+            "Cloud"
+        ],
+        "planets": [
+            "Mars",
+            "Venus",
+            "Jupiter",
+            "Saturn",
+            "Sun"
+        ],
+        "continents": [
+            "Asia",
+            "Africa",
+            "Europe",
+            "America",
+            "Atlantic"
+        ],
+        "coins": [
+            "Penny",
+            "Nickel",
+            "Dime",
+            "Quarter",
+            "Dollar"
+        ],
+        "cards": [
+            "Heart",
+            "Spade",
+            "Club",
+            "Diamond",
+            "Star"
+        ],
+        "chess": [
+            "King",
+            "Queen",
+            "Rook",
+            "Bishop",
+            "Ace"
+        ],
+        "baseball": [
+            "Bat",
+            "Ball",
+            "Glove",
+            "Base",
+            "Goal"
+        ],
+        "soccer": [
+            "Goal",
+            "Kick",
+            "Field",
+            "Team",
+            "Basket"
         ]
     },
     "difficulty": {

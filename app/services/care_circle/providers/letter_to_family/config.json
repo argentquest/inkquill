@@ -1,0 +1,9 @@
+{
+    "name": "Letter to Family",
+    "description": "A warm, heartfelt letter to share with your family — a connection and conversation starter.",
+    "technical_summary": "LLM provider. Generates a short personalised letter using Claude, themed around happy memories and gratitude. Falls back to 5 curated static letters.",
+    "grid_width": 4,
+    "grid_height": 3,
+    "common": false,
+    "llm": true
+}

@@ -10,6 +10,7 @@ import asyncio
 import importlib
 import json
 import os
+import random
 import subprocess
 import sys
 import time
@@ -27,39 +28,26 @@ os.environ.setdefault("APP_ENV", "development")
 SCRIPTS_DIR = Path(__file__).resolve().parent
 FRONTENDV1_DIR = ROOT / "frontendv1"
 
-# ── sample patient (matches real CareCirclePatientProfile shape) ───────────────
-class MockPatient:
-    id = 1
-    display_name = "Margaret Thompson"
-    first_name = "Margaret"
-    access_state = "active"
-    preferences = {
-        "recipient_name": "Margaret",
-        "preferences": {
-            "hometown": "Boston, Massachusetts",
-            "nationality_or_background": "Irish-American",
-            "era_of_youth": "1950s",
-            "preferred_pronoun": "she/her",
-            "hobbies": ["gardening", "reading", "knitting", "baking"],
-            "favorite_activities": ["walking in the park", "bird watching", "playing cards"],
-            "favourite_tv_shows": ["The Ed Sullivan Show", "I Love Lucy", "Jeopardy!"],
-            "favorite_singer": "Frank Sinatra",
-            "favorite_singers": ["Frank Sinatra", "Doris Day", "Bing Crosby"],
-            "family_members": [
-                {"name": "Robert", "relation": "son"},
-                {"name": "Claire", "relation": "daughter"},
-                {"name": "Thomas", "relation": "grandson"},
-            ],
-            "life_roles": ["mother", "grandmother", "retired school teacher"],
-            "pets": [{"name": "Mittens", "type": "cat"}],
-            "favourite_foods": ["apple pie", "chicken soup", "Irish soda bread"],
-            "mobility_level": "limited",
-            "city_for_weather": "Boston",
-            "default_city": "Boston",
-        },
-    }
-    city = "Boston"
-    birth_year = 1942
+# ── database patient loader ─────────────────────────────────────────────────────
+async def _load_active_patients():
+    """Fetch all active patients from the database."""
+    from app.db.database import async_session_local
+    from app.models.care_circle import CareCirclePatientProfile
+    from sqlalchemy import select
+
+    async with async_session_local() as db:
+        stmt = select(CareCirclePatientProfile).where(
+            CareCirclePatientProfile.access_state == "active"
+        ).order_by(CareCirclePatientProfile.id)
+        result = await db.execute(stmt)
+        patients = list(result.scalars().all())
+
+    if not patients:
+        print("No active patients found in database.")
+        return []
+
+    print(f"Found {len(patients)} active patient(s) in database.")
+    return patients
 
 
 # ── result record ──────────────────────────────────────────────────────────────
@@ -104,7 +92,11 @@ LLM_PROVIDERS = {
     )
 }
 
-ALL_PROVIDER_KEYS = sorted(p.parent.name for p in PROVIDERS_DIR.glob("*/provider.py"))
+_RAW_PROVIDER_KEYS = sorted(p.parent.name for p in PROVIDERS_DIR.glob("*/provider.py"))
+
+# Header and footer are run explicitly (first / last) outside the main loop
+LAYOUT_PROVIDERS = {"newsletter_header", "newsletter_footer"}
+ALL_PROVIDER_KEYS = [k for k in _RAW_PROVIDER_KEYS if k not in LAYOUT_PROVIDERS]
 
 ROOT_CONFIG = json.loads((PROVIDERS_DIR / "config.json").read_text(encoding="utf-8"))
 LABEL_MAP = {p["name"]: p["label"] for p in ROOT_CONFIG.get("providers", [])}
@@ -113,6 +105,7 @@ ICON_MAP  = {p["name"]: p.get("icon", "") for p in ROOT_CONFIG.get("providers", 
 
 def _to_camel(snake: str) -> str:
     return "".join(w.title() for w in snake.split("_"))
+
 
 
 # ── patched LLM helpers ────────────────────────────────────────────────────────
@@ -171,7 +164,7 @@ def _install_patches():
 
 
 # ── run one provider ───────────────────────────────────────────────────────────
-async def run_provider(key: str) -> ProviderResult:
+async def run_provider(key: str, patient, patient_config: dict | None = None) -> ProviderResult:
     label = LABEL_MAP.get(key, key)
     uses_llm = key in LLM_PROVIDERS
 
@@ -193,8 +186,7 @@ async def run_provider(key: str) -> ProviderResult:
                               error=f"Class {class_name} not found")
 
     TRACKER.reset()
-    instance = cls()
-    patient = MockPatient()
+    instance = cls(patient_config=patient_config or {})
 
     t0 = time.perf_counter()
     try:
@@ -252,7 +244,8 @@ STATUS_LABEL = {
 }
 
 
-def _build_html(results: list[ProviderResult], today: str) -> str:
+def _build_html(results: list[ProviderResult], today: str, patient_name: str,
+                header_html: str = "", footer_html: str = "") -> str:
     llm_ok  = sum(1 for r in results if r.status == "llm_ok")
     static  = sum(1 for r in results if r.status == "static")
     fb      = sum(1 for r in results if "fallback" in r.status)
@@ -401,7 +394,7 @@ def _build_html(results: list[ProviderResult], today: str) -> str:
 
 <div class="report-header">
   <h1>Care Circle Provider Test Report</h1>
-  <p>Patient: Margaret Thompson &nbsp;&bull;&nbsp; {today} &nbsp;&bull;&nbsp; Model: {model}</p>
+  <p>Patient: {patient_name} &nbsp;&bull;&nbsp; {today} &nbsp;&bull;&nbsp; Model: {model}</p>
   <div class="summary-row">
     <span class="summary-pill">Total: {len(results)}</span>
     <span class="summary-pill" style="background:rgba(34,197,94,0.4)">LLM OK: {llm_ok}</span>
@@ -411,7 +404,11 @@ def _build_html(results: list[ProviderResult], today: str) -> str:
   </div>
 </div>
 
+{header_html}
+
 {"".join(cards_html)}
+
+{footer_html}
 
 </body>
 </html>"""
@@ -467,52 +464,100 @@ async def main():
     print("Installing LLM patches...")
     _install_patches()
 
+    # Load patients from database and pick one at random
+    patients = await _load_active_patients()
+    if not patients:
+        print("No patients to process. Exiting.")
+        return
+
+    patient = random.choice(patients)
+    print(f"Selected patient: {patient.display_name or f'Patient {patient.id}'} (id={patient.id})")
+
+    patient_name = patient.display_name or f"Patient {patient.id}"
+    safe_name = patient_name.lower().replace(" ", "_").replace(",", "")
+
+    # One folder per run: logs/<safe_name>_<YYYYMMDD_HHMMSS>/
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    patient_name = MockPatient.display_name
+    run_dir = ROOT / "logs" / f"{safe_name}_{run_ts}"
+    run_dir.mkdir(parents=True, exist_ok=True)
 
-    # Output dirs
-    desktop = Path.home() / "Desktop"
-    out_dir = desktop if desktop.exists() else ROOT / "logs"
-    provider_html_dir = out_dir / f"care_circle_{run_ts}"
-    provider_html_dir.mkdir(parents=True, exist_ok=True)
+    today = date.today().isoformat()
 
-    print(f"Running {len(ALL_PROVIDER_KEYS)} providers for {patient_name}...\n")
+    print(f"\n{'=' * 60}")
+    print(f"Running {len(ALL_PROVIDER_KEYS)} providers for {patient_name} (id={patient.id})...")
+    print(f"Output folder: {run_dir}")
+    print(f"{'=' * 60}\n")
+
+    # ── Run newsletter header first ───────────────────────────────────────
+    print(f"  [{'newsletter_header':30}] ", end="", flush=True)
+    header_result = await run_provider("newsletter_header", patient)
+    print(f"-- {header_result.status:<22} {header_result.elapsed_s:5.2f}s")
+
     results: list[ProviderResult] = []
 
     for key in ALL_PROVIDER_KEYS:
         print(f"  [{key:30}] ", end="", flush=True)
-        r = await run_provider(key)
+        r = await run_provider(key, patient)
         tag = {"llm_ok": "OK", "static": "--", "fallback_internal": "FB",
                "fallback_exception": "XX", "load_error": "ER"}.get(r.status, "?")
         print(f"{tag} {r.status:<22} {r.elapsed_s:5.2f}s  tokens={r.tokens}")
 
         # Save individual provider HTML
-        html_file = save_provider_html(r, run_ts, patient_name, provider_html_dir)
+        html_file = save_provider_html(r, run_ts, patient_name, run_dir)
         if html_file:
             print(f"    -> {html_file.name}")
 
         results.append(r)
 
+    # ── Aggregate stats for footer ────────────────────────────────────────
+    total_tokens = sum(r.tokens for r in results)
+    total_elapsed = round(sum(r.elapsed_s for r in results), 1)
+    llm_ok_count = sum(1 for r in results if r.status == "llm_ok")
+    model_used = next((r.model_used for r in results if r.model_used), "")
+
     print("\n" + "=" * 60)
-    print(f"  LLM OK:           {sum(1 for r in results if r.status == 'llm_ok')}")
+    print(f"  LLM OK:           {llm_ok_count}")
     print(f"  Static (no LLM):  {sum(1 for r in results if r.status == 'static')}")
     print(f"  Fallback used:    {sum(1 for r in results if 'fallback' in r.status)}")
     print(f"  Load errors:      {sum(1 for r in results if r.status == 'load_error')}")
-    print(f"  Total tokens:     {sum(r.tokens for r in results):,}")
+    print(f"  Total tokens:     {total_tokens:,}")
     print("=" * 60)
 
-    today = date.today().isoformat()
+    # ── Run newsletter footer last with accumulated stats ─────────────────
+    from datetime import datetime as _dt
+    footer_config = {
+        "total_tokens": total_tokens,
+        "total_providers": len(results),
+        "llm_providers": llm_ok_count,
+        "model_used": model_used,
+        "elapsed_s": total_elapsed,
+        "generation_date": _dt.now().strftime("%B %d, %Y  \u2022  %I:%M %p"),
+    }
+    print(f"  [{'newsletter_footer':30}] ", end="", flush=True)
+    footer_result = await run_provider("newsletter_footer", patient,
+                                       patient_config=footer_config)
+    print(f"-- {footer_result.status:<22} {footer_result.elapsed_s:5.2f}s")
 
-    assembled_html_path = provider_html_dir / f"{run_ts}_assembled.html"
-    pdf_path = out_dir / f"care_circle_test_{run_ts}.pdf"
+    header_html = header_result.rendered_html
+    footer_html = footer_result.rendered_html
+
+    # Assembled HTML and PDF both go inside the run folder
+    assembled_html_path = run_dir / "assembled.html"
+    pdf_path = run_dir / "report.pdf"
 
     print(f"\nAssembling HTML -> {assembled_html_path}")
-    html_content = _build_html(results, today)
+    html_content = _build_html(results, today, patient_name,
+                               header_html=header_html, footer_html=footer_html)
     assembled_html_path.write_text(html_content, encoding="utf-8")
 
     print(f"Rendering PDF   -> {pdf_path}")
-    generate_pdf_via_playwright(assembled_html_path, pdf_path)
-    print(f"\nProvider HTML files saved to: {provider_html_dir}")
+    try:
+        generate_pdf_via_playwright(assembled_html_path, pdf_path)
+        print(f"PDF written to {pdf_path}")
+    except Exception as e:
+        print(f"PDF generation failed for {patient_name}: {e}")
+
+    print(f"\nAll files saved to: {run_dir}")
     print("Done.")
 
 

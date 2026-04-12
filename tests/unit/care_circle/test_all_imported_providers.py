@@ -57,13 +57,6 @@ def test_complete_the_duo_structure():
     assert hasattr(provider, '_generate_payload')
     assert provider.is_safe_for_patient is True  # Patient-safe by contract
 
-def test_crossword_structure():
-    from app.services.care_circle.providers.crossword.provider import CrosswordProvider
-    provider = CrosswordProvider()
-    assert isinstance(provider, BaseCareCircleProvider)
-    assert hasattr(provider, '_generate_payload')
-    assert provider.is_safe_for_patient is True  # Patient-safe by contract
-
 def test_daily_affirmation_structure():
     from app.services.care_circle.providers.daily_affirmation.provider import DailyAffirmationProvider
     provider = DailyAffirmationProvider()

@@ -1,0 +1,9 @@
+{
+    "name": "Number Sequence",
+    "description": "A gentle number pattern puzzle to keep your mind sharp.",
+    "technical_summary": "Static provider. Randomly selects one of 30 curated number/pattern sequences from the built-in pool.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": false
+}

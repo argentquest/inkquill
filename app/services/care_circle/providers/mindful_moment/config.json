@@ -1,0 +1,9 @@
+{
+    "name": "Mindful Moment",
+    "description": "A short, gentle mindfulness or breathing exercise to bring calm and peace.",
+    "technical_summary": "LLM provider. Generates a personalised mindfulness exercise using Claude. Falls back to a curated pool of 6 static exercises.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": true
+}

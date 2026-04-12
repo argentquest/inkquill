@@ -1,0 +1,9 @@
+{
+    "name": "Famous Face",
+    "description": "A familiar famous person from history, entertainment, or sport with a fun fact to remember.",
+    "technical_summary": "Static provider. Randomly selects one of 30 curated 20th-century famous figures from the built-in pool.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": false
+}

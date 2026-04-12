@@ -115,7 +115,7 @@ class NostalgiaProvider(BaseCareCircleProvider):
                 f"Focus only on warm, joyful, universally positive experiences."
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=256
+                prompt, system=DEMENTIA_SYSTEM_PROMPT
             )
             self.log_llm_response(
                 llm_response,

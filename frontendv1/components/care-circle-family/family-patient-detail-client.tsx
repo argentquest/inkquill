@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { PatientAccessStateBadge } from "@/components/care-circle-family/patient-access-state-badge";
+import { ProviderOrderingPanel } from "@/components/care-circle-family/provider-ordering-panel";
 import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import {
@@ -14,7 +15,6 @@ import {
   fetchCareCircleProviders,
   type CareCirclePatientUpdateInput,
   updateCareCirclePatient,
-  updateCareCirclePatientProviderConfig,
 } from "@/lib/api";
 
 function parseCsvList(value: string) {
@@ -51,8 +51,6 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   });
   const [isEditing, setIsEditing] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [providerSaveError, setProviderSaveError] = useState<string | null>(null);
-  const [pendingProviderKey, setPendingProviderKey] = useState<string | null>(null);
   const [formState, setFormState] = useState<CareCirclePatientUpdateInput>({
     familyName: "",
     joinCode: "",
@@ -107,28 +105,6 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
     },
   });
 
-  const providerConfigMutation = useMutation({
-    mutationFn: (input: { providerKey: string; isEnabled: boolean }) =>
-      updateCareCirclePatientProviderConfig(patientId, input.providerKey, {
-        is_enabled: input.isEnabled,
-        custom_parameters: {},
-      }),
-    onMutate: (input) => {
-      setProviderSaveError(null);
-      setPendingProviderKey(input.providerKey);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["care-circle-family-patient-provider-configs", patientId] });
-      setPendingProviderKey(null);
-    },
-    onError: (mutationError) => {
-      setPendingProviderKey(null);
-      setProviderSaveError(
-        mutationError instanceof Error ? mutationError.message : "Could not update provider access."
-      );
-    },
-  });
-
   if (isLoading) {
     return <LoadingState label="Loading patient profile" />;
   }
@@ -136,10 +112,6 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   if (isError || !patient) {
     return <ErrorState detail={error instanceof Error ? error.message : "Could not load the patient profile."} title="Patient profile unavailable" />;
   }
-
-  const providerStateByKey = new Map(
-    (providerConfigs ?? []).map((config) => [config.provider_key, config.is_enabled])
-  );
 
   return (
     <div className="space-y-8">
@@ -374,9 +346,9 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
       <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-display text-3xl text-ink-900">Provider selection</h2>
+            <h2 className="font-display text-3xl text-ink-900">Provider selection &amp; order</h2>
             <p className="mt-2 text-sm leading-7 text-ink-700">
-              Enable or disable specific providers for this patient. Disabled providers are skipped during session assembly.
+              Toggle providers on or off, then drag or use the arrows to set the order they appear in the newsletter.
             </p>
           </div>
           <Link
@@ -405,60 +377,12 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             />
           </div>
         ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {providerCatalog?.map((provider) => {
-              const isEnabled = providerStateByKey.get(provider.providerKey) ?? provider.enabled;
-              const isPending = pendingProviderKey === provider.providerKey && providerConfigMutation.isPending;
-
-              return (
-                <article
-                  key={provider.providerKey}
-                  className="rounded-[24px] border border-black/10 bg-[#fcfaf6] p-5"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{provider.icon || "📰"}</span>
-                        <div>
-                          <h3 className="font-semibold text-ink-900">{provider.label}</h3>
-                          <p className="text-xs uppercase tracking-[0.2em] text-ink-600">{provider.category}</p>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                        <span className="rounded-full border border-black/10 px-2 py-1 text-ink-700">
-                          {provider.patientVisible ? "Patient-safe" : "Family-only"}
-                        </span>
-                        <span className="rounded-full border border-black/10 px-2 py-1 text-ink-700">
-                          Global {provider.enabled ? "on" : "off"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <button
-                      className={`inline-flex min-w-24 justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
-                        isEnabled
-                          ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200"
-                          : "bg-slate-200 text-slate-800 hover:bg-slate-300"
-                      } disabled:cursor-not-allowed disabled:opacity-60`}
-                      disabled={providerConfigMutation.isPending}
-                      onClick={() =>
-                        providerConfigMutation.mutate({
-                          providerKey: provider.providerKey,
-                          isEnabled: !isEnabled,
-                        })
-                      }
-                      type="button"
-                    >
-                      {isPending ? "Saving..." : isEnabled ? "Enabled" : "Disabled"}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <ProviderOrderingPanel
+            patientId={patientId}
+            providerCatalog={providerCatalog ?? []}
+            providerConfigs={providerConfigs ?? []}
+          />
         )}
-
-        {providerSaveError ? <p className="mt-4 text-sm text-[#a0382b]">{providerSaveError}</p> : null}
       </section>
     </div>
   );

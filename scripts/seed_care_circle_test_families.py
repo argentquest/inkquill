@@ -40,6 +40,8 @@ class SeedPatient:
     recipient_name: str
     auth_image_keys: list[str]
     preferences: dict[str, Any]
+    email: str = ""
+    phone_number: str = ""
 
 
 @dataclass(frozen=True)
@@ -93,6 +95,8 @@ PATIENTS = [
         family_name="Maple Grove",
         owner_email="ericsilvertx+clara@gmail.com",
         recipient_name="Clara Maple",
+        email="ericsilvertx+patient.clara@gmail.com",
+        phone_number="+15125550101",
         auth_image_keys=["sun", "flower", "house"],
         preferences={
             "city_for_weather": "Portland, OR",
@@ -123,6 +127,8 @@ PATIENTS = [
         family_name="Maple Grove",
         owner_email="ericsilvertx+clara@gmail.com",
         recipient_name="Mason Maple",
+        email="ericsilvertx+patient.mason@gmail.com",
+        phone_number="+15125550102",
         auth_image_keys=["dog", "car", "tree"],
         preferences={
             "city_for_weather": "Portland, OR",
@@ -153,6 +159,8 @@ PATIENTS = [
         family_name="Maple Grove",
         owner_email="ericsilvertx+clara@gmail.com",
         recipient_name="Nina Maple",
+        email="ericsilvertx+patient.nina@gmail.com",
+        phone_number="+15125550103",
         auth_image_keys=["cake", "bird", "flower"],
         preferences={
             "city_for_weather": "Portland, OR",
@@ -183,6 +191,8 @@ PATIENTS = [
         family_name="Harbor Point",
         owner_email="olivia.harbor@example.com",
         recipient_name="Olivia Harbor",
+        email="ericsilvertx+patient.olivia@gmail.com",
+        phone_number="+441234550201",
         auth_image_keys=["bird", "house", "tree"],
         preferences={
             "city_for_weather": "Portsmouth",
@@ -213,6 +223,8 @@ PATIENTS = [
         family_name="Harbor Point",
         owner_email="olivia.harbor@example.com",
         recipient_name="Ethan Harbor",
+        email="ericsilvertx+patient.ethan@gmail.com",
+        phone_number="+16175550202",
         auth_image_keys=["car", "sun", "bird"],
         preferences={
             "city_for_weather": "Boston, MA",
@@ -243,6 +255,8 @@ PATIENTS = [
         family_name="Harbor Point",
         owner_email="olivia.harbor@example.com",
         recipient_name="Jack Harbor",
+        email="ericsilvertx+patient.jack@gmail.com",
+        phone_number="+353871550203",
         auth_image_keys=["dog", "cake", "house"],
         preferences={
             "city_for_weather": "Galway",
@@ -273,6 +287,8 @@ PATIENTS = [
         family_name="Sunset Ridge",
         owner_email="ericsilvertx+sophie@gmail.com",
         recipient_name="Sophie Sunset",
+        email="ericsilvertx+patient.sophie@gmail.com",
+        phone_number="+61291550301",
         auth_image_keys=["flower", "tree", "sun"],
         preferences={
             "city_for_weather": "Sydney",
@@ -303,6 +319,8 @@ PATIENTS = [
         family_name="Sunset Ridge",
         owner_email="ericsilvertx+sophie@gmail.com",
         recipient_name="Noah Sunset",
+        email="ericsilvertx+patient.noah@gmail.com",
+        phone_number="+16025550302",
         auth_image_keys=["car", "dog", "bird"],
         preferences={
             "city_for_weather": "Phoenix, AZ",
@@ -333,6 +351,8 @@ PATIENTS = [
         family_name="Sunset Ridge",
         owner_email="ericsilvertx+sophie@gmail.com",
         recipient_name="Maya Sunset",
+        email="ericsilvertx+patient.maya@gmail.com",
+        phone_number="+13055550303",
         auth_image_keys=["cake", "flower", "house"],
         preferences={
             "city_for_weather": "Miami, FL",
@@ -363,6 +383,8 @@ PATIENTS = [
         family_name="Maple Grove",
         owner_email="ericsilvertx+clara@gmail.com",
         recipient_name="Taylor Shared",
+        email="ericsilvertx+patient.taylor@gmail.com",
+        phone_number="+13125550401",
         auth_image_keys=["moon", "star", "boat"],
         preferences={
             "city_for_weather": "Chicago, IL",
@@ -393,6 +415,8 @@ PATIENTS = [
         family_name="Harbor Point",
         owner_email="olivia.harbor@example.com",
         recipient_name="Taylor Shared",
+        email="ericsilvertx+patient.taylor@gmail.com",
+        phone_number="+13125550401",
         auth_image_keys=["moon", "star", "boat"],
         preferences={
             "city_for_weather": "Chicago, IL",
@@ -423,6 +447,8 @@ PATIENTS = [
         family_name="Sunset Ridge",
         owner_email="ericsilvertx+sophie@gmail.com",
         recipient_name="Taylor Shared",
+        email="ericsilvertx+patient.taylor@gmail.com",
+        phone_number="+13125550401",
         auth_image_keys=["moon", "star", "boat"],
         preferences={
             "city_for_weather": "Chicago, IL",
@@ -607,6 +633,9 @@ async def _upsert_patient(session, family: CareCircleFamily, owner_user: User, s
             family_id=family.id,
             created_by_user_id=owner_user.id,
             display_name=seed_patient.recipient_name,
+            family_name=seed_patient.family_name,
+            email=seed_patient.email or None,
+            phone_number=seed_patient.phone_number or None,
             stage=prefs.get("cognitive_stage", "mild"),
             access_state="active",
             timezone=prefs.get("timezone", "America/Chicago"),
@@ -620,6 +649,9 @@ async def _upsert_patient(session, family: CareCircleFamily, owner_user: User, s
     else:
         patient.created_by_user_id = owner_user.id
         patient.display_name = seed_patient.recipient_name
+        patient.family_name = seed_patient.family_name
+        patient.email = seed_patient.email or None
+        patient.phone_number = seed_patient.phone_number or None
         patient.stage = prefs.get("cognitive_stage", patient.stage)
         patient.access_state = "active"
         patient.timezone = prefs.get("timezone", patient.timezone)

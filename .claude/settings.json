@@ -23,7 +23,13 @@
       "Bash(where \"Google Chrome\")",
       "Read(//c/Users/WGDEVES/AppData/Local/**)",
       "Bash(grep -rn \"provider_key\\\\s*=\" c:/Code/inkandquill/inkquill/app/services/care_circle/providers/*/provider.py)",
-      "Bash(.venv/Scripts/python.exe -)"
+      "Bash(.venv/Scripts/python.exe -)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/unit/care_circle/ -q)",
+      "WebSearch",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(alembic upgrade:*)",
+      "Bash(ls *.cfg *.ini)"
     ]
   }
 }

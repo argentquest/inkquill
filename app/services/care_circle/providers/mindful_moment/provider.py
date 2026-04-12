@@ -138,7 +138,7 @@ class MindfulMomentProvider(BaseCareCircleProvider):
                 '{"title": "...", "instruction": "...", "duration_note": "Takes about X minutes."}'
             )
             data, llm_response = await generate_json_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=256
+                prompt, system=DEMENTIA_SYSTEM_PROMPT
             )
             self.log_llm_response(llm_response, prompt=prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT)
             if data.get("title") and data.get("instruction"):

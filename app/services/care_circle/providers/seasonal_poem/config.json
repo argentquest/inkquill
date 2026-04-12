@@ -1,0 +1,9 @@
+{
+    "name": "Seasonal Poem",
+    "description": "A short, cheerful poem about the current season.",
+    "technical_summary": "LLM provider. Generates a 4-line seasonal poem using Claude. Falls back to 8 curated static poems (2 per season).",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": true
+}

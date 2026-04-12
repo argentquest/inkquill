@@ -1,5 +1,6 @@
 import httpx
 import logging
+import random
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from typing import Any, Dict
@@ -26,7 +27,7 @@ class CatFactProvider(BaseCareCircleProvider):
         """
         cfg = self.patient_config
         api_url = cfg.get("api_url", "https://catfact.ninja/fact")
-        image_url = cfg.get("image_api", "https://cataas.com/cat")
+        image_url = f"https://cataas.com/cat?v={random.randint(1, 1_000_000)}"
         fallback = cfg.get("fallback", "Cats sleep for about 70% of their lives. That's about 13-16 hours a day!")
         try:
             async with httpx.AsyncClient() as client:

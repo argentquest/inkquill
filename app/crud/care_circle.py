@@ -71,8 +71,7 @@ DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "animal_friend", "label": "Animal Friend", "icon": "🐾", "category": "memory", "display_order": 33, "patient_visible": True, "family_visible": True},
     {"provider_key": "bingo", "label": "Bingo", "icon": "🎲", "category": "games", "display_order": 34, "patient_visible": True, "family_visible": True},
     {"provider_key": "color_match", "label": "Color Match", "icon": "🎨", "category": "games", "display_order": 35, "patient_visible": True, "family_visible": True},
-    {"provider_key": "crossword", "label": "Crossword", "icon": "🧩", "category": "games", "display_order": 36, "patient_visible": True, "family_visible": True},
-    {"provider_key": "daily_blessing", "label": "Daily Blessing", "icon": "🕊️", "category": "wellbeing", "display_order": 37, "patient_visible": True, "family_visible": True},
+    {"provider_key": "daily_blessing", "label": "Daily Blessing", "icon": "🕊️", "category": "wellbeing", "display_order": 36, "patient_visible": True, "family_visible": True},
     {"provider_key": "memory_lane_photo", "label": "Memory Lane Photo", "icon": "📷", "category": "memory", "display_order": 38, "patient_visible": True, "family_visible": True},
     {"provider_key": "simple_math", "label": "Simple Math", "icon": "➕", "category": "games", "display_order": 39, "patient_visible": True, "family_visible": True},
     {"provider_key": "word_connect", "label": "Word Connect", "icon": "🔗", "category": "games", "display_order": 40, "patient_visible": True, "family_visible": True},
@@ -455,6 +454,7 @@ async def get_patient_provider_configs(
             "patient_id": c.patient_id,
             "provider_key": c.provider_key,
             "is_enabled": c.is_enabled,
+            "display_order": c.display_order,
             "custom_parameters": c.custom_parameters or {},
         }
         for c in configs
@@ -467,6 +467,7 @@ async def upsert_patient_provider_config(
     provider_key: str,
     is_enabled: bool,
     custom_parameters: dict | None = None,
+    display_order: int | None = None,
 ) -> CareCircleProviderPatientConfig:
     """Insert or update a per-patient provider config."""
     existing = await db.scalar(
@@ -479,6 +480,8 @@ async def upsert_patient_provider_config(
         existing.is_enabled = is_enabled
         if custom_parameters is not None:
             existing.custom_parameters = custom_parameters
+        if display_order is not None:
+            existing.display_order = display_order
         await db.commit()
         await db.refresh(existing)
         return existing
@@ -487,9 +490,38 @@ async def upsert_patient_provider_config(
             patient_id=patient_id,
             provider_key=provider_key,
             is_enabled=is_enabled,
+            display_order=display_order,
             custom_parameters=custom_parameters or {},
         )
         db.add(new_config)
         await db.commit()
         await db.refresh(new_config)
         return new_config
+
+
+async def reorder_patient_provider_configs(
+    db: AsyncSession,
+    patient_id: int,
+    ordering: list[dict],
+) -> None:
+    """Bulk-update display_order for a patient's enabled provider configs."""
+    for item in ordering:
+        provider_key = item["provider_key"]
+        new_order = item["display_order"]
+        existing = await db.scalar(
+            select(CareCircleProviderPatientConfig).where(
+                CareCircleProviderPatientConfig.patient_id == patient_id,
+                CareCircleProviderPatientConfig.provider_key == provider_key,
+            )
+        )
+        if existing:
+            existing.display_order = new_order
+        else:
+            db.add(CareCircleProviderPatientConfig(
+                patient_id=patient_id,
+                provider_key=provider_key,
+                is_enabled=True,
+                display_order=new_order,
+                custom_parameters={},
+            ))
+    await db.commit()

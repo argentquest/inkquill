@@ -55,6 +55,16 @@ class CareCirclePatientLoginRequest(BaseModel):
 class CareCircleProviderPatientConfigUpdate(BaseModel):
     is_enabled: bool = True
     custom_parameters: dict = Field(default_factory=dict)
+    display_order: Optional[int] = None
+
+
+class ProviderReorderItem(BaseModel):
+    provider_key: str
+    display_order: int
+
+
+class CareCircleProviderReorderRequest(BaseModel):
+    ordering: List[ProviderReorderItem]
 
 
 class CareCirclePatientUpdateRequest(BaseModel):
@@ -76,6 +86,7 @@ class CareCircleProviderPatientConfigRead(BaseModel):
     patient_id: int
     provider_key: str
     is_enabled: bool
+    display_order: Optional[int] = None
     custom_parameters: dict = Field(default_factory=dict)
 
     model_config = ConfigDict(from_attributes=True)

@@ -68,6 +68,11 @@ class Settings(BaseSettings):
     CARE_CIRCLE_DEFAULT_TEXT_MODEL: str = Field(default="google/gemini-3.1-flash-lite-preview", alias="CARE_CIRCLE_DEFAULT_TEXT_MODEL")
     CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="openai/gpt-image-1", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
 
+    # --- LM Studio (local) Configuration ---
+    LMSTUDIO_BASE_URL: str = Field(default="http://localhost:1234/v1", alias="LMSTUDIO_BASE_URL")
+    LMSTUDIO_MODEL: str = Field(default="local-model", alias="LMSTUDIO_MODEL")
+    LMSTUDIO_ENABLED: bool = Field(default=False, alias="LMSTUDIO_ENABLED")
+
     # --- Standard OpenAI API Configuration (optional fallback) ---
     OPENAI_API_KEY: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")
     OPENAI_IMAGE_MODEL: str = Field(default="gpt-image-1", alias="OPENAI_IMAGE_MODEL")
@@ -135,6 +140,13 @@ class Settings(BaseSettings):
     }
     DEFAULT_TOKENIZER: str = Field(default="cl100k_base", alias="DEFAULT_TOKENIZER")
     DEFAULT_MODEL_FOR_CHUNKING: str = Field(default="gpt-3.5-turbo", alias="DEFAULT_MODEL_FOR_CHUNKING")
+
+    # --- Twilio SMS Configuration ---
+    TWILIO_ACCOUNT_SID: Optional[str] = Field(default=None, alias="TWILIO_ACCOUNT_SID")
+    TWILIO_AUTH_TOKEN: Optional[str] = Field(default=None, alias="TWILIO_AUTH_TOKEN")
+    TWILIO_FROM_NUMBER: Optional[str] = Field(default=None, alias="TWILIO_FROM_NUMBER")
+    SMS_TEST_MODE: bool = Field(default=True, alias="SMS_TEST_MODE")
+    SMS_TEST_NUMBER: Optional[str] = Field(default=None, alias="SMS_TEST_NUMBER")
 
     # --- Email Configuration ---
     SMTP_SERVER: Optional[str] = Field(default=None, alias="SMTP_SERVER")

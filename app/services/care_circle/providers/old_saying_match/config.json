@@ -1,0 +1,9 @@
+{
+    "name": "Old Saying Match",
+    "description": "A familiar old saying — can you remember what it means?",
+    "technical_summary": "Static provider. Randomly selects one of 45 classic sayings and reveals its meaning from the built-in pool.",
+    "grid_width": 4,
+    "grid_height": 2,
+    "common": false,
+    "llm": false
+}

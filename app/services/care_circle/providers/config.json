@@ -38,7 +38,19 @@
     {"name": "daily_blessing", "label": "Daily Blessing", "icon": "🕊️", "enabled": true, "order": 37, "category": "wellbeing", "patient_visible": true, "family_visible": true},
     {"name": "memory_lane_photo", "label": "Memory Lane Photo", "icon": "📷", "enabled": true, "order": 38, "category": "memory", "patient_visible": true, "family_visible": true},
     {"name": "simple_math", "label": "Simple Math", "icon": "➕", "enabled": true, "order": 39, "category": "games", "patient_visible": true, "family_visible": true},
-    {"name": "word_connect", "label": "Word Connect", "icon": "🔗", "enabled": true, "order": 40, "category": "games", "patient_visible": true, "family_visible": true}
+    {"name": "word_connect", "label": "Word Connect", "icon": "🔗", "enabled": true, "order": 40, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "morning_stretch", "label": "Morning Stretch", "icon": "🧘", "enabled": true, "order": 41, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "word_of_the_day", "label": "Word of the Day", "icon": "📖", "enabled": true, "order": 42, "category": "core", "patient_visible": true, "family_visible": true},
+    {"name": "country_spotlight", "label": "Country Spotlight", "icon": "🌍", "enabled": true, "order": 43, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "number_sequence", "label": "Number Sequence", "icon": "🔢", "enabled": true, "order": 44, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "hymn_of_the_day", "label": "Hymn of the Day", "icon": "🎼", "enabled": true, "order": 45, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "mindful_moment", "label": "Mindful Moment", "icon": "🌸", "enabled": true, "order": 46, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "seasonal_poem", "label": "Seasonal Poem", "icon": "🍂", "enabled": true, "order": 47, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "old_saying_match", "label": "Old Saying Match", "icon": "💬", "enabled": true, "order": 48, "category": "games", "patient_visible": true, "family_visible": true},
+    {"name": "letter_to_family", "label": "Letter to Family", "icon": "✉️", "enabled": true, "order": 49, "category": "wellbeing", "patient_visible": true, "family_visible": true},
+    {"name": "famous_face", "label": "Famous Face", "icon": "⭐", "enabled": true, "order": 50, "category": "memory", "patient_visible": true, "family_visible": true},
+    {"name": "newsletter_header", "label": "Newsletter Header", "icon": "📰", "enabled": true, "order": 0, "category": "layout", "patient_visible": true, "family_visible": true},
+    {"name": "newsletter_footer", "label": "Newsletter Footer", "icon": "📋", "enabled": true, "order": 99, "category": "layout", "patient_visible": true, "family_visible": true}
   ],
   "default_theme": "classic",
   "assembly": {
