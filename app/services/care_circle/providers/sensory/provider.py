@@ -113,7 +113,7 @@ class SensoryProvider(BaseCareCircleProvider):
                 f"Ensure the activity is accessible for someone who may be seated."
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=128
             )
             self.log_llm_response(
                 llm_response,

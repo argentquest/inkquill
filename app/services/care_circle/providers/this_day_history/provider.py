@@ -62,7 +62,7 @@ class ThisDayHistoryProvider(BaseCareCircleProvider):
                         # Use LLM to rewrite for memory care
                         prompt = f"Rewrite this historical event to be one short, warm sentence for an 88-year-old: '{text} (Year: {year})'. Focus on the positive or neutral aspects only. Avoid any mention of conflict, tragedy, or distressing events."
                         try:
-                            llm_response = await generate_text_with_usage(prompt, system=DEMENTIA_SYSTEM_PROMPT)
+                            llm_response = await generate_text_with_usage(prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=128)
                             self.log_llm_response(llm_response, prompt=prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT)
                             if llm_response.content:
                                 return {"year": year, "event": llm_response.content, "month": today.strftime("%B"), "day": today.day}

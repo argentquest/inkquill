@@ -36,10 +36,17 @@ class LLMResponse:
 def _build_text_client():
     """Return (AsyncOpenAI client, model_name) for text generation.
 
-    Priority: OpenRouter (CARE_CIRCLE_DEFAULT_TEXT_MODEL) → OpenAI fallback.
+    Priority: LM Studio (local) → OpenRouter → OpenAI fallback.
     """
     import openai
     from app.core.config import settings
+
+    if settings.LMSTUDIO_ENABLED:
+        client = openai.AsyncOpenAI(
+            api_key="lm-studio",  # LM Studio doesn't validate the key
+            base_url=settings.LMSTUDIO_BASE_URL,
+        )
+        return client, settings.LMSTUDIO_MODEL
 
     if settings.OPENROUTER_API_KEY:
         model_name = settings.CARE_CIRCLE_DEFAULT_TEXT_MODEL
@@ -98,7 +105,7 @@ async def generate_text_with_usage(
     prompt: str,
     system: str | None = None,
     max_tokens: int = 512,
-    temperature: float = 0.7,
+    temperature: float = 0.9,
 ) -> LLMResponse:
     """Call the LLM and return an LLMResponse whose `.content` is the text reply."""
     client, model_name = _build_text_client()
@@ -130,7 +137,7 @@ async def generate_json_with_usage(
     prompt: str,
     system: str | None = None,
     max_tokens: int = 1024,
-    temperature: float = 0.7,
+    temperature: float = 0.9,
 ) -> Tuple[dict[str, Any], LLMResponse]:
     """Call the LLM, parse JSON from the response, return (dict, LLMResponse).
 
@@ -164,7 +171,7 @@ async def generate_json_with_usage(
 
 
 async def generate_image_url_with_usage(prompt: str) -> LLMResponse:
-    """Generate an image and return an LLMResponse whose `.content` is the URL."""
+    """Generate an image and return an LLMResponse whose `.content` is a URL or data URI."""
     client, model_name = _build_image_client()
 
     response = await client.images.generate(
@@ -172,9 +179,18 @@ async def generate_image_url_with_usage(prompt: str) -> LLMResponse:
         prompt=prompt,
         n=1,
         size="1024x1024",
+        quality="low",
     )
-    image_url: str = response.data[0].url or ""
+    item = response.data[0]
+
+    # Prefer a direct URL if the model returns one
+    image_url: str = item.url or ""
+
+    # Some models (e.g. gpt-image-1) return base64 instead of a URL
+    if not image_url and item.b64_json:
+        image_url = f"data:image/png;base64,{item.b64_json}"
+
     if not image_url:
-        raise RuntimeError("Image generation returned no URL.")
+        raise RuntimeError("Image generation returned no URL or base64 data.")
 
     return LLMResponse(content=image_url, model=model_name)

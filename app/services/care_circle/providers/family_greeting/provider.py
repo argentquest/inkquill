@@ -80,7 +80,7 @@ class FamilyGreetingProvider(BaseCareCircleProvider):
                 f"{context_str}"
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=256
             )
             self.log_llm_response(
                 llm_response,

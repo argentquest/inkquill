@@ -74,7 +74,7 @@ class LocalHistoryProvider(BaseCareCircleProvider):
                 f"Avoid wars, disasters, controversial events, or anything distressing."
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=256
             )
             self.log_llm_response(
                 llm_response,
