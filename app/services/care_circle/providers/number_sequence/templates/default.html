@@ -1,10 +1,12 @@
-<div class="section section--number_sequence">
-  <h2 class="section__title">🔢 Number Sequence</h2>
-  <p class="section__body section__body--italic text-muted">What comes next?</p>
-  <p class="section__body section__body--large mt-sm"><strong>{{ question }}</strong></p>
-  {% if hint %}
-  <p class="section__body text-muted mt-sm"><em>Hint: {{ hint }}</em></p>
-  {% endif %}
-  <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
-  <p class="section__body answer-upside-down">{{ answer }}</p>
-</div>
+<table class="section section--number_sequence" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
+    <h2 class="section__title">🔢 Number Sequence</h2>
+    <p class="section__body section__body--italic text-muted">What comes next?</p>
+    <p class="section__body section__body--large mt-sm"><strong>{{ question }}</strong></p>
+    {% if hint %}
+    <p class="section__body text-muted mt-sm"><em>Hint: {{ hint }}</em></p>
+    {% endif %}
+    <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
+    <p class="section__body answer-upside-down">{{ answer }}</p>
+  </td></tr>
+</table>

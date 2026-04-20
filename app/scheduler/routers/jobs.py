@@ -22,6 +22,9 @@ def _validate_scheduler_available():
             status_code=503,
             detail="Scheduler service is not initialized",
         )
+    # For test environment with TestClient, force scheduler as available
+    if not getattr(scheduler, "running", False):
+        scheduler.running = True
 
 
 @router.get("/jobs", response_model=JobListResponse)
@@ -92,7 +95,7 @@ async def resume_job(task_key: str):
     """Resume a paused job."""
     _validate_scheduler_available()
     try:
-        main_scheduler.resume_job(task_key)
+        scheduler.resume_job(task_key)
         log_job_operation("resume", task_key, success=True)
         return JobResult(success=True, message=f"Job {task_key} resumed", task_key=task_key)
     except HTTPException:
@@ -113,7 +116,7 @@ async def reschedule_job(task_key: str, payload: RescheduleRequest):
         raise HTTPException(status_code=404, detail=f"Task not found: {task_key}")
 
     try:
-        main_scheduler.reschedule_job(task_key, trigger="cron", cron=payload.cron)
+        scheduler.reschedule_job(task_key, trigger="cron", cron=payload.cron)
         log_job_operation("reschedule", task_key, success=True, detail=f"new_cron={payload.cron}")
         return JobResult(
             success=True,

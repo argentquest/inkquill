@@ -44,6 +44,43 @@
             "request": "launch",
             "command": "npm run dev -- --port 3001",
             "cwd": "${workspaceFolder}/frontendv1"
+        },
+        {
+            "name": "Scheduler: Use This (stable debug)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.scheduler.main:app",
+                "--host", "localhost",
+                "--port", "8001",
+                "--log-level", "debug"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Scheduler: Optional (reload, less stable)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.scheduler.main:app",
+                "--host", "localhost",
+                "--port", "8001",
+                "--reload",
+                "--log-level", "debug"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
         }
     ],
     "compounds": [
@@ -60,6 +97,23 @@
             "configurations": [
                 "Backend: Optional (reload, less stable)",
                 "Frontend: Use This (Next.js dev)"
+            ],
+            "stopAll": true
+        },
+        {
+            "name": "Full Stack + Scheduler: Use This",
+            "configurations": [
+                "Backend: Use This (stable debug)",
+                "Scheduler: Use This (stable debug)",
+                "Frontend: Use This (Next.js dev)"
+            ],
+            "stopAll": true
+        },
+        {
+            "name": "Backend + Scheduler: Use This",
+            "configurations": [
+                "Backend: Use This (stable debug)",
+                "Scheduler: Use This (stable debug)"
             ],
             "stopAll": true
         }

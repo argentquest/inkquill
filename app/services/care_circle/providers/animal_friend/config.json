@@ -9,14 +9,12 @@
         "medium": {},
         "hard": {}
     },
-    "warm_facts": [
+    "dog_facts": [
         "Dogs are loyal friends who love to see their families.",
-        "Cats enjoy warm sunny spots and gentle pets.",
-        "Birds sing beautiful songs that brighten our days.",
-        "Fish swimming calmly can help us feel peaceful.",
-        "Bunnies love gentle strokes and quiet company.",
-        "Butterflies remind us that beautiful things come our way.",
-        "Horses are gentle giants who sense our feelings.",
-        "Dolphins are playful and love to make us smile."
+        "Golden retrievers are known for their friendly and patient nature.",
+        "Labrador dogs are wonderful companions who love gentle walks.",
+        "Poodles are intelligent dogs who enjoy gentle games and walks.",
+        "Beagles are curious hounds who follow interesting scents happily.",
+        "Corgis are cheerful little dogs with big personalities."
     ]
 }

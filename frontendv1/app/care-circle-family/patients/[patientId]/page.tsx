@@ -25,7 +25,7 @@ export default async function CareCircleFamilyPatientDetailPage({
         eyebrow="Patient detail"
         title="Patient profile"
       />
-      <FamilyPatientDetailClient patientId={patientId} />
+      <FamilyPatientDetailClient key={patientId} patientId={patientId} />
     </div>
   );
 }

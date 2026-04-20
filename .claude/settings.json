@@ -29,7 +29,21 @@
       "Skill(claude-api)",
       "Skill(claude-api:*)",
       "Bash(alembic upgrade:*)",
-      "Bash(ls *.cfg *.ini)"
+      "Bash(ls *.cfg *.ini)",
+      "Bash(c:/Code/inkandquill/inkquill/.venv/Scripts/python.exe -c ' *)",
+      "WebFetch(domain:www.freepik.com)",
+      "WebFetch(domain:www.gocomics.com)",
+      "WebFetch(domain:gocomics.readthedocs.io)",
+      "WebFetch(domain:github.com)",
+      "Bash(.venv/Scripts/python.exe scripts/test_mini_newsletter.py --patient 4)",
+      "Bash(xargs grep *)",
+      "Bash(grep -rn \"image_path\\\\|_image\\\\\\\\.jpg\\\\|save.*image\\\\|download.*image\\\\|cache.*image\\\\|image.*cache\" c:/Code/inkandquill/inkquill/app/services/care_circle --include=\"*.py\" -l)",
+      "Bash(grep -rl \"file:///\\\\|\\\\\\\\\\\\\\\\Code\\\\\\\\\\\\\\\\inkandquill\\\\|/Code/inkandquill\" c:/Code/inkandquill/inkquill/cache --include=\"*.json\")",
+      "Bash(grep -rl \"C:\\\\\\\\\\\\\\\\Code\\\\\\\\\\\\\\\\inkandquill\\\\|C:/Code/inkandquill\\\\|inkandquill\" c:/Code/inkandquill/inkquill/cache --include=\"*.json\")",
+      "Bash(xargs rm *)",
+      "Bash(ls .venv/Scripts/python*)",
+      "Bash(ls venv/Scripts/python*)",
+      "Bash(.venv/Scripts/python.exe -c ' *)"
     ]
   }
 }

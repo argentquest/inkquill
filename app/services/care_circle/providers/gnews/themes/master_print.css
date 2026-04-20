@@ -1,0 +1,50 @@
+/* GNews provider — print theme */
+
+@media print {
+    .section--gnews {
+        page-break-inside: avoid;
+        margin-bottom: 12pt;
+    }
+
+    .section--gnews .section__title {
+        font-size: 14pt;
+        font-weight: bold;
+        margin-bottom: 8pt;
+        color: #000;
+    }
+
+    .news-article {
+        border-bottom: 0.5pt solid #ccc;
+    }
+
+    .news-article__index {
+        font-weight: bold;
+        color: #333;
+        font-size: 10pt;
+        width: 18pt;
+    }
+
+    .news-article__content {
+        padding: 4pt 0;
+    }
+
+    .news-article__title {
+        font-size: 11pt;
+        font-weight: bold;
+        margin: 0 0 2pt 0;
+        color: #000;
+    }
+
+    .news-article__description {
+        font-size: 9pt;
+        color: #333;
+        margin: 0 0 2pt 0;
+    }
+
+    .news-article__source {
+        font-size: 8pt;
+        color: #666;
+        font-style: italic;
+        margin: 0;
+    }
+}

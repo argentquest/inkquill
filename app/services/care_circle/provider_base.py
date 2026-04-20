@@ -24,6 +24,24 @@ ROOT_CONFIG_PATH = PROVIDERS_ROOT / "config.json"
 THEMES_DIR = PROVIDERS_ROOT / "themes"
 HTML_CACHE_DIR = Path(__file__).resolve().parents[2] / "logs" / "care_circle_render_cache"
 
+# Wikimedia requires a descriptive User-Agent or it returns 403.
+# Format: <app>/<version> (<url>; <email>)
+WIKIMEDIA_USER_AGENT = "InkAndQuill-CareCircle/1.0 (https://inkandquill.com; contact@inkandquill.com)"
+
+PROVIDER_TABLE_BASE_CSS = """
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: none !important;
+}
+
+table td,
+table th {
+    border: none !important;
+    padding: 10px !important;
+}
+"""
+
 
 class BaseCareCircleProvider:
     """
@@ -53,6 +71,7 @@ class BaseCareCircleProvider:
         merged_config.update(patient_config)
         self.patient_config = merged_config
         self._template_name = str(self.patient_config.get("template", "default") or "default")
+        self._token_usage: dict[str, Any] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "model": ""}
 
     @property
     def config(self) -> dict[str, Any]:
@@ -93,6 +112,13 @@ class BaseCareCircleProvider:
     @property
     def common(self) -> bool:
         return bool(self.config.get("common", False))
+
+    @property
+    def is_enabled(self) -> bool:
+        """Respect per-provider 'enabled' flag from its config.json (for dev/testing fallback).
+        DB catalog and patient configs take precedence in production flows.
+        """
+        return bool(self.config.get("enabled", True))
 
     @property
     def difficulty_level(self) -> str:
@@ -311,8 +337,11 @@ class BaseCareCircleProvider:
             return ""
 
         theme_css = self.get_combined_theme_css(theme_name)
-        if theme_css:
-            html = f"<style>\n{theme_css}\n</style>\n{html}"
+        combined_css = "\n\n".join(
+            part for part in (PROVIDER_TABLE_BASE_CSS, theme_css) if part.strip()
+        )
+        if combined_css:
+            html = f"<style>\n{combined_css}\n</style>\n{html}"
 
         if self.common:
             self._save_common_html_cache(html, theme_name)
@@ -337,6 +366,7 @@ class BaseCareCircleProvider:
                 "success": True,
                 "provider_key": self.provider_key,
                 "data": result,
+                "token_usage": dict(self._token_usage),
             }
         except Exception as exc:
             logger.error("Provider %s failed: %s", self.provider_key, str(exc))
@@ -363,13 +393,20 @@ class BaseCareCircleProvider:
     ) -> None:
         """Log token usage from an LLMResponse for debugging and cost tracking."""
         try:
-            tokens = getattr(llm_response, "total_tokens", 0)
-            model = getattr(llm_response, "model", "unknown")
+            prompt_tokens = getattr(llm_response, "prompt_tokens", 0) or 0
+            completion_tokens = getattr(llm_response, "completion_tokens", 0) or 0
+            total_tokens = getattr(llm_response, "total_tokens", 0) or 0
+            model = getattr(llm_response, "model", "") or ""
+            self._token_usage["prompt_tokens"] += prompt_tokens
+            self._token_usage["completion_tokens"] += completion_tokens
+            self._token_usage["total_tokens"] += total_tokens
+            if model:
+                self._token_usage["model"] = model
             logger.debug(
                 "Provider %s LLM call - model=%s tokens=%s prompt_len=%d",
                 self.provider_key,
                 model,
-                tokens,
+                total_tokens,
                 len(prompt),
             )
         except Exception:

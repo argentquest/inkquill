@@ -1,122 +1,90 @@
-<style>
-.newsletter-footer {
-    margin-top: 32px;
-    padding-top: 0;
-}
+<div style="height:24px; font-size:0; line-height:0;">&nbsp;</div>
 
-.newsletter-footer__accent-bar {
-    height: 5px;
-    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%);
-    border-radius: 4px 4px 0 0;
-    margin-bottom: 0;
-}
+{% if scalar_fields or list_fields %}
+<!-- Patient profile summary -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc; border:2px solid #e2e8f0; border-radius:14px; margin-bottom:16px;">
+  <tr>
+    <td style="padding:24px 32px;">
 
-.newsletter-footer__body {
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 60%, #4a9fd4 100%);
-    border-radius: 0 0 14px 14px;
-    padding: 20px 36px 22px;
-    color: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 4px 16px rgba(30, 58, 95, 0.2);
-}
+      <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#64748b; font-family:Verdana,sans-serif; margin-bottom:16px;">Patient Profile</div>
 
-.newsletter-footer__disclaimer {
-    font-size: 11px;
-    line-height: 1.6;
-    font-style: italic;
-    font-family: 'Verdana', sans-serif;
-    margin-bottom: 12px;
-    opacity: 0.8;
-}
+      {% if scalar_fields %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if list_fields %}16px{% else %}0{% endif %};">
+        {% for pair in scalar_fields | batch(2, '') %}
+        <tr>
+          {% for field in pair %}
+          {% if field %}
+          <td width="50%" valign="top" style="padding:4px 16px 4px 0;">
+            <span style="font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#94a3b8; font-family:Verdana,sans-serif;">{{ field["label"] }}&nbsp;</span><span style="font-size:14px; font-weight:600; color:#1e293b; font-family:Verdana,sans-serif;">{{ field["value"] }}</span>
+          </td>
+          {% else %}
+          <td width="50%"></td>
+          {% endif %}
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
 
-.newsletter-footer__divider {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    margin: 10px 0;
-}
+      {% if list_fields %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        {% for field in list_fields %}
+        <tr>
+          <td style="padding:5px 0; vertical-align:top;">
+            <span style="font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#94a3b8; font-family:Verdana,sans-serif; display:inline-block; min-width:160px;">{{ field["label"] }}</span>
+            <span style="font-size:14px; color:#334155; font-family:Verdana,sans-serif;">{{ field["items"] | join(" · ") }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
 
-.newsletter-footer__stats {
-    font-size: 10px;
-    font-family: 'Verdana', monospace;
-    opacity: 0.65;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 16px;
-    align-items: center;
-}
+    </td>
+  </tr>
+</table>
+{% endif %}
 
-.newsletter-footer__stat {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-}
+<!-- Accent bar -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td height="5" style="background:#f59e0b; font-size:0; line-height:0; border-radius:4px 4px 0 0;">&nbsp;</td>
+  </tr>
+</table>
+<!-- Footer body -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e3a5f; border-radius:0 0 14px 14px;">
+  <tr>
+    <td style="padding:20px 36px 24px;">
 
-.newsletter-footer__stat-label {
-    opacity: 0.7;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 9px;
-}
+      <p style="font-size:11px; line-height:1.6; font-style:italic; font-family:Verdana,sans-serif; color:rgba(255,255,255,0.75); margin:0 0 12px 0;">{{ disclaimer }}</p>
 
-.newsletter-footer__stat-value {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
-}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr><td height="1" style="background:rgba(255,255,255,0.2); font-size:0; line-height:0;"></td></tr>
+        <tr><td height="10">&nbsp;</td></tr>
+      </table>
 
-.newsletter-footer__brand {
-    font-size: 10px;
-    font-family: 'Verdana', sans-serif;
-    opacity: 0.5;
-    margin-top: 10px;
-    text-align: right;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-</style>
+      <!-- Stats row -->
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr valign="middle">
+          {% if generation_date %}
+          <td style="padding-right:16px; white-space:nowrap;">
+            <span style="font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:Verdana,sans-serif;">Generated&nbsp;</span><span style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); font-family:Verdana,sans-serif;">{{ generation_date }}</span>
+          </td>
+          {% endif %}
+          {% if total_providers %}
+          <td style="padding-right:16px; white-space:nowrap;">
+            <span style="font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:Verdana,sans-serif;">Sections&nbsp;</span><span style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); font-family:Verdana,sans-serif;">{{ total_providers }}</span>
+          </td>
+          {% endif %}
+          {% if total_tokens %}
+          <td style="padding-right:16px; white-space:nowrap;">
+            <span style="font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:Verdana,sans-serif;">Tokens&nbsp;</span><span style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); font-family:Verdana,sans-serif;">{{ "{:,}".format(total_tokens) }}</span>
+          </td>
+          {% endif %}
+        </tr>
+      </table>
 
-<div class="newsletter-footer">
-    <div class="newsletter-footer__accent-bar"></div>
-    <div class="newsletter-footer__body">
-        <p class="newsletter-footer__disclaimer">{{ disclaimer }}</p>
-        <hr class="newsletter-footer__divider">
-        <div class="newsletter-footer__stats">
-            {% if generation_date %}
-            <span class="newsletter-footer__stat">
-                <span class="newsletter-footer__stat-label">Generated</span>
-                <span class="newsletter-footer__stat-value">{{ generation_date }}</span>
-            </span>
-            {% endif %}
-            {% if total_providers %}
-            <span class="newsletter-footer__stat">
-                <span class="newsletter-footer__stat-label">Sections</span>
-                <span class="newsletter-footer__stat-value">{{ total_providers }}</span>
-            </span>
-            {% endif %}
-            {% if llm_providers %}
-            <span class="newsletter-footer__stat">
-                <span class="newsletter-footer__stat-label">AI-powered</span>
-                <span class="newsletter-footer__stat-value">{{ llm_providers }}</span>
-            </span>
-            {% endif %}
-            {% if total_tokens %}
-            <span class="newsletter-footer__stat">
-                <span class="newsletter-footer__stat-label">Tokens used</span>
-                <span class="newsletter-footer__stat-value">{{ "{:,}".format(total_tokens) }}</span>
-            </span>
-            {% endif %}
-            {% if elapsed_s %}
-            <span class="newsletter-footer__stat">
-                <span class="newsletter-footer__stat-label">Generation time</span>
-                <span class="newsletter-footer__stat-value">{{ elapsed_s }}s</span>
-            </span>
-            {% endif %}
-            {% if model_used %}
-            <span class="newsletter-footer__stat">
-                <span class="newsletter-footer__stat-label">Model</span>
-                <span class="newsletter-footer__stat-value">{{ model_used }}</span>
-            </span>
-            {% endif %}
-        </div>
-        <div class="newsletter-footer__brand">Care Circle &bull; Ink &amp; Quill</div>
-    </div>
-</div>
+      <div style="font-size:10px; font-family:Verdana,sans-serif; color:rgba(255,255,255,0.5); margin-top:10px; text-align:right; letter-spacing:1px; text-transform:uppercase;">Care Circle &bull; Ink &amp; Quill</div>
+
+    </td>
+  </tr>
+</table>

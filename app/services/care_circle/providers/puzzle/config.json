@@ -171,8 +171,7 @@
             "word_count": 4,
             "show_word_list": true,
             "puzzle_types": [
-                "fill_in_the_blank",
-                "word_pair"
+                "fill_in_the_blank"
             ]
         },
         "medium": {
@@ -181,7 +180,6 @@
             "show_word_list": true,
             "puzzle_types": [
                 "fill_in_the_blank",
-                "word_pair",
                 "word_search"
             ]
         },
@@ -191,7 +189,6 @@
             "show_word_list": false,
             "puzzle_types": [
                 "fill_in_the_blank",
-                "word_pair",
                 "word_search"
             ]
         }

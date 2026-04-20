@@ -94,13 +94,26 @@ LLM_PROVIDERS = {
 
 _RAW_PROVIDER_KEYS = sorted(p.parent.name for p in PROVIDERS_DIR.glob("*/provider.py"))
 
-# Header and footer are run explicitly (first / last) outside the main loop
-LAYOUT_PROVIDERS = {"newsletter_header", "newsletter_footer"}
-ALL_PROVIDER_KEYS = [k for k in _RAW_PROVIDER_KEYS if k not in LAYOUT_PROVIDERS]
-
 ROOT_CONFIG = json.loads((PROVIDERS_DIR / "config.json").read_text(encoding="utf-8"))
 LABEL_MAP = {p["name"]: p["label"] for p in ROOT_CONFIG.get("providers", [])}
 ICON_MAP  = {p["name"]: p.get("icon", "") for p in ROOT_CONFIG.get("providers", [])}
+
+# Only include providers that are enabled in the root catalog config.
+# Providers absent from config.json are treated as enabled (new/unregistered).
+_ENABLED_IN_CONFIG: set[str] = {
+    p["name"]
+    for p in ROOT_CONFIG.get("providers", [])
+    if p.get("enabled", True)
+}
+_REGISTERED_KEYS: set[str] = {p["name"] for p in ROOT_CONFIG.get("providers", [])}
+
+# Header and footer are run explicitly (first / last) outside the main loop
+LAYOUT_PROVIDERS = {"newsletter_header", "newsletter_footer"}
+ALL_PROVIDER_KEYS = [
+    k for k in _RAW_PROVIDER_KEYS
+    if k not in LAYOUT_PROVIDERS
+    and (k not in _REGISTERED_KEYS or k in _ENABLED_IN_CONFIG)
+]
 
 
 def _to_camel(snake: str) -> str:
@@ -450,6 +463,75 @@ def save_provider_html(result: ProviderResult, run_ts: str, patient_name: str, o
     return path
 
 
+# ── test email dispatch ────────────────────────────────────────────────────────
+async def _send_test_email(
+    patient,
+    header_html: str,
+    results: list[ProviderResult],
+    footer_html: str,
+    run_dir: Path,
+) -> None:
+    """
+    Assemble the clean newsletter HTML and send it via the production email
+    service so the full rendering pipeline (image embedding, MIME structure,
+    email shell) can be verified in a real inbox.
+
+    Behaviour:
+    - EMAIL_TEST_MODE=true  → delivered to EMAIL_TEST_ADDRESS (default for dev)
+    - EMAIL_TEST_MODE=false → delivered to the patient's own email address
+    - SMTP not configured   → skipped with a printed warning
+    """
+    from app.core.config import settings
+
+    print(f"\n{'=' * 60}")
+    print("Email dispatch")
+    print("=" * 60)
+
+    if not settings.SMTP_SERVER:
+        print("  SMTP not configured (SMTP_SERVER is unset) — skipping email.")
+        print("  To enable: set SMTP_SERVER, SMTP_USERNAME, SMTP_PASSWORD in .env")
+        return
+
+    # Build the clean newsletter HTML — header + all successful provider blocks + footer.
+    # This is the same content that the daily scheduler sends; no debug chrome included.
+    provider_blocks = "\n".join(
+        r.rendered_html for r in results if r.rendered_html
+    )
+    newsletter_html = f"{header_html}\n{provider_blocks}\n{footer_html}"
+
+    test_mode = getattr(settings, "EMAIL_TEST_MODE", False)
+    destination = settings.EMAIL_TEST_ADDRESS if test_mode else getattr(patient, "email", None)
+
+    if not destination:
+        print("  No destination address available.")
+        print("  Set EMAIL_TEST_MODE=true and EMAIL_TEST_ADDRESS=you@example.com in .env")
+        return
+
+    print(f"  Test mode:   {test_mode}")
+    print(f"  Sending to:  {destination}")
+    print(f"  Patient:     {getattr(patient, 'display_name', 'Unknown')}")
+    print(f"  Blocks:      {len([r for r in results if r.rendered_html])} provider(s) rendered")
+
+    try:
+        from app.services.care_circle.newsletter_email_service import send_newsletter_email
+
+        dispatch = await send_newsletter_email(patient, newsletter_html)
+
+        if dispatch.get("success"):
+            print(f"  Status:      SENT")
+            print(f"  Subject:     {dispatch.get('subject', '')}")
+            # Save a copy of the raw newsletter HTML for offline inspection
+            email_html_path = run_dir / "email_newsletter.html"
+            email_html_path.write_text(newsletter_html, encoding="utf-8")
+            print(f"  HTML saved:  {email_html_path.name}")
+        else:
+            reason = dispatch.get("reason", "unknown")
+            print(f"  Status:      FAILED ({reason})")
+
+    except Exception as exc:
+        print(f"  Status:      ERROR — {exc}")
+
+
 # ── main ───────────────────────────────────────────────────────────────────────
 async def main():
     from datetime import datetime
@@ -483,8 +565,11 @@ async def main():
 
     today = date.today().isoformat()
 
+    disabled_count = len(_RAW_PROVIDER_KEYS) - len(LAYOUT_PROVIDERS) - len(ALL_PROVIDER_KEYS)
     print(f"\n{'=' * 60}")
-    print(f"Running {len(ALL_PROVIDER_KEYS)} providers for {patient_name} (id={patient.id})...")
+    print(f"Running {len(ALL_PROVIDER_KEYS)} enabled providers for {patient_name} (id={patient.id})...")
+    if disabled_count:
+        print(f"  ({disabled_count} provider(s) skipped — disabled in config.json)")
     print(f"Output folder: {run_dir}")
     print(f"{'=' * 60}\n")
 
@@ -556,6 +641,9 @@ async def main():
         print(f"PDF written to {pdf_path}")
     except Exception as e:
         print(f"PDF generation failed for {patient_name}: {e}")
+
+    # ── Send test email ───────────────────────────────────────────────────
+    await _send_test_email(patient, header_html, results, footer_html, run_dir)
 
     print(f"\nAll files saved to: {run_dir}")
     print("Done.")

@@ -64,31 +64,40 @@ class SpotTheDifferenceProvider(BaseCareCircleProvider):
                 and changed_a
                 and changed_b
             ):
+                # Shuffle both lists independently for more challenge
+                shuffled_a = [w.capitalize() for w in list_a]
+                shuffled_b = [w.capitalize() for w in list_b]
+                random.shuffle(shuffled_a)
+                random.shuffle(shuffled_b)
                 return {
                     "title": "Spot the Difference",
                     "instruction": (
                         "One word has changed between List A and List B. "
                         "Can you find it?"
                     ),
-                    "list_a": [w.capitalize() for w in list_a],
-                    "list_b": [w.capitalize() for w in list_b],
+                    "list_a": shuffled_a,
+                    "list_b": shuffled_b,
                     "changed_in_a": changed_a.capitalize(),
                     "changed_in_b": changed_b.capitalize(),
                 }
         except Exception as e:
             app_logger.error(f"LLM Error (spot_the_difference): {e}")
 
-        # Fallback: pick a static word set
+        # Fallback: pick a static word set and shuffle
         fallback_sets = cfg.get("fallback_sets", [])
         chosen = random.choice(fallback_sets)
+        shuffled_a = list(chosen["list_a"])
+        shuffled_b = list(chosen["list_b"])
+        random.shuffle(shuffled_a)
+        random.shuffle(shuffled_b)
         return {
             "title": "Spot the Difference",
             "instruction": (
                 "One word has changed between List A and List B. "
                 "Can you find it?"
             ),
-            "list_a": chosen["list_a"],
-            "list_b": chosen["list_b"],
+            "list_a": shuffled_a,
+            "list_b": shuffled_b,
             "changed_in_a": chosen["changed_in_a"],
             "changed_in_b": chosen["changed_in_b"],
         }

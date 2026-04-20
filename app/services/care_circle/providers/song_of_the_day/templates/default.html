@@ -1,13 +1,19 @@
-<div class="section section--song-of-the-day">
+<table class="section section--song-of-the-day" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">🎵 Song of the Day</h2>
-    <div class="song-of-the-day">
-        {% if image %}
-        <img class="song-of-the-day__image" src="{{ image }}" alt="{{ artist }}">
-        {% endif %}
-        <div class="song-of-the-day__content">
-            <p class="song-of-the-day__song">{{ song }}</p>
-            <p class="song-of-the-day__artist">{{ artist }}{% if year %} &mdash; {{ year }}{% endif %}</p>
-            <p class="song-of-the-day__fact">{{ fact }}</p>
-        </div>
-    </div>
-</div>
+    <table class="song-of-the-day" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            {% if image %}
+            <td class="song-of-the-day__image-cell" width="70%" valign="top" style="padding-right:16px; vertical-align:top">
+                <img class="song-of-the-day__image" src="{{ image }}" alt="{{ artist }}" style="width:100%; aspect-ratio:1/1; border-radius:8px; object-fit:cover; display:block">
+            </td>
+            {% endif %}
+            <td class="song-of-the-day__content-cell" width="{% if image %}30%{% else %}100%{% endif %}" valign="top">
+                <p class="song-of-the-day__song" style="margin:0 0 2px; font-size:20px; font-weight:800">{{ song }}</p>
+                <p class="song-of-the-day__artist" style="margin:0 0 10px; color:#64748b; font-size:15px">{{ artist }}{% if year %} &mdash; {{ year }}{% endif %}</p>
+                <p class="song-of-the-day__fact" style="margin:0; font-size:15px; line-height:1.6">{{ fact }}</p>
+            </td>
+        </tr>
+    </table>
+  </td></tr>
+</table>

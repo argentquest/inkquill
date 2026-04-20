@@ -1,0 +1,40 @@
+.wikimedia-gallery__tagline {
+    margin: 0 0 10px;
+    color: #444;
+}
+
+.wikimedia-gallery__frame {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wikimedia-gallery__image {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+}
+
+.wikimedia-gallery__details {
+    padding: 0;
+}
+
+.wikimedia-gallery__title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.wikimedia-gallery__description {
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.wikimedia-gallery__credit {
+    margin: 0;
+    font-size: 0.72rem;
+    color: #666;
+    font-style: italic;
+}

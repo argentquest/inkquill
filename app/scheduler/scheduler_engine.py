@@ -2,6 +2,7 @@
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.executors.asyncio import AsyncIOExecutor
 
 from app.core.config import settings

@@ -1,12 +1,18 @@
-<div class="section section--dog_photo">
+<table class="section section--dog_photo" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">🐶 Furry Friend of the Day</h2>
-    <div class="pet-photo">
-        <div class="pet-photo__content">
-            <p class="section__body pet-photo__caption">{{ caption }}</p>
-            <p class="section__subtitle pet-photo__meta">Breed: {{ breed }}</p>
-        </div>
-        {% if image_url %}
-        <img class="pet-photo__image" src="{{ image_url }}" alt="A cute dog">
-        {% endif %}
-    </div>
-</div>
+    <table class="pet-photo" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td class="pet-photo__content" width="30%" valign="top" style="padding-right:16px; vertical-align:top">
+                <p class="section__body pet-photo__caption" style="font-size:24px; font-weight:500; line-height:1.7; margin:0">{{ caption }}</p>
+                <p class="section__subtitle pet-photo__meta" style="font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; opacity:0.7; margin-top:10px">Breed: {{ breed }}</p>
+            </td>
+            {% if image_url %}
+            <td class="pet-photo__image-cell" width="70%" valign="top" style="vertical-align:top">
+                <img class="pet-photo__image" src="{{ image_url }}" alt="A cute dog" style="width:100%; border-radius:12px; object-fit:cover; display:block">
+            </td>
+            {% endif %}
+        </tr>
+    </table>
+  </td></tr>
+</table>

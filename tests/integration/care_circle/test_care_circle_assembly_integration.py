@@ -1,7 +1,10 @@
 import pytest
 from sqlalchemy import select
 
-from app.models.care_circle import CareCirclePatientProfile
+from app.models.care_circle import (
+    CareCirclePatientProfile,
+    CareCircleProviderPatientConfig,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -233,9 +236,53 @@ def test_provider_registry_includes_all_seed_providers(client, register_and_logi
     assert "animal_friend" in provider_keys
     assert "bingo" in provider_keys
     assert "daily_blessing" in provider_keys
-    assert "memory_lane_photo" in provider_keys
     assert "simple_math" in provider_keys
     assert "word_connect" in provider_keys
+    assert "comic_mimi_eunice" not in provider_keys
+
+
+def test_patient_provider_config_list_hides_removed_mimi_eunice_provider(client, register_and_login, run_db):
+    """Removed providers are filtered out of patient profile configs."""
+    payload, _ = register_and_login("carecircle_removed_provider_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    def insert_removed_config(session):
+        async def _inner():
+            session.add(
+                CareCircleProviderPatientConfig(
+                    patient_id=patient_id,
+                    provider_key="comic_mimi_eunice",
+                    is_enabled=True,
+                    display_order=57,
+                    custom_parameters={},
+                )
+            )
+            await session.commit()
+
+        return _inner()
+
+    run_db(insert_removed_config)
+
+    response = client.get(f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs")
+    assert response.status_code == 200
+    provider_keys = [item["provider_key"] for item in response.json()["data"]]
+    assert "comic_mimi_eunice" not in provider_keys
+
+
+def test_patient_provider_config_upsert_rejects_removed_mimi_eunice_provider(client, register_and_login, run_db):
+    """Removed providers cannot be re-added to patient profiles."""
+    payload, _ = register_and_login("carecircle_removed_provider_upsert_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    response = client.put(
+        f"/api/v1/care-circle/family/patients/{patient_id}/provider-configs/comic_mimi_eunice",
+        json={"is_enabled": True, "custom_parameters": {}},
+    )
+    assert response.status_code == 404
 
 
 def test_patient_session_includes_highlights_with_provider_keys(client, register_and_login, run_db):

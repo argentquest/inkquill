@@ -55,3 +55,4 @@ word-search-generator==5.0.0
 # --- Scheduler Server ---
 APScheduler>=3.10.4
 psycopg2-binary>=2.9.9
+premailer>=3.10.0

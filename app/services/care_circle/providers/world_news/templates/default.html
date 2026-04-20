@@ -1,14 +1,16 @@
-<div class="section section--world-news">
+<table class="section section--world-news" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">🌍 World News</h2>
-    <div class="world-news">
+    <table class="world-news" width="100%" cellpadding="0" cellspacing="0" border="0">
         {% for story in stories %}
-        <div class="world-news__story">
-            <span class="world-news__index">{{ loop.index }}.</span>
-            <div class="world-news__content">
+        <tr class="world-news__story">
+            <td class="world-news__index" valign="top" style="padding:4px 8px 4px 0; white-space:nowrap">{{ loop.index }}.</td>
+            <td class="world-news__content" valign="top" style="padding:4px 0">
                 <p class="world-news__title">{{ story.title }}</p>
                 <p class="world-news__summary">{{ story.summary }}</p>
-            </div>
-        </div>
+            </td>
+        </tr>
         {% endfor %}
-    </div>
-</div>
+    </table>
+  </td></tr>
+</table>

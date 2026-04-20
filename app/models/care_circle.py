@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 from typing import Optional
@@ -42,6 +42,11 @@ class CareCirclePatientProfile(Base):
     stage: Mapped[str] = mapped_column(String(50), default="moderate", nullable=False)
     access_state: Mapped[str] = mapped_column(String(50), default="active", nullable=False)
     timezone: Mapped[str] = mapped_column(String(100), default="America/Chicago", nullable=False)
+    preferred_language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
+    country: Mapped[str] = mapped_column(String(10), default="US", nullable=False)
+    postal_code: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     delivery_time: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     delivery_days: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     auth_image_keys: Mapped[list] = mapped_column(JSON, default=list, nullable=False)

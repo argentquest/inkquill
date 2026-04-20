@@ -1,0 +1,54 @@
+.classic-art__frame {
+    width: 100%;
+}
+
+.classic-art__image-cell {
+    padding-right: 16px;
+    vertical-align: top;
+}
+
+.classic-art__image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 8px;
+    background-color: #f8f5f0;
+    display: block;
+}
+
+.classic-art__details-cell {
+    vertical-align: top;
+}
+
+.classic-art__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.classic-art__artist {
+    margin: 0 0 4px;
+    color: #5a5a5a;
+}
+
+.classic-art__medium {
+    margin: 0 0 10px;
+    font-style: italic;
+    color: #7a7a7a;
+    font-size: 0.875rem;
+}
+
+.classic-art__description {
+    margin: 0 0 10px;
+    line-height: 1.6;
+}
+
+.classic-art__source {
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.classic-art__link {
+    color: #6b5b45;
+    text-decoration: underline;
+}

@@ -39,9 +39,17 @@ const careCirclePatients = [
     timezone: "America/Chicago",
     deliveryTime: "08:30",
     days: ["Mon", "Wed", "Fri", "Sun"],
-    familyMembers: ["Nina", "Paul", "Maggie"],
-    preferences: ["1950s music", "family photos", "tea and biscuits", "gardening"],
     authImageKeys: ["sun", "dog", "house"],
+    email: null,
+    phoneNumber: null,
+    preferences: {
+      recipientName: null, preferredPronoun: "she/her",
+      hometown: "Springfield", cityForWeather: "Chicago",
+      eraOfYouth: "1950s", nationalityOrBackground: null, mobilityLevel: null,
+      familyMembers: ["Nina", "Paul", "Maggie"], lifeRoles: ["mother", "teacher"],
+      pets: [], hobbies: ["gardening"], favoriteActivities: [],
+      favoriteSingers: [], favouriteFoods: ["tea and biscuits"], favouriteTvShows: [],
+    },
     highlights: [
       {
         title: "Family hello",
@@ -69,9 +77,17 @@ const careCirclePatients = [
     timezone: "America/New_York",
     deliveryTime: "09:15",
     days: ["Tue", "Thu", "Sat"],
-    familyMembers: ["Janet", "Chris"],
-    preferences: ["local history", "jazz", "crosswords"],
     authImageKeys: ["tree", "car", "star"],
+    email: null,
+    phoneNumber: null,
+    preferences: {
+      recipientName: null, preferredPronoun: "he/him",
+      hometown: null, cityForWeather: "New York",
+      eraOfYouth: "1940s", nationalityOrBackground: null, mobilityLevel: null,
+      familyMembers: ["Janet", "Chris"], lifeRoles: [],
+      pets: [], hobbies: ["crosswords"], favoriteActivities: [],
+      favoriteSingers: [], favouriteFoods: [], favouriteTvShows: [],
+    },
     highlights: [
       {
         title: "Daily note",

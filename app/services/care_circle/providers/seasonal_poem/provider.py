@@ -129,27 +129,38 @@ class SeasonalPoemProvider(BaseCareCircleProvider):
         try:
             prompt = (
                 f"Write a short, gentle {season} poem for a senior person. "
-                f"It should be 4 lines long, cheerful and warm, with a simple rhyme scheme. "
-                f"The poem should paint a peaceful {season} scene using familiar, comforting imagery. "
+                f"It should be exactly 4 lines, cheerful and warm, with a simple rhyme scheme. "
+                f"Paint a peaceful {season} scene using familiar, comforting imagery. "
                 f"Keep the language simple and beautiful — no complex words. "
-                f"Return as JSON: "
-                '{"title": "...", "lines": "line1\\nline2\\nline3\\nline4"}'
+                f'Return ONLY valid JSON with no extra text: {{"title": "Poem Title", "lines": ["line 1", "line 2", "line 3", "line 4"]}}'
             )
             data, llm_response = await generate_json_with_usage(
                 prompt, system=DEMENTIA_SYSTEM_PROMPT
             )
             self.log_llm_response(llm_response, prompt=prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT)
-            if data.get("title") and data.get("lines"):
-                return {
-                    "title": data["title"],
-                    "lines": data["lines"],
-                    "season": season.capitalize(),
-                }
+
+            title = data.get("title", "")
+            lines = data.get("lines", [])
+
+            # Accept either an array of lines or a pre-joined string
+            if isinstance(lines, list) and lines:
+                lines = "\n".join(str(l) for l in lines)
+            elif isinstance(lines, str) and lines.strip():
+                pass  # already a string
+            else:
+                lines = ""
+
+            if title and lines:
+                logger.info("seasonal_poem: LLM generated poem '%s'", title)
+                return {"title": title, "lines": lines, "season": season.capitalize()}
+
+            logger.warning("seasonal_poem: LLM response missing title/lines, data=%s", data)
         except Exception as e:
-            logger.error(f"LLM Error (seasonal_poem): {e}")
+            logger.error("seasonal_poem: LLM error: %s", e)
 
         fallback_pool = FALLBACK_POEMS.get(season, FALLBACK_POEMS["spring"])
         entry = random.choice(fallback_pool)
+        logger.info("seasonal_poem: using fallback poem '%s'", entry["title"])
         return {
             "title": entry["title"],
             "lines": entry["lines"],

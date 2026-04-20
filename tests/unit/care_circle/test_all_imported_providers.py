@@ -135,11 +135,8 @@ def test_local_history_structure():
     assert provider.is_safe_for_patient is True  # Patient-safe by contract
 
 def test_memory_lane_photo_structure():
-    from app.services.care_circle.providers.memory_lane_photo.provider import MemoryLanePhotoProvider
-    provider = MemoryLanePhotoProvider()
-    assert isinstance(provider, BaseCareCircleProvider)
-    assert hasattr(provider, '_generate_payload')
-    assert provider.is_safe_for_patient is True  # Patient-safe by contract
+    # Disabled per task - memory lane and nature scene no longer active
+    pass
 
 def test_missing_vowels_structure():
     from app.services.care_circle.providers.missing_vowels.provider import MissingVowelsProvider
@@ -149,11 +146,8 @@ def test_missing_vowels_structure():
     assert provider.is_safe_for_patient is True  # Patient-safe by contract
 
 def test_nature_scene_structure():
-    from app.services.care_circle.providers.nature_scene.provider import NatureSceneProvider
-    provider = NatureSceneProvider()
-    assert isinstance(provider, BaseCareCircleProvider)
-    assert hasattr(provider, '_generate_payload')
-    assert provider.is_safe_for_patient is True  # Patient-safe by contract
+    # Disabled per task - memory lane and nature scene no longer active
+    pass
 
 def test_nostalgia_structure():
     from app.services.care_circle.providers.nostalgia.provider import NostalgiaProvider

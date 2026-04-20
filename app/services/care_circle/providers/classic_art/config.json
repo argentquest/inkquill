@@ -1,0 +1,15 @@
+{
+    "name": "Classic Art",
+    "description": "A beautiful public-domain painting from the Metropolitan Museum of Art with its title, artist, and a short description.",
+    "technical_summary": "Queries the Met Open Access API for a random public-domain artwork matching a curated search term. Falls back to a pre-defined list of classic paintings when the API is unavailable.",
+    "grid_width": 2,
+    "grid_height": 3,
+    "common": false,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    }
+}

@@ -75,7 +75,13 @@ def _build_text_client():
 def _build_image_client():
     """Return (AsyncOpenAI client, model_name) for image generation.
 
-    Uses the standard OpenAI API (DALL-E / gpt-image-1) or OpenRouter.
+    Priority: OpenAI.
+
+    OpenRouter image generation is not currently wired through a compatible
+    `images.generate()` endpoint in this codebase. Attempting to use it here
+    produces HTML not-found responses instead of image payloads, so providers
+    should fall back to their static images unless OpenAI image generation is
+    configured.
     """
     import openai
     from app.core.config import settings
@@ -83,21 +89,8 @@ def _build_image_client():
     if settings.OPENAI_API_KEY:
         return openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY), settings.OPENAI_IMAGE_MODEL
 
-    if settings.OPENROUTER_API_KEY:
-        default_headers: dict[str, str] = {}
-        if settings.OPENROUTER_SITE_URL:
-            default_headers["HTTP-Referer"] = settings.OPENROUTER_SITE_URL
-        if settings.OPENROUTER_APP_NAME:
-            default_headers["X-Title"] = settings.OPENROUTER_APP_NAME
-        client = openai.AsyncOpenAI(
-            api_key=settings.OPENROUTER_API_KEY,
-            base_url=settings.OPENROUTER_BASE_URL,
-            default_headers=default_headers or None,
-        )
-        return client, settings.CARE_CIRCLE_DEFAULT_IMAGE_MODEL
-
     raise RuntimeError(
-        "No image API key configured. Set OPENAI_API_KEY or OPENROUTER_API_KEY in .env."
+        "No supported image API key configured. Set OPENAI_API_KEY in .env."
     )
 
 
@@ -170,23 +163,25 @@ async def generate_json_with_usage(
     return data, llm_response
 
 
+_OPENAI_ONLY_PARAMS = {"openai/", "gpt-image", "dall-e"}
+
+
 async def generate_image_url_with_usage(prompt: str) -> LLMResponse:
     """Generate an image and return an LLMResponse whose `.content` is a URL or data URI."""
     client, model_name = _build_image_client()
 
-    response = await client.images.generate(
-        model=model_name,
-        prompt=prompt,
-        n=1,
-        size="1024x1024",
-        quality="low",
-    )
+    # quality param is OpenAI-specific; omit for OpenRouter/Gemini models
+    is_openai_model = any(tok in model_name for tok in _OPENAI_ONLY_PARAMS)
+    kwargs: dict = {"model": model_name, "prompt": prompt, "n": 1}
+    if is_openai_model:
+        kwargs["size"] = "1024x1024"
+        kwargs["quality"] = "low"
+
+    response = await client.images.generate(**kwargs)
     item = response.data[0]
 
-    # Prefer a direct URL if the model returns one
     image_url: str = item.url or ""
 
-    # Some models (e.g. gpt-image-1) return base64 instead of a URL
     if not image_url and item.b64_json:
         image_url = f"data:image/png;base64,{item.b64_json}"
 

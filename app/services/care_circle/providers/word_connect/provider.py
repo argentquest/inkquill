@@ -19,7 +19,8 @@ class WordConnectProvider(BaseCareCircleProvider):
         Get word connection puzzles.
         
         Returns:
-            dict with word connect data
+            dict with word connect data. Left and right columns are shuffled
+            independently so the puzzle requires matching.
         """
         cfg = self.patient_config
         
@@ -45,8 +46,28 @@ class WordConnectProvider(BaseCareCircleProvider):
         # Select 4 random pairs
         selected = random.sample(word_pairs, 4)
         
+        # Shuffle left and right columns independently for the puzzle display
+        left_words = [p["word1"] for p in selected]
+        right_words = [p["word2"] for p in selected]
+        random.shuffle(left_words)
+        random.shuffle(right_words)
+        
+        # Build display pairs (left[i] paired with right[i] for display)
+        # The actual answers keep the original word1->word2 connections
+        display_pairs = []
+        for i in range(len(selected)):
+            display_pairs.append({
+                "word1": left_words[i],
+                "word2": right_words[i],
+                "connection": "",  # No connection shown in display
+            })
+        
+        # Answer pairs keep original connections for the upside-down answer section
+        answer_pairs = selected
+        
         return {
             "title": "Word Connect",
             "instruction": "Draw a line to connect the related words!",
-            "pairs": selected,
+            "pairs": display_pairs,
+            "answer_pairs": answer_pairs,
         }

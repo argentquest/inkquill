@@ -54,8 +54,6 @@ RUNS = 5
 
 # Providers known to pick from static lists
 STATIC_LIST_PROVIDERS = [
-    "memory_lane_photo",
-    "nature_scene",
     "daily_quote",
     "daily_affirmation",
     "joke",

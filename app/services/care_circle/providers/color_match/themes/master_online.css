@@ -3,14 +3,6 @@
     text-align: center;
 }
 
-.color-match__options {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
 .color-match__option {
     min-width: 100px;
     padding: 16px 28px;
@@ -19,12 +11,15 @@
     background: #fff;
     font-size: 22px;
     font-weight: 700;
+    font-family: Verdana, Arial, sans-serif;
 }
 
 .color-match__answer {
-    margin-top: 12px;
-    text-align: center;
     font-size: 20px;
     font-weight: 700;
+    font-family: Verdana, Arial, sans-serif;
+    /* Email-compatible upside-down text */
     transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
 }

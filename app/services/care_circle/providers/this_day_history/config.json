@@ -1,8 +1,8 @@
 {
     "name": "This Day in History",
     "description": "Historical events that happened on this day.",
-    "technical_summary": "Fetches historical events from ByAbbe API for the current month/day. Falls back to static message on API failure.",
-    "api_url": "https://byabbe.se/on-this-day/{month}/{day}/events.json",
+    "technical_summary": "Fetches historical events from the Wikimedia On This Day API for the current month/day. Falls back to static message on API failure.",
+    "api_url": "https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/{month}/{day}",
     "fallback": "Many wonderful things have happened on this day throughout history!",
     "difficulty": {
         "default": "easy",

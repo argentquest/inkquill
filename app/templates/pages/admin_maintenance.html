@@ -511,5 +511,38 @@ async function sendTestEmail() {
         showToast('Error sending test email', 'error');
     }
 }
+
+// Deliver Newsletter Now (used by both Admin and Patient pages)
+async function deliverNewsletterNow(patientId, patientName) {
+    if (!confirm(`Deliver today's newsletter to ${patientName || 'this patient'} now?\n\nThis will send a real email.`)) {
+        return;
+    }
+
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    try {
+        const response = await fetch(`/ui/admin/newsletter/deliver/${patientId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showToast(`Newsletter delivered successfully to ${patientName || 'patient'}`, 'success');
+        } else {
+            showToast(data.message || 'Failed to deliver newsletter', 'error');
+        }
+    } catch (error) {
+        console.error('Error delivering newsletter:', error);
+        showToast('Error delivering newsletter', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
 </script>
 {% endblock %}

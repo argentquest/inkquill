@@ -93,7 +93,6 @@ LLM_PROVIDERS = [
     "letter_to_family",
     "local_history",
     "mindful_moment",
-    "nature_scene",
     "nostalgia",
     "pen_pal_letter",
     "personal_affirmation",

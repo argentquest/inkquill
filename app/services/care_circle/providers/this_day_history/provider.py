@@ -3,7 +3,7 @@ import random
 from datetime import date
 import logging
 app_logger = logging.getLogger(__name__)
-from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.provider_base import BaseCareCircleProvider, WIKIMEDIA_USER_AGENT
 from app.services.care_circle.llm_helpers import (
     DEMENTIA_SYSTEM_PROMPT,
     generate_image_url_with_usage,
@@ -39,9 +39,7 @@ class ThisDayHistoryProvider(BaseCareCircleProvider):
         api_url = f"https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/{today.month:02}/{today.day:02}"
         fallback = cfg.get("fallback", "Many wonderful things have happened on this day!")
         
-        headers = {
-            "User-Agent": "DailyNewsletter/1.0 (memory-care newsletter; contact@example.com)"
-        }
+        headers = {"User-Agent": WIKIMEDIA_USER_AGENT}
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(api_url, headers=headers, follow_redirects=True, timeout=5.0)
@@ -66,8 +64,8 @@ class ThisDayHistoryProvider(BaseCareCircleProvider):
                             self.log_llm_response(llm_response, prompt=prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT)
                             if llm_response.content:
                                 return {"year": year, "event": llm_response.content, "month": today.strftime("%B"), "day": today.day}
-                        except:
-                            pass
+                        except Exception as llm_exc:
+                            app_logger.warning("LLM rewrite failed for this_day_history: %s", llm_exc)
                             
                         return {"year": year, "event": text, "month": today.strftime("%B"), "day": today.day}
             return {"year": "", "event": fallback, "month": today.strftime("%B"), "day": today.day}

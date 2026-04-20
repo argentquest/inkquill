@@ -1,0 +1,15 @@
+{
+    "name": "Nature Park",
+    "description": "A stunning public-domain photograph from a U.S. National Park, with the park name, image caption, and photographer credit.",
+    "technical_summary": "Queries the NPS Open Data API for a random park and selects one of its images. Falls back to a curated list of hardcoded park photographs when NPS_API_KEY is absent or the API is unavailable.",
+    "grid_width": 2,
+    "grid_height": 3,
+    "common": true,
+    "llm": false,
+    "difficulty": {
+        "default": "easy",
+        "easy": {},
+        "medium": {},
+        "hard": {}
+    }
+}

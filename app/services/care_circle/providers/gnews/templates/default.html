@@ -1,0 +1,19 @@
+<table class="section section--gnews" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
+    <h2 class="section__title">📰 News</h2>
+    <table class="news-articles" width="100%" cellpadding="0" cellspacing="0" border="0">
+        {% for article in articles %}
+        <tr class="news-article">
+            <td class="news-article__index" valign="top" style="padding:4px 8px 4px 0; white-space:nowrap">{{ loop.index }}.</td>
+            <td class="news-article__content" valign="top" style="padding:4px 0">
+                <p class="news-article__title">{{ article.title }}</p>
+                <p class="news-article__description">{{ article.description }}</p>
+                {% if article.source_name %}
+                <p class="news-article__source">— {{ article.source_name }}</p>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+  </td></tr>
+</table>

@@ -4,7 +4,7 @@ from secrets import choice
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.care_circle import (
@@ -14,8 +14,11 @@ from app.models.care_circle import (
     CareCirclePatientProfile,
     CareCircleProviderCatalog,
     CareCircleProviderPatientConfig,
+    CareCircleProviderRunLog,
+    CareCircleProviderSessionOutput,
 )
 from app.models.user import User
+from app.services.care_circle.location_service import resolve_postal_location
 
 PATIENT_AUTH_CATALOG = [
     {"key": "sun", "label": "Sun", "emoji": "☀️"},
@@ -34,6 +37,7 @@ PATIENT_AUTH_CATALOG = [
 PATIENT_AUTH_KEYS = {item["key"] for item in PATIENT_AUTH_CATALOG}
 
 PROVIDER_INVENTORY_CONFIG_PATH = Path(__file__).resolve().parent.parent / "services" / "care_circle" / "providers" / "config.json"
+OBSOLETE_PROVIDER_KEYS = {"comic_mimi_eunice"}
 
 DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "weather", "label": "Weather", "icon": "☀️", "category": "core", "display_order": 1, "patient_visible": True, "family_visible": True},
@@ -49,7 +53,6 @@ DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "gratitude", "label": "Gratitude", "icon": "🙏", "category": "wellbeing", "display_order": 11, "patient_visible": True, "family_visible": True},
     {"provider_key": "gentle_exercise", "label": "Gentle Exercise", "icon": "🤼", "category": "wellbeing", "display_order": 12, "patient_visible": True, "family_visible": True},
     {"provider_key": "daily_affirmation", "label": "Affirmation", "icon": "💛", "category": "core", "display_order": 13, "patient_visible": True, "family_visible": True},
-    {"provider_key": "nature_scene", "label": "Nature Scene", "icon": "🌿", "category": "memory", "display_order": 14, "patient_visible": True, "family_visible": True},
     {"provider_key": "simple_recipe", "label": "Simple Recipe", "icon": "🍳", "category": "lifestyle", "display_order": 15, "patient_visible": True, "family_visible": True},
     {"provider_key": "this_day_history", "label": "On This Day", "icon": "📅", "category": "memory", "display_order": 16, "patient_visible": True, "family_visible": True},
     {"provider_key": "riddle", "label": "Daily Riddle", "icon": "🤔", "category": "games", "display_order": 17, "patient_visible": True, "family_visible": True},
@@ -72,9 +75,11 @@ DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG = [
     {"provider_key": "bingo", "label": "Bingo", "icon": "🎲", "category": "games", "display_order": 34, "patient_visible": True, "family_visible": True},
     {"provider_key": "color_match", "label": "Color Match", "icon": "🎨", "category": "games", "display_order": 35, "patient_visible": True, "family_visible": True},
     {"provider_key": "daily_blessing", "label": "Daily Blessing", "icon": "🕊️", "category": "wellbeing", "display_order": 36, "patient_visible": True, "family_visible": True},
-    {"provider_key": "memory_lane_photo", "label": "Memory Lane Photo", "icon": "📷", "category": "memory", "display_order": 38, "patient_visible": True, "family_visible": True},
     {"provider_key": "simple_math", "label": "Simple Math", "icon": "➕", "category": "games", "display_order": 39, "patient_visible": True, "family_visible": True},
     {"provider_key": "word_connect", "label": "Word Connect", "icon": "🔗", "category": "games", "display_order": 40, "patient_visible": True, "family_visible": True},
+    {"provider_key": "classic_art", "label": "Art of the Day", "icon": "🖼️", "category": "memory", "display_order": 41, "patient_visible": True, "family_visible": True},
+    {"provider_key": "nature_park", "label": "National Park", "icon": "🏞️", "category": "memory", "display_order": 42, "patient_visible": True, "family_visible": True},
+    {"provider_key": "wikimedia_gallery", "label": "Photo of the Day", "icon": "📸", "category": "memory", "display_order": 43, "patient_visible": True, "family_visible": True},
 ]
 
 DEFAULT_PATIENTS = [
@@ -123,7 +128,7 @@ def _patient_to_dict(
     family_join_code: str,
     highlights: list[CareCirclePatientContentCard] | None = None,
 ) -> dict[str, Any]:
-    preferences = patient.preferences or {}
+    raw = patient.preferences or {}
     return {
         "id": str(patient.id),
         "displayName": patient.display_name,
@@ -132,11 +137,33 @@ def _patient_to_dict(
         "stage": patient.stage,
         "accessState": patient.access_state,
         "timezone": patient.timezone,
+        "preferredLanguage": patient.preferred_language,
+        "country": patient.country,
+        "postalCode": patient.postal_code,
+        "latitude": patient.latitude,
+        "longitude": patient.longitude,
         "deliveryTime": patient.delivery_time,
         "days": patient.delivery_days or [],
-        "familyMembers": preferences.get("family_members", []),
-        "preferences": preferences.get("preference_tags", []),
         "authImageKeys": patient.auth_image_keys or [],
+        "email": patient.email,
+        "phoneNumber": patient.phone_number,
+        "preferences": {
+            "recipientName": raw.get("recipient_name"),
+            "preferredPronoun": raw.get("preferred_pronoun"),
+            "hometown": raw.get("hometown"),
+            "cityForWeather": raw.get("city_for_weather"),
+            "eraOfYouth": raw.get("era_of_youth"),
+            "nationalityOrBackground": raw.get("nationality_or_background"),
+            "mobilityLevel": raw.get("mobility_level"),
+            "familyMembers": raw.get("family_members", []),
+            "lifeRoles": raw.get("life_roles", []),
+            "pets": raw.get("pets", []),
+            "hobbies": raw.get("hobbies", []),
+            "favoriteActivities": raw.get("favorite_activities", []),
+            "favoriteSingers": raw.get("favorite_singers", []),
+            "favouriteFoods": raw.get("favourite_foods", []),
+            "favouriteTvShows": raw.get("favourite_tv_shows", []),
+        },
         "highlights": [
             {
                 "title": card.title,
@@ -172,6 +199,8 @@ def _load_provider_catalog_inventory() -> list[dict[str, Any]]:
         providers = raw_inventory.get("providers", [])
         normalized: list[dict[str, Any]] = []
         for item in providers:
+            if item["name"] in OBSOLETE_PROVIDER_KEYS:
+                continue
             normalized.append(
                 {
                     "provider_key": item["name"],
@@ -188,7 +217,25 @@ def _load_provider_catalog_inventory() -> list[dict[str, Any]]:
     return DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG
 
 
+async def remove_obsolete_provider_data(db: AsyncSession) -> None:
+    """Delete provider rows that should no longer exist anywhere in Care Circle."""
+    if not OBSOLETE_PROVIDER_KEYS:
+        return
+
+    for model in (
+        CareCircleProviderSessionOutput,
+        CareCircleProviderRunLog,
+        CareCirclePatientContentCard,
+        CareCircleProviderPatientConfig,
+        CareCircleProviderCatalog,
+    ):
+        await db.execute(
+            delete(model).where(model.provider_key.in_(OBSOLETE_PROVIDER_KEYS))
+        )
+
+
 async def ensure_provider_catalog_seeded(db: AsyncSession) -> None:
+    await remove_obsolete_provider_data(db)
     provider_catalog = _load_provider_catalog_inventory()
     existing_rows = (
         await db.execute(select(CareCircleProviderCatalog))
@@ -201,7 +248,9 @@ async def ensure_provider_catalog_seeded(db: AsyncSession) -> None:
             existing.label = item["label"]
             existing.icon = item["icon"]
             existing.category = item["category"]
+            existing.enabled = item["enabled"]
             existing.display_order = item["display_order"]
+            existing.patient_visible = item["patient_visible"]
             existing.family_visible = item["family_visible"]
             continue
 
@@ -336,18 +385,91 @@ async def update_family_patient_detail(
     patient.stage = payload["stage"].strip()
     patient.access_state = payload["accessState"].strip()
     patient.timezone = payload["timezone"].strip()
+    patient.preferred_language = payload.get("preferredLanguage", "en")
+    patient.country = payload.get("country", "US")
+    patient.postal_code = (payload.get("postalCode") or "").strip() or None
     patient.delivery_time = payload["deliveryTime"] or None
     patient.delivery_days = payload["days"]
     patient.auth_image_keys = payload["authImageKeys"]
+    patient.email = payload.get("email") or None
+    patient.phone_number = payload.get("phoneNumber") or None
+    prefs = payload.get("preferences") or {}
     patient.preferences = {
-        "family_members": payload["familyMembers"],
-        "preference_tags": payload["preferences"],
+        "recipient_name": prefs.get("recipientName") or None,
+        "preferred_pronoun": prefs.get("preferredPronoun") or None,
+        "hometown": prefs.get("hometown") or None,
+        "city_for_weather": prefs.get("cityForWeather") or None,
+        "era_of_youth": prefs.get("eraOfYouth") or None,
+        "nationality_or_background": prefs.get("nationalityOrBackground") or None,
+        "mobility_level": prefs.get("mobilityLevel") or None,
+        "family_members": prefs.get("familyMembers") or [],
+        "life_roles": prefs.get("lifeRoles") or [],
+        "pets": prefs.get("pets") or [],
+        "hobbies": prefs.get("hobbies") or [],
+        "favorite_activities": prefs.get("favoriteActivities") or [],
+        "favorite_singers": prefs.get("favoriteSingers") or [],
+        "favourite_foods": prefs.get("favouriteFoods") or [],
+        "favourite_tv_shows": prefs.get("favouriteTvShows") or [],
     }
+    if patient.postal_code:
+        resolved_location = await resolve_postal_location(
+            postal_code=patient.postal_code,
+            country_code=patient.country,
+        )
+        if resolved_location:
+            patient.latitude = resolved_location.latitude
+            patient.longitude = resolved_location.longitude
+            if not patient.preferences.get("city_for_weather") and resolved_location.formatted_city:
+                patient.preferences["city_for_weather"] = resolved_location.formatted_city
+        else:
+            patient.latitude = None
+            patient.longitude = None
+    else:
+        patient.latitude = None
+        patient.longitude = None
     family.name = payload["familyName"].strip()
     family.join_code = normalized_join_code
 
     await db.commit()
     return await get_family_patient_detail(db, user, patient_id)
+
+
+async def create_family_patient(
+    db: AsyncSession,
+    user: User,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    family = await get_or_create_family_for_user(db, user)
+    patient = CareCirclePatientProfile(
+        family_id=family.id,
+        created_by_user_id=user.id,
+        display_name=payload["displayName"].strip(),
+        stage=payload.get("stage", "moderate"),
+        access_state=payload.get("accessState", "active"),
+        timezone=payload.get("timezone", "America/Chicago"),
+        preferred_language=payload.get("preferredLanguage", "en"),
+        country=payload.get("country", "US"),
+        postal_code=(payload.get("postalCode") or "").strip() or None,
+        delivery_time=payload.get("deliveryTime") or None,
+        delivery_days=[],
+        auth_image_keys=[],
+        preferences={},
+    )
+    if patient.postal_code:
+        resolved_location = await resolve_postal_location(
+            postal_code=patient.postal_code,
+            country_code=patient.country,
+        )
+        if resolved_location:
+            patient.latitude = resolved_location.latitude
+            patient.longitude = resolved_location.longitude
+            patient.preferences = {
+                "city_for_weather": resolved_location.formatted_city,
+            } if resolved_location.formatted_city else {}
+    db.add(patient)
+    await db.commit()
+    await db.refresh(patient)
+    return _patient_to_dict(patient, family.name, family.join_code)
 
 
 async def list_provider_catalog(db: AsyncSession) -> list[dict[str, Any]]:
@@ -444,7 +566,8 @@ async def get_patient_provider_configs(
     configs = (
         await db.execute(
             select(CareCircleProviderPatientConfig).where(
-                CareCircleProviderPatientConfig.patient_id == patient_id
+                CareCircleProviderPatientConfig.patient_id == patient_id,
+                CareCircleProviderPatientConfig.provider_key.notin_(OBSOLETE_PROVIDER_KEYS),
             )
         )
     ).scalars().all()
@@ -470,6 +593,9 @@ async def upsert_patient_provider_config(
     display_order: int | None = None,
 ) -> CareCircleProviderPatientConfig:
     """Insert or update a per-patient provider config."""
+    if provider_key in OBSOLETE_PROVIDER_KEYS:
+        raise ValueError(f"Provider '{provider_key}' is no longer available")
+
     existing = await db.scalar(
         select(CareCircleProviderPatientConfig).where(
             CareCircleProviderPatientConfig.patient_id == patient_id,
@@ -507,6 +633,8 @@ async def reorder_patient_provider_configs(
     """Bulk-update display_order for a patient's enabled provider configs."""
     for item in ordering:
         provider_key = item["provider_key"]
+        if provider_key in OBSOLETE_PROVIDER_KEYS:
+            continue
         new_order = item["display_order"]
         existing = await db.scalar(
             select(CareCircleProviderPatientConfig).where(

@@ -992,3 +992,83 @@ async def test_nostalgia_era_facts_string_not_list():
     result = await provider.execute(patient)
     assert result["success"] is True
     assert result["data"]["nostalgia"] == "Big band music filled dance halls everywhere."
+
+
+@pytest.mark.asyncio
+async def test_riddle_provider_disabled_in_config():
+    """Provider with 'enabled': false in its config.json is skipped by assembler (dev fallback)."""
+    from app.services.care_circle.session_assembler import assemble_daily_patient_session
+    from app.models.care_circle import CareCircleProviderCatalog, CareCircleProviderPatientConfig
+    from unittest.mock import AsyncMock, patch
+
+    mock_db = AsyncMock()
+    # Mock patient
+    mock_patient = MagicMock()
+    mock_patient.id = 1
+    mock_patient.access_state = "active"
+    mock_db.get.return_value = mock_patient
+
+    # Mock catalog with riddle (which has enabled=false in config)
+    mock_catalog = [
+        MagicMock(provider_key="riddle", display_order=17, patient_visible=True),
+        MagicMock(provider_key="puzzle", display_order=4, patient_visible=True),
+    ]
+    mock_execute_result = MagicMock()
+    mock_execute_result.scalars.return_value.all.return_value = mock_catalog
+    mock_db.execute.return_value = mock_execute_result
+    # avoid coroutine issue in mock for second call (config_query)
+    mock_config_execute = MagicMock()
+    mock_config_execute.scalars.return_value.all.return_value = []
+    mock_db.execute.side_effect = [
+        mock_execute_result,  # catalog
+        mock_config_execute,  # config
+        MagicMock()  # delete query
+    ]
+
+    with patch("app.services.care_circle.session_assembler.get_provider_class") as mock_get_class, \
+         patch("app.services.care_circle.session_assembler.logger") as mock_logger:
+        mock_riddle_cls = MagicMock()
+        mock_riddle_cls.is_safe_for_patient = True
+        mock_riddle_instance = MagicMock()
+        mock_riddle_cls.return_value = mock_riddle_instance
+        mock_riddle_instance.is_enabled = False  # from config
+
+        mock_puzzle_cls = MagicMock()
+        mock_puzzle_cls.is_safe_for_patient = True
+        mock_puzzle_instance = AsyncMock()
+        mock_puzzle_cls.return_value = mock_puzzle_instance
+        mock_puzzle_instance.is_enabled = True
+        mock_puzzle_instance.execute = AsyncMock(return_value={"success": True, "data": {"title": "Puzzle"}})
+
+        mock_get_class.side_effect = [mock_riddle_cls, mock_puzzle_cls]
+
+        result = await assemble_daily_patient_session(mock_db, 1)
+
+    assert result is True
+    # Only puzzle should have been executed (riddle skipped due to config enabled=false)
+    assert mock_puzzle_instance.execute.called
+    assert not mock_riddle_instance.execute.called
+    mock_logger.info.assert_any_call("Skipping riddle - disabled in its config.json")
+
+
+@pytest.mark.asyncio
+async def test_comic_wuffle_uses_stable_wikimedia_sources():
+    """Wuffle should keep using live Wikimedia Special:FilePath comic pages."""
+    from datetime import date
+
+    from app.services.care_circle.providers.comic_wuffle.provider import ComicWuffleProvider
+
+    provider = ComicWuffleProvider()
+
+    assert len(provider._sample_strips) >= 2
+    for strip in provider._sample_strips:
+        assert strip["image_url"].startswith(
+            "https://commons.wikimedia.org/wiki/Special:FilePath/"
+        )
+        assert strip["source_url"].startswith(
+            "https://commons.wikimedia.org/wiki/File:"
+        )
+
+    strip = await provider._fetch_strip(date(2026, 4, 19), patient_id=17)
+    assert strip in provider._sample_strips
+    assert "Little%20Red%20Riding%20Hood" in strip["image_url"]

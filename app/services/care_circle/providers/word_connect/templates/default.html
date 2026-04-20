@@ -1,24 +1,31 @@
-<div class="section section--word-connect">
+<table class="section section--word-connect" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">🔗 {{ title }}</h2>
     <p class="section__subtitle">{{ instruction }}</p>
-    <div class="section__body word-connect">
+    <table class="section__body word-connect" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         {% for pair in pairs %}
-        <div class="word-connect__pair">
-            <div class="word-connect__word">
+        <tr>
+            <td class="word-connect__word" width="40%" style="padding:8px 12px; text-align:center; font-size:26px; font-weight:700; border:2px solid #1e40af; border-radius:8px; background:#eff6ff" align="center">
                 {{ pair.word1 }}
-            </div>
-            <div class="word-connect__word">
+            </td>
+            <td width="20%" style="text-align:center; font-size:24px; color:#64748b" align="center">⟷</td>
+            <td class="word-connect__word" width="40%" style="padding:8px 12px; text-align:center; font-size:26px; font-weight:700; border:2px solid #059669; border-radius:8px; background:#ecfdf5" align="center">
                 {{ pair.word2 }}
-            </div>
-        </div>
+            </td>
+        </tr>
         {% endfor %}
-        <p class="section__body section__body--italic text-muted mt-md word-connect__note">(Answers are upside down below)</p>
-        <div class="word-connect__answers">
-            {% for pair in pairs %}
-            <span class="word-connect__answer">
+        <tr><td colspan="3" height="16">&nbsp;</td></tr>
+        <tr>
+            <td colspan="3" align="center" class="section__body section__body--italic text-muted" style="font-size:24px; font-weight:500; line-height:1.7; font-style:italic; color:#64748b">(Answers are upside down below)</td>
+        </tr>
+        <tr><td colspan="3" height="12">&nbsp;</td></tr>
+        {% for pair in answer_pairs %}
+        <tr>
+            <td colspan="3" class="word-connect__answer" style="font-size:22px; font-weight:600; padding:8px 0; border-bottom:1px solid #e2e8f0; transform:rotate(180deg); -webkit-transform:rotate(180deg); -ms-transform:rotate(180deg)">
                 {{ pair.word1 }} ⟷ {{ pair.word2 }}: {{ pair.connection }}
-            </span>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+  </td></tr>
+</table>

@@ -66,7 +66,11 @@ class Settings(BaseSettings):
     
     # --- Care Circle Specific Provider Configuration ---
     CARE_CIRCLE_DEFAULT_TEXT_MODEL: str = Field(default="google/gemini-3.1-flash-lite-preview", alias="CARE_CIRCLE_DEFAULT_TEXT_MODEL")
-    CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="openai/gpt-image-1", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
+    CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="google/gemini-3.1-flash-image-preview", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
+
+    # --- Third-party Data APIs (Care Circle providers) ---
+    NPS_API_KEY: Optional[str] = Field(default=None, alias="NPS_API_KEY")
+    GNEWS_API_KEY: Optional[str] = Field(default=None, alias="GNEWS_API_KEY")
 
     # --- LM Studio (local) Configuration ---
     LMSTUDIO_BASE_URL: str = Field(default="http://localhost:1234/v1", alias="LMSTUDIO_BASE_URL")

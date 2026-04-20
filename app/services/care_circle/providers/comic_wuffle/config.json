@@ -1,0 +1,11 @@
+{
+  "name": "Wuffle Comics",
+  "description": "Warm, all-ages slice-of-life comic about a gentle wolf and his friends. Cozy tone, soft colors, perfect for calming newsletters. CC0 licensed.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

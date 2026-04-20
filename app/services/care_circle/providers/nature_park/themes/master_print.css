@@ -1,0 +1,40 @@
+.nature-park__frame {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nature-park__image {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+}
+
+.nature-park__details {
+    padding: 0;
+}
+
+.nature-park__park-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 3px;
+}
+
+.nature-park__title {
+    margin: 0 0 6px;
+    color: #444;
+}
+
+.nature-park__caption {
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.nature-park__credit {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #666;
+    font-style: italic;
+}

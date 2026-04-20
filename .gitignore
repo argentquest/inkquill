@@ -125,3 +125,6 @@ __pycache__/
 
 # Deployment artifacts
 *.zip
+
+# Generated newsletter/provider cache
+cache/

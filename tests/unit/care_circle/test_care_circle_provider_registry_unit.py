@@ -213,6 +213,132 @@ def test_get_provider_class_returns_provider_for_known_weather():
     assert result is not None
 
 
+@pytest.mark.asyncio
+async def test_newsletter_footer_provider_includes_patient_settings_summary():
+    """Footer payload should include core patient settings and preference lists."""
+    from types import SimpleNamespace
+
+    from app.services.care_circle.providers.newsletter_footer.provider import (
+        NewsletterFooterProvider,
+    )
+
+    patient = SimpleNamespace(
+        display_name="Rose Ellis",
+        stage="moderate",
+        access_state="active",
+        timezone="America/Chicago",
+        preferred_language="en",
+        country="US",
+        postal_code="60601",
+        latitude=41.8864,
+        longitude=-87.6186,
+        delivery_time="08:30",
+        delivery_days=["Mon", "Wed", "Fri"],
+        auth_image_keys=["sun", "dog", "house"],
+        email="rose@example.com",
+        phone_number="+15551230000",
+        preferences={
+            "preferred_pronoun": "she/her",
+            "era_of_youth": "1950s",
+            "hometown": "Leeds",
+            "nationality_or_background": "British",
+            "city_for_weather": "Chicago",
+            "mobility_level": "independent",
+            "family_members": ["Nina", "Paul"],
+            "hobbies": ["gardening"],
+        },
+    )
+
+    provider = NewsletterFooterProvider(
+        patient_config={"total_providers": 7, "generation_date": "April 19, 2026"}
+    )
+    payload = await provider._generate_payload(patient)
+
+    scalar_map = {item["label"]: item["value"] for item in payload["scalar_fields"]}
+    assert scalar_map["Stage"] == "moderate"
+    assert scalar_map["Timezone"] == "America/Chicago"
+    assert scalar_map["Preferred Language"] == "en"
+    assert scalar_map["Country"] == "US"
+    assert scalar_map["Postal Code"] == "60601"
+    assert scalar_map["Latitude"] == 41.8864
+    assert scalar_map["Longitude"] == -87.6186
+    assert scalar_map["Delivery Time"] == "08:30"
+    assert scalar_map["Email"] == "rose@example.com"
+    assert scalar_map["Phone"] == "+15551230000"
+
+    list_map = {item["label"]: item["items"] for item in payload["list_fields"]}
+    assert list_map["Delivery Days"] == ["Mon", "Wed", "Fri"]
+    assert list_map["Auth Images"] == ["sun", "dog", "house"]
+    assert list_map["Family Members"] == ["Nina", "Paul"]
+
+
+@pytest.mark.asyncio
+async def test_session_assembler_pins_footer_to_bottom(unit_client_factory):
+    """Footer provider should always be rendered after all other providers."""
+    from app.services.care_circle.session_assembler import assemble_daily_patient_session
+
+    mock_patient = MagicMock()
+    mock_patient.id = 1
+    mock_patient.access_state = "active"
+    mock_patient.preferences = {}
+
+    mock_catalog = [
+        MagicMock(provider_key="newsletter_footer", display_order=0, patient_visible=True),
+        MagicMock(provider_key="weather", display_order=1, patient_visible=True),
+    ]
+    mock_result = MagicMock()
+    mock_result.scalars.return_value.all.return_value = mock_catalog
+    mock_config_result = MagicMock()
+    mock_config_result.scalars.return_value.all.return_value = []
+
+    mock_db = AsyncMock()
+    mock_db.get = AsyncMock(return_value=mock_patient)
+    mock_db.execute = AsyncMock(side_effect=[mock_result, mock_config_result, MagicMock()])
+    mock_db.flush = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.commit = AsyncMock()
+
+    weather_instance = MagicMock()
+    weather_instance.execute = AsyncMock(
+        return_value={
+            "success": True,
+            "data": {"title": "Weather", "rendered_html": "<div>weather</div>"},
+            "token_usage": {"total_tokens": 12, "model": "gpt-test"},
+        }
+    )
+
+    footer_instance = MagicMock()
+    footer_instance.execute = AsyncMock(
+        return_value={
+            "success": True,
+            "data": {"title": "Footer"},
+            "token_usage": {"total_tokens": 0, "model": ""},
+        }
+    )
+    footer_instance.render_template = MagicMock(return_value="<div>footer</div>")
+
+    weather_cls = MagicMock()
+    weather_cls.is_safe_for_patient = True
+    weather_cls.return_value = weather_instance
+    weather_instance.is_enabled = True
+
+    footer_cls = MagicMock()
+    footer_cls.is_safe_for_patient = True
+    footer_cls.return_value = footer_instance
+    footer_instance.is_enabled = True
+
+    with patch("app.services.care_circle.session_assembler.ensure_provider_catalog_seeded", new=AsyncMock()), \
+         patch("app.services.care_circle.session_assembler.get_provider_class", side_effect=[footer_cls, weather_cls]), \
+         patch("app.services.care_circle.session_assembler.get_cached_result", return_value=None), \
+         patch("app.services.care_circle.session_assembler.save_cached_result"):
+        result = await assemble_daily_patient_session(mock_db, 1, force_regenerate=True)
+
+    assert result["success"] is True
+    added_cards = [call.args[0] for call in mock_db.add.call_args_list]
+    assert [card.provider_key for card in added_cards] == ["weather", "newsletter_footer"]
+    assert added_cards[-1].display_order > added_cards[0].display_order
+
+
 # ---------------------------------------------------------------------------
 # CRUD async function tests (using pytest.mark.asyncio)
 # ---------------------------------------------------------------------------
@@ -334,6 +460,21 @@ async def test_crud_patient_provider_configs_upsert_updates_existing():
 
     assert existing_config.is_enabled is False
     mock_db.commit.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_crud_patient_provider_configs_upsert_rejects_removed_provider():
+    """Removed providers cannot be re-added to patient configs."""
+    from app.crud import care_circle as care_circle_crud
+
+    mock_db = AsyncMock()
+
+    with pytest.raises(ValueError, match="comic_mimi_eunice"):
+        await care_circle_crud.upsert_patient_provider_config(
+            mock_db, patient_id=1, provider_key="comic_mimi_eunice", is_enabled=True
+        )
+
+    mock_db.commit.assert_not_called()
 
 
 @pytest.mark.asyncio

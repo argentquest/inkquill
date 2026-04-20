@@ -220,6 +220,9 @@ export function ProviderOrderingPanel({ patientId, providerCatalog, providerConf
   const reorderMutation = useMutation({
     mutationFn: (ordering: { provider_key: string; display_order: number }[]) =>
       reorderCareCirclePatientProviderConfigs(patientId, ordering),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["care-circle-family-patient-provider-configs", patientId] });
+    },
     onError: () => setSaveError("Could not save the new order. Please try again."),
   });
 
@@ -235,15 +238,26 @@ export function ProviderOrderingPanel({ patientId, providerCatalog, providerConf
 
   const toggleMutation = useMutation({
     mutationFn: ({ providerKey, isEnabled }: { providerKey: string; isEnabled: boolean }) =>
-      updateCareCirclePatientProviderConfig(patientId, providerKey, {
-        is_enabled: isEnabled,
-        custom_parameters: {},
-      }),
-    onSuccess: () => {
+      updateCareCirclePatientProviderConfig(patientId, providerKey, { is_enabled: isEnabled }),
+    onSuccess: (_data, { providerKey, isEnabled }) => {
       queryClient.invalidateQueries({ queryKey: ["care-circle-family-patient-provider-configs", patientId] });
       setSaveError(null);
+      // Fire reorder only after toggle is confirmed saved (avoids INSERT race condition)
+      if (isEnabled) {
+        const nextEnabledRows = rows
+          .map((r) => (r.providerKey === providerKey ? { ...r, isEnabled: true } : r))
+          .filter((r) => r.isEnabled)
+          .sort((a, b) => a.displayOrder - b.displayOrder);
+        persistOrder([...nextEnabledRows]);
+      }
     },
-    onError: () => setSaveError("Could not update provider. Please try again."),
+    onError: (_err, { providerKey }) => {
+      // Revert optimistic update
+      setRows((prev) =>
+        prev.map((r) => (r.providerKey === providerKey ? { ...r, isEnabled: !r.isEnabled } : r))
+      );
+      setSaveError("Could not update provider. Please try again.");
+    },
   });
 
   function handleToggle(providerKey: string) {
@@ -257,12 +271,6 @@ export function ProviderOrderingPanel({ patientId, providerCatalog, providerConf
     );
 
     toggleMutation.mutate({ providerKey, isEnabled: nextEnabled });
-
-    // If enabling, append to end of enabled list and persist order
-    if (nextEnabled) {
-      const nextEnabledRows = [...enabledRows, { ...row, isEnabled: true }];
-      persistOrder(nextEnabledRows);
-    }
   }
 
   // ── Drag end ──────────────────────────────────────────────────────────────

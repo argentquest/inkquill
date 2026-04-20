@@ -2,6 +2,7 @@
     "name": "Daily Riddle",
     "description": "Fun riddles with answers to ponder.",
     "technical_summary": "Provides riddles with questions and answers from a curated configurable list.",
+    "enabled": false,
     "riddles": [
         {
             "question": "What has hands but cant clap?",

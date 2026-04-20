@@ -25,36 +25,11 @@ async def _fetch_active_patients():
 
 async def _send_to_patient(patient) -> dict:
     """Send newsletter to a single patient."""
-    from app.services.care_circle.session_assembler import assemble_daily_patient_session
-    from app.services.care_circle.newsletter_email_service import send_newsletter_email
-    from app.services.care_circle.newsletter_sms_service import send_sms_newsletter
+    from app.services.care_circle.newsletter_delivery_service import deliver_newsletter_to_patient
+    from app.db.database import async_session_local
 
-    # Assemble the patient's daily session
-    session_data = await assemble_daily_patient_session(patient.id)
-
-    # Send email newsletter
-    email_result = None
-    if getattr(patient, "email", None):
-        email_result = await send_newsletter_email(
-            patient, session_data.get("html", "")
-        )
-        logger.info("Email to %s: %s", patient.email, email_result.get("success"))
-
-    # Send SMS newsletter
-    sms_result = None
-    if getattr(patient, "phone_number", None):
-        sms_result = await send_sms_newsletter(
-            patient, session_data.get("provider_results", [])
-        )
-        logger.info("SMS to %s: %s", patient.phone_number, sms_result.get("success"))
-
-    return {
-        "patient_id": patient.id,
-        "patient_name": patient.display_name,
-        "status": "sent",
-        "email_sent": email_result.get("success") if email_result else False,
-        "sms_sent": sms_result.get("success") if sms_result else False,
-    }
+    async with async_session_local() as db:
+        return await deliver_newsletter_to_patient(db, patient)
 
 
 @register_task(

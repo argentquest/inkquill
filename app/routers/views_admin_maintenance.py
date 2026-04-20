@@ -13,6 +13,7 @@ from app.core.deps import get_db_session, get_current_active_user
 from app.models.user import User
 from app.core.config import settings
 from app.services.email_service import EmailService
+from app.services.care_circle.newsletter_delivery_service import deliver_newsletter_to_patient
 from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
@@ -140,6 +141,50 @@ async def test_email(
                 "message": f"Error sending test email: {str(e)}"
             }
         )
+
+
+@router.post("/newsletter/deliver/{patient_id}")
+async def deliver_newsletter(
+    patient_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db_session)
+):
+    """Trigger real newsletter generation and delivery for a specific patient.
+    Used by frontend buttons (admin or patient view pages)."""
+    
+    if not current_user or not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+
+    try:
+        result = await deliver_newsletter_to_patient(
+            db=db,
+            patient_id=patient_id,
+            force_regenerate=False,
+            test_mode=False
+        )
+        
+        if result.get("success"):
+            return JSONResponse({
+                "success": True,
+                "message": f"Newsletter successfully sent to patient {patient_id}",
+                "result": result
+            })
+        else:
+            return JSONResponse({
+                "success": False,
+                "message": result.get("message", "Failed to send newsletter"),
+                "result": result
+            }, status_code=400)
+            
+    except Exception as e:
+        logger.error(f"Error delivering newsletter to patient {patient_id}: {e}")
+        return JSONResponse({
+            "success": False,
+            "message": f"Server error: {str(e)}"
+        }, status_code=500)
 
 
 @router.get("/user-email", response_class=HTMLResponse, name="admin_user_email_page")

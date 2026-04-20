@@ -1,15 +1,19 @@
-<div class="section section--odd-one-out">
+<table class="section section--odd-one-out" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">🎯 {{ title }}</h2>
     <p class="section__subtitle">{{ instruction }}</p>
     <div class="section__body odd-one-out">
-        <div class="odd-one-out__items">
-            {% for item in items %}
-            <div class="odd-one-out__item">
-                {{ item }}
-            </div>
-            {% endfor %}
-        </div>
+        <table class="odd-one-out__items" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                {% for item in items %}
+                <td class="odd-one-out__item" valign="top" style="padding:4px 8px">
+                    {{ item }}
+                </td>
+                {% endfor %}
+            </tr>
+        </table>
         <p class="section__body section__body--italic text-muted mt-md">(Answer is upside down below)</p>
         <p class="section__body odd-one-out__answer">{{ answer }}</p>
     </div>
-</div>
+  </td></tr>
+</table>

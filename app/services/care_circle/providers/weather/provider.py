@@ -25,19 +25,19 @@ class WeatherProvider(BaseCareCircleProvider):
     CACHE_TTL_SECONDS = 900
 
     @classmethod
-    def _load_cached_weather(cls, city: str) -> dict[str, Any] | None:
-        cached = cls._weather_cache.get(city.lower())
+    def _load_cached_weather(cls, location_key: str) -> dict[str, Any] | None:
+        cached = cls._weather_cache.get(location_key.lower())
         if not cached:
             return None
         expires_at, payload = cached
         if time.time() >= expires_at:
-            cls._weather_cache.pop(city.lower(), None)
+            cls._weather_cache.pop(location_key.lower(), None)
             return None
         return dict(payload)
 
     @classmethod
-    def _save_cached_weather(cls, city: str, payload: dict[str, Any]) -> None:
-        cls._weather_cache[city.lower()] = (
+    def _save_cached_weather(cls, location_key: str, payload: dict[str, Any]) -> None:
+        cls._weather_cache[location_key.lower()] = (
             time.time() + cls.CACHE_TTL_SECONDS,
             dict(payload),
         )
@@ -68,10 +68,17 @@ class WeatherProvider(BaseCareCircleProvider):
             or self.patient_config.get("default_city")
             or "Unknown"
         ).strip()
+        latitude = getattr(patient_profile, "latitude", None)
+        longitude = getattr(patient_profile, "longitude", None)
+        query_target = city
+        cache_key = city
+        if latitude is not None and longitude is not None:
+            query_target = f"{latitude},{longitude}"
+            cache_key = query_target
         recipient_name = self.get_recipient_name(patient_profile)
         fallback_msg = self.patient_config.get("fallback", "Weather currently unavailable.")
 
-        if not city or city == "Unknown":
+        if (not city or city == "Unknown") and (latitude is None or longitude is None):
             return {
                 "text": "Weather unavailable. Please set a city in the Family portal.",
                 "subheading": "Update Profile",
@@ -79,7 +86,7 @@ class WeatherProvider(BaseCareCircleProvider):
                 "city": "Unknown",
             }
 
-        cached_payload = self._load_cached_weather(city)
+        cached_payload = self._load_cached_weather(cache_key)
         if cached_payload is not None:
             cached_payload["text"] = (
                 f"Good morning, {recipient_name}! It is "
@@ -88,8 +95,8 @@ class WeatherProvider(BaseCareCircleProvider):
             return cached_payload
 
         try:
-            city_encoded = urllib.parse.quote(city)
-            url = f"https://wttr.in/{city_encoded}?format=j1"
+            location_encoded = urllib.parse.quote(query_target)
+            url = f"https://wttr.in/{location_encoded}?format=j1"
 
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.get(url, headers={"Accept": "application/json"})
@@ -109,11 +116,11 @@ class WeatherProvider(BaseCareCircleProvider):
                 temperature=temp_f,
                 condition=desc,
             )
-            self._save_cached_weather(city, payload)
+            self._save_cached_weather(cache_key, payload)
             return payload
 
         except Exception as exc:
-            logger.warning("Weather fetch failed for city %s: %s", city, exc)
+            logger.warning("Weather fetch failed for location %s: %s", query_target, exc)
             return {
                 "text": fallback_msg,
                 "subheading": "Weather",

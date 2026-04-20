@@ -1,5 +1,6 @@
 """FastAPI Scheduler Server entry point."""
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -11,8 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings, log_application_settings
 from app.scheduler.scheduler_engine import create_scheduler
-from app.scheduler.routers.health import router as health_router
-from app.scheduler.routers.jobs import router as jobs_router
+from apscheduler.triggers.cron import CronTrigger
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +31,8 @@ async def lifespan(app_instance: FastAPI):
     # Create and start scheduler
     scheduler = create_scheduler()
 
-    # Register all tasks from the tasks package
-    from app.scheduler.tasks import care_circle_newsletter, care_circle_session, cleanup  # noqa: F401
+    # Register all tasks from the tasks package (this triggers @register_task decorators)
+    from app.scheduler.tasks import care_circle_newsletter, care_circle_session, care_circle_precache, care_circle_mini_newsletter, cleanup, diagnostic  # noqa: F401
 
     # Schedule enabled tasks
     from app.scheduler.registry import list_tasks
@@ -40,10 +40,9 @@ async def lifespan(app_instance: FastAPI):
         if task_def.enabled_by_default:
             scheduler.add_job(
                 func=task_def.func,
-                trigger="cron",
+                trigger=CronTrigger.from_crontab(task_def.default_cron),
                 id=task_def.key,
                 name=task_def.name,
-                cron=task_def.default_cron,
                 max_instances=task_def.max_instances,
                 misfire_grace_time=task_def.misfire_grace_time,
                 replace_existing=True,
@@ -52,6 +51,10 @@ async def lifespan(app_instance: FastAPI):
 
     scheduler.start()
     logger.info("Scheduler Server: Started")
+
+    # Warm the cache immediately on startup so today + next 3 days are covered
+    from app.scheduler.tasks.care_circle_precache import precache_provider_outputs
+    asyncio.create_task(precache_provider_outputs())
 
     try:
         yield
@@ -93,7 +96,10 @@ async def serve_ui():
     return {"message": "Scheduler UI not found. Build the static files first."}
 
 
-# Include routers
+# Routers are imported inside lifespan or at bottom to avoid circular imports
+from app.scheduler.routers.health import router as health_router
+from app.scheduler.routers.jobs import router as jobs_router
+
 app.include_router(health_router, prefix="/scheduler", tags=["Health"])
 app.include_router(jobs_router, prefix="/scheduler", tags=["Jobs"])
 

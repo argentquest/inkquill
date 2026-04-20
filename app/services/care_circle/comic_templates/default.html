@@ -1,0 +1,94 @@
+<table class="comic-strip-card" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td class="comic-strip-header">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td class="comic-strip-name">{{ title }}</td>
+      {% if author %}<td class="comic-strip-author" align="right">by {{ author }}</td>{% endif %}
+    </tr></table>
+  </td></tr>
+
+  <tr><td class="comic-strip-meta">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td class="comic-strip-date">{{ comic_date }}</td>
+      <td class="comic-strip-generated" align="right">Prepared {{ generated_at }}</td>
+    </tr></table>
+  </td></tr>
+
+  {% if image_url %}
+  <tr><td class="comic-strip-image-wrap" align="center">
+    <img src="{{ image_url }}" alt="{{ title }}" class="comic-strip-image" />
+  </td></tr>
+  {% else %}
+  <tr><td class="comic-strip-placeholder" align="center">
+    <p>Today's comic is not available right now. Please check back soon!</p>
+  </td></tr>
+  {% endif %}
+
+  {% if caption %}
+  <tr><td class="comic-strip-caption">{{ caption }}</td></tr>
+  {% endif %}
+
+  <tr><td class="comic-strip-attribution">{{ attribution }}</td></tr>
+</table>
+
+<style>
+.comic-strip-card {
+  font-family: Georgia, serif;
+  background: #fffef8;
+  border: 2px solid #d4c9a0;
+  border-radius: 8px;
+  padding: 16px;
+}
+.comic-strip-header {
+  border-bottom: 1px solid #e8dfc0;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+.comic-strip-name {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #4a3c28;
+}
+.comic-strip-author {
+  font-size: 0.85em;
+  color: #7a6a50;
+}
+.comic-strip-meta {
+  padding: 4px 0 12px;
+}
+.comic-strip-date {
+  font-size: 0.78em;
+  color: #9a8a70;
+}
+.comic-strip-generated {
+  font-size: 0.78em;
+  color: #9a8a70;
+}
+.comic-strip-image-wrap {
+  padding: 12px 0;
+}
+.comic-strip-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid #e0d5b0;
+}
+.comic-strip-placeholder {
+  background: #f5f0e0;
+  border-radius: 4px;
+  padding: 24px;
+  color: #7a6a50;
+  font-style: italic;
+}
+.comic-strip-caption {
+  font-size: 0.9em;
+  color: #5a4a35;
+  padding: 10px 0 4px;
+  font-style: italic;
+}
+.comic-strip-attribution {
+  font-size: 0.72em;
+  color: #9a8a70;
+  padding-top: 8px;
+  border-top: 1px solid #e8dfc0;
+}
+</style>

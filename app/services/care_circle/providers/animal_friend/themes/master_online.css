@@ -1,28 +1,32 @@
 .animal-friend {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 18px;
+    width: 100%;
+}
+
+.animal-friend__image-cell {
+    padding-right: 16px;
+    vertical-align: middle;
 }
 
 .animal-friend__image {
-    flex: 0 0 70%;
-    width: 70%;
-    max-width: 260px;
+    width: 100%;
     border-radius: 16px;
     object-fit: cover;
+    display: block;
 }
 
-.animal-friend__fallback {
-    flex: 0 0 70%;
-    width: 70%;
-    padding: 36px;
+.animal-friend__fallback-cell {
+    padding-right: 16px;
+    vertical-align: middle;
+    text-align: center;
     font-size: 120px;
     line-height: 1;
 }
 
+.animal-friend__fact-cell {
+    vertical-align: middle;
+}
+
 .animal-friend__fact {
-    flex: 0 0 30%;
     margin: 0;
     font-style: italic;
 }

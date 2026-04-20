@@ -1,0 +1,11 @@
+{
+  "name": "Mr. Skygack, from Mars",
+  "description": "Charming early 1900s single-panel sci-fi humor strip — a Martian visitor observes human life, public domain.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

@@ -1,4 +1,5 @@
-<div class="section section--gridless-crossword">
+<table class="section section--gridless-crossword" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">📝 Gridless Crossword</h2>
     <p class="section__subtitle">
         Solve the 10 clues below. The first letters of all answers spell a secret word!
@@ -6,24 +7,24 @@
     <div class="section__body">
         <div class="gridless-crossword__word-bank">
             <p class="gridless-crossword__bank-title">🔤 WORD BANK (scrambled letters)</p>
-            <div class="gridless-crossword__bank-list">
-                {% for scrambled in scrambled_words %}
-                <span class="gridless-crossword__bank-chip">{{ scrambled }}</span>
-                {% endfor %}
-            </div>
+            <table class="gridless-crossword__bank-list" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    {% for scrambled in scrambled_words %}
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">{{ scrambled }}</td>
+                    {% endfor %}
+                </tr>
+            </table>
         </div>
 
-        <div class="gridless-crossword__clues">
+        <table class="gridless-crossword__clues" width="100%" cellpadding="0" cellspacing="0" border="0">
             {% for item in words %}
-            <div class="gridless-crossword__clue">
-                <div class="gridless-crossword__clue-row">
-                    <span class="gridless-crossword__clue-number">{{ loop.index }}.</span>
-                    <span class="gridless-crossword__clue-length">[{{ item.word|length }} letters]</span>
-                    <span class="gridless-crossword__clue-text">{{ item.clue }}</span>
-                </div>
-            </div>
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">{{ loop.index }}.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[{{ item.word|length }} letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">{{ item.clue }}</td>
+            </tr>
             {% endfor %}
-        </div>
+        </table>
 
         <div class="gridless-crossword__secret-hint">
             <p class="gridless-crossword__secret-text">
@@ -33,14 +34,17 @@
 
         <div class="gridless-crossword__answers">
             <p class="section__body section__body--italic text-muted gridless-crossword__answers-note">(Answers are upside down below)</p>
-            <div class="gridless-crossword__answers-list">
-                {% for item in words %}
-                <span class="gridless-crossword__answer-chip">{{ item.word }}</span>
-                {% endfor %}
-            </div>
+            <table class="gridless-crossword__answers-list" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    {% for item in words %}
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">{{ item.word }}</td>
+                    {% endfor %}
+                </tr>
+            </table>
             <p class="gridless-crossword__secret-answer">
                 Secret Word: {{ secret_word }}
             </p>
         </div>
     </div>
-</div>
+  </td></tr>
+</table>

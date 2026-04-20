@@ -1,11 +1,17 @@
-<div class="section section--cat_fact">
+<table class="section section--cat_fact" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
     <h2 class="section__title">🐱 Fun Cat Fact</h2>
-    <div class="pet-photo">
-        <div class="pet-photo__content">
-            <p class="section__body pet-photo__caption">{{ fact }}</p>
-        </div>
-        {% if image_url %}
-        <img class="pet-photo__image" src="{{ image_url }}" alt="A cute cat">
-        {% endif %}
-    </div>
-</div>
+    <table class="pet-photo" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td class="pet-photo__content" width="30%" valign="top" style="padding-right:16px; vertical-align:top">
+                <p class="section__body pet-photo__caption" style="font-size:24px; font-weight:500; line-height:1.7; margin:0">{{ fact }}</p>
+            </td>
+            {% if image_url %}
+            <td class="pet-photo__image-cell" width="70%" valign="top" style="vertical-align:top">
+                <img class="pet-photo__image" src="{{ image_url }}" alt="A cute cat" style="width:100%; border-radius:12px; object-fit:cover; display:block">
+            </td>
+            {% endif %}
+        </tr>
+    </table>
+  </td></tr>
+</table>

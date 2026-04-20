@@ -1,0 +1,57 @@
+{
+    "name": "News",
+    "description": "Current news articles from the GNews API with language and country filtering.",
+    "mode": "search",
+    "query": "positive news",
+    "lang": "",
+    "country": "",
+    "category": "",
+    "max": 5,
+    "cache_ttl": 600,
+    "grid_width": 8,
+    "grid_height": 4,
+    "fallback_stories": [
+        {
+            "title": "Community Volunteers Plant Trees in Local Park",
+            "description": "Residents came together to plant dozens of trees, making the neighborhood greener and more welcoming for families.",
+            "url": "#",
+            "image": "",
+            "publishedAt": "2026-04-19T08:00:00Z",
+            "source": {"name": "Local News", "url": "#"}
+        },
+        {
+            "title": "New Library Program Brings Books to Seniors",
+            "description": "A new delivery service ensures that homebound seniors can enjoy fresh books and magazines every week.",
+            "url": "#",
+            "image": "",
+            "publishedAt": "2026-04-18T10:00:00Z",
+            "source": {"name": "Community Herald", "url": "#"}
+        },
+        {
+            "title": "Scientists Discover New Species of Butterfly",
+            "description": "Researchers have identified a beautiful new butterfly species in a tropical forest, adding to our understanding of nature.",
+            "url": "#",
+            "image": "",
+            "publishedAt": "2026-04-17T14:00:00Z",
+            "source": {"name": "Science Daily", "url": "#"}
+        },
+        {
+            "title": "Town Celebrates Annual Harvest Festival",
+            "description": "Families gathered for food, music, and fun at the yearly harvest celebration that brings the community together.",
+            "url": "#",
+            "image": "",
+            "publishedAt": "2026-04-16T09:00:00Z",
+            "source": {"name": "Town Gazette", "url": "#"}
+        },
+        {
+            "title": "Garden Club Shares Tips for Spring Planting",
+            "description": "Local gardening experts share their best advice for growing flowers and vegetables this spring season.",
+            "url": "#",
+            "image": "",
+            "publishedAt": "2026-04-15T07:00:00Z",
+            "source": {"name": "Garden Weekly", "url": "#"}
+        }
+    ],
+    "common": false,
+    "llm": false
+}

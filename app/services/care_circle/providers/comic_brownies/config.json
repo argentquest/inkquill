@@ -1,0 +1,11 @@
+{
+  "name": "The Brownies",
+  "description": "Whimsical illustrated comics by Palmer Cox featuring mischievous elf-like Brownies, public domain.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

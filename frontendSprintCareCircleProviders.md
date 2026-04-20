@@ -28,7 +28,7 @@ Those files remain the source of truth for the common platform and the family/pa
 External provider inventory from `C:\code2026\DailyNewsletter\backend\content_providers`:
 
 - core: `weather`, `daily_quote`, `daily_affirmation`, `family_greeting`, `world_news`
-- memory and comfort: `nostalgia`, `local_history`, `memory_lane_photo`, `nature_scene`, `personal_affirmation`, `activity_suggestion`, `song_of_the_day`, `animal_friend`, `dog_photo`, `cat_fact`
+- memory and comfort: `nostalgia`, `local_history`, `personal_affirmation`, `activity_suggestion`, `song_of_the_day`, `animal_friend`, `dog_photo`, `cat_fact` (memory_lane_photo and nature_scene disabled)
 - games and cognition: `puzzle`, `brain_booster`, `riddle`, `missing_vowels`, `finish_phrase`, `odd_one_out`, `word_scramble`, `gridless_crossword`, `crossword`, `word_connect`, `complete_the_duo`, `spot_the_difference`, `bingo`, `simple_math`, `color_match`, `whats_missing`, `ai_trivia`
 - wellbeing and lifestyle: `sensory`, `gratitude`, `gentle_exercise`, `simple_recipe`, `daily_blessing`, `hobby_spotlight`, `pen_pal_letter`
 
