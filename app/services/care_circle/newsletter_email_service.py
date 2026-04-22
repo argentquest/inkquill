@@ -18,7 +18,7 @@ import re
 import smtplib
 import uuid
 from pathlib import Path
-from datetime import datetime
+from datetime import date, datetime
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -184,8 +184,8 @@ def _html_to_plain(html: str) -> str:
     return text.strip()
 
 
-def _build_subject(patient_name: str, family_name: str | None) -> str:
-    date_str = datetime.now().strftime("%B %d, %Y")
+def _build_subject(patient_name: str, family_name: str | None, reference_date: date) -> str:
+    date_str = reference_date.strftime("%B %d, %Y")
     if family_name:
         return f"Your Care Circle Newsletter — {date_str} | {family_name} Family"
     return f"Your Care Circle Newsletter — {date_str}"
@@ -374,6 +374,7 @@ async def _send_via_smtp(
 async def send_newsletter_email(
     patient: Any,
     newsletter_html: str,
+    reference_date: date,
 ) -> dict[str, Any]:
     """
     Send the full Care Circle newsletter to the patient's email address.
@@ -393,7 +394,7 @@ async def send_newsletter_email(
         logger.warning("Patient %s has no email address — skipping newsletter email.", patient_name)
         return {"success": False, "reason": "no_email", "to_email": None}
 
-    subject = _build_subject(patient_name, family_name)
+    subject = _build_subject(patient_name, family_name, reference_date)
     # Restore local file paths so CID embedding works (web view uses served URLs)
     email_html = _resolve_served_images(newsletter_html)
     html_content = _build_email_html(email_html, subject)

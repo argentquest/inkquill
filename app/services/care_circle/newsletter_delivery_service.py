@@ -4,6 +4,7 @@ Single entry point used by both the scheduler and on-demand frontend triggers.
 """
 
 import logging
+from datetime import date
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 async def deliver_newsletter_to_patient(
     db: AsyncSession,
     patient: Any,
+    reference_date: date,
     force_regenerate: bool = False,
 ) -> dict[str, Any]:
     """
@@ -28,13 +30,18 @@ async def deliver_newsletter_to_patient(
         force_regenerate: If True, bypasses the provider cache.
 
     Returns:
-        dict with keys: success, patient_id, email_sent, sms_sent, message
+        dict with keys: success, patient_id, email_sent, message
     """
     patient_id: int = patient.id
     patient_name: str = getattr(patient, "display_name", "Unknown")
 
     try:
-        session_data = await assemble_daily_patient_session(db, patient_id)
+        session_data = await assemble_daily_patient_session(
+            db,
+            patient_id,
+            force_regenerate=force_regenerate,
+            for_date=reference_date,
+        )
 
         if not session_data or not isinstance(session_data, dict) or not session_data.get("success"):
             logger.warning("Newsletter assembly failed for patient %s", patient_id)
@@ -45,7 +52,6 @@ async def deliver_newsletter_to_patient(
                 "reason": "assembly_failed",
                 "message": "Failed to assemble newsletter content",
                 "email_sent": False,
-                "sms_sent": False,
             }
 
         html_content = session_data.get("html", "")
@@ -58,32 +64,24 @@ async def deliver_newsletter_to_patient(
                 "reason": "no_html",
                 "message": "Newsletter assembled but produced no HTML",
                 "email_sent": False,
-                "sms_sent": False,
             }
 
         email_sent = False
         if getattr(patient, "email", None):
-            email_result = await send_newsletter_email(patient, html_content)
+            email_result = await send_newsletter_email(
+                patient,
+                html_content,
+                reference_date,
+            )
             email_sent = bool(email_result.get("success"))
             logger.info("Email to %s (%s): sent=%s", patient_name, patient.email, email_sent)
 
-        sms_sent = False
-        if getattr(patient, "phone_number", None):
-            try:
-                from app.services.care_circle.newsletter_sms_service import send_sms_newsletter
-                sms_result = await send_sms_newsletter(patient, session_data.get("provider_results", []))
-                sms_sent = bool(sms_result.get("success"))
-                logger.info("SMS to %s (%s): sent=%s", patient_name, patient.phone_number, sms_sent)
-            except Exception as exc:
-                logger.error("SMS delivery failed for patient %s: %s", patient_id, exc)
-
         return {
-            "success": email_sent or sms_sent,
+            "success": email_sent,
             "patient_id": patient_id,
             "patient_name": patient_name,
             "status": "sent",
             "email_sent": email_sent,
-            "sms_sent": sms_sent,
             "message": "Newsletter dispatched",
         }
 
@@ -96,5 +94,4 @@ async def deliver_newsletter_to_patient(
             "reason": "exception",
             "message": str(exc),
             "email_sent": False,
-            "sms_sent": False,
         }

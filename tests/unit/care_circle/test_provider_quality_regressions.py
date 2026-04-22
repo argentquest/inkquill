@@ -4,9 +4,31 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from app.services.care_circle.providers.animal_friend.provider import AnimalFriendProvider
+from app.services.care_circle.providers.ai_trivia.provider import AiTriviaProvider
+from app.services.care_circle.providers.brain_booster.provider import BrainBoosterProvider
+from app.services.care_circle.providers.classic_art.provider import ClassicArtProvider
+from app.services.care_circle.providers.country_spotlight.provider import CountrySpotlightProvider
+from app.services.care_circle.providers.finish_phrase.provider import FinishPhraseProvider
+from app.services.care_circle.providers.famous_face.provider import FamousFaceProvider
+from app.services.care_circle.providers.gratitude.provider import GratitudeProvider
+from app.services.care_circle.providers.hymn_of_the_day.provider import HymnOfTheDayProvider
+from app.services.care_circle.providers.missing_vowels.provider import MissingVowelsProvider
+from app.services.care_circle.providers.morning_stretch.provider import MorningStretchProvider
+from app.services.care_circle.providers.number_sequence.provider import NumberSequenceProvider
+from app.services.care_circle.providers.odd_one_out.provider import OddOneOutProvider
+from app.services.care_circle.providers.old_saying_match.provider import (
+    OldSayingMatchProvider,
+)
+from app.services.care_circle.providers.puzzle.provider import PuzzleProvider
+from app.services.care_circle.providers.simple_recipe.provider import SimpleRecipeProvider
+from app.services.care_circle.providers.song_of_the_day.provider import SongOfTheDayProvider
 from app.services.care_circle.providers.wikimedia_gallery.provider import (
     WikimediaGalleryProvider,
 )
+from app.services.care_circle.providers.word_of_the_day.provider import (
+    WordOfTheDayProvider,
+)
+from app.services.care_circle.providers.word_scramble.provider import WordScrambleProvider
 
 
 class _DummyResponse:
@@ -193,3 +215,90 @@ async def test_wikimedia_gallery_filters_non_latin_metadata_for_english_patients
     assert payload["image_url"] == "https://images.example/english.jpg"
     assert payload["title"] == "Sunny Garden"
     assert "peaceful garden path" in payload["description"]
+
+
+@pytest.mark.asyncio
+async def test_wikimedia_gallery_uses_updated_garden_fallback_when_category_is_empty(monkeypatch):
+    class DummyAsyncClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def get(self, url, params=None):
+            return _DummyResponse({"query": {"categorymembers": []}})
+
+    garden_theme = {
+        "key": "gardens",
+        "label": "Gardens",
+        "category": "Featured pictures of gardens",
+        "tagline": "Peaceful green spaces to enjoy.",
+        "fallback": {
+            "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Boston%20Public%20Garden%20%2836008p%29.jpg",
+            "title": "Boston Public Garden",
+            "description": "A graceful city garden offers flowers, trees, and a peaceful path to enjoy.",
+            "credit": "Wikimedia Commons (featured picture)",
+        },
+    }
+
+    monkeypatch.setattr(
+        "app.services.care_circle.providers.wikimedia_gallery.provider.httpx.AsyncClient",
+        lambda *args, **kwargs: DummyAsyncClient(),
+    )
+    monkeypatch.setattr(
+        "app.services.care_circle.providers.wikimedia_gallery.provider.random.choice",
+        lambda values: garden_theme,
+    )
+
+    provider = WikimediaGalleryProvider(patient_config={"themes": [garden_theme]})
+    payload = await provider._generate_payload(
+        SimpleNamespace(id=20, preferred_language="en")
+    )
+
+    assert payload["image_url"] == garden_theme["fallback"]["image_url"]
+    assert payload["title"] == "Boston Public Garden"
+    assert payload["theme_label"] == "Gardens"
+
+
+def test_wikimedia_gallery_is_not_common_cached():
+    provider = WikimediaGalleryProvider()
+    assert provider.common is False
+
+
+@pytest.mark.parametrize(
+    ("provider_cls",),
+    [
+        (AiTriviaProvider,),
+        (BrainBoosterProvider,),
+        (FinishPhraseProvider,),
+        (GratitudeProvider,),
+        (MissingVowelsProvider,),
+        (OddOneOutProvider,),
+        (PuzzleProvider,),
+        (SimpleRecipeProvider,),
+        (SongOfTheDayProvider,),
+        (WordScrambleProvider,),
+    ],
+)
+def test_profile_dependent_providers_are_not_common_cached(provider_cls):
+    provider = provider_cls()
+    assert provider.common is False
+
+
+@pytest.mark.parametrize(
+    ("provider_cls",),
+    [
+        (ClassicArtProvider,),
+        (CountrySpotlightProvider,),
+        (FamousFaceProvider,),
+        (HymnOfTheDayProvider,),
+        (MorningStretchProvider,),
+        (NumberSequenceProvider,),
+        (OldSayingMatchProvider,),
+        (WordOfTheDayProvider,),
+    ],
+)
+def test_shared_static_providers_are_common_cached(provider_cls):
+    provider = provider_cls()
+    assert provider.common is True

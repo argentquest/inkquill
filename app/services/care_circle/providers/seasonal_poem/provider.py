@@ -18,8 +18,8 @@ from app.services.care_circle.llm_helpers import (
 logger = logging.getLogger(__name__)
 
 
-def _current_season() -> str:
-    month = datetime.date.today().month
+def _current_season(for_date: datetime.date | None = None) -> str:
+    month = (for_date or datetime.date.today()).month
     if month in (12, 1, 2):
         return "winter"
     elif month in (3, 4, 5):
@@ -124,7 +124,7 @@ class SeasonalPoemProvider(BaseCareCircleProvider):
     """
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
-        season = _current_season()
+        season = _current_season(self.get_generation_date())
 
         try:
             prompt = (

@@ -60,7 +60,7 @@ class PenPalLetterProvider(BaseCareCircleProvider):
         favourite_foods = prefs.get("favourite_foods", [])
         favourite_tv_shows = prefs.get("favourite_tv_shows", [])
 
-        month = datetime.date.today().month
+        month = self.get_generation_date().month
         season = _SEASON_MAP.get(month, "spring")
 
         friend_names = cfg.get("friend_names", ["Margaret"])

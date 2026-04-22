@@ -31,6 +31,6 @@
     },
     "grid_width": 4,
     "grid_height": 2,
-    "common": true,
+    "common": false,
     "llm": true
 }

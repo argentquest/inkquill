@@ -108,7 +108,7 @@ async def run_send(patient, today: date, all_providers: bool = False):
     )
     full_html = _build_email_html(body_html, subject)
 
-    result = await send_newsletter_email(patient, body_html)
+    result = await send_newsletter_email(patient, body_html, today)
     status = "sent" if result.get("success") else "failed"
     if status == "sent":
         print(f"  OK  Sent  -- {result}")

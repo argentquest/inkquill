@@ -1,9 +1,10 @@
 """Job management API — trigger, pause, resume, reschedule."""
 
 import logging
+from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.scheduler.main import scheduler
 from app.scheduler.registry import get_task, list_tasks
@@ -50,7 +51,7 @@ async def list_jobs():
 
 
 @router.post("/jobs/{task_key}/run", response_model=JobResult)
-async def trigger_job(task_key: str):
+async def trigger_job(task_key: str, reference_date: date | None = Query(default=None)):
     """Manually trigger a task execution immediately."""
     _validate_scheduler_available()
     task_def = get_task(task_key)
@@ -59,7 +60,7 @@ async def trigger_job(task_key: str):
         raise HTTPException(status_code=404, detail=f"Task not found: {task_key}")
 
     try:
-        result = await task_def.func()
+        result = await task_def.func(reference_date=reference_date)
         log_job_operation("trigger", task_key, success=True)
         return JobResult(
             success=True,

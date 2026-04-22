@@ -4,6 +4,6 @@
     "technical_summary": "Static provider. Randomly selects one of 20 classic hymns from the built-in curated pool.",
     "grid_width": 4,
     "grid_height": 3,
-    "common": false,
+    "common": true,
     "llm": false
 }

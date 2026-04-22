@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0, '.')
 
 import asyncio
+from datetime import date
 from app.db.database import async_session_local
 from app.models.care_circle import CareCirclePatientProfile
 from sqlalchemy import select
@@ -36,7 +37,7 @@ async def send_test_newsletter_to_patient_5():
         if not html_content:
             print("Warning: No HTML content generated!")
         
-        result = await send_newsletter_email(patient, html_content)
+        result = await send_newsletter_email(patient, html_content, date.today())
         print("\n=== Test Email Result ===")
         print(result)
         

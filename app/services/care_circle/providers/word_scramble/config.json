@@ -122,6 +122,6 @@
     },
     "grid_width": 4,
     "grid_height": 3,
-    "common": true,
+    "common": false,
     "llm": false
 }

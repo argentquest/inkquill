@@ -290,6 +290,7 @@ async def send_patient_newsletter(
     current_user: User = Depends(get_current_active_user),
 ):
     """Immediately assemble and send the newsletter to a single patient."""
+    from datetime import date as _date
     from app.services.care_circle.newsletter_delivery_service import deliver_newsletter_to_patient
 
     family = await care_circle_crud.get_or_create_family_for_user(db, current_user)
@@ -302,7 +303,7 @@ async def send_patient_newsletter(
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
 
-    result = await deliver_newsletter_to_patient(db, patient)
+    result = await deliver_newsletter_to_patient(db, patient, _date.today())
     return ApiResponse.success_response(data=result)
 
 

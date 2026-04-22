@@ -8,6 +8,7 @@ from __future__ import annotations
 import logging
 import time
 import urllib.parse
+from datetime import date
 from typing import Any
 
 import httpx
@@ -62,6 +63,8 @@ class WeatherProvider(BaseCareCircleProvider):
         }
 
     async def _generate_payload(self, patient_profile: Any) -> dict[str, Any]:
+        reference_date = self.get_generation_date()
+        today = date.today()
         prefs = self.get_patient_preferences(patient_profile)
         city = str(
             prefs.get("city_for_weather")
@@ -71,10 +74,10 @@ class WeatherProvider(BaseCareCircleProvider):
         latitude = getattr(patient_profile, "latitude", None)
         longitude = getattr(patient_profile, "longitude", None)
         query_target = city
-        cache_key = city
+        cache_key = f"{city}:{reference_date.isoformat()}"
         if latitude is not None and longitude is not None:
             query_target = f"{latitude},{longitude}"
-            cache_key = query_target
+            cache_key = f"{query_target}:{reference_date.isoformat()}"
         recipient_name = self.get_recipient_name(patient_profile)
         fallback_msg = self.patient_config.get("fallback", "Weather currently unavailable.")
 
@@ -103,12 +106,31 @@ class WeatherProvider(BaseCareCircleProvider):
                 resp.raise_for_status()
                 data = resp.json()
 
-            current = data.get("current_condition", [{}])[0]
-            temp_f = str(current.get("temp_F", "")).strip()
-            desc = str(current.get("weatherDesc", [{}])[0].get("value", "")).strip()
+            temp_f = ""
+            desc = ""
+
+            if reference_date == today:
+                current = data.get("current_condition", [{}])[0]
+                temp_f = str(current.get("temp_F", "")).strip()
+                desc = str(current.get("weatherDesc", [{}])[0].get("value", "")).strip()
+            else:
+                forecast_days = data.get("weather", [])
+                matched = None
+                for forecast in forecast_days:
+                    forecast_date = str(forecast.get("date", "")).strip()
+                    if forecast_date == reference_date.isoformat():
+                        matched = forecast
+                        break
+                if matched:
+                    temp_f = str(matched.get("avgtempF", "")).strip()
+                    hourly = matched.get("hourly") or [{}]
+                    midday = hourly[min(len(hourly) // 2, len(hourly) - 1)]
+                    desc = str(midday.get("weatherDesc", [{}])[0].get("value", "")).strip()
 
             if not temp_f or not desc:
-                raise ValueError("Weather response missing temperature or condition")
+                raise ValueError(
+                    f"Weather response missing forecast for {reference_date.isoformat()}"
+                )
 
             payload = self._build_weather_payload(
                 city=city,

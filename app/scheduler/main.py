@@ -32,7 +32,7 @@ async def lifespan(app_instance: FastAPI):
     scheduler = create_scheduler()
 
     # Register all tasks from the tasks package (this triggers @register_task decorators)
-    from app.scheduler.tasks import care_circle_newsletter, care_circle_session, care_circle_precache, care_circle_mini_newsletter, cleanup, diagnostic  # noqa: F401
+    from app.scheduler.tasks import care_circle_newsletter, care_circle_newsletter_pdf, care_circle_session, care_circle_precache, care_circle_mini_newsletter, cleanup, diagnostic  # noqa: F401
 
     # Schedule enabled tasks
     from app.scheduler.registry import list_tasks

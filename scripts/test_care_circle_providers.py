@@ -515,7 +515,7 @@ async def _send_test_email(
     try:
         from app.services.care_circle.newsletter_email_service import send_newsletter_email
 
-        dispatch = await send_newsletter_email(patient, newsletter_html)
+        dispatch = await send_newsletter_email(patient, newsletter_html, date.today())
 
         if dispatch.get("success"):
             print(f"  Status:      SENT")

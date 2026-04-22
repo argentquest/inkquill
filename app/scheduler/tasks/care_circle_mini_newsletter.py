@@ -9,7 +9,7 @@ Runs at 9:00 AM daily (after the 2 AM precache and 6 AM session assembly).
 import json
 import logging
 import random
-from datetime import date
+from datetime import date, datetime, time as dt_time
 from pathlib import Path
 from sqlalchemy import select
 
@@ -78,14 +78,22 @@ async def _build_mini_newsletter(patient, today: date, limit: int | None = None)
     if not selected:
         logger.warning("Mini newsletter: no cached providers for patient %s on %s", patient.id, today)
 
-    # Fresh header (shows current timestamp)
-    header_html = await _render_provider("newsletter_header", patient)
+    reference_config = {
+        "_for_date": today,
+        "_generated_at": datetime.combine(today, dt_time(hour=9, minute=0)),
+    }
+    header_html = await _render_provider(
+        "newsletter_header",
+        patient,
+        patient_config=reference_config,
+    )
 
     # Fresh footer with basic stats
     footer_html = await _render_provider(
         "newsletter_footer",
         patient,
         patient_config={
+            **reference_config,
             "total_providers": len(selected),
             "generation_date": today.strftime("%B %d, %Y"),
         },
@@ -117,7 +125,7 @@ async def _send_mini_to_patient(patient, today: date) -> dict:
             "reason": "no content available",
         }
 
-    result = await send_newsletter_email(patient, body_html)
+    result = await send_newsletter_email(patient, body_html, today)
     return {
         "patient_id": patient.id,
         "patient_name": patient.display_name,
@@ -135,9 +143,9 @@ async def _send_mini_to_patient(patient, today: date) -> dict:
     max_instances=1,
     misfire_grace_time=600,
 )
-async def dispatch_mini_newsletter() -> dict:
+async def dispatch_mini_newsletter(reference_date: date | None = None) -> dict:
     """Send mini newsletter to all active patients."""
-    today = date.today()
+    today = reference_date or date.today()
 
     async with task_execution_context(
         task_key="care_circle.mini_newsletter",
@@ -173,13 +181,14 @@ async def dispatch_mini_newsletter() -> dict:
                 failure_count += 1
 
         ctx["total_patients"] = len(patients)
+        ctx["reference_date"] = today.isoformat()
         ctx["success_count"] = success_count
         ctx["failure_count"] = failure_count
         ctx["results"] = results
 
     return {
         "task": "care_circle.mini_newsletter",
-        "date": today.isoformat(),
+        "reference_date": today.isoformat(),
         "total_patients": len(patients),
         "success_count": success_count,
         "failure_count": failure_count,

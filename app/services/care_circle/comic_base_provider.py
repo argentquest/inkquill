@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import random
 import re
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -65,10 +65,10 @@ class BaseComicStripProvider(BaseCareCircleProvider):
         raise NotImplementedError
 
     async def _generate_payload(self, patient_profile: Any) -> dict[str, Any]:
-        today = date.today()
+        today = self.get_generation_date()
         patient_id = int(getattr(patient_profile, "id", 0) or 0)
         strip = await self._fetch_strip(today, patient_id)
-        now = datetime.now()
+        now = self.get_generation_datetime()
         return {
             "title": self.comic_name,
             "author": self.comic_author,

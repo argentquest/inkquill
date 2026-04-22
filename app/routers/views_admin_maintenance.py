@@ -8,8 +8,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 from typing import Optional
+from datetime import date
 
 from app.core.deps import get_db_session, get_current_active_user
+from app.models.care_circle import CareCirclePatientProfile
 from app.models.user import User
 from app.core.config import settings
 from app.services.email_service import EmailService
@@ -159,11 +161,20 @@ async def deliver_newsletter(
         )
 
     try:
+        patient = await db.scalar(
+            select(CareCirclePatientProfile).where(CareCirclePatientProfile.id == patient_id)
+        )
+        if not patient:
+            return JSONResponse({
+                "success": False,
+                "message": f"Patient {patient_id} not found",
+            }, status_code=404)
+
         result = await deliver_newsletter_to_patient(
             db=db,
-            patient_id=patient_id,
+            patient=patient,
+            reference_date=date.today(),
             force_regenerate=False,
-            test_mode=False
         )
         
         if result.get("success"):

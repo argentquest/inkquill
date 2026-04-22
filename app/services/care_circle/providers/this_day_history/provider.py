@@ -34,7 +34,7 @@ class ThisDayHistoryProvider(BaseCareCircleProvider):
             dict: Containing the 'year', rewritten 'event' string, 'month', and 'day'.
         """
         cfg = self.patient_config
-        today = date.today()
+        today = self.get_generation_date()
         # Wikimedia On This Day endpoint
         api_url = f"https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/{today.month:02}/{today.day:02}"
         fallback = cfg.get("fallback", "Many wonderful things have happened on this day!")

@@ -35,13 +35,13 @@ _THEMES = [
     {
         "key": "animals",
         "label": "Animals",
-        "category": "Domestic animals",
+        "category": "Featured pictures of dogs",
         "tagline": "Wonderful creatures from near and far.",
         "fallback": {
-            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Cute_dog.jpg/800px-Cute_dog.jpg",
-            "title": "A Friendly Dog",
-            "description": "A cheerful dog enjoys a sunny day outdoors.",
-            "credit": "Wikimedia Commons (public domain)",
+            "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Alaskan%20Malamute%20R%20Bartz.jpg",
+            "title": "Alaskan Malamute",
+            "description": "A bright, alert dog pauses for a portrait outdoors.",
+            "credit": "Wikimedia Commons (featured picture)",
         },
     },
     {
@@ -59,13 +59,13 @@ _THEMES = [
     {
         "key": "gardens",
         "label": "Gardens",
-        "category": "Gardens",
+        "category": "Featured pictures of gardens",
         "tagline": "Peaceful green spaces to enjoy.",
         "fallback": {
-            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Hoh_Rainforest_2.jpg/800px-Hoh_Rainforest_2.jpg",
-            "title": "Hoh Rain Forest",
-            "description": "Ancient moss-draped trees create a lush, cathedral-like canopy in Olympic National Park.",
-            "credit": "Wikimedia Commons (public domain)",
+            "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Boston%20Public%20Garden%20%2836008p%29.jpg",
+            "title": "Boston Public Garden",
+            "description": "A graceful city garden offers flowers, trees, and a peaceful path to enjoy.",
+            "credit": "Wikimedia Commons (featured picture)",
         },
     },
     {

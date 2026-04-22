@@ -32,7 +32,7 @@ class NewsletterHeaderProvider(BaseCareCircleProvider):
             or ""
         )
 
-        generated_at = datetime.now().strftime("%B %d, %Y  \u2022  %I:%M %p")
+        generated_at = self.get_generation_datetime().strftime("%B %d, %Y  \u2022  %I:%M %p")
 
         return {
             "patient_name": patient_name,

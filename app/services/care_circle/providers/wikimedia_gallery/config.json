@@ -4,7 +4,7 @@
     "technical_summary": "Fetches a random image from a Wikimedia Commons category via two API calls (categorymembers + imageinfo). No API key required. Falls back to confirmed-working hardcoded images per theme.",
     "grid_width": 2,
     "grid_height": 3,
-    "common": true,
+    "common": false,
     "llm": false,
     "difficulty": {
         "default": "easy",

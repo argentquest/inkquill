@@ -44,7 +44,10 @@ class GridlessCrosswordProvider(BaseCareCircleProvider):
         diff_config = self.difficulty_config
         
         # Get today's category based on day of week
-        today = datetime.datetime.now()
+        today = datetime.datetime.combine(
+            self.get_generation_date(),
+            datetime.time.min,
+        )
         day_of_week = str(today.weekday())
         category = cfg.get("day_categories", {}).get(day_of_week, "nature")
         

@@ -73,6 +73,28 @@ class BaseCareCircleProvider:
         self._template_name = str(self.patient_config.get("template", "default") or "default")
         self._token_usage: dict[str, Any] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "model": ""}
 
+    def get_generation_date(self) -> datetime.date:
+        configured = self.patient_config.get("_for_date")
+        if isinstance(configured, datetime.date):
+            return configured
+        if isinstance(configured, str):
+            try:
+                return datetime.date.fromisoformat(configured)
+            except ValueError:
+                pass
+        return datetime.date.today()
+
+    def get_generation_datetime(self) -> datetime.datetime:
+        configured = self.patient_config.get("_generated_at")
+        if isinstance(configured, datetime.datetime):
+            return configured
+        if isinstance(configured, str):
+            try:
+                return datetime.datetime.fromisoformat(configured)
+            except ValueError:
+                pass
+        return datetime.datetime.now()
+
     @property
     def config(self) -> dict[str, Any]:
         cls = self.__class__
@@ -243,7 +265,7 @@ class BaseCareCircleProvider:
         return HTML_CACHE_DIR / self.provider_key
 
     def _common_html_path(self, theme_name: str = "classic") -> Path:
-        date_str = datetime.date.today().strftime("%Y%m%d")
+        date_str = self.get_generation_date().strftime("%Y%m%d")
         return self._common_dir() / f"common_{date_str}_{theme_name}.html"
 
     def _load_common_html_cache(self, theme_name: str = "classic") -> str | None:

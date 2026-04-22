@@ -34,7 +34,7 @@ class CompleteTheDuoProvider(BaseCareCircleProvider):
         pairs_per_day = cfg.get("pairs_per_day", 4)
 
         # Stable daily selection — same pairs for all profiles today
-        today = datetime.date.today().isoformat()
+        today = self.get_generation_date().isoformat()
         seed = int(hashlib.md5(today.encode()).hexdigest(), 16)
         rng = random.Random(seed)
         selected = rng.sample(pairs, min(pairs_per_day, len(pairs)))

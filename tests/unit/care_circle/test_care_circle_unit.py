@@ -1,5 +1,6 @@
 """Mock-based unit tests for the care-circle router."""
 
+from datetime import date
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -473,7 +474,7 @@ def test_send_newsletter_email_sends_to_patient_address():
         mock_smtplib.SMTP.return_value.__enter__ = MagicMock(return_value=mock_smtp_instance)
         mock_smtplib.SMTP.return_value.__exit__ = MagicMock(return_value=False)
 
-        result = asyncio.run(send_newsletter_email(mock_patient, "<h1>Hello Rose</h1>"))
+        result = asyncio.run(send_newsletter_email(mock_patient, "<h1>Hello Rose</h1>", date.today()))
 
     assert result["success"] is True
     assert result["to_email"] == "rose@example.com"
@@ -505,7 +506,7 @@ def test_send_newsletter_email_redirects_in_test_mode():
         mock_smtplib.SMTP.return_value.__enter__ = MagicMock(return_value=mock_smtp_instance)
         mock_smtplib.SMTP.return_value.__exit__ = MagicMock(return_value=False)
 
-        result = asyncio.run(send_newsletter_email(mock_patient, "<h1>Hello Rose</h1>"))
+        result = asyncio.run(send_newsletter_email(mock_patient, "<h1>Hello Rose</h1>", date.today()))
 
     assert result["success"] is True
     assert result["to_email"] == "dev@example.com"
@@ -526,7 +527,7 @@ def test_send_newsletter_email_skips_when_no_email():
     with patch("app.services.care_circle.newsletter_email_service.settings") as mock_settings:
         mock_settings.EMAIL_TEST_MODE = False
 
-        result = asyncio.run(send_newsletter_email(mock_patient, "<h1>Hello Rose</h1>"))
+        result = asyncio.run(send_newsletter_email(mock_patient, "<h1>Hello Rose</h1>", date.today()))
 
     assert result["success"] is False
     assert result["reason"] == "no_email"

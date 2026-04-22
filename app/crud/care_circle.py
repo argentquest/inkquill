@@ -37,6 +37,7 @@ PATIENT_AUTH_CATALOG = [
 PATIENT_AUTH_KEYS = {item["key"] for item in PATIENT_AUTH_CATALOG}
 
 PROVIDER_INVENTORY_CONFIG_PATH = Path(__file__).resolve().parent.parent / "services" / "care_circle" / "providers" / "config.json"
+PROVIDER_CONFIGS_ROOT = Path(__file__).resolve().parent.parent / "services" / "care_circle" / "providers"
 OBSOLETE_PROVIDER_KEYS = {"comic_mimi_eunice"}
 
 DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG = [
@@ -215,6 +216,15 @@ def _load_provider_catalog_inventory() -> list[dict[str, Any]]:
             )
         return normalized
     return DEFAULT_DAILY_NEWSLETTER_PROVIDER_CATALOG
+
+
+def _load_provider_common_flag(provider_key: str) -> bool:
+    config_path = PROVIDER_CONFIGS_ROOT / provider_key / "config.json"
+    if not config_path.exists():
+        return False
+
+    raw = json.loads(config_path.read_text(encoding="utf-8-sig"))
+    return bool(raw.get("common", False))
 
 
 async def remove_obsolete_provider_data(db: AsyncSession) -> None:
@@ -487,6 +497,7 @@ async def list_provider_catalog(db: AsyncSession) -> list[dict[str, Any]]:
             "displayOrder": provider.display_order,
             "patientVisible": provider.patient_visible,
             "familyVisible": provider.family_visible,
+            "common": _load_provider_common_flag(provider.provider_key),
         }
         for provider in providers
     ]

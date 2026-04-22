@@ -2,7 +2,7 @@
 
 import logging
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, time as dt_time, timedelta
 from sqlalchemy import select
 
 from app.scheduler.registry import register_task
@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 DAYS_AHEAD = 3
 
 
-async def _get_active_providers_for_patient(db, patient_id: int):
-    """Return list of (provider_key, display_order, instance) for a patient."""
+async def _get_active_provider_configs_for_patient(db, patient_id: int):
+    """Return list of (provider_key, display_order, provider_cls, config_dict) for a patient."""
     catalog_items = (await db.execute(
         select(CareCircleProviderCatalog).where(
             CareCircleProviderCatalog.enabled == True,
@@ -49,8 +49,8 @@ async def _get_active_providers_for_patient(db, patient_id: int):
             continue
         if not cls.is_safe_for_patient:
             continue
-        cfg_dict = conf.custom_parameters if conf else {}
-        active.append((item.provider_key, item.display_order, cls(patient_config=cfg_dict)))
+        cfg_dict = dict(conf.custom_parameters or {}) if conf else {}
+        active.append((item.provider_key, item.display_order, cls, cfg_dict))
 
     return active
 
@@ -64,13 +64,13 @@ async def _get_active_providers_for_patient(db, patient_id: int):
     max_instances=1,
     misfire_grace_time=1800,
 )
-async def precache_provider_outputs() -> dict:
+async def precache_provider_outputs(reference_date: date | None = None) -> dict:
     """Generate ONLY providers that are not yet in the cache for each patient/date."""
     async with task_execution_context(
         task_key="care_circle.precache_providers",
         task_name="Provider Output Pre-cache",
     ) as ctx:
-        today = date.today()
+        today = reference_date or date.today()
         target_dates = [today + timedelta(days=d) for d in range(DAYS_AHEAD + 1)]
 
         async with async_session_local() as db:
@@ -90,14 +90,23 @@ async def precache_provider_outputs() -> dict:
                 patient_skipped = 0
                 patient_failed = 0
 
-                active_providers = await _get_active_providers_for_patient(db, patient.id)
+                active_providers = await _get_active_provider_configs_for_patient(db, patient.id)
 
                 for for_date in target_dates:
-                    for provider_key, _order, provider_instance in active_providers:
+                    generated_at = datetime.combine(for_date, dt_time(hour=9, minute=0))
+                    for provider_key, _order, provider_cls, base_cfg in active_providers:
                         if is_cached(patient.id, for_date, provider_key):
                             patient_skipped += 1
                             total_skipped += 1
                             continue
+
+                        provider_instance = provider_cls(
+                            patient_config={
+                                **base_cfg,
+                                "_for_date": for_date,
+                                "_generated_at": generated_at,
+                            }
+                        )
 
                         # Only regenerate if missing from cache — this is the core request
                         try:
@@ -138,6 +147,7 @@ async def precache_provider_outputs() -> dict:
                 )
 
         ctx.update({
+            "reference_date": today.isoformat(),
             "total_patients": len(patients),
             "total_generated": total_generated,
             "total_skipped": total_skipped,
@@ -147,6 +157,7 @@ async def precache_provider_outputs() -> dict:
 
     return {
         "task": "care_circle.precache_providers",
+        "reference_date": today.isoformat(),
         "dates": [d.isoformat() for d in target_dates],
         "total_patients": len(patients),
         "total_generated": total_generated,

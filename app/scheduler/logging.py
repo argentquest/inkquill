@@ -4,7 +4,7 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ async def task_execution_context(task_key: str, task_name: str):
     - Result tracking
     """
     start_time = time.monotonic()
-    start_ts = datetime.utcnow().isoformat()
+    start_ts = datetime.now(timezone.utc).isoformat()
 
     logger.info(
         "Task execution started",
@@ -39,7 +39,7 @@ async def task_execution_context(task_key: str, task_name: str):
     try:
         yield result
         elapsed = time.monotonic() - start_time
-        result["completed_at"] = datetime.utcnow().isoformat()
+        result["completed_at"] = datetime.now(timezone.utc).isoformat()
         result["duration_seconds"] = round(elapsed, 3)
         result["status"] = "success"
 
@@ -55,7 +55,7 @@ async def task_execution_context(task_key: str, task_name: str):
         )
     except Exception as exc:
         elapsed = time.monotonic() - start_time
-        result["completed_at"] = datetime.utcnow().isoformat()
+        result["completed_at"] = datetime.now(timezone.utc).isoformat()
         result["duration_seconds"] = round(elapsed, 3)
         result["status"] = "error"
         result["error"] = str(exc)

@@ -1,7 +1,7 @@
 """Daily Care Circle newsletter dispatch task."""
 
 import logging
-from datetime import datetime
+from datetime import date, datetime, timezone
 from sqlalchemy import select
 
 from app.scheduler.registry import register_task
@@ -23,13 +23,13 @@ async def _fetch_active_patients():
         return list(patient_rows)
 
 
-async def _send_to_patient(patient) -> dict:
+async def _send_to_patient(patient, reference_date: date) -> dict:
     """Send newsletter to a single patient."""
     from app.services.care_circle.newsletter_delivery_service import deliver_newsletter_to_patient
     from app.db.database import async_session_local
 
     async with async_session_local() as db:
-        return await deliver_newsletter_to_patient(db, patient)
+        return await deliver_newsletter_to_patient(db, patient, reference_date)
 
 
 @register_task(
@@ -41,8 +41,9 @@ async def _send_to_patient(patient) -> dict:
     max_instances=3,
     misfire_grace_time=600,
 )
-async def dispatch_daily_newsletter() -> dict:
+async def dispatch_daily_newsletter(reference_date: date | None = None) -> dict:
     """Send daily newsletter to all active patients."""
+    target_date = reference_date or date.today()
     async with task_execution_context(
         task_key="care_circle.daily_newsletter",
         task_name="Daily Care Circle Newsletter",
@@ -65,7 +66,7 @@ async def dispatch_daily_newsletter() -> dict:
 
         for patient in patients:
             try:
-                result = await _send_to_patient(patient)
+                result = await _send_to_patient(patient, target_date)
                 results.append(result)
                 success_count += 1
             except Exception as exc:
@@ -82,13 +83,15 @@ async def dispatch_daily_newsletter() -> dict:
                 failure_count += 1
 
         ctx["total_patients"] = len(patients)
+        ctx["reference_date"] = target_date.isoformat()
         ctx["success_count"] = success_count
         ctx["failure_count"] = failure_count
         ctx["results"] = results
 
     return {
         "task": "care_circle.daily_newsletter",
-        "executed_at": datetime.utcnow().isoformat(),
+        "executed_at": datetime.now(timezone.utc).isoformat(),
+        "reference_date": target_date.isoformat(),
         "total_patients": len(patients),
         "success_count": success_count,
         "failure_count": failure_count,

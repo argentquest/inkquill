@@ -4,6 +4,6 @@
     "technical_summary": "Static provider. Randomly selects one of 15 curated seated stretches from the built-in pool each session.",
     "grid_width": 4,
     "grid_height": 3,
-    "common": false,
+    "common": true,
     "llm": false
 }

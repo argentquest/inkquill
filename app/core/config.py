@@ -65,8 +65,17 @@ class Settings(BaseSettings):
     OPENROUTER_PREMIUM_MODEL: str = Field(default="openai/gpt-4o", alias="OPENROUTER_PREMIUM_MODEL")
     
     # --- Care Circle Specific Provider Configuration ---
+    CARE_CIRCLE_TEXT_PROVIDER: str = Field(default="AUTO", alias="CARE_CIRCLE_TEXT_PROVIDER")
+    CARE_CIRCLE_IMAGE_PROVIDER: str = Field(default="AUTO", alias="CARE_CIRCLE_IMAGE_PROVIDER")
     CARE_CIRCLE_DEFAULT_TEXT_MODEL: str = Field(default="google/gemini-3.1-flash-lite-preview", alias="CARE_CIRCLE_DEFAULT_TEXT_MODEL")
     CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="google/gemini-3.1-flash-image-preview", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
+    CARE_CIRCLE_DEFAULT_INPUT_PRICE_USD_PM: float = Field(default=0.60, alias="CARE_CIRCLE_DEFAULT_INPUT_PRICE_USD_PM")
+    CARE_CIRCLE_DEFAULT_OUTPUT_PRICE_USD_PM: float = Field(default=0.60, alias="CARE_CIRCLE_DEFAULT_OUTPUT_PRICE_USD_PM")
+    AZURE_FOUNDRY_API_KEY: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_API_KEY")
+    AZURE_FOUNDRY_ENDPOINT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_ENDPOINT")
+    AZURE_FOUNDRY_API_VERSION: str = Field(default="2024-10-21", alias="AZURE_FOUNDRY_API_VERSION")
+    AZURE_FOUNDRY_TEXT_DEPLOYMENT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_TEXT_DEPLOYMENT")
+    AZURE_FOUNDRY_IMAGE_DEPLOYMENT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_IMAGE_DEPLOYMENT")
 
     # --- Third-party Data APIs (Care Circle providers) ---
     NPS_API_KEY: Optional[str] = Field(default=None, alias="NPS_API_KEY")

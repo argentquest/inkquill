@@ -1,10 +1,11 @@
 """
 LLM helper functions for Care Circle providers.
 
-Bypasses the model_cache (which requires DB records) and builds clients
-directly from env settings. Falls back gracefully so providers can serve
-their static fallback content when no API key is configured.
+Bypasses the model cache and builds clients directly from Care Circle
+environment settings so providers can cleanly fall back when a given
+provider is unavailable.
 """
+
 from __future__ import annotations
 
 import json
@@ -12,6 +13,9 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import Any, Tuple
+from urllib.parse import urlparse
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -33,22 +37,57 @@ class LLMResponse:
     model: str = ""
 
 
-def _build_text_client():
-    """Return (AsyncOpenAI client, model_name) for text generation.
+def _normalize_provider_name(value: str | None, default: str = "AUTO") -> str:
+    return str(value or default).strip().upper()
 
-    Priority: LM Studio (local) → OpenRouter → OpenAI fallback.
-    """
+
+def _normalize_azure_foundry_endpoint(endpoint: str) -> str:
+    trimmed = endpoint.strip().rstrip("/")
+    parsed = urlparse(trimmed)
+    if not parsed.scheme or not parsed.netloc:
+        raise RuntimeError("AZURE_FOUNDRY_ENDPOINT must be a valid HTTPS URL.")
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
+def _build_azure_foundry_client(model_name: str):
     import openai
     from app.core.config import settings
 
-    if settings.LMSTUDIO_ENABLED:
+    if not settings.AZURE_FOUNDRY_API_KEY:
+        raise RuntimeError("AZURE_FOUNDRY_API_KEY is not configured.")
+    if not settings.AZURE_FOUNDRY_ENDPOINT:
+        raise RuntimeError("AZURE_FOUNDRY_ENDPOINT is not configured.")
+
+    client = openai.AsyncAzureOpenAI(
+        api_key=settings.AZURE_FOUNDRY_API_KEY,
+        azure_endpoint=_normalize_azure_foundry_endpoint(settings.AZURE_FOUNDRY_ENDPOINT),
+        api_version=settings.AZURE_FOUNDRY_API_VERSION,
+    )
+    return client, model_name
+
+
+def _build_text_client():
+    """Return (client, model_name) for Care Circle text generation."""
+    import openai
+    from app.core.config import settings
+
+    provider = _normalize_provider_name(settings.CARE_CIRCLE_TEXT_PROVIDER)
+
+    if provider == "AZURE_FOUNDRY":
+        model_name = (
+            settings.AZURE_FOUNDRY_TEXT_DEPLOYMENT
+            or settings.CARE_CIRCLE_DEFAULT_TEXT_MODEL
+        )
+        return _build_azure_foundry_client(model_name)
+
+    if provider in {"LMSTUDIO", "AUTO"} and settings.LMSTUDIO_ENABLED:
         client = openai.AsyncOpenAI(
-            api_key="lm-studio",  # LM Studio doesn't validate the key
+            api_key="lm-studio",
             base_url=settings.LMSTUDIO_BASE_URL,
         )
         return client, settings.LMSTUDIO_MODEL
 
-    if settings.OPENROUTER_API_KEY:
+    if provider in {"OPENROUTER", "AUTO"} and settings.OPENROUTER_API_KEY:
         model_name = settings.CARE_CIRCLE_DEFAULT_TEXT_MODEL
         default_headers: dict[str, str] = {}
         if settings.OPENROUTER_SITE_URL:
@@ -62,35 +101,60 @@ def _build_text_client():
         )
         return client, model_name
 
-    if settings.OPENAI_API_KEY:
+    if provider in {"OPENAI", "AUTO"} and settings.OPENAI_API_KEY:
         model_name = "gpt-4o-mini"
         client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         return client, model_name
 
+    if (
+        provider == "AUTO"
+        and settings.AZURE_FOUNDRY_API_KEY
+        and settings.AZURE_FOUNDRY_ENDPOINT
+    ):
+        model_name = (
+            settings.AZURE_FOUNDRY_TEXT_DEPLOYMENT
+            or settings.CARE_CIRCLE_DEFAULT_TEXT_MODEL
+        )
+        return _build_azure_foundry_client(model_name)
+
     raise RuntimeError(
-        "No LLM API key configured. Set OPENROUTER_API_KEY or OPENAI_API_KEY in .env."
+        "No Care Circle text provider is configured. Set CARE_CIRCLE_TEXT_PROVIDER with matching credentials."
     )
 
 
 def _build_image_client():
-    """Return (AsyncOpenAI client, model_name) for image generation.
-
-    Priority: OpenAI.
-
-    OpenRouter image generation is not currently wired through a compatible
-    `images.generate()` endpoint in this codebase. Attempting to use it here
-    produces HTML not-found responses instead of image payloads, so providers
-    should fall back to their static images unless OpenAI image generation is
-    configured.
-    """
+    """Return (client, model_name) for Care Circle image generation."""
     import openai
     from app.core.config import settings
 
-    if settings.OPENAI_API_KEY:
-        return openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY), settings.OPENAI_IMAGE_MODEL
+    provider = _normalize_provider_name(settings.CARE_CIRCLE_IMAGE_PROVIDER)
+
+    if provider == "AZURE_FOUNDRY":
+        model_name = (
+            settings.AZURE_FOUNDRY_IMAGE_DEPLOYMENT
+            or settings.CARE_CIRCLE_DEFAULT_IMAGE_MODEL
+        )
+        return _build_azure_foundry_client(model_name)
+
+    if provider in {"OPENAI", "AUTO"} and settings.OPENAI_API_KEY:
+        return (
+            openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY),
+            settings.OPENAI_IMAGE_MODEL,
+        )
+
+    if (
+        provider == "AUTO"
+        and settings.AZURE_FOUNDRY_API_KEY
+        and settings.AZURE_FOUNDRY_ENDPOINT
+    ):
+        model_name = (
+            settings.AZURE_FOUNDRY_IMAGE_DEPLOYMENT
+            or settings.CARE_CIRCLE_DEFAULT_IMAGE_MODEL
+        )
+        return _build_azure_foundry_client(model_name)
 
     raise RuntimeError(
-        "No supported image API key configured. Set OPENAI_API_KEY in .env."
+        "No Care Circle image provider is configured. Set CARE_CIRCLE_IMAGE_PROVIDER with matching credentials."
     )
 
 
@@ -132,18 +196,15 @@ async def generate_json_with_usage(
     max_tokens: int = 4096,
     temperature: float = 0.9,
 ) -> Tuple[dict[str, Any], LLMResponse]:
-    """Call the LLM, parse JSON from the response, return (dict, LLMResponse).
-
-    Strips markdown code fences before parsing. Returns ({}, response) if JSON
-    cannot be extracted so providers can serve their fallback.
-    """
+    """Call the LLM, parse JSON from the response, return (dict, LLMResponse)."""
     llm_response = await generate_text_with_usage(
-        prompt, system=system, max_tokens=max_tokens, temperature=temperature
+        prompt,
+        system=system,
+        max_tokens=max_tokens,
+        temperature=temperature,
     )
 
     raw = llm_response.content.strip()
-
-    # Strip markdown code fences: ```json ... ``` or ``` ... ```
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-zA-Z]*\n?", "", raw)
         raw = re.sub(r"\n?```$", "", raw.strip())
@@ -170,9 +231,8 @@ async def generate_image_url_with_usage(prompt: str) -> LLMResponse:
     """Generate an image and return an LLMResponse whose `.content` is a URL or data URI."""
     client, model_name = _build_image_client()
 
-    # quality param is OpenAI-specific; omit for OpenRouter/Gemini models
-    is_openai_model = any(tok in model_name for tok in _OPENAI_ONLY_PARAMS)
-    kwargs: dict = {"model": model_name, "prompt": prompt, "n": 1}
+    is_openai_model = any(token in model_name for token in _OPENAI_ONLY_PARAMS)
+    kwargs: dict[str, Any] = {"model": model_name, "prompt": prompt, "n": 1}
     if is_openai_model:
         kwargs["size"] = "1024x1024"
         kwargs["quality"] = "low"
@@ -181,7 +241,6 @@ async def generate_image_url_with_usage(prompt: str) -> LLMResponse:
     item = response.data[0]
 
     image_url: str = item.url or ""
-
     if not image_url and item.b64_json:
         image_url = f"data:image/png;base64,{item.b64_json}"
 
