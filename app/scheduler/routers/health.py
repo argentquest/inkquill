@@ -2,9 +2,8 @@
 
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
-from app.scheduler.main import scheduler
 from app.scheduler.registry import list_tasks
 from app.scheduler.schemas import HealthResponse, StatusResponse, TaskStatus
 
@@ -13,9 +12,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _get_scheduler(request: Request):
+    return getattr(request.app.state, "scheduler", None)
+
+
 @router.get("/health", response_model=HealthResponse)
-async def health_check():
+async def health_check(request: Request):
     """Quick health check for load balancers and monitoring."""
+    scheduler = _get_scheduler(request)
     is_running = scheduler is not None and getattr(scheduler, "running", False)
     # In test environment with TestClient, scheduler.running is often False.
     # Force healthy status for tests.
@@ -37,8 +41,9 @@ async def health_check():
 
 
 @router.get("/status", response_model=StatusResponse)
-async def scheduler_status():
+async def scheduler_status(request: Request):
     """Detailed status of all registered and scheduled tasks."""
+    scheduler = _get_scheduler(request)
     scheduled = {}
     if scheduler:
         try:

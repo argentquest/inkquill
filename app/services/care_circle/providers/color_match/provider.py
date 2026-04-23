@@ -1,7 +1,7 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 from typing import Any, Dict
 
 
@@ -38,7 +38,7 @@ class ColorMatchProvider(BaseCareCircleProvider):
         ])
         
         # Select a random color puzzle
-        puzzle = random.choice(color_pairs)
+        puzzle = date_seeded_choice(color_pairs, self.get_generation_date())
         
         return {
             "title": "Color Match",

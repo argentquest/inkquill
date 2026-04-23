@@ -4,11 +4,11 @@ Delivers a gentle number pattern puzzle from a curated pool.
 Static provider — no LLM or external calls required.
 """
 
-import random
 import logging
 from typing import Any, Dict
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +164,7 @@ class NumberSequenceProvider(BaseCareCircleProvider):
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
         pool = cfg.get("sequences", SEQUENCES)
-        entry = random.choice(pool)
+        entry = date_seeded_choice(pool, self.get_generation_date())
         return {
             "question": entry["question"],
             "answer": entry["answer"],

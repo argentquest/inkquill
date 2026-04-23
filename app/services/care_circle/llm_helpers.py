@@ -8,6 +8,7 @@ provider is unavailable.
 
 from __future__ import annotations
 
+import datetime
 import json
 import logging
 import re
@@ -19,13 +20,23 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-DEMENTIA_SYSTEM_PROMPT = (
+_DEMENTIA_SYSTEM_PROMPT_BASE = (
     "You are a kind, warm, and patient assistant creating daily content for older adults, "
     "some of whom are living with dementia. "
     "Use simple, clear language. Keep responses short and positive. "
     "Avoid anything confusing, distressing, or that tests memory. "
     "Focus on familiar, comforting, and uplifting topics."
 )
+
+# Static constant kept for backwards compatibility — new code should use
+# get_dementia_system_prompt() so the date is injected automatically.
+DEMENTIA_SYSTEM_PROMPT = _DEMENTIA_SYSTEM_PROMPT_BASE
+
+
+def get_dementia_system_prompt(for_date: datetime.date) -> str:
+    """Return the dementia system prompt with today's date injected."""
+    date_str = f"{for_date.strftime('%B')} {for_date.day}, {for_date.year}"
+    return f"{_DEMENTIA_SYSTEM_PROMPT_BASE} Today's date is {date_str}."
 
 
 @dataclass

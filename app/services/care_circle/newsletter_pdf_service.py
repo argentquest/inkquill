@@ -1,20 +1,16 @@
 """Generate Care Circle newsletter artifacts from cached daily provider output."""
 
-import asyncio
-import json
 import logging
 import re
 from datetime import date
 from html import escape
 from pathlib import Path
-from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.care_circle import CareCirclePatientProfile, CareCircleProviderCatalog
+from app.models.care_circle import CareCirclePatientProfile
 from app.services.care_circle import provider_cache
 from app.services.care_circle.session_assembler import (
-    _provider_sort_order,
     get_newsletter_html_for_date,
 )
 
@@ -25,11 +21,6 @@ _IMG_SRC_RE = re.compile(r'src=(["\'])([^"\']+)\1', re.IGNORECASE)
 
 class CareCircleNewsletterPDFService:
     """Build newsletter artifacts from cached provider output."""
-
-    def __init__(self) -> None:
-        repo_root = Path(__file__).resolve().parents[3]
-        self.frontend_root = repo_root / "frontendv1"
-        self.playwright_script = self.frontend_root / "scripts" / "render_newsletter_pdf.js"
 
     async def generate_for_patient_date(
         self,
@@ -119,26 +110,36 @@ class CareCircleNewsletterPDFService:
         return _IMG_SRC_RE.sub(_replace, html)
 
     async def _render_pdf_with_playwright(self, html_path: Path, pdf_path: Path) -> None:
-        if not self.playwright_script.exists():
-            raise FileNotFoundError(
-                f"Playwright render script not found at {self.playwright_script}"
-            )
+        from playwright.async_api import async_playwright
 
-        process = await asyncio.create_subprocess_exec(
-            "node",
-            str(self.playwright_script),
-            str(html_path),
-            str(pdf_path),
-            cwd=str(self.frontend_root),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await process.communicate()
-        if process.returncode != 0:
-            raise RuntimeError(
-                "Playwright newsletter PDF render failed: "
-                + (stderr.decode("utf-8", errors="ignore") or stdout.decode("utf-8", errors="ignore")).strip()
-            )
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+            try:
+                page = await browser.new_page(
+                    viewport={"width": 1280, "height": 1810},
+                    device_scale_factor=1,
+                )
+                await page.goto(html_path.resolve().as_uri(), wait_until="load", timeout=120000)
+                await page.emulate_media(media="print")
+                await page.wait_for_function(
+                    "() => Array.from(document.images).every((img) => img.complete)",
+                    timeout=120000,
+                )
+                await page.pdf(
+                    path=str(pdf_path),
+                    format="Letter",
+                    print_background=True,
+                    margin={
+                        "top": "0.35in",
+                        "right": "0.35in",
+                        "bottom": "0.35in",
+                        "left": "0.35in",
+                    },
+                    prefer_css_page_size=True,
+                )
+            finally:
+                await browser.close()
+
         if not pdf_path.exists():
             raise RuntimeError("Playwright finished without creating newsletter.pdf")
 

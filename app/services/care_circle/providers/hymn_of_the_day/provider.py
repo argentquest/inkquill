@@ -4,11 +4,11 @@ Delivers a beloved hymn or classic spiritual song with a short lyrics excerpt.
 Static provider — no LLM or external calls required.
 """
 
-import random
 import logging
 from typing import Any, Dict
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 
 logger = logging.getLogger(__name__)
 
@@ -471,7 +471,7 @@ class HymnOfTheDayProvider(BaseCareCircleProvider):
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
         pool = cfg.get("hymns", HYMNS)
-        entry = random.choice(pool)
+        entry = date_seeded_choice(pool, self.get_generation_date())
         return {
             "title": entry["title"],
             "era": entry["era"],

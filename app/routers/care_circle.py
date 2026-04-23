@@ -1,6 +1,7 @@
 from datetime import date as date_type
+import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -9,7 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_active_user, get_db_session
 from app.crud import care_circle as care_circle_crud
 from app.crud.care_circle_delete import hard_delete_patient
+from app.crud import job_status as crud_job_status
+from app.db.database import async_session_local
 from app.models.care_circle import CareCirclePatientProfile
+from app.models.job_status import JobStateEnum, JobTypeEnum
 from app.models.user import User
 from app.schemas.base import ApiError, ApiResponse
 from app.schemas.care_circle import (
@@ -27,6 +31,54 @@ router = APIRouter(prefix="/care-circle", tags=["care-circle"])
 class ProviderUpdate(BaseModel):
     enabled: bool
     patient_visible: bool
+
+
+async def _run_patient_newsletter_regeneration_job(
+    job_id: str,
+    patient_id: int,
+    patient_name: str,
+) -> None:
+    """Run newsletter regeneration asynchronously and update the job status row."""
+    from app.services.care_circle.session_assembler import assemble_daily_patient_session
+
+    async with async_session_local() as db:
+        await crud_job_status.update_job_status(
+            db,
+            job_id,
+            JobStateEnum.RUNNING,
+            status_message=f"Regenerating newsletter for {patient_name}.",
+        )
+        try:
+            result = await assemble_daily_patient_session(
+                db,
+                patient_id,
+                force_regenerate=True,
+            )
+            if not result or not result.get("success"):
+                await crud_job_status.update_job_status(
+                    db,
+                    job_id,
+                    JobStateEnum.FAILED,
+                    status_message=f"Newsletter regeneration failed for {patient_name}.",
+                    result_message="assemble_daily_patient_session returned no successful result.",
+                )
+                return
+
+            await crud_job_status.update_job_status(
+                db,
+                job_id,
+                JobStateEnum.COMPLETED,
+                status_message=f"Newsletter regeneration completed for {patient_name}.",
+                result_message=f"Generated {result.get('card_count', 0)} cards.",
+            )
+        except Exception as exc:
+            await crud_job_status.update_job_status(
+                db,
+                job_id,
+                JobStateEnum.FAILED,
+                status_message=f"Newsletter regeneration failed for {patient_name}.",
+                result_message=str(exc)[:500],
+            )
 
 
 @router.get("/cached-image/{patient_id}/{date_str}/{filename}")
@@ -310,11 +362,11 @@ async def send_patient_newsletter(
 @router.post("/family/patients/{patient_id}/regenerate-newsletter", response_model=ApiResponse)
 async def regenerate_patient_newsletter(
     patient_id: int,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_active_user),
 ):
-    """Force-regenerate today's newsletter for a patient, bypassing the provider cache."""
-    from app.services.care_circle.session_assembler import assemble_daily_patient_session
+    """Queue a forced newsletter regeneration job for a patient."""
 
     family = await care_circle_crud.get_or_create_family_for_user(db, current_user)
     patient = await db.scalar(
@@ -326,12 +378,57 @@ async def regenerate_patient_newsletter(
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
 
-    result = await assemble_daily_patient_session(db, patient_id, force_regenerate=True)
-    if not result or not result.get("success"):
-        raise HTTPException(status_code=500, detail="Newsletter regeneration failed")
+    job_id = str(uuid.uuid4())
+    await crud_job_status.create_job(
+        db=db,
+        job_id=job_id,
+        user_id=current_user.id,
+        job_type=JobTypeEnum.CARE_CIRCLE_DAILY_SESSION,
+        status_message=f"Queued newsletter regeneration for {patient.display_name}.",
+    )
+    background_tasks.add_task(
+        _run_patient_newsletter_regeneration_job,
+        job_id,
+        patient.id,
+        patient.display_name,
+    )
+
     return ApiResponse.success_response(data={
-        "card_count": result.get("card_count", 0),
-        "message": "Newsletter regenerated successfully",
+        "job_id": job_id,
+        "state": JobStateEnum.PENDING.value,
+        "message": "Newsletter regeneration started",
+    })
+
+
+@router.get("/family/patients/{patient_id}/regenerate-newsletter/{job_id}", response_model=ApiResponse)
+async def get_regenerate_patient_newsletter_status(
+    patient_id: int,
+    job_id: str,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Return status for a queued newsletter regeneration job."""
+    family = await care_circle_crud.get_or_create_family_for_user(db, current_user)
+    patient = await db.scalar(
+        select(CareCirclePatientProfile).where(
+            CareCirclePatientProfile.id == patient_id,
+            CareCirclePatientProfile.family_id == family.id,
+        )
+    )
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+
+    job = await crud_job_status.get_job_by_job_id(db, job_id=job_id, user_id=current_user.id)
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+
+    return ApiResponse.success_response(data={
+        "job_id": job.job_id,
+        "state": job.state.value,
+        "status_message": job.status_message,
+        "result_message": job.result_message,
+        "created_at": job.created_at,
+        "updated_at": job.updated_at,
     })
 
 

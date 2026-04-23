@@ -1,7 +1,7 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_sample
 from typing import Any, Dict
 
 
@@ -43,14 +43,17 @@ class WordConnectProvider(BaseCareCircleProvider):
             {"word1": "Chair", "word2": "Sit", "connection": "You sit on a chair"},
         ])
         
-        # Select 4 random pairs
-        selected = random.sample(word_pairs, 4)
-        
-        # Shuffle left and right columns independently for the puzzle display
+        # Select 4 pairs deterministically per day, shuffle columns with day-offset seeds
+        today = self.get_generation_date()
+        selected = date_seeded_sample(word_pairs, 4, today)
+
+        import hashlib, random as _random
+        _seed = int(hashlib.md5(today.isoformat().encode()).hexdigest(), 16)
+        _rng = _random.Random(_seed + 1)
         left_words = [p["word1"] for p in selected]
         right_words = [p["word2"] for p in selected]
-        random.shuffle(left_words)
-        random.shuffle(right_words)
+        _rng.shuffle(left_words)
+        _rng.shuffle(right_words)
         
         # Build display pairs (left[i] paired with right[i] for display)
         # The actual answers keep the original word1->word2 connections

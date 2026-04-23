@@ -1,13 +1,13 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    DEMENTIA_SYSTEM_PROMPT,
+    get_dementia_system_prompt,
     generate_image_url_with_usage,
     generate_json_with_usage,
     generate_text_with_usage,
 )
+from app.services.care_circle.variety_utils import pick_avoiding_recent
 from typing import Any, Dict
 
 
@@ -40,7 +40,8 @@ class FamilyGreetingProvider(BaseCareCircleProvider):
                 ),
             }
 
-        sender = random.choice(family_members)
+        patient_id = getattr(patient_profile, "id", None) if patient_profile else None
+        sender = pick_avoiding_recent(family_members, "family_greeting_sender", patient_id=patient_id)
 
         life_roles = prefs.get("life_roles", [])
         pets = prefs.get("pets", [])
@@ -80,12 +81,12 @@ class FamilyGreetingProvider(BaseCareCircleProvider):
                 f"{context_str}"
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=get_dementia_system_prompt(self.get_generation_date())
             )
             self.log_llm_response(
                 llm_response,
                 prompt=prompt,
-                system_prompt=DEMENTIA_SYSTEM_PROMPT,
+                system_prompt=get_dementia_system_prompt(self.get_generation_date()),
             )
             if llm_response.content and len(llm_response.content) > 10:
                 return {"sender": sender, "message": llm_response.content}

@@ -6,16 +6,16 @@ Static provider — no LLM or external calls required.
 
 import json
 import logging
-import random
 from pathlib import Path
 from typing import Any, Dict, List
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 
 logger = logging.getLogger(__name__)
 
 # Path to external data file
-_DATA_FILE = Path(__file__).resolve().parents[3] / "data" / "country_spotlight.json"
+_DATA_FILE = Path(__file__).resolve().parents[5] / "data" / "country_spotlight.json"
 
 # Lazy-loaded country pool
 _countries_cache: List[Dict[str, str]] = []
@@ -57,7 +57,7 @@ class CountrySpotlightProvider(BaseCareCircleProvider):
         cfg = self.patient_config
         # Allow config override, otherwise load from external data file
         pool = cfg.get("countries") or _load_countries()
-        entry = random.choice(pool)
+        entry = date_seeded_choice(pool, self.get_generation_date())
         return {
             "country": entry["country"],
             "flag": entry["flag"],

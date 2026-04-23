@@ -14,6 +14,7 @@ import {
   fetchCareCirclePatient,
   fetchCareCirclePatientAuthCatalog,
   fetchCareCirclePatientProviderConfigs,
+  fetchRegeneratePatientNewsletterStatus,
   fetchCareCircleProviders,
   fetchIsoCodes,
   fetchPatientNewsletterPreview,
@@ -79,7 +80,7 @@ function TagInput({
 }: {
   label: string;
   values: string[];
-  onChange: (next: string[]) => void;
+  onChange: (_next: string[]) => void;
   placeholder?: string;
   hint?: string;
   span2?: boolean;
@@ -143,7 +144,7 @@ function AuthImagePicker({
 }: {
   catalog: CareCircleAuthCatalogItem[];
   values: string[];
-  onChange: (next: string[]) => void;
+  onChange: (_next: string[]) => void;
 }) {
   function toggle(key: string) {
     if (values.includes(key)) onChange(values.filter((k) => k !== key));
@@ -292,6 +293,8 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   }, [searchParams]);
 
   const [sendResult, setSendResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [regenerationJobId, setRegenerationJobId] = useState<string | null>(null);
+  const [regenerationMessage, setRegenerationMessage] = useState<string | null>(null);
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const [previewDate, setPreviewDate] = useState(todayStr);
@@ -300,6 +303,37 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
     queryKey: ["care-circle-newsletter-preview", patientId, previewDate],
     queryFn: () => fetchPatientNewsletterPreview(patientId, previewDate),
   });
+
+  const { data: regenerationStatus } = useQuery({
+    queryKey: ["care-circle-newsletter-regeneration", patientId, regenerationJobId],
+    queryFn: () => fetchRegeneratePatientNewsletterStatus(patientId, regenerationJobId ?? ""),
+    enabled: Boolean(regenerationJobId),
+    refetchInterval: (query) => {
+      const state = query.state.data?.state;
+      return state === "COMPLETED" || state === "FAILED" ? false : 3000;
+    },
+  });
+
+  useEffect(() => {
+    if (!regenerationStatus) {
+      return;
+    }
+
+    if (regenerationStatus.state === "COMPLETED") {
+      setRegenerationMessage(regenerationStatus.result_message || "Newsletter regeneration finished.");
+      setRegenerationJobId(null);
+      queryClient.invalidateQueries({ queryKey: ["care-circle-newsletter-preview", patientId, previewDate] });
+      return;
+    }
+
+    if (regenerationStatus.state === "FAILED") {
+      setRegenerationMessage(regenerationStatus.result_message || "Newsletter regeneration failed.");
+      setRegenerationJobId(null);
+      return;
+    }
+
+    setRegenerationMessage(regenerationStatus.status_message || "Newsletter regeneration in progress...");
+  }, [patientId, previewDate, queryClient, regenerationStatus]);
 
   function shiftPreviewDate(days: number) {
     const d = new Date(previewDate + "T12:00:00");
@@ -310,7 +344,14 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
 
   const regenerateMutation = useMutation({
     mutationFn: () => regeneratePatientNewsletter(patientId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["care-circle-newsletter-preview", patientId, previewDate] }),
+    onSuccess: (result) => {
+      setRegenerationJobId(result.job_id);
+      setRegenerationMessage(result.message);
+    },
+    onError: (err) => {
+      setRegenerationJobId(null);
+      setRegenerationMessage(err instanceof Error ? err.message : "Failed to start regeneration.");
+    },
   });
 
   const sendNewsletterMutation = useMutation({
@@ -619,7 +660,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             <p className={EYEBROW_CLS}>Manual dispatch</p>
             <h2 className="mt-2 font-display text-3xl text-ink-900">Send newsletter now</h2>
             <p className="mt-2 text-sm leading-7 text-ink-700">
-              Assembles and sends today's newsletter for this patient immediately. Requires an email or phone number on the profile.
+              Assembles and sends today&apos;s newsletter for this patient immediately. Requires an email or phone number on the profile.
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -671,19 +712,29 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             {previewDate === todayStr && (
               <div className="flex flex-col items-end gap-1">
                 <button
-                  onClick={() => regenerateMutation.mutate()}
-                  disabled={regenerateMutation.isPending}
+                  onClick={() => {
+                    setRegenerationMessage(null);
+                    regenerateMutation.mutate();
+                  }}
+                  disabled={regenerateMutation.isPending || Boolean(regenerationJobId)}
                   className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20 hover:bg-[#f8f5f0] disabled:cursor-not-allowed disabled:opacity-60"
                   title="Re-run all providers with fresh data"
                   type="button"
                 >
-                  {regenerateMutation.isPending ? "Regenerating…" : "↺ Regenerate"}
+                  {regenerateMutation.isPending || regenerationJobId ? "Regenerating…" : "↺ Regenerate"}
                 </button>
                 <span className="text-xs text-ink-500">
-                  {regenerateMutation.isPending
-                    ? "This may take up to 2 minutes…"
-                    : "Fetches fresh data from all providers"}
+                  {regenerationJobId
+                    ? regenerationStatus?.status_message || "Regeneration is running in the background…"
+                    : regenerateMutation.isPending
+                      ? "Starting regeneration…"
+                      : "Fetches fresh data from all providers"}
                 </span>
+                {regenerationMessage ? (
+                  <span className={`text-xs ${regenerationStatus?.state === "FAILED" ? "text-[#a0382b]" : "text-ink-500"}`}>
+                    {regenerationMessage}
+                  </span>
+                ) : null}
               </div>
             )}
           </div>

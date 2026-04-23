@@ -1,7 +1,9 @@
-import random
+import hashlib
 import logging
+import random
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 from typing import Any, Dict
 
 
@@ -42,10 +44,20 @@ class WordScrambleProvider(BaseCareCircleProvider):
 
         # Filter word pool by difficulty length constraints
         all_words = cfg.get("words", [
+            # Nature
             "WATER", "RIVER", "TREES", "BIRDS", "SNOW", "LAKE", "FISH",
-            "DAM", "STEEL", "PIPE", "BOLT",
-            "HOME", "BREAD", "CHAIR", "LIGHT", "WARM",
-            "MAPLE", "FROST", "CABIN"
+            "MAPLE", "FROST", "CABIN", "CLOUD", "BLOOM", "STONE", "GRASS",
+            "SUNNY", "OCEAN", "BROOK", "WOODS", "PEARL", "SHORE",
+            # Home & everyday
+            "HOME", "BREAD", "CHAIR", "LIGHT", "WARM", "CLOCK", "KETTLE",
+            "LEMON", "HONEY", "SUGAR", "SPOON", "PLATE", "GLASS", "TOWEL",
+            "PILLOW", "CANDLE", "BASKET", "WINDOW", "GARDEN", "PANTRY",
+            # People & feelings
+            "SMILE", "LAUGH", "PEACE", "CHEER", "GRACE", "BRAVE",
+            "QUIET", "PROUD", "FRIEND", "TENDER", "GENTLE", "MERRY",
+            # Seasons & celebrations
+            "SPRING", "AUTUMN", "WINTER", "SUMMER", "HOLLY", "CAROL",
+            "ROBIN", "TULIP", "DAISY", "CLOVER",
         ])
         word_pool = [w for w in all_words if min_length <= len(w) <= max_length]
 
@@ -61,30 +73,35 @@ class WordScrambleProvider(BaseCareCircleProvider):
         if not word_pool:
             word_pool = all_words
 
-        word = random.choice(word_pool)
+        today = self.get_generation_date()
+        word = date_seeded_choice(word_pool, today)
+
+        # Build a deterministic RNG seeded by date + word for stable scrambling
+        seed = int(hashlib.md5(f"{today.isoformat()}:{word}".encode()).hexdigest(), 16)
+        rng = random.Random(seed)
 
         # Scramble strategy varies by difficulty
         if show_first_letter and len(word) > 2:
             # Keep first letter, scramble rest
             middle = list(word[1:])
-            random.shuffle(middle)
+            rng.shuffle(middle)
             scrambled = word[0] + "".join(middle)
         elif len(word) > 3:
             # Keep first and last, scramble middle
             middle = list(word[1:-1])
-            random.shuffle(middle)
+            rng.shuffle(middle)
             scrambled = word[0] + "".join(middle) + word[-1]
         else:
             # Full scramble
             letters = list(word)
-            random.shuffle(letters)
+            rng.shuffle(letters)
             scrambled = "".join(letters)
 
         # Make sure it's actually scrambled (not the same)
         attempts = 0
         while scrambled == word and attempts < 10:
             letters = list(word)
-            random.shuffle(letters)
+            rng.shuffle(letters)
             scrambled = "".join(letters)
             attempts += 1
 

@@ -1,7 +1,7 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_sample
 from typing import Any, Dict
 
 
@@ -34,8 +34,8 @@ class BingoProvider(BaseCareCircleProvider):
             "Song", "Dance", "Flower", "Garden", "Morning"
         ])
         
-        # Shuffle and take 24 words (center is free)
-        words = random.sample(word_bank, 24)
+        # Pick 24 words, deterministic for the day so re-renders are stable
+        words = date_seeded_sample(word_bank, 24, self.get_generation_date())
         
         # Insert FREE in the middle (position 12)
         words.insert(12, "FREE")

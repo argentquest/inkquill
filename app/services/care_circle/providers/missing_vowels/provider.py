@@ -1,7 +1,7 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import pick_avoiding_recent
 from typing import Any, Dict
 
 
@@ -54,9 +54,22 @@ class MissingVowelsProvider(BaseCareCircleProvider):
 
         # Add engineering/Quebec-themed defaults from config
         default_words = cfg.get("words", [
-            "TURBINE", "CONCRETE", "RESERVOIR", "QUEBEC", "MONTREAL",
-            "BRIDGE", "ENGINEER", "RIVER", "FOREST", "WINTER",
-            "GARDEN", "KITCHEN", "FAMILY", "SUNSHINE", "MORNING"
+            # Nature
+            "RIVER", "FOREST", "WINTER", "SUNSHINE", "MORNING",
+            "MOUNTAIN", "MEADOW", "BLOSSOM", "GARDEN", "AUTUMN",
+            "RAINBOW", "SNOWFALL", "FLOWER", "WILLOW", "SUMMER",
+            # Home & kitchen
+            "KITCHEN", "FAMILY", "BUTTER", "TEAPOT", "CURTAIN",
+            "BLANKET", "FIREPLACE", "CUSHION", "WINDOW", "PANTRY",
+            # Community & people
+            "NEIGHBOUR", "WELCOME", "HOLIDAY", "BIRTHDAY", "HARVEST",
+            "POSTMAN", "MARKET", "VILLAGE", "CARNIVAL", "PICNIC",
+            # Animals
+            "SPARROW", "RABBIT", "SQUIRREL", "KITTEN", "DUCKLING",
+            "ROBIN", "PIGEON", "BUTTERFLY", "LADYBIRD", "HEDGEHOG",
+            # Feelings & virtues
+            "KINDNESS", "COMFORT", "LAUGHTER", "PATIENCE", "COURAGE",
+            "GRATITUDE", "PEACEFUL", "CHEERFUL", "TOGETHER", "BELOVED",
         ])
         word_pool.extend(default_words)
 
@@ -72,7 +85,8 @@ class MissingVowelsProvider(BaseCareCircleProvider):
         if not valid_words:
             valid_words = default_words
 
-        word = random.choice(valid_words)
+        patient_id = getattr(patient_profile, "id", None) if patient_profile else None
+        word = pick_avoiding_recent(valid_words, "missing_vowels_word", patient_id=patient_id)
 
         # Build puzzle display based on difficulty settings
         if show_consonants:

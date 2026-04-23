@@ -1,7 +1,7 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 from typing import Any, Dict
 
 
@@ -47,7 +47,7 @@ class FinishPhraseProvider(BaseCareCircleProvider):
         if not pool:
             pool = all_phrases
 
-        selected = random.choice(pool)
+        selected = date_seeded_choice(pool, self.get_generation_date())
 
         result = {
             "type": "finish_phrase",

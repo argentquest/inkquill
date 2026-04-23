@@ -30,6 +30,7 @@ async def lifespan(app_instance: FastAPI):
 
     # Create and start scheduler
     scheduler = create_scheduler()
+    app_instance.state.scheduler = scheduler
 
     # Register all tasks from the tasks package (this triggers @register_task decorators)
     from app.scheduler.tasks import care_circle_newsletter, care_circle_newsletter_pdf, care_circle_session, care_circle_precache, care_circle_mini_newsletter, cleanup, diagnostic  # noqa: F401
@@ -62,6 +63,7 @@ async def lifespan(app_instance: FastAPI):
         logger.info("Scheduler Server: Shutting down...")
         if scheduler:
             scheduler.shutdown(wait=False)
+        app_instance.state.scheduler = None
         logger.info("Scheduler Server: Shutdown complete")
 
 

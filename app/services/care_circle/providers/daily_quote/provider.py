@@ -20,7 +20,7 @@ class DailyQuoteProvider(BaseCareCircleProvider):
         Implementation of the quote fetch logic.
         """
         # Pull family configs or use defaults
-        api_url = self.patient_config.get("api_url", "https://zenquotes.io/api/today")
+        api_url = self.patient_config.get("api_url", "https://zenquotes.io/api/random")
         fallback_quote = self.patient_config.get("fallback_quote", "Every day is a new beginning.")
         fallback_author = self.patient_config.get("fallback_author", "Unknown")
 

@@ -1,14 +1,14 @@
 import httpx
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    DEMENTIA_SYSTEM_PROMPT,
+    get_dementia_system_prompt,
     generate_image_url_with_usage,
     generate_json_with_usage,
     generate_text_with_usage,
 )
+from app.services.care_circle.variety_utils import date_seeded_choice, pick_avoiding_recent
 from typing import Any, Dict
 
 
@@ -41,7 +41,8 @@ class SongOfTheDayProvider(BaseCareCircleProvider):
         singers = prefs.get("favorite_singers") or []
         if not singers and prefs.get("favorite_singer"):
             singers = [prefs["favorite_singer"]]
-        favorite = random.choice(singers) if singers else ""
+        patient_id = getattr(patient_profile, "id", None) if patient_profile else None
+        favorite = pick_avoiding_recent(singers, "song_of_the_day_singer", patient_id=patient_id) if singers else ""
         artist_data = None
 
         if favorite:
@@ -50,13 +51,13 @@ class SongOfTheDayProvider(BaseCareCircleProvider):
             )
 
         if not artist_data and artists_list:
-            artist_data = random.choice(artists_list)
+            artist_data = date_seeded_choice(artists_list, self.get_generation_date())
 
         if artist_data:
             singer = artist_data["name"]
             songs = artist_data.get("songs", [])
             song_title = (
-                random.choice(songs) if songs else "A wonderful classic"
+                date_seeded_choice(songs, self.get_generation_date()) if songs else "A wonderful classic"
             )
             era = artist_data.get("era", "1960s")
 
@@ -87,12 +88,12 @@ class SongOfTheDayProvider(BaseCareCircleProvider):
                     f"Avoid any memories of loss, hardship, or distressing events."
                 )
                 llm_response = await generate_text_with_usage(
-                    fact_prompt, system=DEMENTIA_SYSTEM_PROMPT
+                    fact_prompt, system=get_dementia_system_prompt(self.get_generation_date())
                 )
                 self.log_llm_response(
                     llm_response,
                     prompt=fact_prompt,
-                    system_prompt=DEMENTIA_SYSTEM_PROMPT,
+                    system_prompt=get_dementia_system_prompt(self.get_generation_date()),
                 )
                 fact = llm_response.content
                 if not fact or len(fact) < 10:

@@ -6,15 +6,18 @@ assembles it into a single-page document, and exports a PDF via Playwright.
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import importlib
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import time
 import traceback
+import urllib.request
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -532,10 +535,64 @@ async def _send_test_email(
         print(f"  Status:      ERROR — {exc}")
 
 
+# ── image downloader ──────────────────────────────────────────────────────────
+def _download_images_in_html(html: str, images_dir: Path) -> str:
+    """
+    Find every remote http(s) URL in <img src="..."> tags, download the file to
+    images_dir, and replace the URL with a relative ``images/<filename>`` path.
+    Returns the rewritten HTML.
+    """
+    images_dir.mkdir(parents=True, exist_ok=True)
+    seen: dict[str, str] = {}  # url -> local filename
+
+    def _replace(m: re.Match) -> str:
+        url = m.group(1)
+        if not url.startswith("http"):
+            return m.group(0)
+        if url in seen:
+            return f'src="{seen[url]}"'
+        # Derive a local filename from the URL
+        url_path = url.split("?")[0].rstrip("/")
+        raw_name = url_path.split("/")[-1] or "image"
+        # Strip non-safe chars and ensure an extension
+        safe_name = re.sub(r"[^\w.\-]", "_", raw_name)
+        if "." not in safe_name:
+            safe_name += ".jpg"
+        # Avoid collisions
+        dest = images_dir / safe_name
+        counter = 1
+        stem, ext = safe_name.rsplit(".", 1) if "." in safe_name else (safe_name, "jpg")
+        while dest.exists() and dest.read_bytes()[:4] != b"":
+            safe_name = f"{stem}_{counter}.{ext}"
+            dest = images_dir / safe_name
+            counter += 1
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                dest.write_bytes(resp.read())
+            rel = f"images/{safe_name}"
+            seen[url] = rel
+            print(f"    IMG  {safe_name}")
+            return f'src="{rel}"'
+        except Exception as exc:
+            print(f"    IMG  FAIL {url[:60]}: {exc}")
+            seen[url] = url
+            return m.group(0)
+
+    return re.sub(r'src="(https?://[^"]+)"', _replace, html)
+
+
 # ── main ───────────────────────────────────────────────────────────────────────
 async def main():
     from datetime import datetime
     import shutil
+
+    parser = argparse.ArgumentParser(description="Care Circle provider test runner")
+    parser.add_argument("--patient-id", type=int, default=None,
+                        help="Run for a specific patient ID (default: random active patient)")
+    parser.add_argument("--no-images", action="store_true",
+                        help="Skip downloading remote images to local files")
+    args = parser.parse_args()
 
     # Clear stale render cache so providers don't return each other's cached HTML
     cache_dir = ROOT / "app" / "logs" / "care_circle_render_cache"
@@ -546,13 +603,20 @@ async def main():
     print("Installing LLM patches...")
     _install_patches()
 
-    # Load patients from database and pick one at random
+    # Load patients from database
     patients = await _load_active_patients()
     if not patients:
         print("No patients to process. Exiting.")
         return
 
-    patient = random.choice(patients)
+    if args.patient_id is not None:
+        matching = [p for p in patients if p.id == args.patient_id]
+        if not matching:
+            print(f"Patient {args.patient_id} not found or not active. Exiting.")
+            return
+        patient = matching[0]
+    else:
+        patient = random.choice(patients)
     print(f"Selected patient: {patient.display_name or f'Patient {patient.id}'} (id={patient.id})")
 
     patient_name = patient.display_name or f"Patient {patient.id}"
@@ -633,6 +697,24 @@ async def main():
     print(f"\nAssembling HTML -> {assembled_html_path}")
     html_content = _build_html(results, today, patient_name,
                                header_html=header_html, footer_html=footer_html)
+
+    # ── Download remote images to local files ────────────────────────────
+    if not args.no_images:
+        print("\nDownloading remote images...")
+        images_dir = run_dir / "images"
+        html_content = _download_images_in_html(html_content, images_dir)
+        # Also rewrite individual provider HTML files and the header/footer
+        header_html = _download_images_in_html(header_html, images_dir)
+        footer_html = _download_images_in_html(footer_html, images_dir)
+        for r in results:
+            if r.rendered_html:
+                r.rendered_html = _download_images_in_html(r.rendered_html, images_dir)
+        # Rebuild with localised images
+        html_content = _build_html(results, today, patient_name,
+                                   header_html=header_html, footer_html=footer_html)
+        img_count = len(list(images_dir.glob("*"))) if images_dir.exists() else 0
+        print(f"  {img_count} image(s) saved to {images_dir.name}/")
+
     assembled_html_path.write_text(html_content, encoding="utf-8")
 
     print(f"Rendering PDF   -> {pdf_path}")

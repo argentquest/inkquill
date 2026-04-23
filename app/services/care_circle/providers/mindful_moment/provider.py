@@ -4,15 +4,15 @@ Uses an LLM to generate a personalised short mindfulness or breathing exercise.
 Falls back to a curated static pool if LLM is unavailable.
 """
 
-import random
 import logging
 from typing import Any, Dict
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    DEMENTIA_SYSTEM_PROMPT,
+    get_dementia_system_prompt,
     generate_json_with_usage,
 )
+from app.services.care_circle.variety_utils import pick_avoiding_recent
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +42,41 @@ EXERCISE_TYPES = [
         "key": "gratitude_breath",
         "label": "a gratitude breathing moment — breathing in something good, breathing out tension",
         "example": "Breathe in warmth and love; breathe out any worries.",
+    },
+    {
+        "key": "finger_breathing",
+        "label": "a finger-tracing breathing exercise — tracing each finger up and down with the breath",
+        "example": "Trace slowly up each finger as you breathe in, and down as you breathe out.",
+    },
+    {
+        "key": "warm_hands",
+        "label": "a warm-hands relaxation — rubbing the palms together to create warmth",
+        "example": "Rub your palms together, hold them over your cheeks, and breathe in the warmth.",
+    },
+    {
+        "key": "shoulder_release",
+        "label": "a gentle shoulder-release moment — lifting and dropping the shoulders with the breath",
+        "example": "Breathe in and lift your shoulders to your ears, then drop them as you breathe out.",
+    },
+    {
+        "key": "colour_breathing",
+        "label": "a colour-breathing exercise — imagining breathing in a favourite calming colour",
+        "example": "Imagine breathing in a soft golden light that fills you with peace.",
+    },
+    {
+        "key": "sound_awareness",
+        "label": "a gentle sound-awareness moment — simply listening to what can be heard around you",
+        "example": "Close your eyes, listen quietly, and notice three different sounds in the room.",
+    },
+    {
+        "key": "smile_breath",
+        "label": "a smile-and-breathe exercise — smiling gently while breathing slowly",
+        "example": "Let a gentle smile come to your face and breathe in slowly. Feel how warmth spreads through you.",
+    },
+    {
+        "key": "counting_blessings",
+        "label": "a counting-blessings breath — breathing in gratitude for people and places you love",
+        "example": "Breathe in and think of someone you love; breathe out and feel grateful.",
     },
 ]
 
@@ -125,10 +160,13 @@ class MindfulMomentProvider(BaseCareCircleProvider):
 
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
-        exercise_type = random.choice(EXERCISE_TYPES)
+        exercise_type = pick_avoiding_recent(EXERCISE_TYPES, "mindful_moment_type", key_fn=lambda x: x["key"])
 
         try:
+            d = self.get_generation_date()
+            today_str = f"{d.strftime('%B')} {d.day}, {d.year}"
             prompt = (
+                f"Today is {today_str}. "
                 f"Create {exercise_type['label']} for a senior person. "
                 f"It must be very gentle, calming, and easy to follow from a chair. "
                 f"Write the instruction as a single short paragraph in a warm, soothing tone. "
@@ -138,13 +176,13 @@ class MindfulMomentProvider(BaseCareCircleProvider):
                 '{"title": "...", "instruction": "...", "duration_note": "Takes about X minutes."}'
             )
             data, llm_response = await generate_json_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=get_dementia_system_prompt(self.get_generation_date())
             )
-            self.log_llm_response(llm_response, prompt=prompt, system_prompt=DEMENTIA_SYSTEM_PROMPT)
+            self.log_llm_response(llm_response, prompt=prompt, system_prompt=get_dementia_system_prompt(self.get_generation_date()))
             if data.get("title") and data.get("instruction"):
                 return data
         except Exception as e:
             logger.error(f"LLM Error (mindful_moment): {e}")
 
         fallback_pool = cfg.get("exercises", FALLBACK_EXERCISES)
-        return random.choice(fallback_pool)
+        return pick_avoiding_recent(fallback_pool, "mindful_moment_fallback", key_fn=lambda x: x["title"])

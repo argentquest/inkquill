@@ -1,13 +1,13 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    DEMENTIA_SYSTEM_PROMPT,
+    get_dementia_system_prompt,
     generate_image_url_with_usage,
     generate_json_with_usage,
     generate_text_with_usage,
 )
+from app.services.care_circle.variety_utils import pick_avoiding_recent
 from typing import Any, Dict
 
 
@@ -38,7 +38,8 @@ class ActivitySuggestionProvider(BaseCareCircleProvider):
                 ],
             )
 
-        activity = random.choice(activities)
+        patient_id = getattr(patient_profile, "id", None) if patient_profile else None
+        activity = pick_avoiding_recent(activities, "activity_suggestion_activity", patient_id=patient_id)
 
         mobility_level = prefs.get("mobility_level", "")
         favourite_foods = prefs.get("favourite_foods", [])
@@ -74,7 +75,10 @@ class ActivitySuggestionProvider(BaseCareCircleProvider):
         context_str = " ".join(context_parts)
 
         try:
+            d = self.get_generation_date()
+            today_str = f"{d.strftime('%B')} {d.day}, {d.year}"
             prompt = (
+                f"Today is {today_str}. "
                 f"Write 2 short sentences gently encouraging {name} to "
                 f"enjoy {activity} today. "
                 f"Make it feel warm, inviting, and easy — like a lovely "
@@ -84,12 +88,12 @@ class ActivitySuggestionProvider(BaseCareCircleProvider):
                 f"{context_str}"
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=get_dementia_system_prompt(self.get_generation_date())
             )
             self.log_llm_response(
                 llm_response,
                 prompt=prompt,
-                system_prompt=DEMENTIA_SYSTEM_PROMPT,
+                system_prompt=get_dementia_system_prompt(self.get_generation_date()),
             )
             if llm_response.content and len(llm_response.content) > 10:
                 return {

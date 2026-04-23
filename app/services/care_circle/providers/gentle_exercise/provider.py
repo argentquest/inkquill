@@ -1,7 +1,7 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 from typing import Any, Dict
 
 class GentleExerciseProvider(BaseCareCircleProvider):
@@ -23,5 +23,5 @@ class GentleExerciseProvider(BaseCareCircleProvider):
         exercises = cfg.get("exercises", [
             {"name": "Seated Arm Raise", "steps": "Sit comfortably. Slowly raise both arms above your head. Hold for 5 seconds. Lower slowly. Repeat 3 times.", "benefit": "Improves shoulder mobility and circulation."}
         ])
-        selected = random.choice(exercises)
+        selected = date_seeded_choice(exercises, self.get_generation_date())
         return selected

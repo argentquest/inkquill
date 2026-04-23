@@ -1,13 +1,13 @@
-import random
 import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    DEMENTIA_SYSTEM_PROMPT,
+    get_dementia_system_prompt,
     generate_image_url_with_usage,
     generate_json_with_usage,
     generate_text_with_usage,
 )
+from app.services.care_circle.variety_utils import pick_avoiding_recent
 from typing import Any, Dict
 
 
@@ -36,6 +36,54 @@ QUESTION_TYPES = [
         "example": "like 'True or false: The sun rises in the east.'",
         "has_answer": True,
     },
+    {
+        "key": "rhyme",
+        "label": "A simple rhyming word to complete",
+        "example": "like 'Jack and Jill went up the ___'",
+        "has_answer": True,
+    },
+    {
+        "key": "category",
+        "label": "Name something that belongs to a familiar category",
+        "example": "like 'Name a fruit that starts with A'",
+        "has_answer": False,
+    },
+    {
+        "key": "opposite",
+        "label": "A gentle 'what is the opposite of?' question",
+        "example": "like 'What is the opposite of hot?'",
+        "has_answer": True,
+    },
+    {
+        "key": "colour",
+        "label": "A colour-association question",
+        "example": "like 'What colour is a ripe banana?'",
+        "has_answer": True,
+    },
+    {
+        "key": "number",
+        "label": "A simple counting or number question",
+        "example": "like 'How many days are in a week?'",
+        "has_answer": True,
+    },
+    {
+        "key": "season",
+        "label": "A question about seasons or weather",
+        "example": "like 'Which season comes after summer?'",
+        "has_answer": True,
+    },
+    {
+        "key": "animal",
+        "label": "A gentle animal-knowledge question",
+        "example": "like 'What sound does a cow make?'",
+        "has_answer": True,
+    },
+    {
+        "key": "memory",
+        "label": "A pleasant 'do you remember?' question with no wrong answer",
+        "example": "like 'Do you remember your favourite childhood meal?'",
+        "has_answer": False,
+    },
 ]
 
 
@@ -55,7 +103,11 @@ class BrainBoosterProvider(BaseCareCircleProvider):
         prefs = self.get_patient_preferences(patient_profile)
         era = prefs.get("era_of_youth", "1950s")
 
-        qt = random.choice(QUESTION_TYPES)
+        qt = pick_avoiding_recent(
+            QUESTION_TYPES,
+            "brain_booster_type",
+            key_fn=lambda x: x["key"],
+        )
         answer_field = (
             '"answer": "the correct answer"'
             if qt["has_answer"]
@@ -63,7 +115,10 @@ class BrainBoosterProvider(BaseCareCircleProvider):
         )
 
         try:
+            d = self.get_generation_date()
+            today_str = f"{d.strftime('%B')} {d.day}, {d.year}"
             prompt = (
+                f"Today is {today_str}. "
                 f"Create one fun, gentle thinking activity for someone "
                 f"who grew up in the {era}. "
                 f"Use this type: {qt['label']} ({qt['example']}). "
@@ -74,12 +129,12 @@ class BrainBoosterProvider(BaseCareCircleProvider):
                 f'{{"type": "{qt["key"]}", "prompt": "...", {answer_field}}}'
             )
             data, llm_response = await generate_json_with_usage(
-                prompt, system=DEMENTIA_SYSTEM_PROMPT
+                prompt, system=get_dementia_system_prompt(self.get_generation_date())
             )
             self.log_llm_response(
                 llm_response,
                 prompt=prompt,
-                system_prompt=DEMENTIA_SYSTEM_PROMPT,
+                system_prompt=get_dementia_system_prompt(self.get_generation_date()),
             )
             if data.get("prompt"):
                 return data
@@ -90,7 +145,7 @@ class BrainBoosterProvider(BaseCareCircleProvider):
         matching = [p for p in prompts if p.get("type") == qt["key"]]
         pool = matching if matching else prompts
         return (
-            random.choice(pool)
+            pick_avoiding_recent(pool, "brain_booster_fallback", key_fn=lambda x: x.get("prompt", str(x)))
             if pool
             else {"type": "either_or", "prompt": "Coffee or tea?", "answer": ""}
         )

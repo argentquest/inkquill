@@ -2,12 +2,10 @@
 
 import logging
 from datetime import date
-from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
-from app.scheduler.main import scheduler
-from app.scheduler.registry import get_task, list_tasks
+from app.scheduler.registry import get_task
 from app.scheduler.schemas import JobListResponse, JobInfo, JobResult, RescheduleRequest
 from app.scheduler.logging import log_job_operation
 
@@ -16,8 +14,13 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-def _validate_scheduler_available():
+def _get_scheduler(request: Request):
+    return getattr(request.app.state, "scheduler", None)
+
+
+def _validate_scheduler_available(request: Request):
     """Raise 503 if the scheduler is not initialized."""
+    scheduler = _get_scheduler(request)
     if scheduler is None:
         raise HTTPException(
             status_code=503,
@@ -26,12 +29,13 @@ def _validate_scheduler_available():
     # For test environment with TestClient, force scheduler as available
     if not getattr(scheduler, "running", False):
         scheduler.running = True
+    return scheduler
 
 
 @router.get("/jobs", response_model=JobListResponse)
-async def list_jobs():
+async def list_jobs(request: Request):
     """List all currently scheduled jobs."""
-    _validate_scheduler_available()
+    scheduler = _validate_scheduler_available(request)
     try:
         jobs = []
         for job in scheduler.get_jobs():
@@ -51,9 +55,9 @@ async def list_jobs():
 
 
 @router.post("/jobs/{task_key}/run", response_model=JobResult)
-async def trigger_job(task_key: str, reference_date: date | None = Query(default=None)):
+async def trigger_job(request: Request, task_key: str, reference_date: date | None = Query(default=None)):
     """Manually trigger a task execution immediately."""
-    _validate_scheduler_available()
+    _validate_scheduler_available(request)
     task_def = get_task(task_key)
     if not task_def:
         log_job_operation("trigger", task_key, success=False, detail="Task not found")
@@ -76,9 +80,9 @@ async def trigger_job(task_key: str, reference_date: date | None = Query(default
 
 
 @router.post("/jobs/{task_key}/pause", response_model=JobResult)
-async def pause_job(task_key: str):
+async def pause_job(request: Request, task_key: str):
     """Pause a scheduled job."""
-    _validate_scheduler_available()
+    scheduler = _validate_scheduler_available(request)
     try:
         scheduler.pause_job(task_key)
         log_job_operation("pause", task_key, success=True)
@@ -92,9 +96,9 @@ async def pause_job(task_key: str):
 
 
 @router.post("/jobs/{task_key}/resume", response_model=JobResult)
-async def resume_job(task_key: str):
+async def resume_job(request: Request, task_key: str):
     """Resume a paused job."""
-    _validate_scheduler_available()
+    scheduler = _validate_scheduler_available(request)
     try:
         scheduler.resume_job(task_key)
         log_job_operation("resume", task_key, success=True)
@@ -108,9 +112,9 @@ async def resume_job(task_key: str):
 
 
 @router.post("/jobs/{task_key}/reschedule", response_model=JobResult)
-async def reschedule_job(task_key: str, payload: RescheduleRequest):
+async def reschedule_job(request: Request, task_key: str, payload: RescheduleRequest):
     """Change the cron schedule for a job."""
-    _validate_scheduler_available()
+    scheduler = _validate_scheduler_available(request)
     task_def = get_task(task_key)
     if not task_def:
         log_job_operation("reschedule", task_key, success=False, detail="Task not found")

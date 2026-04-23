@@ -1,0 +1,8 @@
+services:
+  backend:
+    ports:
+      - "127.0.0.1:${CARE_CIRCLE_BACKEND_PORT}:8000"
+
+  scheduler:
+    ports:
+      - "127.0.0.1:${CARE_CIRCLE_SCHEDULER_PORT}:8001"

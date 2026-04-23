@@ -43,7 +43,9 @@
       "Bash(xargs rm *)",
       "Bash(ls .venv/Scripts/python*)",
       "Bash(ls venv/Scripts/python*)",
-      "Bash(.venv/Scripts/python.exe -c ' *)"
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(.venv/Scripts/python scripts/test_care_circle_providers.py --patient-id 20)",
+      "Bash(.venv/Scripts/python -c ' *)"
     ]
   }
 }

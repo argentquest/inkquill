@@ -36,7 +36,7 @@ COPY alembic.ini /app/alembic.ini
 COPY maintenance_status.json /app/maintenance_status.json
 COPY story_wizard_system_prompt.txt /app/story_wizard_system_prompt.txt
 
-RUN mkdir -p /app/data/uploads /app/logs && \
+RUN mkdir -p /app/data/uploads /app/logs /app/cache && \
     addgroup --system --gid 1001 appgroup && \
     adduser --system --uid 1001 --ingroup appgroup --home /app appuser && \
     chown -R appuser:appgroup /app

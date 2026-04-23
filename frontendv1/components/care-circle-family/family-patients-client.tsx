@@ -44,7 +44,7 @@ export function FamilyPatientsClient() {
         <div className="text-center py-16 border border-dashed border-gray-300 rounded-3xl">
           <p className="text-gray-500">No patients yet.</p>
           <p className="text-sm text-gray-400 mt-2">
-            Click "New Patient" to create your first care circle profile.
+            Click &quot;New Patient&quot; to create your first care circle profile.
           </p>
         </div>
       )}

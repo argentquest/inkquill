@@ -4,11 +4,11 @@ Delivers a gentle seated stretching exercise from a curated pool.
 Static provider — no LLM required.
 """
 
-import random
 import logging
 from typing import Any, Dict
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
+from app.services.care_circle.variety_utils import date_seeded_choice
 
 logger = logging.getLogger(__name__)
 
@@ -799,7 +799,7 @@ class MorningStretchProvider(BaseCareCircleProvider):
     async def _generate_payload(self, patient_profile: Any) -> Dict[str, Any]:
         cfg = self.patient_config
         pool = cfg.get("stretches", STRETCHES)
-        stretch = random.choice(pool)
+        stretch = date_seeded_choice(pool, self.get_generation_date())
         return {
             "title": stretch["title"],
             "description": stretch["description"],
