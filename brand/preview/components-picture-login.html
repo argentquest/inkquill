@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 10px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 6px; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+
+  .pl {
+    background: rgba(255,255,255,0.82);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 12px;
+    box-shadow: var(--shadow-panel);
+  }
+  .eb3 {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.28em;
+    color: var(--fg-3);
+  }
+  .pl h2 {
+    font-family: var(--font-display); font-size: 18px;
+    color: var(--fg-1); margin: 2px 0 8px;
+    line-height: 1.2;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .tile {
+    display: grid; place-items: center; gap: 2px;
+    aspect-ratio: 1;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    background: #fffdf9;
+  }
+  .tile.sel { border-width: 3px; }
+  .tile .emoji { font-size: 84px; line-height: 1; }
+  .tile .name {
+    font-family: var(--font-sans); font-size: 13px;
+    font-weight: 600; color: var(--ink-900);
+  }
+
+</style></head><body><div class="card">
+  <div class="label">Picture login · patient sign-in (signature)</div>
+  <section class="pl">
+    <p class="eb3">Friend sign-in</p>
+    <h2>Choose the 3 pictures that belong to you.</h2>
+    <div class="grid">
+      <div class="tile sel" style="border-color:#e09f3e"><span class="emoji">☀️</span><span class="name">Sun</span></div>
+      <div class="tile"><span class="emoji">🐶</span><span class="name">Dog</span></div>
+      <div class="tile sel" style="border-color:#cf6f91"><span class="emoji">🌸</span><span class="name">Flower</span></div>
+      <div class="tile"><span class="emoji">🎂</span><span class="name">Cake</span></div>
+      <div class="tile"><span class="emoji">🐦</span><span class="name">Bird</span></div>
+      <div class="tile"><span class="emoji">🚗</span><span class="name">Car</span></div>
+      <div class="tile sel" style="border-color:#56835a"><span class="emoji">🌳</span><span class="name">Tree</span></div>
+      <div class="tile"><span class="emoji">🏠</span><span class="name">House</span></div>
+    </div>
+  </section>
+</div></body></html>

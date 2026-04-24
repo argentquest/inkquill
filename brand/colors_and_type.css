@@ -1,9 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
 
 :root {
-  color-scheme: light;
+  /* ── Fonts ─────────────────────────────────────────── */
+  --font-display: "EB Garamond", Garamond, Georgia, serif;
+  --font-sans:    Lora, Georgia, Cambria, "Times New Roman", serif;
+  --font-mono:    "Courier New", Courier, monospace;
 
   /* ── Core palette ──────────────────────────────────── */
   --paper:   #f6f1e8;
@@ -38,74 +41,28 @@
   --shadow-panel: 0 20px 60px rgba(19, 22, 26, 0.12);
 
   /* ── Backgrounds ───────────────────────────────────── */
-  --bg-shell:       linear-gradient(135deg, #f6f1e8 0%, #efe7db 100%);
-  --bg-patient:     linear-gradient(135deg, #dce5e2 0%, #f6f1e8 100%);
-  --bg-chat-aside:  linear-gradient(160deg, #285751 0%, #1f3b36 60%, #231913 100%);
+  --bg-shell:      linear-gradient(135deg, #f6f1e8 0%, #efe7db 100%);
+  --bg-patient:    linear-gradient(135deg, #dce5e2 0%, #f6f1e8 100%);
+  --bg-chat-aside: linear-gradient(160deg, #285751 0%, #1f3b36 60%, #231913 100%);
   --bg-card-strong: rgba(255, 255, 255, 0.78);
 
-  /* ── Status: Info ──────────────────────────────────── */
+  /* ── Status: Info (mist / forest) ──────────────────── */
   --info-bg:     rgba(220, 229, 226, 0.50);
   --info-fg:     #1f3b36;
   --info-border: rgba(31, 59, 54, 0.22);
 
-  /* ── Status: Success ───────────────────────────────── */
+  /* ── Status: Success (deep forest) ────────────────── */
   --success-bg:     rgba(31, 59, 54, 0.10);
   --success-fg:     #1f3b36;
   --success-border: rgba(31, 59, 54, 0.28);
 
-  /* ── Status: Warning ───────────────────────────────── */
+  /* ── Status: Warning (ember-washed) ───────────────── */
   --warning-bg:     rgba(216, 108, 61, 0.12);
   --warning-fg:     #8b3a0f;
   --warning-border: rgba(216, 108, 61, 0.35);
 
-  /* ── Status: Danger ────────────────────────────────── */
+  /* ── Status: Danger (muted brick) ─────────────────── */
   --danger-bg:     rgba(198, 83, 83, 0.12);
   --danger-fg:     #8b2222;
   --danger-border: rgba(198, 83, 83, 0.30);
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --paper:   #1e1b18;
-  --paper-2: #28231e;
-  --fg-1:    #f6f1e8;
-  --fg-2:    #cfb28a;
-  --fg-3:    #a87a42;
-  --border-subtle: rgba(246, 241, 232, 0.10);
-  --border-strong: rgba(246, 241, 232, 0.22);
-  --shadow-soft:   0 2px 8px rgba(0, 0, 0, 0.30);
-  --shadow-panel:  0 20px 60px rgba(0, 0, 0, 0.40);
-  --bg-card-strong: rgba(0, 0, 0, 0.25);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: var(--paper);
-  color: var(--fg-1);
-  font-family: var(--font-sans, Lora, Georgia, serif);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-::selection {
-  background: rgba(216, 108, 61, 0.22);
 }

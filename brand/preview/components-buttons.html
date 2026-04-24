@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  .sub { font-size: 11px; color: var(--fg-3); font-family: var(--font-mono); margin-top: 4px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    padding: 12px 20px; border-radius: 9999px;
+    font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+    border: 1px solid transparent; cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    line-height: 1;
+  }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* PRIMARY — high-emphasis, only one per view */
+  .btn.primary { background: var(--ink-900); color: var(--paper); }
+  .btn.primary:hover { background: var(--ink-700); }
+
+  /* SECONDARY — medium emphasis, bordered on paper */
+  .btn.secondary {
+    background: rgba(255,255,255,0.80);
+    color: var(--ink-900);
+    border-color: var(--border-subtle);
+  }
+  .btn.secondary:hover { background: white; border-color: var(--border-strong); }
+
+  /* GHOST — low emphasis, ALWAYS visible on paper.
+     Visible border + faint tinted background so it doesn't vanish. */
+  .btn.ghost {
+    background: rgba(255,255,255,0.45);
+    color: var(--ink-800);
+    border-color: rgba(35,25,19,0.18);
+  }
+  .btn.ghost:hover {
+    background: rgba(255,255,255,0.75);
+    border-color: rgba(35,25,19,0.28);
+  }
+
+  /* DANGER — destructive */
+  .btn.danger { background: var(--danger-bg); color: var(--danger-fg); border-color: var(--danger-border); }
+  .btn.danger:hover { background: #f3d5d5; border-color: rgba(198,83,83,0.38); }
+
+  /* Inverse surface demo (matches chatbot aside) */
+  .inverse {
+    background: linear-gradient(135deg, #285751, #1f3b36);
+    border-radius: 22px;
+    padding: 18px;
+  }
+  .btn.ghost-inverse {
+    background: rgba(255,255,255,0.10);
+    color: var(--paper);
+    border-color: rgba(246,241,232,0.28);
+  }
+  .btn.ghost-inverse:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(246,241,232,0.45);
+  }
+
+</style></head><body><div class="card">
+
+  <div>
+    <div class="label">Buttons · pill scale · on paper</div>
+    <div class="sub">Ghost now keeps a visible border + tinted fill so it never disappears.</div>
+  </div>
+
+  <div class="row">
+    <button class="btn primary">Edit profile</button>
+    <button class="btn secondary">Review billing</button>
+    <button class="btn ghost">Cancel</button>
+    <button class="btn danger">Delete friend</button>
+    <button class="btn primary" disabled>Disabled</button>
+  </div>
+
+  <div>
+    <div class="label" style="margin-top: 4px;">On inverse surface · forest gradient</div>
+    <div class="sub">Ghost-inverse variant for chatbot aside and dark hero sections.</div>
+  </div>
+  <div class="inverse row">
+    <button class="btn primary" style="background: var(--paper); color: var(--ink-900);">Send message</button>
+    <button class="btn ghost-inverse">Clear</button>
+  </div>
+
+</div></body></html>

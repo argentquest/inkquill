@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; flex-direction:column; justify-content:flex-end; padding: 6px 8px; color: var(--paper); font-family: var(--font-mono); font-size: 10px; line-height: 1.1; }
+  .swatch.lt { color: var(--ink-900); }
+  .swatch .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  
+  .row2 { display: grid; grid-template-columns: 80px 1fr; gap: 14px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border-subtle); }
+  .row2:last-child { border-bottom: none; }
+  .tok { font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); }
+  .spec { font-family: var(--font-display); color: var(--fg-1); }
+
+</style></head><body><div class="card">
+  <div class="label">Type scale · display ramp</div>
+  <div class="row2"><div class="tok">48 / 1.08</div><div class="spec" style="font-size:48px; line-height:1.08;">Display</div></div>
+  <div class="row2"><div class="tok">36 / 1.1</div><div class="spec" style="font-size:36px;">Heading 1</div></div>
+  <div class="row2"><div class="tok">30 / 1.15</div><div class="spec" style="font-size:30px;">Heading 2</div></div>
+  <div class="row2"><div class="tok">24 / 1.2</div><div class="spec" style="font-size:24px;">Heading 3</div></div>
+  <div class="row2"><div class="tok">18 / 1.7</div><div class="spec" style="font-family:var(--font-sans); font-size:18px;">Body large</div></div>
+  <div class="row2"><div class="tok">14 / 1.7</div><div class="spec" style="font-family:var(--font-sans); font-size:14px;">Body small</div></div>
+</div></body></html>

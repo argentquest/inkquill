@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; flex-direction:column; justify-content:flex-end; padding: 6px 8px; color: var(--paper); font-family: var(--font-mono); font-size: 10px; line-height: 1.1; }
+  .swatch.lt { color: var(--ink-900); }
+  .swatch .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  
+  .bg { height: 100px; border-radius: 20px; border: 1px solid var(--border-subtle); padding: 10px 14px; font-size:12px; color: var(--fg-2); display:flex; align-items:flex-end; }
+  .bg.dark { color: var(--paper); }
+
+</style></head><body><div class="card">
+  <div class="label">Backdrops · signature gradients</div>
+  <div class="bg" style="background: var(--bg-shell);">bg-shell · app shell</div>
+  <div class="bg" style="background: var(--bg-patient);">bg-patient · friend surface</div>
+  <div class="bg dark" style="background: var(--bg-chat-aside);">bg-chat-aside · forest → ink</div>
+</div></body></html>

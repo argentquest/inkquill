@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+
+  .card { display: flex; flex-direction: column; gap: 18px; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.28em; }
+  .sub { font-size: 11px; color: var(--fg-3); font-family: var(--font-mono); }
+
+  /* Vibrant hero stripe */
+  .hero {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    padding: 16px 18px;
+    color: var(--paper);
+    background:
+      radial-gradient(circle at 8% 110%, rgba(216,108,61,0.75), transparent 42%),
+      radial-gradient(circle at 92% -10%, rgba(220,229,226,0.55), transparent 44%),
+      linear-gradient(100deg, #231913 0%, #43311f 42%, #634829 72%, #855f34 100%);
+  }
+  .hero .kicker {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.32em;
+    color: rgba(246,241,232,0.78);
+  }
+  .hero h3 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 22px; line-height: 1.1; margin: 6px 0 0; color: var(--paper);
+  }
+  .hero .legend { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(246,241,232,0.85); }
+  .legend-dot i { width: 10px; height: 10px; border-radius: 999px; display: inline-block; border: 1px solid rgba(246,241,232,0.35); }
+
+  /* Main ramp */
+  .ramp {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+  }
+  .step {
+    position: relative;
+    aspect-ratio: 1 / 1.18;
+    min-height: 72px;
+    padding: 8px 9px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    color: var(--paper);
+    font-family: var(--font-sans);
+  }
+  .step.lt { color: var(--ink-900); }
+  .step .name {
+    font-weight: 600; font-size: 12px; letter-spacing: 0.04em;
+  }
+  .step .hex { font-family: var(--font-mono); font-size: 9.5px; opacity: 0.8; }
+  .step::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 38%);
+    pointer-events: none;
+  }
+
+  /* Accents row */
+  .accents {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .accent {
+    border-radius: 16px; padding: 12px 14px;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 92px; justify-content: space-between;
+  }
+  .accent .tag {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.26em; font-weight: 600;
+  }
+  .accent .nm { font-family: var(--font-display); font-size: 19px; font-weight: 500; line-height: 1.1; }
+  .accent .hx { font-family: var(--font-mono); font-size: 10px; }
+  .accent.paper {
+    background:
+      radial-gradient(circle at 15% 0%, rgba(220,229,226,0.75), transparent 60%),
+      linear-gradient(180deg, #f6f1e8, #efe7db);
+    color: var(--ink-900);
+  }
+  .accent.ember {
+    background: linear-gradient(140deg, #e9824f 0%, #d86c3d 55%, #b95528 100%);
+    color: #fff4e9;
+  }
+  .accent.forest {
+    background: linear-gradient(140deg, #285751 0%, #1f3b36 60%, #142824 100%);
+    color: #e7f1ee;
+  }
+  .accent.mist {
+    background: linear-gradient(140deg, #e9f0ee 0%, #dce5e2 60%, #c6d2ce 100%);
+    color: var(--ink-900);
+  }
+</style></head><body>
+<div class="card">
+
+  <!-- Vibrant hero header -->
+  <div class="hero">
+    <div class="kicker">Ink scale · warm brown</div>
+    <h3>A single ink, from dawn cream to deep walnut.</h3>
+    <div class="legend">
+      <span class="legend-dot"><i style="background:#efe7db"></i> Paper-adjacent</span>
+      <span class="legend-dot"><i style="background:#a87a42"></i> Amber midtones</span>
+      <span class="legend-dot"><i style="background:#231913"></i> Inkwell</span>
+    </div>
+  </div>
+
+  <!-- Full 10-step ramp, edge-to-edge -->
+  <div>
+    <div class="label" style="margin-bottom: 8px;">10-step ramp · 50 → 900</div>
+    <div class="ramp">
+      <div class="step lt" style="background:#f7f4ef"><span class="name">50</span><span class="hex">#f7f4ef</span></div>
+      <div class="step lt" style="background:#efe7db"><span class="name">100</span><span class="hex">#efe7db</span></div>
+      <div class="step lt" style="background:#dfcfb4"><span class="name">200</span><span class="hex">#dfcfb4</span></div>
+      <div class="step lt" style="background:#cfb28a"><span class="name">300</span><span class="hex">#cfb28a</span></div>
+      <div class="step"    style="background:#bd9560"><span class="name">400</span><span class="hex">#bd9560</span></div>
+      <div class="step"    style="background:#a87a42"><span class="name">500</span><span class="hex">#a87a42</span></div>
+      <div class="step"    style="background:#855f34"><span class="name">600</span><span class="hex">#855f34</span></div>
+      <div class="step"    style="background:#634829"><span class="name">700</span><span class="hex">#634829</span></div>
+      <div class="step"    style="background:#43311f"><span class="name">800</span><span class="hex">#43311f</span></div>
+      <div class="step"    style="background:#231913"><span class="name">900</span><span class="hex">#231913</span></div>
+    </div>
+  </div>
+
+  <!-- Accents that give Ink & Quill its color story -->
+  <div>
+    <div class="label" style="margin-bottom: 8px;">Lives alongside · brand accents</div>
+    <div class="accents">
+      <div class="accent paper">
+        <div>
+          <div class="tag" style="color: var(--fg-3);">Paper</div>
+          <div class="nm">The page.</div>
+        </div>
+        <div class="hx">#f6f1e8 → #efe7db</div>
+      </div>
+      <div class="accent ember">
+        <div>
+          <div class="tag">Ember</div>
+          <div class="nm">Rare spark.</div>
+        </div>
+        <div class="hx">#d86c3d</div>
+      </div>
+      <div class="accent forest">
+        <div>
+          <div class="tag">Forest</div>
+          <div class="nm">Quiet depth.</div>
+        </div>
+        <div class="hx">#1f3b36</div>
+      </div>
+      <div class="accent mist">
+        <div>
+          <div class="tag" style="color: var(--fg-3);">Mist</div>
+          <div class="nm">Cool wash.</div>
+        </div>
+        <div class="hx">#dce5e2</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body></html>

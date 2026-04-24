@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; flex-direction:column; justify-content:flex-end; padding: 6px 8px; color: var(--paper); font-family: var(--font-mono); font-size: 10px; line-height: 1.1; }
+  .swatch.lt { color: var(--ink-900); }
+  .swatch .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  
+  .r-row { display: flex; gap: 12px; align-items: flex-end; }
+  .r-box { background: var(--bg-card-strong); border:1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; align-items:flex-end; justify-content:center; padding: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); }
+
+</style></head><body><div class="card">
+  <div class="label">Radii · pebble scale</div>
+  <div class="r-row">
+    <div class="r-box" style="width:70px; height:70px; border-radius:12px;">12</div>
+    <div class="r-box" style="width:70px; height:70px; border-radius:20px;">20</div>
+    <div class="r-box" style="width:70px; height:70px; border-radius:24px;">24</div>
+    <div class="r-box" style="width:70px; height:70px; border-radius:28px;">28</div>
+    <div class="r-box" style="width:70px; height:70px; border-radius:32px;">32</div>
+    <div class="r-box" style="width:70px; height:70px; border-radius:9999px;">full</div>
+  </div>
+</div></body></html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 12px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 10px; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+
+  .field { display: block; }
+  .field > span {
+    display: block; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.24em; color: var(--fg-3);
+  }
+  .field > input {
+    margin-top: 4px; width: 100%;
+    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    background: rgba(255,255,255,0.85);
+    padding: 8px 12px;
+    font: inherit; color: var(--fg-1);
+    outline: none;
+    transition: 180ms ease;
+  }
+  .field > input:focus { border-color: var(--ink-400); box-shadow: 0 0 0 2px #dfcfb4; }
+  .hint { margin-top: 4px; font-size: 12px; color: var(--fg-3); }
+
+</style></head><body><div class="card">
+  <div class="label">Form · text field with eyebrow label</div>
+  <label class="field"><span>Display name</span><input value="Rose Ellis" /></label>
+  <label class="field"><span>Timezone</span><input placeholder="Europe/London" /><div class="hint">Used to schedule the daily delivery.</div></label>
+</div></body></html>

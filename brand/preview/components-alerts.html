@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; flex-direction:column; justify-content:flex-end; padding: 6px 8px; color: var(--paper); font-family: var(--font-mono); font-size: 10px; line-height: 1.1; }
+  .swatch.lt { color: var(--ink-900); }
+  .swatch .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  
+  .a { display:flex; gap: 12px; padding: 14px 16px; border-radius: 22px; border: 1px solid; font-size: 14px; align-items: flex-start; }
+  .a svg { flex-shrink:0; margin-top: 2px; }
+  .a strong { display:block; }
+  .a p { margin:4px 0 0; font-size: 13px; line-height: 1.55; opacity: 0.85; }
+
+</style></head><body><div class="card">
+  <div class="label">Alerts · four tones, rounded-22</div>
+  <div class="a" style="color:var(--info-fg); background:var(--info-bg); border-color:var(--info-border);">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <div><strong>Maintenance window scheduled.</strong><p>Daily delivery pauses briefly on Sunday between 02:00–02:30 UTC.</p></div>
+  </div>
+  <div style="height:10px;"></div>
+  <div class="a" style="color:var(--success-fg); background:var(--success-bg); border-color:var(--success-border);">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <div><strong>Profile saved.</strong><p>Rose's preferences were updated.</p></div>
+  </div>
+  <div style="height:10px;"></div>
+  <div class="a" style="color:var(--danger-fg); background:var(--danger-bg); border-color:var(--danger-border);">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+    <div><strong>Could not load providers.</strong><p>Check your connection and retry.</p></div>
+  </div>
+</div></body></html>

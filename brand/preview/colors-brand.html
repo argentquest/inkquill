@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; flex-direction:column; justify-content:flex-end; padding: 6px 8px; color: var(--paper); font-family: var(--font-mono); font-size: 10px; line-height: 1.1; }
+  .swatch.lt { color: var(--ink-900); }
+  .swatch .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  
+</style></head><body><div class="card">
+  <div class="label">Brand · named colors</div>
+  <div class="row">
+    <div class="swatch lt" style="background:#f6f1e8"><span class="name">Paper</span><span>#f6f1e8</span></div><div class="swatch lt" style="background:#dce5e2"><span class="name">Mist</span><span>#dce5e2</span></div><div class="swatch " style="background:#d86c3d"><span class="name">Ember</span><span>#d86c3d</span></div><div class="swatch " style="background:#1f3b36"><span class="name">Forest</span><span>#1f3b36</span></div><div class="swatch " style="background:#231913"><span class="name">Ink</span><span>#231913</span></div>
+  </div>
+</div></body></html>

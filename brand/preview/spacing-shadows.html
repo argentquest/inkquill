@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); display:flex; flex-direction:column; justify-content:flex-end; padding: 6px 8px; color: var(--paper); font-family: var(--font-mono); font-size: 10px; line-height: 1.1; }
+  .swatch.lt { color: var(--ink-900); }
+  .swatch .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  
+  .cards { display:flex; gap: 16px; padding: 20px 4px; }
+  .e { width: 120px; height: 80px; background: var(--paper-2); border-radius: 20px; border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; font-family: var(--font-mono); font-size: 11px; color: var(--fg-3); }
+
+</style></head><body><div class="card">
+  <div class="label">Shadows · one panel shadow, soft variant</div>
+  <div class="cards">
+    <div class="e" style="box-shadow:none;">none</div>
+    <div class="e" style="box-shadow: var(--shadow-soft);">soft</div>
+    <div class="e" style="box-shadow: var(--shadow-panel);">panel</div>
+  </div>
+</div></body></html>

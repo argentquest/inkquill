@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 18px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 12px; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+
+  .badges { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Badge — bigger: larger padding + font + status dot */
+  .b {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid;
+    font-family: var(--font-sans);
+    line-height: 1.2;
+  }
+  .b .dot {
+    width: 8px; height: 8px; border-radius: 999px;
+    background: currentColor; flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.55);
+  }
+
+  .b.active   { color: var(--success-fg); background: var(--success-bg); border-color: var(--success-border); }
+  .b.inactive { color: var(--fg-3);       background: var(--paper-2);    border-color: var(--border-subtle); }
+  .b.archived { color: var(--warning-fg); background: var(--warning-bg); border-color: var(--warning-border); }
+  .b.coin     { color: var(--forest);     background: var(--mist);       border-color: var(--info-border); }
+
+  .tag {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-subtle);
+    background: var(--paper-2);
+    font-size: 14px;
+    color: var(--fg-2);
+  }
+  .tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+</style></head><body><div class="card">
+  <div class="label">Badges · pill · filled tint with status dot</div>
+  <div class="badges">
+    <span class="b active"><span class="dot"></span>Active</span>
+    <span class="b inactive"><span class="dot"></span>Inactive</span>
+    <span class="b archived"><span class="dot"></span>Archived</span>
+    <span class="b coin">✦ 1,240 coins</span>
+  </div>
+  <div class="label" style="margin-top: 6px;">Tags · preferences</div>
+  <div class="tags">
+    <span class="tag">Gardening</span>
+    <span class="tag">Crosswords</span>
+    <span class="tag">Sunday roast</span>
+    <span class="tag">Opera</span>
+  </div>
+</div></body></html>

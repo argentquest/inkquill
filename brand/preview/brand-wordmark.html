@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 16px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 14px; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+  .kicker { font-size: 10px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; font-family: var(--font-sans); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .bay {
+    background: rgba(255,255,255,0.65);
+    border: 1px solid var(--border-subtle);
+    border-radius: 18px;
+    padding: 18px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    min-height: 150px;
+    justify-content: center;
+  }
+  .bay.inv {
+    background: linear-gradient(135deg, #2a1f18 0%, #43311f 100%);
+    color: var(--paper);
+    border-color: rgba(246,241,232,0.12);
+  }
+  .bay.inv .kicker { color: rgba(246,241,232,0.62); }
+  .bay.inv .wm { color: var(--paper); }
+
+  .mark { display: flex; align-items: center; gap: 10px; }
+  .wm {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 22px; letter-spacing: 0.08em;
+    color: var(--ink-900);
+  }
+  .wm-sm {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 14px; letter-spacing: 0.08em;
+    color: inherit;
+  }
+  .name { font-family: var(--font-sans); font-weight: 600; font-size: 11px; color: var(--fg-3); letter-spacing: 0.02em; }
+
+  /* Wordmark-only row */
+  .wordmarks {
+    display: flex; flex-direction: column; gap: 14px;
+    align-items: center; padding: 20px 0; border-bottom: 1px dashed var(--border-subtle);
+  }
+  .xl { font-family: var(--font-display); font-weight: 500; font-size: 40px; letter-spacing: 0.08em; color: var(--ink-900); }
+  .md { font-family: var(--font-display); font-weight: 500; font-size: 20px; letter-spacing: 0.08em; color: var(--ink-900); }
+  .inv-pill {
+    background: var(--ink-900); color: var(--paper);
+    padding: 10px 18px; border-radius: 12px;
+    font-family: var(--font-display); font-weight: 500;
+    letter-spacing: 0.08em; font-size: 18px;
+  }
+
+  /* Favicon row */
+  .favrow { display: flex; gap: 10px; justify-content: center; align-items: center; padding-top: 4px; }
+  .fav {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: grid; place-items: center;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
+  }
+  .fav.a { background: #231913; }
+  .fav.b { background: #f6f1e8; border-color: rgba(35,25,19,0.22); }
+  .fav.c { background: #d86c3d; }
+  .fav.d { background: #1f3b36; }
+  .favlabel { text-align: center; font-size: 10px; color: var(--fg-3); margin-top: 4px; letter-spacing: 0.08em; }
+
+</style></head><body>
+<div class="card">
+
+  <!-- Row 1: Wordmarks on their own -->
+  <div>
+    <div class="label">Wordmark · type is the brand</div>
+    <div class="wordmarks">
+      <div class="xl">Ink &amp; Quill</div>
+      <div class="md">Ink &amp; Quill</div>
+      <div class="inv-pill">Ink &amp; Quill</div>
+    </div>
+  </div>
+
+  <!-- Row 2: Four logomark options -->
+  <div>
+    <div class="label">Four logomark options · literary · ink-forward</div>
+    <div class="grid">
+
+      <!-- A · Nib -->
+      <div class="bay">
+        <div class="mark">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <!-- Nib body -->
+            <path d="M22 4 L34 30 L22 26 L10 30 Z" fill="#231913"/>
+            <!-- Centre slit -->
+            <path d="M22 8 L22 26" stroke="#f6f1e8" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Nib hole -->
+            <circle cx="22" cy="20" r="1.6" fill="#f6f1e8"/>
+            <!-- Ink drop -->
+            <circle cx="22" cy="36" r="3" fill="#d86c3d"/>
+          </svg>
+          <span class="wm">Ink &amp; Quill</span>
+        </div>
+        <span class="name">A · The Nib</span>
+      </div>
+
+      <!-- B · Ampersand monogram -->
+      <div class="bay">
+        <div class="mark">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="42" height="42" rx="12" fill="#231913"/>
+            <!-- Garamond-style italic ampersand, hand-tuned -->
+            <text x="22" y="31" font-family="EB Garamond, Garamond, Georgia, serif" font-style="italic" font-weight="500" font-size="30" fill="#f6f1e8" text-anchor="middle">&amp;</text>
+            <!-- Ember spark -->
+            <circle cx="34" cy="10" r="2.4" fill="#d86c3d"/>
+          </svg>
+          <span class="wm">Ink &amp; Quill</span>
+        </div>
+        <span class="name">B · Ampersand monogram</span>
+      </div>
+
+      <!-- C · Open book with ink line -->
+      <div class="bay">
+        <div class="mark">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <!-- Left page -->
+            <path d="M4 10 L22 14 L22 36 L4 32 Z" fill="#f6f1e8" stroke="#231913" stroke-width="1.6" stroke-linejoin="round"/>
+            <!-- Right page -->
+            <path d="M40 10 L22 14 L22 36 L40 32 Z" fill="#f6f1e8" stroke="#231913" stroke-width="1.6" stroke-linejoin="round"/>
+            <!-- Binding -->
+            <path d="M22 14 L22 36" stroke="#231913" stroke-width="1.6"/>
+            <!-- Ink line of writing on left page -->
+            <path d="M8 20 L18 21.5 M8 24 L16 25" stroke="#d86c3d" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <span class="wm">Ink &amp; Quill</span>
+        </div>
+        <span class="name">C · Open book + ink line</span>
+      </div>
+
+      <!-- D · Inkwell + quill silhouette -->
+      <div class="bay">
+        <div class="mark">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <!-- Inkwell base -->
+            <rect x="10" y="26" width="16" height="12" rx="2.5" fill="#231913"/>
+            <rect x="8" y="24" width="20" height="4" rx="1.6" fill="#231913"/>
+            <!-- Ink surface -->
+            <rect x="11" y="25" width="14" height="2" fill="#d86c3d"/>
+            <!-- Quill -->
+            <path d="M22 32 L38 10" stroke="#231913" stroke-width="2" stroke-linecap="round"/>
+            <path d="M38 10 C 36 14, 32 16, 30 18 C 33 18, 36 16, 38 13 Z" fill="#231913"/>
+          </svg>
+          <span class="wm">Ink &amp; Quill</span>
+        </div>
+        <span class="name">D · Inkwell + quill</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Row 3: Inverse / on-dark variants -->
+  <div>
+    <div class="label">Inverse · on Ink-900</div>
+    <div class="grid">
+      <div class="bay inv">
+        <div class="mark">
+          <svg width="38" height="38" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <path d="M22 4 L34 30 L22 26 L10 30 Z" fill="#f6f1e8"/>
+            <path d="M22 8 L22 26" stroke="#231913" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="22" cy="20" r="1.6" fill="#231913"/>
+            <circle cx="22" cy="36" r="3" fill="#d86c3d"/>
+          </svg>
+          <span class="wm">Ink &amp; Quill</span>
+        </div>
+        <span class="kicker">A · on ink</span>
+      </div>
+      <div class="bay inv">
+        <div class="mark">
+          <svg width="38" height="38" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="42" height="42" rx="12" fill="#f6f1e8"/>
+            <text x="22" y="31" font-family="EB Garamond, Garamond, Georgia, serif" font-style="italic" font-weight="500" font-size="30" fill="#231913" text-anchor="middle">&amp;</text>
+            <circle cx="34" cy="10" r="2.4" fill="#d86c3d"/>
+          </svg>
+          <span class="wm">Ink &amp; Quill</span>
+        </div>
+        <span class="kicker">B · on ink</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Favicon / app-icon test -->
+  <div>
+    <div class="label">App icon · 44px · mark without wordmark</div>
+    <div class="favrow">
+      <div>
+        <div class="fav a">
+          <svg width="24" height="24" viewBox="0 0 44 44" fill="none"><path d="M22 4 L34 30 L22 26 L10 30 Z" fill="#f6f1e8"/><path d="M22 8 L22 26" stroke="#231913" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="20" r="1.6" fill="#231913"/><circle cx="22" cy="36" r="3" fill="#d86c3d"/></svg>
+        </div>
+        <div class="favlabel">NIB</div>
+      </div>
+      <div>
+        <div class="fav b">
+          <svg width="28" height="28" viewBox="0 0 44 44" fill="none"><text x="22" y="32" font-family="EB Garamond, Garamond, Georgia, serif" font-style="italic" font-weight="500" font-size="34" fill="#231913" text-anchor="middle">&amp;</text></svg>
+        </div>
+        <div class="favlabel">AMP</div>
+      </div>
+      <div>
+        <div class="fav c">
+          <svg width="24" height="24" viewBox="0 0 44 44" fill="none"><rect x="10" y="26" width="16" height="12" rx="2.5" fill="#231913"/><rect x="8" y="24" width="20" height="4" rx="1.6" fill="#231913"/><rect x="11" y="25" width="14" height="2" fill="#f6f1e8"/><path d="M22 32 L38 10" stroke="#231913" stroke-width="2.4" stroke-linecap="round"/><path d="M38 10 C 36 14, 32 16, 30 18 C 33 18, 36 16, 38 13 Z" fill="#231913"/></svg>
+        </div>
+        <div class="favlabel">INKWELL</div>
+      </div>
+      <div>
+        <div class="fav d">
+          <svg width="26" height="26" viewBox="0 0 44 44" fill="none"><path d="M4 10 L22 14 L22 36 L4 32 Z" fill="#f6f1e8"/><path d="M40 10 L22 14 L22 36 L40 32 Z" fill="#f6f1e8"/><path d="M22 14 L22 36" stroke="#231913" stroke-width="1.6"/><path d="M8 20 L18 21.5 M8 24 L16 25" stroke="#d86c3d" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="favlabel">BOOK</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body></html>

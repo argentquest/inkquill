@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; }
+  body { background: var(--paper); padding: 12px; font-family: var(--font-sans); color: var(--fg-1); }
+  .card { display: flex; flex-direction: column; gap: 10px; }
+  .label { font-size: 11px; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.24em; }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-panel);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    /* Layered palette: mist wash top-left, ember glow bottom-right, cream base */
+    background:
+      radial-gradient(circle at 10% -10%, rgba(220, 229, 226, 0.95), transparent 45%),
+      radial-gradient(circle at 100% 120%, rgba(216, 108, 61, 0.22), transparent 42%),
+      linear-gradient(135deg, #f6f1e8 0%, #efe7db 100%);
+  }
+  /* Forest accent bar on the leading edge */
+  .hero::before {
+    content: "";
+    position: absolute; left: 0; top: 14%; bottom: 14%; width: 4px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--forest) 0%, var(--ember) 100%);
+  }
+
+  .hero .content { position: relative; z-index: 1; min-width: 0; }
+  .hero .eb {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.28em; color: var(--forest);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .hero .eb::before {
+    content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--ember);
+  }
+  .hero h1 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 24px; line-height: 1.15; margin-top: 4px; color: var(--fg-1);
+  }
+  .hero p {
+    margin-top: 4px; font-size: 13px; line-height: 1.5;
+    color: var(--fg-2); max-width: 360px;
+  }
+
+  .hero .actions {
+    position: relative; z-index: 1;
+    display: flex; gap: 8px; flex-shrink: 0;
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 8px 16px; border-radius: 9999px;
+    font-weight: 600; font-size: 13px; font-family: var(--font-sans);
+    border: 1px solid transparent; cursor: pointer; text-decoration: none;
+  }
+  .btn.primary { background: var(--ink-900); color: var(--paper); }
+  .btn.secondary {
+    background: rgba(255,255,255,0.6); color: var(--ink-900);
+    border-color: var(--border-subtle);
+  }
+
+</style></head><body><div class="card">
+  <div class="label">Page header · condensed · palette in play</div>
+  <header class="hero">
+    <div class="content">
+      <p class="eb">Care Circle</p>
+      <h1>Welcome back, Rose.</h1>
+      <p>You own this Care Circle. Manage friends, providers, billing, and settings below.</p>
+    </div>
+    <div class="actions">
+      <a class="btn secondary">Preview</a>
+      <a class="btn primary">Edit profile</a>
+    </div>
+  </header>
+</div></body></html>
