@@ -16,7 +16,7 @@ export default function ProvidersPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        description="Review and configure the content providers available to generate daily active highlights and memory exercises for the patient session."
+        description="Review and configure the content providers available to generate daily active highlights and memory exercises for the friend session."
         eyebrow="Provider Registry"
         title="Content Providers"
       />

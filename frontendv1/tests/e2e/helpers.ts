@@ -285,7 +285,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         json(
           {
             success: false,
-            errors: [{ code: "INVALID_PATIENT_AUTH", message: "Those pictures did not match an active patient profile." }]
+            errors: [{ code: "INVALID_PATIENT_AUTH", message: "Those pictures did not match an active friend profile." }]
           },
           200
         )

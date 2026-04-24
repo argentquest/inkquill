@@ -336,9 +336,10 @@ class MemoryLanePhotoProvider(BaseCareCircleProvider):
                 f"Avoid famous landmarks or political content.\n"
                 f'Return ONLY valid JSON: {{"search_query": "...", "theme": "...short description of what the photo should show..."}}'
             )
-            query_data, _ = await generate_json_with_usage(
+            query_data, query_llm_response = await generate_json_with_usage(
                 query_prompt, system=DEMENTIA_SYSTEM_PROMPT, max_tokens=256, temperature=0.7
             )
+            self.log_llm_response(query_llm_response)
             search_query = (query_data.get("search_query") or "").strip()
             theme = (query_data.get("theme") or "").strip()
 

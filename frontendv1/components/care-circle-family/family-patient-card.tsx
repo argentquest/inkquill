@@ -1,11 +1,15 @@
 import { deleteCareCirclePatient } from "@/lib/api";
 import type { CareCirclePatientRecord } from "@/lib/api";
+import { useSession } from "@/components/providers/app-providers";
 
 import { PatientAccessStateBadge } from "./patient-access-state-badge";
 
 export function FamilyPatientCard({ patient }: { patient: CareCirclePatientRecord }) {
+  const session = useSession();
+  const isOwner = session.user?.is_family_owner === true;
+
   const handleDelete = async () => {
-    if (!confirm(`Delete patient ${patient.displayName} permanently?\n\nThis action cannot be undone.`)) {
+    if (!confirm(`Delete friend ${patient.displayName} permanently?\n\nThis action cannot be undone.`)) {
       return;
     }
 
@@ -17,10 +21,10 @@ export function FamilyPatientCard({ patient }: { patient: CareCirclePatientRecor
 
     try {
       await deleteCareCirclePatient(patient.id);
-      alert(`Patient ${patient.displayName} has been permanently deleted.`);
+      alert(`Friend ${patient.displayName} has been permanently deleted.`);
       window.location.reload();
     } catch {
-      alert("Failed to delete patient. Check console.");
+      alert("Failed to delete friend. Check console.");
     }
   };
 
@@ -55,18 +59,30 @@ export function FamilyPatientCard({ patient }: { patient: CareCirclePatientRecor
         </p>
         
         <div className="flex gap-3">
-          <a
-            className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-            href={`/care-circle-family/patients/${patient.id}?edit=1`}
-          >
-            Edit
-          </a>
-          <button
-            onClick={handleDelete}
-            className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 hover:text-red-800 transition"
-          >
-            Delete
-          </button>
+          {isOwner && (
+            <a
+              className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
+              href={`/care-circle-family/patients/${patient.id}?edit=1`}
+            >
+              Edit
+            </a>
+          )}
+          {isOwner && (
+            <button
+              onClick={handleDelete}
+              className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 hover:text-red-800 transition"
+            >
+              Delete
+            </button>
+          )}
+          {!isOwner && (
+            <a
+              className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
+              href={`/care-circle-family/patients/${patient.id}`}
+            >
+              View
+            </a>
+          )}
         </div>
       </div>
     </article>

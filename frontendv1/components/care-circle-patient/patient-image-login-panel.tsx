@@ -39,7 +39,7 @@ export function PatientImageLoginPanel() {
       router.push(`/care-circle-patient/home?patient=${patient.id}`);
     },
     onError: (mutationError) => {
-      setError(mutationError instanceof Error ? mutationError.message : "Patient sign-in failed.");
+      setError(mutationError instanceof Error ? mutationError.message : "Friend sign-in failed.");
       setSelectedKeys([]);
     }
   });
@@ -62,17 +62,17 @@ export function PatientImageLoginPanel() {
   }
 
   if (isError || !catalog) {
-    return <ErrorState detail={queryError instanceof Error ? queryError.message : "Could not load the patient sign-in catalog."} title="Sign-in unavailable" />;
+    return <ErrorState detail={queryError instanceof Error ? queryError.message : "Could not load the friend sign-in catalog."} title="Sign-in unavailable" />;
   }
 
   return (
     <section className="rounded-[32px] border border-black/10 bg-white/82 p-6 shadow-panel md:p-8">
       <div className="max-w-2xl">
-        <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Patient sign-in</p>
+        <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Friend sign-in</p>
         <h2 className="mt-3 font-display text-3xl text-ink-900 md:text-4xl">Choose the 3 pictures that belong to you.</h2>
         <p className="mt-4 text-base leading-8 text-ink-700">
           This direct-entry flow is imported from the DailyNewsletter picture sign-in pattern and adapted for the care-circle
-          patient surface.
+          friend surface.
         </p>
       </div>
 

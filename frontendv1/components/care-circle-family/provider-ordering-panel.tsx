@@ -43,6 +43,7 @@ interface Props {
   patientId: string;
   providerCatalog: CareCircleProvider[];
   providerConfigs: CareCircleProviderConfig[];
+  readOnly?: boolean;
 }
 
 // ── Sortable row ──────────────────────────────────────────────────────────────
@@ -177,7 +178,7 @@ function DisabledProviderRow({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function ProviderOrderingPanel({ patientId, providerCatalog, providerConfigs }: Props) {
+export function ProviderOrderingPanel({ patientId, providerCatalog, providerConfigs, readOnly = false }: Props) {
   const queryClient = useQueryClient();
 
   // Build initial ordered list from catalog + per-patient configs
@@ -314,6 +315,53 @@ export function ProviderOrderingPanel({ patientId, providerCatalog, providerConf
   }
 
   const isPending = reorderMutation.isPending || toggleMutation.isPending;
+
+  if (readOnly) {
+    return (
+      <div className="mt-6 space-y-6">
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-[0.24em] text-ink-600">Active providers</span>
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">{enabledRows.length}</span>
+          </div>
+          <div className="space-y-2">
+            {enabledRows.map((row, index) => (
+              <div key={row.providerKey} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 shadow-sm">
+                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-ink-100 text-xs font-bold text-ink-600">{index + 1}</span>
+                <span className="text-xl leading-none">{row.icon || "📰"}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink-900">{row.label}</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-ink-500">{row.category}</p>
+                </div>
+                <ToggleRight size={28} className="flex-shrink-0 text-emerald-600" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {disabledRows.length > 0 && (
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-[0.24em] text-ink-500">Available (disabled)</span>
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">{disabledRows.length}</span>
+            </div>
+            <div className="space-y-2">
+              {disabledRows.map((row) => (
+                <div key={row.providerKey} className="flex items-center gap-3 rounded-2xl border border-black/5 bg-[#f8f9fb] px-4 py-3 opacity-60">
+                  <span className="w-6 flex-shrink-0" />
+                  <span className="text-xl leading-none">{row.icon || "📰"}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="truncate text-sm font-semibold text-ink-700">{row.label}</p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-ink-400">{row.category}</p>
+                  </div>
+                  <ToggleLeft size={28} className="flex-shrink-0 text-slate-400" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6 space-y-6">

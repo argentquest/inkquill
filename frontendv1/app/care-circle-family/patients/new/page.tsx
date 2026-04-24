@@ -20,14 +20,14 @@ export default function NewPatientPage() {
     },
     onError: (error) => {
       console.error("Failed to create patient:", error);
-      alert("Failed to create new patient. Please try again.");
+      alert("Failed to create new friend. Please try again.");
     },
   });
 
   useEffect(() => {
     // Auto-create a minimal patient record and redirect to edit
     const defaultPatient = {
-      displayName: "New Patient",
+      displayName: "New Friend",
       familyName: "New Family",
       stage: "moderate" as const,
       accessState: "active" as const,
@@ -41,7 +41,7 @@ export default function NewPatientPage() {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
-      <LoadingState label="Creating new patient profile and generating login icons..." />
+      <LoadingState label="Creating new friend profile and generating login icons..." />
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function PatientSessionClient({ patientId }: { patientId: string }) {
   }
 
   if (isError || !patient) {
-    return <ErrorState detail={error instanceof Error ? error.message : "Could not load the patient session."} title="Daily session unavailable" />;
+    return <ErrorState detail={error instanceof Error ? error.message : "Could not load the friend session."} title="Daily session unavailable" />;
   }
 
   return <PatientDailyHighlights patient={patient} />;

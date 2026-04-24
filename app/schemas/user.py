@@ -78,6 +78,7 @@ class UserRead(UserBase):
     id: int
     is_active: bool
     is_admin: Optional[bool] = False
+    is_family_owner: bool = False
     created_at: datetime
     updated_at: datetime
     

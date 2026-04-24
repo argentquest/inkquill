@@ -11,6 +11,7 @@ import {
   fetchCareCircleProviders,
   updateCareCirclePatientProviderConfig,
 } from "@/lib/api";
+import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -19,6 +20,8 @@ export default function ProviderDetailPage() {
   const params = useParams();
   const providerKey = params?.providerKey as string;
   const queryClient = useQueryClient();
+  const session = useSession();
+  const isOwner = session.user?.is_family_owner === true;
 
   const { data: providers, isLoading, isError } = useQuery({
     queryKey: ["care-circle", "providers"],
@@ -93,7 +96,7 @@ export default function ProviderDetailPage() {
   if (isPatientsError) {
     return (
       <ErrorState
-        detail={patientsError instanceof Error ? patientsError.message : "Could not load family patients."}
+        detail={patientsError instanceof Error ? patientsError.message : "Could not load family friends."}
         title="Provider diagnostics unavailable"
       />
     );
@@ -152,12 +155,12 @@ export default function ProviderDetailPage() {
               <span>{provider.enabled ? "Active" : "Disabled"}</span>
             </li>
             <li className="flex justify-between border-b pb-2">
-              <span className="font-semibold text-ink-900">Patient Visibility</span>
+              <span className="font-semibold text-ink-900">Friend Visibility</span>
               <span>{provider.patientVisible ? "Safe for Direct Display" : "Family Access Only"}</span>
             </li>
             <li className="flex justify-between pb-2">
-              <span className="font-semibold text-ink-900">Patient Home Eligibility</span>
-              <span>{canReachPatientHome ? "Eligible for patient session assembly" : "Blocked before patient assembly"}</span>
+              <span className="font-semibold text-ink-900">Friend Home Eligibility</span>
+              <span>{canReachPatientHome ? "Eligible for friend session assembly" : "Blocked before friend assembly"}</span>
             </li>
           </ul>
         </section>
@@ -168,15 +171,15 @@ export default function ProviderDetailPage() {
             <p>
               {provider.enabled
                 ? "This provider is globally enabled in the catalog."
-                : "This provider is globally disabled, so no patient can receive it until the catalog setting is turned back on."}
+                : "This provider is globally disabled, so no friend can receive it until the catalog setting is turned back on."}
             </p>
             <p>
               {provider.patientVisible
-                ? "It is currently marked patient-visible."
-                : "It is currently family-only and will not appear in the patient-facing daily session."}
+                ? "It is currently marked friend-visible."
+                : "It is currently family-only and will not appear in the friend-facing daily session."}
             </p>
             <p>
-              Patient-level toggles below decide which family members may receive this provider when session assembly runs.
+              Friend-level toggles below decide which family members may receive this provider when session assembly runs.
             </p>
           </div>
         </section>
@@ -185,9 +188,9 @@ export default function ProviderDetailPage() {
       <section className="rounded-[28px] border border-black/10 bg-white/70 p-6 shadow-panel">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-base font-bold text-ink-900">Patient mapping</h3>
+            <h3 className="text-base font-bold text-ink-900">Friend mapping</h3>
             <p className="mt-2 text-sm text-ink-700">
-              Control which patients in this family can receive <span className="font-semibold">{provider.label}</span>.
+              Control which friends in this family can receive <span className="font-semibold">{provider.label}</span>.
             </p>
           </div>
           <Link
@@ -200,7 +203,7 @@ export default function ProviderDetailPage() {
 
         {isLoadingConfigs ? (
           <div className="mt-6">
-            <LoadingState label="Loading patient mappings" />
+            <LoadingState label="Loading friend mappings" />
           </div>
         ) : (
           <div className="mt-6 grid gap-4">
@@ -226,30 +229,38 @@ export default function ProviderDetailPage() {
 
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="rounded-full border border-black/10 px-3 py-2 text-xs text-ink-700">
-                      {provider.patientVisible ? "Patient-safe" : "Family-only"}
+                      {provider.patientVisible ? "Friend-safe" : "Family-only"}
                     </span>
-                    <button
-                      className={`inline-flex min-w-28 justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
-                        isEnabledForPatient
-                          ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200"
-                          : "bg-slate-200 text-slate-800 hover:bg-slate-300"
-                      } disabled:cursor-not-allowed disabled:opacity-60`}
-                      disabled={updateMutation.isPending}
-                      onClick={() =>
-                        updateMutation.mutate({
-                          patientId: patient.id,
-                          isEnabled: !isEnabledForPatient,
-                        })
-                      }
-                      type="button"
-                    >
-                      {isSavingThisPatient ? "Saving..." : isEnabledForPatient ? "Enabled" : "Disabled"}
-                    </button>
+                    {isOwner ? (
+                      <button
+                        className={`inline-flex min-w-28 justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          isEnabledForPatient
+                            ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200"
+                            : "bg-slate-200 text-slate-800 hover:bg-slate-300"
+                        } disabled:cursor-not-allowed disabled:opacity-60`}
+                        disabled={updateMutation.isPending}
+                        onClick={() =>
+                          updateMutation.mutate({
+                            patientId: patient.id,
+                            isEnabled: !isEnabledForPatient,
+                          })
+                        }
+                        type="button"
+                      >
+                        {isSavingThisPatient ? "Saving..." : isEnabledForPatient ? "Enabled" : "Disabled"}
+                      </button>
+                    ) : (
+                      <span className={`inline-flex min-w-28 justify-center rounded-full px-4 py-2 text-sm font-semibold ${
+                        isEnabledForPatient ? "bg-emerald-100 text-emerald-900" : "bg-slate-200 text-slate-800"
+                      }`}>
+                        {isEnabledForPatient ? "Enabled" : "Disabled"}
+                      </span>
+                    )}
                     <Link
                       className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-                      href={`/care-circle-family/patients/${patient.id}?edit=1`}
+                      href={`/care-circle-family/patients/${patient.id}`}
                     >
-                      Open patient
+                      Open friend
                     </Link>
                   </div>
                 </article>
@@ -260,7 +271,7 @@ export default function ProviderDetailPage() {
 
         {updateMutation.isError ? (
           <p className="mt-4 text-sm text-[#a0382b]">
-            {updateMutation.error instanceof Error ? updateMutation.error.message : "Could not save patient mapping."}
+            {updateMutation.error instanceof Error ? updateMutation.error.message : "Could not save friend mapping."}
           </p>
         ) : null}
       </section>

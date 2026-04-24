@@ -1,36 +1,64 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { Users, Puzzle, CreditCard, Gift, UserCircle, Camera, Activity, UserCheck } from "lucide-react";
+
+import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 
+const ownerLinks = [
+  { href: "/care-circle-family/patients", label: "Friends", description: "View and manage all friend profiles.", icon: Users },
+  { href: "/care-circle-family/providers", label: "Providers", description: "Configure content providers for daily highlights.", icon: Puzzle },
+  { href: "/care-circle-family/billing", label: "Billing", description: "Review your balance and transaction history.", icon: CreditCard },
+  { href: "/care-circle-family/referrals", label: "Referrals", description: "Track invitations and earned credits.", icon: Gift },
+  { href: "/care-circle-family/account", label: "Account", description: "Edit your profile and contact details.", icon: UserCircle },
+  { href: "/care-circle-family/media", label: "Media", description: "Upload family photos for personalised prompts.", icon: Camera },
+  { href: "/care-circle-family/events", label: "Activity", description: "Monitor recent session and engagement events.", icon: Activity },
+  { href: "/care-circle-patient/login", label: "Friend sign-in", description: "Preview the picture-based sign-in flow.", icon: UserCheck },
+];
+
+const memberLinks = [
+  { href: "/care-circle-family/patients", label: "Friends", description: "View all friend profiles in this care circle.", icon: Users },
+  { href: "/care-circle-family/providers", label: "Providers", description: "View content providers for daily highlights.", icon: Puzzle },
+  { href: "/care-circle-family/account", label: "Account", description: "Edit your profile and contact details.", icon: UserCircle },
+  { href: "/care-circle-patient/login", label: "Friend sign-in", description: "Preview the picture-based sign-in flow.", icon: UserCheck },
+];
+
 export default function CareCircleFamilyPage() {
+  const { user, status } = useSession();
+  const isOwner = user?.is_family_owner === true;
+  const links = isOwner ? ownerLinks : memberLinks;
+  const name = user?.display_name ?? user?.username;
+
   return (
     <div className="space-y-8">
       <PageHeader
-        description="Care Circle remains a separate application with family and patient surfaces, and now imports DailyNewsletter-style family-managed patient profiles, provider catalog structure, and picture-based patient access."
         eyebrow="Care Circle"
-        title="Family-side care workflows now sit on imported patient and provider foundations."
+        title={status === "authenticated" && name ? `Welcome back, ${name}.` : "Care Circle"}
+        description={
+          isOwner
+            ? "You own this Care Circle. Manage friends, providers, billing, and account settings below."
+            : "You are a member of this Care Circle. View and manage friend profiles and providers below."
+        }
       />
 
-      <section className="rounded-[28px] border border-black/10 bg-white/70 p-6 shadow-panel">
-        <p className="text-sm leading-7 text-ink-700">
-          This dashboard now anchors the imported family-side model: patient records, provider-driven daily content, and direct-entry
-          patient access without mixing those assumptions into chatbot or storytelling.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {links.map(({ href, label, description, icon: Icon }) => (
           <Link
-            className="inline-flex items-center rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-paper transition hover:bg-ink-700"
-            href="/care-circle-family/patients"
+            key={href}
+            href={href}
+            className="flex flex-col gap-3 rounded-[24px] border border-black/10 bg-white/70 p-5 shadow-panel transition hover:border-black/20 hover:bg-white"
           >
-            Open patient profiles
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ink-900/6">
+              <Icon className="h-5 w-5 text-ink-700" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-ink-900">{label}</h2>
+              <p className="mt-1 text-sm leading-6 text-ink-600">{description}</p>
+            </div>
           </Link>
-          <Link
-            className="inline-flex items-center rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-            href="/care-circle-patient/login"
-          >
-            Preview patient sign-in
-          </Link>
-        </div>
-      </section>
+        ))}
+      </div>
     </div>
   );
 }

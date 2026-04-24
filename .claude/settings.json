@@ -45,7 +45,8 @@
       "Bash(ls venv/Scripts/python*)",
       "Bash(.venv/Scripts/python.exe -c ' *)",
       "Bash(.venv/Scripts/python scripts/test_care_circle_providers.py --patient-id 20)",
-      "Bash(.venv/Scripts/python -c ' *)"
+      "Bash(.venv/Scripts/python -c ' *)",
+      "Bash(find /c/Code/inkandquill/inkquill/frontendv1/app/care-circle* -type f)"
     ]
   }
 }

@@ -25,8 +25,6 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 from typing import Any
 
-import httpx
-
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -193,34 +191,36 @@ def _build_subject(patient_name: str, family_name: str | None, reference_date: d
 
 # ── Image embedding ─────────────────────────────────────────────────────────────
 
-_SRC_REMOTE_RE = re.compile(r'src=(["\'])(https?://[^"\'> ]+)\1', re.IGNORECASE)
 _SRC_LOCAL_RE = re.compile(r'src=(["\'])([^"\'> ]+\.(?:jpg|jpeg|png|gif|webp))\1', re.IGNORECASE)
 _SRC_SERVED_RE = re.compile(r'src=(["\'])(/api/v1/care-circle/cached-image/[^"\'> ]+\.(?:jpg|jpeg|png|gif|webp))\1', re.IGNORECASE)
 
 
-def _resolve_served_images(html: str) -> str:
-    """Replace served cache-image API URLs with their local filesystem paths for CID embedding."""
+def _public_app_base_url() -> str | None:
+    app_url = (getattr(settings, "APP_URL", None) or "").strip()
+    if not app_url or not app_url.startswith(("http://", "https://")):
+        return None
+    return app_url.rstrip("/")
+
+
+def _prepare_served_images_for_email(html: str) -> str:
+    """Prefer public hosted image URLs so Gmail doesn't surface inline image attachments.
+
+    If APP_URL is public, convert served cache-image paths into absolute URLs and let
+    the email client load them normally. If APP_URL is not usable, fall back to local
+    file paths so the images can still be embedded via CID.
+    """
     from app.services.care_circle.provider_cache import local_path_for_served_url
+
+    public_base = _public_app_base_url()
 
     def _replace(m: re.Match) -> str:
         quote, url = m.group(1), m.group(2)
+        if public_base:
+            return f"src={quote}{public_base}{url}{quote}"
         local = local_path_for_served_url(url)
         return f"src={quote}{local}{quote}" if local else m.group(0)
 
     return _SRC_SERVED_RE.sub(_replace, html)
-
-
-async def _download_one(
-    client: httpx.AsyncClient, url: str
-) -> tuple[str, bytes | None, str | None]:
-    try:
-        resp = await client.get(url, follow_redirects=True)
-        resp.raise_for_status()
-        content_type = resp.headers.get("content-type", "image/jpeg").split(";")[0].strip()
-        return url, resp.content, content_type
-    except Exception as exc:
-        logger.warning("Could not download image %s for embedding: %s", url, exc)
-        return url, None, None
 
 
 def _embed_local_images(html: str) -> tuple[str, list[MIMEImage]]:
@@ -257,54 +257,13 @@ def _embed_local_images(html: str) -> tuple[str, list[MIMEImage]]:
     return _SRC_LOCAL_RE.sub(replace_local, html), parts
 
 
-async def _embed_images(html: str) -> tuple[str, list[MIMEImage]]:
+def _embed_images(html: str) -> tuple[str, list[MIMEImage]]:
+    """Embed only true local file-path images.
+
+    Hosted image URLs are intentionally left as normal URLs because Gmail handles those
+    more naturally than large sets of inline CID attachments.
     """
-    Embed all images — local file paths first, then any remaining remote URLs.
-    Local images (from the provider cache) are read directly from disk.
-    Remote URLs are downloaded in parallel; failures leave the src unchanged.
-    """
-    # Local images (already cached to disk by provider_cache.py)
-    html, local_parts = _embed_local_images(html)
-
-    # Any remaining remote URLs
-    seen: dict[str, None] = {}
-    for m in _SRC_REMOTE_RE.finditer(html):
-        seen[m.group(2)] = None
-    remote_urls = list(seen.keys())
-
-    if not remote_urls:
-        return html, local_parts
-
-    from app.services.care_circle.provider_base import WIKIMEDIA_USER_AGENT
-    async with httpx.AsyncClient(
-        timeout=20.0,
-        follow_redirects=True,
-        headers={"User-Agent": WIKIMEDIA_USER_AGENT},
-    ) as client:
-        results = await asyncio.gather(*(_download_one(client, url) for url in remote_urls))
-
-    url_to_cid: dict[str, str] = {}
-    remote_parts: list[MIMEImage] = []
-    for url, data, content_type in results:
-        if data is None:
-            continue
-        cid = uuid.uuid4().hex
-        mime_type, _ = mimetypes.guess_type(url)
-        subtype = (mime_type or content_type or "image/jpeg").split("/")[-1]
-        if subtype.lower() == "jpg":
-            subtype = "jpeg"
-        part = MIMEImage(data, _subtype=subtype)
-        part["Content-ID"] = f"<{cid}>"
-        part["Content-Disposition"] = "inline"
-        remote_parts.append(part)
-        url_to_cid[url] = cid
-
-    def replace_remote(match: re.Match) -> str:
-        quote, url = match.group(1), match.group(2)
-        return f"src={quote}cid:{url_to_cid[url]}{quote}" if url in url_to_cid else match.group(0)
-
-    html = _SRC_REMOTE_RE.sub(replace_remote, html)
-    return html, local_parts + remote_parts
+    return _embed_local_images(html)
 
 
 # ── SMTP send ───────────────────────────────────────────────────────────────────
@@ -332,7 +291,7 @@ async def _send_via_smtp(
     so it does not stall the event loop.
     """
     try:
-        html_with_cids, image_parts = await _embed_images(html_content)
+        html_with_cids, image_parts = _embed_images(html_content)
 
         # Structure: multipart/mixed > multipart/related > multipart/alternative
         # This satisfies strict clients while keeping inline images working.
@@ -359,7 +318,7 @@ async def _send_via_smtp(
         await loop.run_in_executor(None, _smtp_send_blocking, msg)
 
         logger.info(
-            "Newsletter email sent to %s (%s) — %d image(s) embedded",
+            "Newsletter email sent to %s (%s) — %d local image(s) embedded",
             to_email, subject, len(image_parts),
         )
         return True
@@ -395,8 +354,9 @@ async def send_newsletter_email(
         return {"success": False, "reason": "no_email", "to_email": None}
 
     subject = _build_subject(patient_name, family_name, reference_date)
-    # Restore local file paths so CID embedding works (web view uses served URLs)
-    email_html = _resolve_served_images(newsletter_html)
+    # Prefer public hosted image URLs in email clients; fall back to local CID embedding only
+    # when a public app URL is not configured.
+    email_html = _prepare_served_images_for_email(newsletter_html)
     html_content = _build_email_html(email_html, subject)
     text_content = _html_to_plain(html_content)
 

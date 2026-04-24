@@ -18,12 +18,12 @@ export default async function CareCircleFamilyPatientDetailPage({
             className="inline-flex items-center rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-ink-900 transition hover:border-black/20"
             href="/care-circle-family/patients"
           >
-            Back to patients
+            Back to friends
           </Link>
         }
-        description="The imported profile model captures family members, delivery schedule, care stage, preferred content, and image-based patient sign-in."
-        eyebrow="Patient detail"
-        title="Patient profile"
+        description="The imported profile model captures family members, delivery schedule, care stage, preferred content, and image-based friend sign-in."
+        eyebrow="Friend detail"
+        title="Friend profile"
       />
       <FamilyPatientDetailClient key={patientId} patientId={patientId} />
     </div>

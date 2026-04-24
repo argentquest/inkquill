@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { readTemplateEditorDocument, saveTemplateEditorDocument } from "@/lib/care-circle-template-admin";
+import { requireAdmin } from "@/lib/require-admin";
 
 export const runtime = "nodejs";
 
@@ -8,6 +9,9 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ providerKey: string }> },
 ) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const { providerKey } = await context.params;
     const theme = request.nextUrl.searchParams.get("theme") || "classic";
@@ -25,6 +29,9 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ providerKey: string }> },
 ) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   try {
     const { providerKey } = await context.params;
     const body = (await request.json()) as {

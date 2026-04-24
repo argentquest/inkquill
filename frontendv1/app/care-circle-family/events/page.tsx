@@ -29,7 +29,7 @@ export default function FamilyEventFeedPage() {
              <Heart className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-ink-900">Patient Session Loaded</p>
+              <p className="text-sm font-semibold text-ink-900">Friend Session Loaded</p>
               <p className="text-sm text-ink-500">Arthur Bloom accessed their daily highlights safely.</p>
               <p className="mt-1 text-xs text-ink-400">2 hours ago</p>
             </div>

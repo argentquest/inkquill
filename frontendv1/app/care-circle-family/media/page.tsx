@@ -7,7 +7,7 @@ export default function FamilyMediaLibraryPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        description="Upload and arrange the photographs that power personalized patient memory prompts such as 'Memory Lane Photo' and 'Dog Photo'."
+        description="Upload and arrange the photographs that power personalized friend memory prompts such as 'Memory Lane Photo' and 'Dog Photo'."
         eyebrow="Media Library"
         title="Family Uploads & Pictures"
       />
@@ -18,7 +18,7 @@ export default function FamilyMediaLibraryPage() {
         </div>
         <h3 className="mt-4 text-base font-bold text-ink-900">No media uploaded yet</h3>
         <p className="mt-2 text-sm text-ink-500 max-w-sm">
-          Family members can upload classic photographs here. These will be securely mapped and parsed by the localized generative AI model to build calm daily patient prompts.
+          Family members can upload classic photographs here. These will be securely mapped and parsed by the localized generative AI model to build calm daily friend prompts.
         </p>
         <button className="mt-6 rounded-full bg-ink-900 px-6 py-2.5 text-sm font-semibold text-paper transition hover:bg-ink-700">
           Upload Photos

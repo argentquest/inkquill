@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useSession } from "@/components/providers/app-providers";
 import { PatientAccessStateBadge } from "@/components/care-circle-family/patient-access-state-badge";
 import { ProviderOrderingPanel } from "@/components/care-circle-family/provider-ordering-panel";
 import { ErrorState } from "@/components/ui/error-state";
@@ -181,7 +182,7 @@ function AuthImagePicker({
         })}
       </div>
       <p className="mt-2 text-xs text-ink-600">
-        {values.length}/3 selected — exactly three images are required for patient sign-in.
+        {values.length}/3 selected — exactly three images are required for friend sign-in.
       </p>
     </div>
   );
@@ -253,6 +254,8 @@ function patientToForm(patient: {
 export function FamilyPatientDetailClient({ patientId }: { patientId: string }) {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const session = useSession();
+  const isOwner = session.user?.is_family_owner === true;
 
   const { data: patient, isLoading, isError, error } = useQuery({
     queryKey: ["care-circle-family-patient", patientId],
@@ -289,8 +292,8 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   }, [patientId]);
 
   useEffect(() => {
-    if (searchParams.get("edit") === "1") { setIsEditing(true); setSaveError(null); }
-  }, [searchParams]);
+    if (searchParams.get("edit") === "1" && isOwner) { setIsEditing(true); setSaveError(null); }
+  }, [searchParams, isOwner]);
 
   const [sendResult, setSendResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [regenerationJobId, setRegenerationJobId] = useState<string | null>(null);
@@ -375,12 +378,12 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
       setSaveError(null);
       setIsEditing(false);
     },
-    onError: (err) => setSaveError(err instanceof Error ? err.message : "Could not save patient settings."),
+    onError: (err) => setSaveError(err instanceof Error ? err.message : "Could not save friend settings."),
   });
 
-  if (isLoading) return <LoadingState label="Loading patient profile" />;
+  if (isLoading) return <LoadingState label="Loading friend profile" />;
   if (isError || !patient) {
-    return <ErrorState detail={error instanceof Error ? error.message : "Could not load the patient profile."} title="Patient profile unavailable" />;
+    return <ErrorState detail={error instanceof Error ? error.message : "Could not load the friend profile."} title="Friend profile unavailable" />;
   }
 
   const prefs = formState.preferences;
@@ -393,15 +396,17 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className={EYEBROW_CLS}>Family configuration</p>
-            <h2 className="mt-2 font-display text-3xl text-ink-900">Managed patient settings</h2>
+            <h2 className="mt-2 font-display text-3xl text-ink-900">Managed friend settings</h2>
           </div>
-          <button
-            className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-            onClick={() => { setIsEditing((v) => !v); setSaveError(null); }}
-            type="button"
-          >
-            {isEditing ? "Close editor" : "Edit patient profile"}
-          </button>
+          {isOwner && (
+            <button
+              className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
+              onClick={() => { setIsEditing((v) => !v); setSaveError(null); }}
+              type="button"
+            >
+              {isEditing ? "Close editor" : "Edit friend profile"}
+            </button>
+          )}
         </div>
 
         {isEditing ? (
@@ -418,7 +423,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             <FormField label="Join code">
               <input className={`${INPUT_CLS} font-mono uppercase tracking-[0.18em]`} onChange={(e) => setFormState((c) => ({ ...c, joinCode: e.target.value.toUpperCase() }))} value={formState.joinCode} />
             </FormField>
-            <FormField label="Patient display name">
+            <FormField label="Friend display name">
               <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, displayName: e.target.value }))} value={formState.displayName} />
             </FormField>
             <FormField label="Newsletter name">
@@ -444,7 +449,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
               </select>
             </FormField>
             <FormField label="Email address">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, email: e.target.value || null }))} placeholder="patient@example.com" type="email" value={formState.email ?? ""} />
+              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, email: e.target.value || null }))} placeholder="friend@example.com" type="email" value={formState.email ?? ""} />
             </FormField>
             <FormField label="Phone number">
               <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, phoneNumber: e.target.value || null }))} placeholder="+1 555 000 0000" type="tel" value={formState.phoneNumber ?? ""} />
@@ -639,7 +644,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
                 disabled={updateMutation.isPending}
                 type="submit"
               >
-                {updateMutation.isPending ? "Saving…" : "Save patient profile"}
+                {updateMutation.isPending ? "Saving…" : "Save friend profile"}
               </button>
               <button
                 className="inline-flex rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-ink-900 transition hover:border-black/20"
@@ -660,7 +665,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             <p className={EYEBROW_CLS}>Manual dispatch</p>
             <h2 className="mt-2 font-display text-3xl text-ink-900">Send newsletter now</h2>
             <p className="mt-2 text-sm leading-7 text-ink-700">
-              Assembles and sends today&apos;s newsletter for this patient immediately. Requires an email or phone number on the profile.
+              Assembles and sends today&apos;s newsletter for this friend immediately. Requires an email or phone number on the profile.
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -827,7 +832,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
         <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
           <h2 className="font-display text-3xl text-ink-900">Image sign-in</h2>
           <p className="mt-4 text-sm leading-7 text-ink-700">
-            Three familiar images assigned for direct patient access.
+            Three familiar images assigned for direct friend access.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {patient.authImageKeys.map((key) => (
@@ -837,14 +842,14 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             ))}
           </div>
           <Link className="mt-6 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20" href="/care-circle-patient/login">
-            Preview patient sign-in
+            Preview friend sign-in
           </Link>
         </article>
       </section>
 
       {/* ── Preferences summary ────────────────────────────────────── */}
       <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-        <h2 className="font-display text-3xl text-ink-900">Patient preferences</h2>
+        <h2 className="font-display text-3xl text-ink-900">Friend preferences</h2>
         <dl className="mt-5 grid gap-5 md:grid-cols-2">
           {patient.preferences.hometown ? (
             <div>
@@ -942,6 +947,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
             patientId={patientId}
             providerCatalog={providerCatalog ?? []}
             providerConfigs={providerConfigs ?? []}
+            readOnly={!isOwner}
           />
         )}
       </section>

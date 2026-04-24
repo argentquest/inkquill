@@ -25,15 +25,15 @@ const SURFACES: SurfaceDefinition[] = [
     requires_auth: true,
     owner_scope: "family",
     title: "Care Circle Family",
-    description: "Family-side coordination, events, patients, and household-owned billing live here."
+    description: "Family-side coordination, events, friends, and household-owned billing live here."
   },
   {
     surface_id: "care-circle-patient",
     app_id: "care-circle",
     requires_auth: false,
     owner_scope: "patient",
-    title: "Care Circle Patient",
-    description: "Patient access stays simplified and direct-entry by design."
+    title: "Care Circle Friend",
+    description: "Friend access stays simplified and direct-entry by design."
   },
   {
     surface_id: "chatbot",

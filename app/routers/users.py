@@ -3,6 +3,7 @@
 # /story_app/app/routers/users.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 import logging
@@ -16,6 +17,7 @@ from app.schemas import user as schema_user
 from app.schemas.base import ApiResponse
 from app.crud import user as crud_user
 from app.core.config import settings # For API prefix
+from app.models.care_circle import CareCircleFamily
 
 logger = logging.getLogger(__name__)
 
@@ -32,17 +34,21 @@ router = APIRouter(
 
 @router.get("/me", response_model=ApiResponse, name="read_current_user_profile")
 async def read_users_me(
-    current_user: ModelUser = Depends(get_current_active_user) # Dependency injects the authenticated user
+    db: AsyncSession = Depends(get_db_session),
+    current_user: ModelUser = Depends(get_current_active_user),
 ):
     """
     Get profile of the currently authenticated user.
-    The `get_current_active_user` dependency handles authentication and
-    retrieves the active user model from the database.
     """
     logger.info(f"User '{current_user.username}' requesting their profile.")
-    # The current_user object is already the SQLAlchemy User model instance.
-    # Pydantic's UserRead schema will automatically convert it for the response.
-    return ApiResponse.success_response(data=schema_user.UserRead.model_validate(current_user))
+    result = await db.execute(
+        select(exists().where(CareCircleFamily.created_by_user_id == current_user.id))
+    )
+    is_family_owner: bool = result.scalar() or False
+    user_read = schema_user.UserRead.model_validate(current_user).model_copy(
+        update={"is_family_owner": is_family_owner}
+    )
+    return ApiResponse.success_response(data=user_read)
 
 
 @router.put("/me", response_model=ApiResponse, name="update_current_user_profile")
