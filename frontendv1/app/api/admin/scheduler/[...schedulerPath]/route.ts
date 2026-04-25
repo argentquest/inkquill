@@ -75,3 +75,17 @@ export async function POST(
 ) {
   return proxySchedulerRequest(request, context);
 }
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ schedulerPath: string[] }> },
+) {
+  return proxySchedulerRequest(request, context);
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ schedulerPath: string[] }> },
+) {
+  return proxySchedulerRequest(request, context);
+}

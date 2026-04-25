@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CalendarClock,
   Clock3,
+  ExternalLink,
   PauseCircle,
   PlayCircle,
   RefreshCw,
@@ -80,6 +81,17 @@ async function schedulerFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/**
+ * Validate a cron expression with a basic check.
+ * A valid cron expression has at least 5 space-separated fields.
+ */
+function isValidCronExpression(cron: string): boolean {
+  const parts = cron.trim().split(/\s+/);
+  return parts.length >= 5 && parts.every((part) => /^[\d\-\*,\/]+$/.test(part));
+}
+
+const SCHEDULER_REFRESH_INTERVAL_MS = 30_000;
+
 function formatDateTime(value: string | null) {
   if (!value) {
     return "Not scheduled";
@@ -116,21 +128,21 @@ export function SchedulerAdminConsole() {
     queryKey: ["scheduler-admin", "health"],
     queryFn: () => schedulerFetch<SchedulerHealthResponse>("health"),
     enabled: session.status === "authenticated" && isAdmin,
-    refetchInterval: 30000,
+    refetchInterval: SCHEDULER_REFRESH_INTERVAL_MS,
   });
 
   const statusQuery = useQuery({
     queryKey: ["scheduler-admin", "status"],
     queryFn: () => schedulerFetch<SchedulerStatusResponse>("status"),
     enabled: session.status === "authenticated" && isAdmin,
-    refetchInterval: 30000,
+    refetchInterval: SCHEDULER_REFRESH_INTERVAL_MS,
   });
 
   const jobsQuery = useQuery({
     queryKey: ["scheduler-admin", "jobs"],
     queryFn: () => schedulerFetch<SchedulerJobListResponse>("jobs"),
     enabled: session.status === "authenticated" && isAdmin,
-    refetchInterval: 30000,
+    refetchInterval: SCHEDULER_REFRESH_INTERVAL_MS,
   });
 
   const refreshAll = async () => {
@@ -345,9 +357,24 @@ export function SchedulerAdminConsole() {
                   </div>
 
                   <div className="mt-5 rounded-[22px] border border-black/10 bg-white/85 p-4">
-                    <label className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-600" htmlFor={`cron-${task.key}`}>
-                      Custom cron
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-600" htmlFor={`cron-${task.key}`}>
+                        Custom cron
+                      </label>
+                      <a
+                        href="https://crontab.guru"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-ink-500 transition hover:text-ink-700"
+                        title="Cron expression helper"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        crontab.guru
+                      </a>
+                    </div>
+                    <p className="mt-1 text-xs text-ink-500">
+                      Format: <span className="font-mono">minute hour day month weekday</span> (e.g. <span className="font-mono">0 8 * * *</span> for 8:00 AM daily)
+                    </p>
                     <div className="mt-3 flex flex-col gap-3 md:flex-row">
                       <input
                         id={`cron-${task.key}`}
@@ -362,7 +389,7 @@ export function SchedulerAdminConsole() {
                       />
                       <Button
                         variant="secondary"
-                        disabled={isBusy || cronValue.trim().length === 0 || cronValue === task.cron}
+                        disabled={isBusy || !isValidCronExpression(cronValue) || cronValue === task.cron}
                         onClick={() => {
                           operationMutation.mutate({
                             taskKey: task.key,
