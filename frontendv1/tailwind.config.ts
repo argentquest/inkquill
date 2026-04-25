@@ -46,10 +46,10 @@ const config: Config = {
       fontFamily: {
         sans:    ["var(--font-sans)", "Lora", "Georgia", "Cambria", "serif"],
         display: ["var(--font-display)", "EB Garamond", "Garamond", "Georgia", "serif"],
-        mono:    ["\"Courier New\"", "Courier", "monospace"]
+        mono:    ["var(--font-mono)", "\"JetBrains Mono\"", "\"Courier New\"", "Courier", "monospace"]
       },
       borderRadius: {
-        "2xl":  "20px",
+        "2xl":  "22px",
         "3xl":  "24px",
         "4xl":  "28px",
         "5xl":  "32px"

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.utils.iso_codes import LANGUAGES, COUNTRIES
 
@@ -137,3 +137,55 @@ class CareCircleProviderPatientConfigRead(BaseModel):
     custom_parameters: dict = Field(default_factory=dict)
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class JoinFamilyRequest(BaseModel):
+    join_code: str = Field(min_length=3, max_length=20)
+
+
+class FamilyInviteEmailRequest(BaseModel):
+    email: EmailStr
+
+
+class OwnerFamilySummaryRead(BaseModel):
+    id: int
+    name: str
+    join_code: str
+    active_member_count: int
+    pending_request_count: int
+
+
+class FamilyJoinRequestRead(BaseModel):
+    id: int
+    user_id: int
+    username: str
+    display_name: Optional[str] = None
+    email: Optional[str] = None
+    requested_at: Optional[str] = None
+
+
+class FamilyMemberRead(BaseModel):
+    id: int
+    user_id: int
+    username: str
+    display_name: Optional[str] = None
+    email: Optional[str] = None
+    role: str
+    joined_at: Optional[str] = None
+
+
+class AdminFamilyRead(BaseModel):
+    id: int
+    name: str
+    join_code: str
+    is_disabled: bool
+    owner_username: Optional[str] = None
+    owner_display_name: Optional[str] = None
+    member_count: int
+    patient_count: int
+    pending_requests: int
+    created_at: Optional[str] = None
+
+
+class AdminFamilyDisableRequest(BaseModel):
+    disabled: bool

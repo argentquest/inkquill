@@ -146,7 +146,7 @@ The practical takeaway is:
 For Care Circle specifically, a Docker host is the better first fit because:
 
 - the repo already has separate `backend`, `frontend`, and `scheduler` containers in [docker-compose.yml](C:/Code/inkandquill/inkquill/docker-compose.yml)
-- PDF generation currently calls a Node Playwright script from Python in [newsletter_pdf_service.py](C:/Code/inkandquill/inkquill/app/services/care_circle/newsletter_pdf_service.py)
+- PDF generation uses the Playwright Python library directly in [newsletter_pdf_service.py](C:/Code/inkandquill/inkquill/app/services/care_circle/newsletter_pdf_service.py), which launches a headless Chromium browser — the scheduler image must include Chromium and its system library dependencies
 - newsletter content and images are written to the local cache in [provider_cache.py](C:/Code/inkandquill/inkquill/app/services/care_circle/provider_cache.py)
 - backend and scheduler already benefit from shared persistent storage on a single host
 
@@ -844,21 +844,25 @@ Examples:
 - Azure Container Apps storage mounts: https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts
 - on a single VM or VPS, this is typically just a host-mounted directory or attached disk
 
-### 2. PDF generation needs Node + Playwright
+### 2. PDF generation requires Chromium in the scheduler image
 
-Current PDF generation calls a Node Playwright script from Python.
+PDF generation uses the **Playwright Python library** (`playwright.async_api`) to launch a headless Chromium browser and render newsletter HTML to PDF. There is no Node.js involved.
 
-That means your **scheduler image cannot be Python-only** if it is responsible for PDF generation.
+That means the **scheduler image must include Chromium and its system library dependencies**. A plain `python:slim` base image will not work.
 
-You have two practical choices:
+This is already handled in [`Dockerfile.scheduler`](C:/Code/inkandquill/inkquill/Dockerfile.scheduler):
 
-1. Build a scheduler image that includes:
-   - Python
-   - Node
-   - Playwright + browser dependencies
-2. Split PDF creation into a dedicated worker/job image
+- the runtime stage manually installs all required Chromium system libraries via `apt-get`
+- `python -m playwright install chromium` downloads the Chromium binary into the image
 
-For long-term cleanliness, option 2 is better.
+**Do not replace `Dockerfile.scheduler` with a plain Python base image.** PDF generation will fail at runtime if the Chromium dependencies are missing.
+
+If you want to split PDF creation out later, the alternative is:
+
+1. Keep the scheduler image as-is with Chromium included
+2. Or split PDF creation into a dedicated worker image that carries the same Chromium dependencies
+
+For long-term cleanliness, option 2 is better — but option 1 is what the repo ships today and it works.
 
 ### 3. Use scheduled jobs for the scheduler later
 

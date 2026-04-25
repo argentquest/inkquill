@@ -304,7 +304,7 @@ async def _seed_default_family_state(db: AsyncSession, user: User) -> CareCircle
     await db.flush()
 
     db.add(CareCircleFamilyMembership(
-        family_id=family.id, user_id=user.id, role="owner", is_primary=True
+        family_id=family.id, user_id=user.id, role="owner", status="active", is_primary=True
     ))
 
     await _seed_patients_for_family(db, family, user)
@@ -314,12 +314,16 @@ async def _seed_default_family_state(db: AsyncSession, user: User) -> CareCircle
 
 async def get_or_create_family_for_user(db: AsyncSession, user: User) -> CareCircleFamily:
     membership = await db.scalar(
-        select(CareCircleFamilyMembership).where(CareCircleFamilyMembership.user_id == user.id).order_by(CareCircleFamilyMembership.is_primary.desc(), CareCircleFamilyMembership.id.asc())
+        select(CareCircleFamilyMembership)
+        .where(
+            CareCircleFamilyMembership.user_id == user.id,
+            CareCircleFamilyMembership.status == "active",
+        )
+        .order_by(CareCircleFamilyMembership.is_primary.desc(), CareCircleFamilyMembership.id.asc())
     )
     if membership:
         family = await db.get(CareCircleFamily, membership.family_id)
         if family:
-            # Ensure patients are seeded for existing families (handles families created before patient seeding was added)
             patient_count = await db.scalar(
                 select(func.count(CareCirclePatientProfile.id)).where(CareCirclePatientProfile.family_id == family.id)
             )
@@ -329,6 +333,15 @@ async def get_or_create_family_for_user(db: AsyncSession, user: User) -> CareCir
                 family.join_code = await _generate_unique_join_code(db)
                 await db.commit()
             return family
+    # If the user only has a pending request, don't auto-create a new family
+    has_pending = await db.scalar(
+        select(CareCircleFamilyMembership).where(
+            CareCircleFamilyMembership.user_id == user.id,
+            CareCircleFamilyMembership.status == "pending",
+        )
+    )
+    if has_pending:
+        raise ValueError("Your join request is pending approval. You do not have an active family yet.")
     return await _seed_default_family_state(db, user)
 
 
@@ -663,4 +676,251 @@ async def reorder_patient_provider_configs(
                 display_order=new_order,
                 custom_parameters={},
             ))
+    await db.commit()
+
+
+# ---------------------------------------------------------------------------
+# Family membership / join-request functions
+# ---------------------------------------------------------------------------
+
+async def request_to_join_family(db: AsyncSession, user: User, join_code: str) -> dict[str, Any]:
+    """Create a pending membership for a user wanting to join a family by join code."""
+    normalized = _normalize_join_code(join_code)
+    family = await db.scalar(select(CareCircleFamily).where(CareCircleFamily.join_code == normalized))
+    if not family:
+        raise ValueError("No family found with that join code.")
+    if family.is_disabled:
+        raise ValueError("This family is currently disabled.")
+
+    existing = await db.scalar(
+        select(CareCircleFamilyMembership).where(
+            CareCircleFamilyMembership.family_id == family.id,
+            CareCircleFamilyMembership.user_id == user.id,
+        )
+    )
+    if existing:
+        if existing.status == "active":
+            raise ValueError("You are already a member of this family.")
+        if existing.status == "pending":
+            raise ValueError("You already have a pending request for this family.")
+        # rejected — allow re-request by updating status
+        existing.status = "pending"
+        await db.commit()
+        return {"status": "pending", "family_name": family.name}
+
+    db.add(CareCircleFamilyMembership(
+        family_id=family.id,
+        user_id=user.id,
+        role="member",
+        status="pending",
+        is_primary=True,
+    ))
+    await db.commit()
+    return {"status": "pending", "family_name": family.name}
+
+
+async def get_owner_family(db: AsyncSession, user: User) -> CareCircleFamily | None:
+    """Return the family the user owns (active owner membership)."""
+    membership = await db.scalar(
+        select(CareCircleFamilyMembership).where(
+            CareCircleFamilyMembership.user_id == user.id,
+            CareCircleFamilyMembership.role == "owner",
+            CareCircleFamilyMembership.status == "active",
+        )
+    )
+    if not membership:
+        return None
+    return await db.get(CareCircleFamily, membership.family_id)
+
+
+async def get_owner_family_summary(db: AsyncSession, owner_user: User) -> dict[str, Any]:
+    """Return owner-only family summary details used by the account UI."""
+    family = await get_owner_family(db, owner_user)
+    if not family:
+        raise ValueError("You do not own a family.")
+
+    active_member_count = await db.scalar(
+        select(func.count(CareCircleFamilyMembership.id)).where(
+            CareCircleFamilyMembership.family_id == family.id,
+            CareCircleFamilyMembership.status == "active",
+        )
+    )
+    pending_request_count = await db.scalar(
+        select(func.count(CareCircleFamilyMembership.id)).where(
+            CareCircleFamilyMembership.family_id == family.id,
+            CareCircleFamilyMembership.status == "pending",
+        )
+    )
+
+    return {
+        "id": family.id,
+        "name": family.name,
+        "join_code": family.join_code,
+        "active_member_count": active_member_count or 0,
+        "pending_request_count": pending_request_count or 0,
+    }
+
+
+async def list_join_requests(db: AsyncSession, owner_user: User) -> list[dict[str, Any]]:
+    """Return pending join requests for the owner's family."""
+    family = await get_owner_family(db, owner_user)
+    if not family:
+        return []
+    rows = (
+        await db.execute(
+            select(CareCircleFamilyMembership, User)
+            .join(User, User.id == CareCircleFamilyMembership.user_id)
+            .where(
+                CareCircleFamilyMembership.family_id == family.id,
+                CareCircleFamilyMembership.status == "pending",
+            )
+            .order_by(CareCircleFamilyMembership.created_at.asc())
+        )
+    ).all()
+    return [
+        {
+            "id": m.id,
+            "user_id": u.id,
+            "username": u.username,
+            "display_name": u.display_name,
+            "email": u.email,
+            "requested_at": m.created_at.isoformat() if m.created_at else None,
+        }
+        for m, u in rows
+    ]
+
+
+async def resolve_join_request(
+    db: AsyncSession, owner_user: User, membership_id: int, approve: bool
+) -> dict[str, Any]:
+    """Approve or reject a pending join request. Owner only."""
+    family = await get_owner_family(db, owner_user)
+    if not family:
+        raise ValueError("You do not own a family.")
+    membership = await db.scalar(
+        select(CareCircleFamilyMembership).where(
+            CareCircleFamilyMembership.id == membership_id,
+            CareCircleFamilyMembership.family_id == family.id,
+            CareCircleFamilyMembership.status == "pending",
+        )
+    )
+    if not membership:
+        raise ValueError("Join request not found.")
+    membership.status = "active" if approve else "rejected"
+    await db.commit()
+    return {"id": membership_id, "status": membership.status}
+
+
+async def list_family_members(db: AsyncSession, owner_user: User) -> list[dict[str, Any]]:
+    """Return all active non-owner members of the owner's family."""
+    family = await get_owner_family(db, owner_user)
+    if not family:
+        return []
+    rows = (
+        await db.execute(
+            select(CareCircleFamilyMembership, User)
+            .join(User, User.id == CareCircleFamilyMembership.user_id)
+            .where(
+                CareCircleFamilyMembership.family_id == family.id,
+                CareCircleFamilyMembership.status == "active",
+                CareCircleFamilyMembership.role != "owner",
+            )
+            .order_by(CareCircleFamilyMembership.created_at.asc())
+        )
+    ).all()
+    return [
+        {
+            "id": m.id,
+            "user_id": u.id,
+            "username": u.username,
+            "display_name": u.display_name,
+            "email": u.email,
+            "role": m.role,
+            "joined_at": m.created_at.isoformat() if m.created_at else None,
+        }
+        for m, u in rows
+    ]
+
+
+async def remove_family_member(db: AsyncSession, owner_user: User, membership_id: int) -> None:
+    """Remove an active member from the owner's family."""
+    family = await get_owner_family(db, owner_user)
+    if not family:
+        raise ValueError("You do not own a family.")
+    membership = await db.scalar(
+        select(CareCircleFamilyMembership).where(
+            CareCircleFamilyMembership.id == membership_id,
+            CareCircleFamilyMembership.family_id == family.id,
+            CareCircleFamilyMembership.role != "owner",
+        )
+    )
+    if not membership:
+        raise ValueError("Member not found.")
+    await db.delete(membership)
+    await db.commit()
+
+
+# ---------------------------------------------------------------------------
+# Admin family management
+# ---------------------------------------------------------------------------
+
+async def admin_list_families(db: AsyncSession) -> list[dict[str, Any]]:
+    """Return all families with owner username, member count, patient count."""
+    families = (await db.execute(select(CareCircleFamily).order_by(CareCircleFamily.id.asc()))).scalars().all()
+    result = []
+    for family in families:
+        owner_row = await db.scalar(
+            select(CareCircleFamilyMembership).where(
+                CareCircleFamilyMembership.family_id == family.id,
+                CareCircleFamilyMembership.role == "owner",
+                CareCircleFamilyMembership.status == "active",
+            )
+        )
+        owner_user = await db.get(User, owner_row.user_id) if owner_row else None
+        member_count = await db.scalar(
+            select(func.count(CareCircleFamilyMembership.id)).where(
+                CareCircleFamilyMembership.family_id == family.id,
+                CareCircleFamilyMembership.status == "active",
+            )
+        )
+        patient_count = await db.scalar(
+            select(func.count(CareCirclePatientProfile.id)).where(
+                CareCirclePatientProfile.family_id == family.id,
+            )
+        )
+        pending_count = await db.scalar(
+            select(func.count(CareCircleFamilyMembership.id)).where(
+                CareCircleFamilyMembership.family_id == family.id,
+                CareCircleFamilyMembership.status == "pending",
+            )
+        )
+        result.append({
+            "id": family.id,
+            "name": family.name,
+            "join_code": family.join_code,
+            "is_disabled": family.is_disabled,
+            "owner_username": owner_user.username if owner_user else None,
+            "owner_display_name": owner_user.display_name if owner_user else None,
+            "member_count": member_count or 0,
+            "patient_count": patient_count or 0,
+            "pending_requests": pending_count or 0,
+            "created_at": family.created_at.isoformat() if family.created_at else None,
+        })
+    return result
+
+
+async def admin_set_family_disabled(db: AsyncSession, family_id: int, disabled: bool) -> dict[str, Any]:
+    family = await db.get(CareCircleFamily, family_id)
+    if not family:
+        raise ValueError("Family not found.")
+    family.is_disabled = disabled
+    await db.commit()
+    return {"id": family.id, "is_disabled": family.is_disabled}
+
+
+async def admin_delete_family(db: AsyncSession, family_id: int) -> None:
+    family = await db.get(CareCircleFamily, family_id)
+    if not family:
+        raise ValueError("Family not found.")
+    await db.delete(family)
     await db.commit()

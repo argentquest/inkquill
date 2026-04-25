@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Users, Puzzle, CreditCard, Gift, UserCircle, Camera, Activity, UserCheck } from "lucide-react";
+import { Users, Puzzle, CreditCard, Gift, UserCircle, Camera, Activity, UserCheck, UserPlus } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
@@ -14,6 +14,7 @@ const ownerLinks = [
   { href: "/care-circle-family/account", label: "Account", description: "Edit your profile and contact details.", icon: UserCircle },
   { href: "/care-circle-family/media", label: "Media", description: "Upload family photos for personalised prompts.", icon: Camera },
   { href: "/care-circle-family/events", label: "Activity", description: "Monitor recent session and engagement events.", icon: Activity },
+  { href: "/care-circle-family/members", label: "Members", description: "Approve join requests and manage family members.", icon: UserPlus },
   { href: "/care-circle-patient/login", label: "Friend sign-in", description: "Preview the picture-based sign-in flow.", icon: UserCheck },
 ];
 

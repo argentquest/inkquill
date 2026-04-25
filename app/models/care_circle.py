@@ -12,6 +12,7 @@ class CareCircleFamily(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     join_code: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
+    is_disabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_by_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -25,6 +26,7 @@ class CareCircleFamilyMembership(Base):
     family_id: Mapped[int] = mapped_column(ForeignKey("care_circle_families.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     role: Mapped[str] = mapped_column(String(50), default="owner", nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="active", nullable=False)  # active | pending | rejected
     is_primary: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

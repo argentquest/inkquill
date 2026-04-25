@@ -48,7 +48,8 @@
       "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\integration\\\\story\\\\test_world_story_flow_integration.py tests\\\\integration\\\\story\\\\test_world_content_integration.py tests\\\\integration\\\\story\\\\test_chat_endpoints_integration.py tests\\\\integration\\\\story\\\\test_batch_association_graph_integration.py tests\\\\integration\\\\shared\\\\test_additional_backend_surface_integration.py tests\\\\integration\\\\shared\\\\test_remaining_backend_endpoints.py -q 2>&1 | grep 'UndefinedColumn\\\\|UndefinedTable\\\\|does not exist\\\\|relation.*does not\\\\|UndefinedObject' | sort -u | head -20\")",
       "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\integration\\\\shared\\\\test_remaining_backend_endpoints.py::test_prompt_and_story_class_endpoints_work_with_real_db -q 2>&1 | grep -E 'UndefinedColumn|does not exist|AssertionError|FAILED|Error' | head -15\")",
       "Bash(powershell -Command \".\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit tests\\\\integration --ignore=tests/integration/shared/test_document_upload_integration.py --ignore=tests/integration/shared/test_image_generation_integration.py -q 2>&1 | grep -E '^FAILED|passed|failed' | tail -5\")",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "PowerShell(cd C:\\\\Code\\\\inkandquill\\\\inkquill; powershell -ExecutionPolicy Bypass -File .\\\\scripts\\\\deploy_care_circle_docker_host.ps1 -Environment test -Action up -Build -Detached -AutoMigrate)"
     ],
     "deny": [],
     "ask": []

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLayoutEffect } from "react";
-import { Paintbrush, ShieldCheck } from "lucide-react";
+import { CalendarClock, Paintbrush, ShieldCheck, Users } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
@@ -14,6 +14,18 @@ const adminTools = [
     label: "Template Studio",
     description: "Edit provider HTML templates and per-theme CSS overrides using the GrapesJS visual editor.",
     icon: Paintbrush,
+  },
+  {
+    href: "/care-circle-family/admin/scheduler",
+    label: "Scheduler Console",
+    description: "Monitor Care Circle job health, inspect scheduled runs, and trigger or reschedule tasks from the main admin UI.",
+    icon: CalendarClock,
+  },
+  {
+    href: "/care-circle-family/admin/families",
+    label: "All Families",
+    description: "View, disable, or delete any family across the platform.",
+    icon: Users,
   },
 ];
 

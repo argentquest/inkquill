@@ -175,6 +175,18 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByRole("button", { name: "Save template" })).toBeVisible();
   });
 
+  test("family admin scheduler console renders inside the main UI", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/admin/scheduler");
+
+    await expect(page.getByRole("heading", { name: "Scheduler Console" })).toBeVisible();
+    await expect(page.getByText("Provider Output Pre-cache")).toBeVisible();
+    await expect(page.getByText("Daily Session Pre-generation")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Run now" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Save cron" }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Loaded jobs" })).toBeVisible();
+  });
+
   test("family events page loads", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/events");
@@ -189,5 +201,20 @@ test.describe("Care Circle Family UI", () => {
 
     // Verify the page loads by checking URL
     await expect(page).toHaveURL(/\/care-circle-family\/media/, { timeout: 15000 });
+  });
+
+  test("owner account page shows the join code and can send an invite email", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/account");
+
+    await expect(page.getByRole("heading", { name: "Share your join code or email an invite." })).toBeVisible();
+    await expect(page.getByText("STM111")).toBeVisible();
+    await expect(page.getByText("Active members")).toBeVisible();
+    await expect(page.getByText("Pending requests")).toBeVisible();
+
+    await page.getByLabel("Invite by email").fill("new.member@example.com");
+    await page.getByRole("button", { name: "Send invite email" }).click();
+
+    await expect(page.getByText("An invite email was sent to new.member@example.com.")).toBeVisible();
   });
 });

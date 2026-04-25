@@ -387,6 +387,42 @@ class EmailService:
             self.test_mode = original_test_mode
             
         return success
+
+    async def send_care_circle_invite_email(
+        self,
+        recipient_email: str,
+        family_name: str,
+        join_code: str,
+        inviter_name: str | None = None,
+        is_test: bool = False,
+    ) -> bool:
+        """Send a Care Circle invitation email with the family join code."""
+        join_url = f"{self.app_url.rstrip('/')}/join?code={join_code}"
+        context = {
+            "recipient_email": recipient_email,
+            "family_name": family_name,
+            "join_code": join_code,
+            "inviter_name": inviter_name or "A family owner",
+            "join_url": join_url,
+            "support_email": self.from_email,
+        }
+
+        original_test_mode = self.test_mode
+        if is_test:
+            self.test_mode = True
+
+        success = await self.send_email(
+            to_email=recipient_email,
+            to_name=recipient_email,
+            subject=f"{self.app_name} - Join {family_name} on Care Circle",
+            template_name="care_circle_invite.html",
+            context=context,
+        )
+
+        if is_test:
+            self.test_mode = original_test_mode
+
+        return success
     
     def test_email_configuration(self, test_email: str) -> Dict[str, Any]:
         """Test email configuration by sending a test email."""

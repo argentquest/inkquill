@@ -17,7 +17,7 @@ from app.schemas import user as schema_user
 from app.schemas.base import ApiResponse
 from app.crud import user as crud_user
 from app.core.config import settings # For API prefix
-from app.models.care_circle import CareCircleFamily
+from app.models.care_circle import CareCircleFamily, CareCircleFamilyMembership
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,11 @@ async def read_users_me(
     """
     logger.info(f"User '{current_user.username}' requesting their profile.")
     result = await db.execute(
-        select(exists().where(CareCircleFamily.created_by_user_id == current_user.id))
+        select(exists().where(
+            CareCircleFamilyMembership.user_id == current_user.id,
+            CareCircleFamilyMembership.role == "owner",
+            CareCircleFamilyMembership.status == "active",
+        ))
     )
     is_family_owner: bool = result.scalar() or False
     user_read = schema_user.UserRead.model_validate(current_user).model_copy(

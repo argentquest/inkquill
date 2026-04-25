@@ -70,6 +70,13 @@ test.describe("Sprint 2 auth", () => {
     await expect(page.getByText("Account summary")).toBeVisible({ timeout: 20000 });
   });
 
+  test("join page pre-fills the invite code from the URL", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/join?code=ab-12 cd");
+
+    await expect(page.getByLabel("Join code")).toHaveValue("AB12CD");
+  });
+
   test("forgot password flow shows success messaging", async ({ page }) => {
     await mockAppApis(page);
     await page.goto("/auth/forgot-password");

@@ -25,6 +25,7 @@ const authenticatedUser = {
   email: "storymaker@example.com",
   display_name: "Story Maker",
   is_admin: true,
+  is_family_owner: true,
   is_active: true
 };
 
@@ -164,6 +165,56 @@ const patientProviderConfigs: Record<string, Array<{
   "2": []
 };
 
+const schedulerHealth = {
+  status: "healthy",
+  scheduler_running: true,
+  registered_tasks: 7,
+  scheduled_jobs: 7
+};
+
+const schedulerStatus = {
+  tasks: [
+    {
+      key: "care_circle.precache_providers",
+      name: "Provider Output Pre-cache",
+      cron: "0 2 * * *",
+      next_run: "2026-04-25T02:00:00Z",
+      is_running: true
+    },
+    {
+      key: "care_circle.daily_session",
+      name: "Daily Session Pre-generation",
+      cron: "0 6 * * *",
+      next_run: "2026-04-25T06:00:00Z",
+      is_running: true
+    },
+    {
+      key: "care_circle.daily_newsletter",
+      name: "Daily Care Circle Newsletter",
+      cron: "0 8 * * *",
+      next_run: "2026-04-25T08:00:00Z",
+      is_running: true
+    }
+  ]
+};
+
+const schedulerJobs = {
+  jobs: [
+    {
+      id: "care_circle.precache_providers",
+      name: "Provider Output Pre-cache",
+      next_run: "2026-04-25T02:00:00Z",
+      trigger: "cron[hour='2', minute='0']"
+    },
+    {
+      id: "care_circle.daily_session",
+      name: "Daily Session Pre-generation",
+      next_run: "2026-04-25T06:00:00Z",
+      trigger: "cron[hour='6', minute='0']"
+    }
+  ]
+};
+
 function json(body: unknown, status = 200) {
   return {
     status,
@@ -184,6 +235,42 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
   const referrals = options.referrals ?? "ok";
   const onboarding = options.onboarding ?? "ok";
   const currentUser = { ...authenticatedUser };
+
+  await page.route("**/api/admin/scheduler/**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    if (url.endsWith("/health")) {
+      await route.fulfill(json(schedulerHealth));
+      return;
+    }
+
+    if (url.endsWith("/status")) {
+      await route.fulfill(json(schedulerStatus));
+      return;
+    }
+
+    if (url.endsWith("/jobs") && method === "GET") {
+      await route.fulfill(json(schedulerJobs));
+      return;
+    }
+
+    if (/\/api\/admin\/scheduler\/jobs\/.+\/(run|pause|resume|reschedule)$/.test(url) && method === "POST") {
+      const segments = new URL(url).pathname.split("/");
+      const action = segments.at(-1) ?? "run";
+      const taskKey = segments.at(-2) ?? "unknown";
+      await route.fulfill(
+        json({
+          success: true,
+          message: `Task ${taskKey} ${action} completed`,
+          task_key: taskKey
+        })
+      );
+      return;
+    }
+
+    await route.fallback();
+  });
 
   await page.route("**/api/v1/**", async (route) => {
     const url = route.request().url();
@@ -215,6 +302,37 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
 
     if (url.endsWith("/care-circle/family/patients")) {
       await route.fulfill(json({ success: true, data: careCirclePatients }));
+      return;
+    }
+
+    if (url.endsWith("/care-circle/family/owner-summary")) {
+      await route.fulfill(
+        json({
+          success: true,
+          data: {
+            id: 11,
+            name: "Story Maker household",
+            join_code: "STM111",
+            active_member_count: 3,
+            pending_request_count: 1
+          }
+        })
+      );
+      return;
+    }
+
+    if (url.endsWith("/care-circle/family/invite-email") && method === "POST") {
+      const body = route.request().postDataJSON() as { email?: string };
+      await route.fulfill(
+        json({
+          success: true,
+          data: {
+            sent: true,
+            email: body.email ?? "family.member@example.com",
+            join_code: "STM111"
+          }
+        }, 201)
+      );
       return;
     }
 

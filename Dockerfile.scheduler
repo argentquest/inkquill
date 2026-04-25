@@ -25,6 +25,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# These system libraries are required for Playwright's headless Chromium browser,
+# which is used by newsletter_pdf_service.py to generate newsletter PDFs.
+# DO NOT remove these or switch to a plain python:slim base without re-adding them.
+# The scheduler image MUST include Chromium support — PDF generation will silently
+# fail or crash at runtime if these dependencies are missing.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       curl \
@@ -54,6 +59,8 @@ RUN apt-get update && \
 COPY --from=builder /wheels /wheels
 RUN pip install /wheels/* && rm -rf /wheels
 
+# Install the Chromium browser binary into PLAYWRIGHT_BROWSERS_PATH.
+# This is what newsletter_pdf_service.py launches to render HTML → PDF.
 RUN python -m playwright install chromium
 
 COPY app /app/app

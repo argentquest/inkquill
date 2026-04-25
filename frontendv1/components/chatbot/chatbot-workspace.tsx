@@ -103,7 +103,7 @@ export function ChatbotWorkspace() {
                 <div
                   className={`max-w-2xl rounded-[24px] px-5 py-4 text-sm leading-7 ${
                     isAssistant
-                      ? "bg-[linear-gradient(135deg,rgba(246,241,232,0.96),rgba(220,229,226,0.88))] text-ink-900"
+                      ? "bg-[var(--bg-chat-assistant)] text-ink-900"
                       : "bg-ink-900 text-paper"
                   }`}
                 >

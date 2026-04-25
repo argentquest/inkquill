@@ -17,12 +17,16 @@ from app.models.job_status import JobStateEnum, JobTypeEnum
 from app.models.user import User
 from app.schemas.base import ApiError, ApiResponse
 from app.schemas.care_circle import (
+    AdminFamilyDisableRequest,
     CareCirclePatientCreateRequest,
     CareCirclePatientLoginRequest,
     CareCirclePatientUpdateRequest,
     CareCircleProviderPatientConfigUpdate,
     CareCircleProviderReorderRequest,
+    FamilyInviteEmailRequest,
+    JoinFamilyRequest,
 )
+from app.services.email_service import EmailService, get_email_service
 from app.utils.iso_codes import LANGUAGES, COUNTRIES
 
 router = APIRouter(prefix="/care-circle", tags=["care-circle"])
@@ -499,3 +503,170 @@ async def reorder_patient_provider_configs(
         db, patient_id, [item.model_dump() for item in payload.ordering]
     )
     return ApiResponse.success_response(data={"message": "Order saved"})
+
+
+# ---------------------------------------------------------------------------
+# Family membership / join-request endpoints
+# ---------------------------------------------------------------------------
+
+@router.post("/family/join", response_model=ApiResponse, status_code=201)
+async def join_family(
+    payload: JoinFamilyRequest,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Submit a request to join a family by join code."""
+    try:
+        result = await care_circle_crud.request_to_join_family(db, current_user, payload.join_code)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return ApiResponse.success_response(data=result)
+
+
+@router.get("/family/owner-summary", response_model=ApiResponse)
+async def get_owner_family_summary(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Return family summary data for the current owner account page."""
+    try:
+        result = await care_circle_crud.get_owner_family_summary(db, current_user)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+    return ApiResponse.success_response(data=result)
+
+
+@router.post("/family/invite-email", response_model=ApiResponse, status_code=201)
+async def send_family_invite_email(
+    payload: FamilyInviteEmailRequest,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+    email_service: EmailService = Depends(get_email_service),
+):
+    """Send a Care Circle invite email containing the owner's family join code."""
+    try:
+        summary = await care_circle_crud.get_owner_family_summary(db, current_user)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+    success = await email_service.send_care_circle_invite_email(
+        recipient_email=payload.email,
+        family_name=summary["name"],
+        join_code=summary["join_code"],
+        inviter_name=current_user.display_name or current_user.username,
+    )
+    if not success:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Invite email could not be sent.")
+
+    return ApiResponse.success_response(
+        data={
+            "sent": True,
+            "email": payload.email,
+            "join_code": summary["join_code"],
+        }
+    )
+
+
+@router.get("/family/join-requests", response_model=ApiResponse)
+async def list_join_requests(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    """List pending join requests for the current owner's family."""
+    requests = await care_circle_crud.list_join_requests(db, current_user)
+    return ApiResponse.success_response(data=requests)
+
+
+@router.put("/family/join-requests/{membership_id}/approve", response_model=ApiResponse)
+async def approve_join_request(
+    membership_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    try:
+        result = await care_circle_crud.resolve_join_request(db, current_user, membership_id, approve=True)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return ApiResponse.success_response(data=result)
+
+
+@router.put("/family/join-requests/{membership_id}/reject", response_model=ApiResponse)
+async def reject_join_request(
+    membership_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    try:
+        result = await care_circle_crud.resolve_join_request(db, current_user, membership_id, approve=False)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return ApiResponse.success_response(data=result)
+
+
+@router.get("/family/members", response_model=ApiResponse)
+async def list_family_members(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    """List active members of the current owner's family."""
+    members = await care_circle_crud.list_family_members(db, current_user)
+    return ApiResponse.success_response(data=members)
+
+
+@router.delete("/family/members/{membership_id}", response_model=ApiResponse)
+async def remove_family_member(
+    membership_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    try:
+        await care_circle_crud.remove_family_member(db, current_user, membership_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return ApiResponse.success_response(data={"message": "Member removed"})
+
+
+# ---------------------------------------------------------------------------
+# Admin family management endpoints
+# ---------------------------------------------------------------------------
+
+@router.get("/admin/families", response_model=ApiResponse)
+async def admin_list_families(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    families = await care_circle_crud.admin_list_families(db)
+    return ApiResponse.success_response(data=families)
+
+
+@router.put("/admin/families/{family_id}/disable", response_model=ApiResponse)
+async def admin_disable_family(
+    family_id: int,
+    payload: AdminFamilyDisableRequest,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    try:
+        result = await care_circle_crud.admin_set_family_disabled(db, family_id, payload.disabled)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return ApiResponse.success_response(data=result)
+
+
+@router.delete("/admin/families/{family_id}", response_model=ApiResponse)
+async def admin_delete_family(
+    family_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    try:
+        await care_circle_crud.admin_delete_family(db, family_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return ApiResponse.success_response(data={"message": "Family deleted"})

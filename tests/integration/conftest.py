@@ -86,6 +86,9 @@ class FakeEmailService:
     async def send_story_completion_email(self, *args, **kwargs):
         return True
 
+    async def send_care_circle_invite_email(self, *args, **kwargs):
+        return True
+
 
 @pytest.fixture(scope="session")
 def integration_db_name():
@@ -235,6 +238,22 @@ def app_instance(test_db_url, integration_temp_root):
                     """
                     ALTER TABLE care_circle_patient_content_cards
                     ADD COLUMN IF NOT EXISTS rendered_html TEXT
+                    """
+                )
+            )
+            await conn.execute(
+                text(
+                    """
+                    ALTER TABLE care_circle_family_memberships
+                    ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'active'
+                    """
+                )
+            )
+            await conn.execute(
+                text(
+                    """
+                    ALTER TABLE care_circle_families
+                    ADD COLUMN IF NOT EXISTS is_disabled BOOLEAN NOT NULL DEFAULT FALSE
                     """
                 )
             )

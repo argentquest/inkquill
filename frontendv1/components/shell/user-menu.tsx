@@ -3,16 +3,20 @@
 import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, LogOut, UserRound } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { resolvePlatformContext } from "@/components/platform/platform-context";
 import { useSession, useToasts } from "@/components/providers/app-providers";
 import { logoutUser } from "@/lib/api";
 
 export function UserMenu() {
   const router = useRouter();
+  const pathname = usePathname();
   const { pushToast } = useToasts();
-  const { setAnonymous, status, user } = useSession();
+  const session = useSession();
+  const { setAnonymous, status, user } = session;
+  const context = resolvePlatformContext(pathname, session);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (status !== "authenticated" || !user) {
@@ -75,11 +79,13 @@ export function UserMenu() {
               Edit profile
             </Link>
           </DropdownMenu.Item>
-          <DropdownMenu.Item asChild>
-            <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href="/app/onboarding">
-              Onboarding
-            </Link>
-          </DropdownMenu.Item>
+          {context.surface_id !== "care-circle-patient" && (
+            <DropdownMenu.Item asChild>
+              <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href="/app/onboarding">
+                Onboarding
+              </Link>
+            </DropdownMenu.Item>
+          )}
           <DropdownMenu.Item className="rounded-xl px-3 py-2 text-sm text-ink-600 outline-none">
             {user.email}
           </DropdownMenu.Item>

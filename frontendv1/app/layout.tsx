@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Lora } from "next/font/google";
+import { EB_Garamond, JetBrains_Mono, Lora } from "next/font/google";
 
 import "@/app/globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
@@ -23,6 +23,14 @@ const lora = Lora({
   display: "swap",
 });
 
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  style: ["normal", "italic"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Ink & Quill",
   description: "Care Circle — a thoughtful platform for family and friend care coordination."
@@ -30,7 +38,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${ebGaramond.variable} ${lora.variable}`}>
+    <html lang="en" className={`${ebGaramond.variable} ${lora.variable} ${jetBrainsMono.variable}`}>
       <body>
         <AppProviders>
           <MaintenanceBanner />

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}You're invited to join {{ family_name }} on Care Circle{% endblock %}
+
+{% block content %}
+<h1>You're invited to join {{ family_name }} on Care Circle.</h1>
+
+<p>{{ inviter_name }} has invited this email address to join their family circle.</p>
+
+<div class="info-box">
+    <h2>Your join code</h2>
+    <p style="font-size: 28px; font-weight: 700; letter-spacing: 0.24em; margin: 8px 0 0 0;">{{ join_code }}</p>
+</div>
+
+<p>Create your account, then enter this join code to send your request to the family owner for approval.</p>
+
+<div class="text-center">
+    <a href="{{ join_url }}" class="btn btn-primary">Open join page</a>
+</div>
+
+<div class="spacer"></div>
+
+<p>If the button above does not work, visit this page and enter the code manually:</p>
+<p><a href="{{ join_url }}" style="color: #206bc4; text-decoration: none;">{{ join_url }}</a></p>
+
+<div class="warning-box">
+    <h2>Need to share it manually?</h2>
+    <p>You can also copy and share the join code directly: <strong>{{ join_code }}</strong></p>
+</div>
+
+<p><strong>{{ family_name }}</strong> will only add you after the family owner approves your request.</p>
+{% endblock %}

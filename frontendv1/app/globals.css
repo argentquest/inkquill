@@ -38,10 +38,11 @@
   --shadow-panel: 0 20px 60px rgba(19, 22, 26, 0.12);
 
   /* ── Backgrounds ───────────────────────────────────── */
-  --bg-shell:       linear-gradient(135deg, #f6f1e8 0%, #efe7db 100%);
-  --bg-patient:     linear-gradient(135deg, #dce5e2 0%, #f6f1e8 100%);
-  --bg-chat-aside:  linear-gradient(160deg, #285751 0%, #1f3b36 60%, #231913 100%);
-  --bg-card-strong: rgba(255, 255, 255, 0.78);
+  --bg-shell:           linear-gradient(135deg, #f6f1e8 0%, #efe7db 100%);
+  --bg-patient:         linear-gradient(135deg, #dce5e2 0%, #f6f1e8 100%);
+  --bg-chat-aside:      linear-gradient(160deg, #285751 0%, #1f3b36 60%, #231913 100%);
+  --bg-chat-assistant:  linear-gradient(135deg, rgba(246, 241, 232, 0.96) 0%, rgba(220, 229, 226, 0.88) 100%);
+  --bg-card-strong:     rgba(255, 255, 255, 0.78);
 
   /* ── Status: Info ──────────────────────────────────── */
   --info-bg:     rgba(220, 229, 226, 0.50);
