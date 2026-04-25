@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import { PatientSessionClient } from "@/components/care-circle-patient/patient-session-client";
 import { PageHeader } from "@/components/shell/page-header";
+import { HelpButton } from "@/components/ui/help-modal";
+import { careCirclePatientHomeHelp } from "@/lib/help-content";
 
 export default async function CareCirclePatientHomePage({
   searchParams
@@ -31,6 +33,7 @@ export default async function CareCirclePatientHomePage({
         title="Your day is ready."
       />
       <PatientSessionClient patientId={params.patient} />
+      <HelpButton helpContent={careCirclePatientHomeHelp} position="bottom-right" />
     </div>
   );
 }

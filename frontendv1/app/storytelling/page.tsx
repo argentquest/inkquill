@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { PageHeader } from "@/components/shell/page-header";
+import { HelpButton } from "@/components/ui/help-modal";
+import { storytellingHelp } from "@/lib/help-content";
 
 export default function StorytellingPage() {
   return (
@@ -23,6 +25,7 @@ export default function StorytellingPage() {
           This entry route is reserved for the storytelling shell, world routes, and story routes defined in the platform plan.
         </p>
       </section>
+      <HelpButton helpContent={storytellingHelp} position="bottom-right" />
     </div>
   );
 }

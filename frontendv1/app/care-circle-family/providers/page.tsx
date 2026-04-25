@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react";
 
 import { fetchCareCircleProviders } from "@/lib/api";
 import { PageHeader } from "@/components/shell/page-header";
+import { HelpButton } from "@/components/ui/help-modal";
+import { careCircleProvidersHelp } from "@/lib/help-content";
 
 export default function ProvidersPage() {
   const { data: providers, isLoading, isError } = useQuery({
@@ -61,6 +63,8 @@ export default function ProvidersPage() {
           ))}
         </div>
       )}
+
+      <HelpButton helpContent={careCircleProvidersHelp} position="bottom-right" />
     </div>
   );
 }

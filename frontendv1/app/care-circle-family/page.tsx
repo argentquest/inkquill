@@ -5,6 +5,8 @@ import { Users, Puzzle, CreditCard, Gift, UserCircle, Camera, Activity, UserChec
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
+import { HelpButton } from "@/components/ui/help-modal";
+import { careCircleFamilyHelp } from "@/lib/help-content";
 
 const ownerLinks = [
   { href: "/care-circle-family/patients", label: "Friends", description: "View and manage all friend profiles.", icon: Users },
@@ -60,6 +62,8 @@ export default function CareCircleFamilyPage() {
           </Link>
         ))}
       </div>
+
+      <HelpButton helpContent={careCircleFamilyHelp} position="bottom-right" />
     </div>
   );
 }

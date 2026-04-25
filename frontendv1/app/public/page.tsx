@@ -1,6 +1,8 @@
 import { PublicShell } from "@/components/shell/public-shell";
 import { PageHeader } from "@/components/shell/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { HelpButton } from "@/components/ui/help-modal";
+import { publicPageHelp } from "@/lib/help-content";
 
 export default function PublicPage() {
   return (
@@ -16,6 +18,7 @@ export default function PublicPage() {
           eyebrow="Empty State"
           title="This surface is intentionally sparse in Sprint 1."
         />
+        <HelpButton helpContent={publicPageHelp} position="bottom-right" />
       </div>
     </PublicShell>
   );

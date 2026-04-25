@@ -5,23 +5,35 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { InlineValidationMessage } from "@/components/ui/inline-validation-message";
+import { Tooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+
+interface PasswordFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  error?: string;
+  hint?: string;
+  tooltip?: string;
+  showTooltip?: boolean;
+}
 
 export function PasswordField({
   error,
   hint,
   label,
+  tooltip,
+  showTooltip = false,
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-  error?: string;
-  hint?: string;
-}) {
+}: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
 
   return (
     <label className="block">
-      <span className="text-xs uppercase tracking-[0.24em] text-ink-600">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-xs uppercase tracking-[0.24em] text-ink-600">{label}</span>
+        {showTooltip && tooltip && (
+          <Tooltip content={tooltip} position="right" variant="icon" />
+        )}
+      </div>
       <div className="relative mt-2">
         <input
           className={cn(

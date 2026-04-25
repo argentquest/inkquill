@@ -79,13 +79,6 @@ export function UserMenu() {
               Edit profile
             </Link>
           </DropdownMenu.Item>
-          {context.surface_id !== "care-circle-patient" && (
-            <DropdownMenu.Item asChild>
-              <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href="/app/onboarding">
-                Onboarding
-              </Link>
-            </DropdownMenu.Item>
-          )}
           <DropdownMenu.Item className="rounded-xl px-3 py-2 text-sm text-ink-600 outline-none">
             {user.email}
           </DropdownMenu.Item>

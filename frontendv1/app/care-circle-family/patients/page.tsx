@@ -1,5 +1,9 @@
+"use client";
+
 import { FamilyPatientsClient } from "@/components/care-circle-family/family-patients-client";
 import { PageHeader } from "@/components/shell/page-header";
+import { HelpButton } from "@/components/ui/help-modal";
+import { careCirclePatientsHelp } from "@/lib/help-content";
 
 export default function CareCircleFamilyPatientsPage() {
   return (
@@ -11,6 +15,8 @@ export default function CareCircleFamilyPatientsPage() {
       />
 
       <FamilyPatientsClient />
+
+      <HelpButton helpContent={careCirclePatientsHelp} position="bottom-right" />
     </div>
   );
 }

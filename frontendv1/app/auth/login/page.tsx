@@ -11,6 +11,8 @@ import { useSession, useToasts } from "@/components/providers/app-providers";
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
 import { GoogleSigninButton } from "@/components/ui/google-signin-button";
+import { HelpModal } from "@/components/ui/help-modal";
+import { loginHelp } from "@/lib/help-content";
 import { PasswordField } from "@/components/ui/password-field";
 import { TextField } from "@/components/ui/text-field";
 import { normalizeNextPath } from "@/lib/auth-redirect";
@@ -90,15 +92,34 @@ export default function LoginPage() {
 
   return (
     <section className="rounded-[32px] border border-black/10 bg-white/80 p-8 shadow-panel">
-      <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Authentication</p>
-      <h1 className="mt-3 font-display text-4xl text-ink-900">Sign in to continue your work.</h1>
-      <p className="mt-4 text-sm leading-7 text-ink-700">
-        Sprint 2 keeps auth entry explicit, keyboard-friendly, and aligned with the account landing flow.
-      </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Authentication</p>
+          <h1 className="mt-3 font-display text-4xl text-ink-900">Sign in to continue your work.</h1>
+          <p className="mt-4 text-sm leading-7 text-ink-700">
+            Sprint 2 keeps auth entry explicit, keyboard-friendly, and aligned with the account landing flow.
+          </p>
+        </div>
+        <HelpModal helpContent={loginHelp} triggerLabel="Help" />
+      </div>
       <form className="mt-8 space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
         {submitError ? <AlertBanner title="Login failed" detail={submitError} tone="error" /> : null}
-        <TextField label="Username" autoComplete="username" error={form.formState.errors.username?.message} {...form.register("username")} />
-        <PasswordField label="Password" autoComplete="current-password" error={form.formState.errors.password?.message} {...form.register("password")} />
+        <TextField
+          label="Username"
+          autoComplete="username"
+          error={form.formState.errors.username?.message}
+          tooltip="Enter the username or email associated with your account."
+          showTooltip
+          {...form.register("username")}
+        />
+        <PasswordField
+          label="Password"
+          autoComplete="current-password"
+          error={form.formState.errors.password?.message}
+          tooltip="Your password must be at least 8 characters. Passwords are case-sensitive."
+          showTooltip
+          {...form.register("password")}
+        />
         <Button className="w-full" disabled={form.formState.isSubmitting} type="submit">
           {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
