@@ -1,0 +1,11 @@
+{
+  "name": "Dream of the Rarebit Fiend",
+  "description": "Surreal comic strip by Winsor McCay about bizarre dreams after eating Welsh rarebit. Public domain.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

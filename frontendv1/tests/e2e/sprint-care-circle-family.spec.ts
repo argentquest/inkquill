@@ -187,6 +187,26 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByRole("heading", { name: "Loaded jobs" })).toBeVisible();
   });
 
+  test("family admin families page requires explicit delete confirmation and removes the family", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/admin/families");
+
+    await expect(page.getByRole("heading", { name: "All families" })).toBeVisible();
+    await expect(page.getByText("Story Maker household")).toBeVisible();
+
+    await page.getByRole("button", { name: "Delete..." }).first().click();
+
+    await expect(page.getByRole("heading", { name: "Story Maker household" })).toBeVisible();
+    await expect(page.getByText("This permanently removes the family, patient profiles, memberships, and related Care Circle data.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Delete Story Maker household" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Delete Story Maker household" }).click();
+
+    await expect(page.getByText("Story Maker household")).not.toBeVisible();
+    await expect(page.getByText("Arthur's Circle")).toBeVisible();
+    await expect(page.getByText("The family and all its data have been removed.")).toBeVisible();
+  });
+
   test("family events page loads", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/events");

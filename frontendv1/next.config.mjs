@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+const BACKEND_ORIGIN =
+  !configuredApiBaseUrl || configuredApiBaseUrl.startsWith("/")
+    ? "http://localhost:8000"
+    : configuredApiBaseUrl.replace(/\/api\/v1\/?$/, "");
 
 const nextConfig = {
   reactStrictMode: true,
@@ -19,7 +23,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: `${BACKEND_URL}/api/:path*`,
+        destination: `${BACKEND_ORIGIN}/api/:path*`,
       },
     ];
   },

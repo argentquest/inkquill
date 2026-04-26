@@ -19,6 +19,11 @@ function Write-Status {
 }
 
 $logFile = Join-Path $logsRoot "scheduler-$runStamp.log"
+$schedulerArgs = if ($Detach) {
+    "-m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001"
+} else {
+    "-m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001 --reload"
+}
 
 Write-Status "=== Starting Ink & Quill Scheduler ===" -Color Green
 Write-Status "Log file: $logFile" -Color Gray
@@ -26,14 +31,14 @@ Write-Status "Scheduler will run on http://localhost:8001" -Color Yellow
 
 if ($NoLogs) {
     Write-Status "Running scheduler without log redirection..." -Color Gray
-    & $pythonExe -m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001 --reload
+    Invoke-Expression "& `"$pythonExe`" $schedulerArgs"
 } else {
     Write-Status "Logs will be written to $logFile" -Color Gray
     
     if ($Detach) {
-        Write-Status "Starting scheduler in background (detached)..." -Color Green
+        Write-Status "Starting scheduler in background (detached, reload disabled for Windows stability)..." -Color Green
         Start-Process -FilePath $pythonExe `
-                      -ArgumentList "-m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001 --reload" `
+                      -ArgumentList $schedulerArgs `
                       -RedirectStandardOutput $logFile `
                       -RedirectStandardError "$logFile.err" `
                       -NoNewWindow
@@ -41,7 +46,7 @@ if ($NoLogs) {
     } else {
         Write-Status "Starting scheduler (press Ctrl+C to stop)..." -Color Green
         try {
-            & $pythonExe -m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001 --reload 2>&1 | Tee-Object -FilePath $logFile
+            Invoke-Expression "& `"$pythonExe`" $schedulerArgs" 2>&1 | Tee-Object -FilePath $logFile
         } catch {
             Write-Status "Scheduler stopped." -Color Yellow
         }

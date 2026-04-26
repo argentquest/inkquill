@@ -27,33 +27,6 @@ services:
       - ${CARE_CIRCLE_DATA_ROOT}/logs/backend:/app/logs
     restart: unless-stopped
 
-  scheduler:
-    build:
-      context: ../..
-      dockerfile: Dockerfile.scheduler
-    env_file:
-      - ${CARE_CIRCLE_RUNTIME_ENV_FILE}
-    environment:
-      POSTGRES_SERVER: db
-      POSTGRES_PORT: "5432"
-      SCHEDULER_PORT: "8001"
-      APP_LOG_DIR: /app/logs
-    depends_on:
-      db:
-        condition: service_healthy
-    expose:
-      - "8001"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8001/scheduler/health >/dev/null || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
-    volumes:
-      - ${CARE_CIRCLE_DATA_ROOT}/cache:/app/cache
-      - ${CARE_CIRCLE_DATA_ROOT}/logs/scheduler:/app/logs
-    restart: unless-stopped
-
   frontend:
     build:
       context: ../../frontendv1
@@ -62,9 +35,16 @@ services:
         NEXT_PUBLIC_API_BASE_URL: /api/v1
     environment:
       NEXT_PUBLIC_API_BASE_URL: /api/v1
+      BACKEND_INTERNAL_URL: http://backend:8000
+      # The scheduler runs as a standalone host process. host.docker.internal resolves
+      # to the Docker bridge gateway on Linux (via extra_hosts) and is automatic on
+      # Docker Desktop (Mac/Windows).
+      SCHEDULER_BASE_URL: http://host.docker.internal:8001
       HOSTNAME: 0.0.0.0
       PORT: "3000"
       NODE_ENV: production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       backend:
         condition: service_started

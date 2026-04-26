@@ -37,7 +37,7 @@ if ($startBackend) {
 # Start Scheduler
 if ($startScheduler) {
     Write-Status "`nStarting Scheduler on http://localhost:8001 ..." -Color Magenta
-    Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"cd '$repoRoot'; .\$pythonExe -m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001 --reload`"" -NoNewWindow
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"cd '$repoRoot'; .\$pythonExe -m uvicorn app.scheduler.main:app --host 0.0.0.0 --port 8001`"" -NoNewWindow
     Start-Sleep -Seconds 3
 }
 

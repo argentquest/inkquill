@@ -70,12 +70,13 @@ async def test_pregenerate_daily_sessions_creates_job_and_passes_job_id(monkeypa
         )
         return SimpleNamespace(job_id=job_id, state=state)
 
-    async def fake_assemble_daily_patient_session(db, patient_id, force_regenerate=False, job_id=None):
+    async def fake_assemble_daily_patient_session(db, patient_id, force_regenerate=False, job_id=None, for_date=None):
         captured["assembled"].append(
             {
                 "patient_id": patient_id,
                 "job_id": job_id,
                 "force_regenerate": force_regenerate,
+                "for_date": for_date,
             }
         )
         return True

@@ -67,12 +67,14 @@ class Settings(BaseSettings):
     # --- Care Circle Specific Provider Configuration ---
     CARE_CIRCLE_TEXT_PROVIDER: str = Field(default="AUTO", alias="CARE_CIRCLE_TEXT_PROVIDER")
     CARE_CIRCLE_IMAGE_PROVIDER: str = Field(default="AUTO", alias="CARE_CIRCLE_IMAGE_PROVIDER")
-    CARE_CIRCLE_DEFAULT_TEXT_MODEL: str = Field(default="google/gemini-3.1-flash-lite-preview", alias="CARE_CIRCLE_DEFAULT_TEXT_MODEL")
-    CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="google/gemini-3.1-flash-image-preview", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
+    CARE_CIRCLE_DEFAULT_TEXT_MODEL: str = Field(default="openai/gpt-4o-mini", alias="CARE_CIRCLE_DEFAULT_TEXT_MODEL")
+    CARE_CIRCLE_DEFAULT_IMAGE_MODEL: str = Field(default="gpt-image-1", alias="CARE_CIRCLE_DEFAULT_IMAGE_MODEL")
     CARE_CIRCLE_DEFAULT_INPUT_PRICE_USD_PM: float = Field(default=0.60, alias="CARE_CIRCLE_DEFAULT_INPUT_PRICE_USD_PM")
     CARE_CIRCLE_DEFAULT_OUTPUT_PRICE_USD_PM: float = Field(default=0.60, alias="CARE_CIRCLE_DEFAULT_OUTPUT_PRICE_USD_PM")
     AZURE_FOUNDRY_API_KEY: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_API_KEY")
     AZURE_FOUNDRY_ENDPOINT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_ENDPOINT")
+    AZURE_FOUNDRY_TEXT_ENDPOINT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_TEXT_ENDPOINT")
+    AZURE_FOUNDRY_IMAGE_ENDPOINT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_IMAGE_ENDPOINT")
     AZURE_FOUNDRY_API_VERSION: str = Field(default="2024-10-21", alias="AZURE_FOUNDRY_API_VERSION")
     AZURE_FOUNDRY_TEXT_DEPLOYMENT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_TEXT_DEPLOYMENT")
     AZURE_FOUNDRY_IMAGE_DEPLOYMENT: Optional[str] = Field(default=None, alias="AZURE_FOUNDRY_IMAGE_DEPLOYMENT")
@@ -97,6 +99,7 @@ class Settings(BaseSettings):
     AI_ORCHESTRATION_BACKEND: str = Field(default="LANGGRAPH", alias="AI_ORCHESTRATION_BACKEND")
 
     # --- Scheduler Server Configuration ---
+    SCHEDULER_HOST: str = Field(default="127.0.0.1", alias="SCHEDULER_HOST")
     SCHEDULER_PORT: int = Field(default=8001, alias="SCHEDULER_PORT")
     SCHEDULER_ENABLED: bool = Field(default=True, alias="SCHEDULER_ENABLED")
     SCHEDULER_MISFIRE_GRACE_TIME: int = Field(default=300, alias="SCHEDULER_MISFIRE_GRACE_TIME")

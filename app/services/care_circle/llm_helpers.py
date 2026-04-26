@@ -52,26 +52,37 @@ def _normalize_provider_name(value: str | None, default: str = "AUTO") -> str:
     return str(value or default).strip().upper()
 
 
-def _normalize_azure_foundry_endpoint(endpoint: str) -> str:
+def _normalize_azure_foundry_endpoint(endpoint: str, setting_name: str = "AZURE_FOUNDRY_ENDPOINT") -> str:
     trimmed = endpoint.strip().rstrip("/")
     parsed = urlparse(trimmed)
     if not parsed.scheme or not parsed.netloc:
-        raise RuntimeError("AZURE_FOUNDRY_ENDPOINT must be a valid HTTPS URL.")
-    return f"{parsed.scheme}://{parsed.netloc}"
+        raise RuntimeError(f"{setting_name} must be a valid HTTPS URL.")
+    return trimmed
 
 
-def _build_azure_foundry_client(model_name: str):
+def _build_foundry_openai_base_url(endpoint: str) -> str:
+    return f"{endpoint.rstrip('/')}/openai/v1/"
+
+
+def _build_azure_foundry_client(model_name: str, endpoint: str):
     import openai
-    from app.core.config import settings
 
     if not settings.AZURE_FOUNDRY_API_KEY:
         raise RuntimeError("AZURE_FOUNDRY_API_KEY is not configured.")
-    if not settings.AZURE_FOUNDRY_ENDPOINT:
-        raise RuntimeError("AZURE_FOUNDRY_ENDPOINT is not configured.")
+    parsed = urlparse(endpoint)
+
+    # Azure AI Foundry project/resource endpoints on services.ai.azure.com use
+    # the OpenAI-compatible v1 base_url flow, including non-OpenAI models like Grok.
+    if parsed.netloc.endswith("services.ai.azure.com"):
+        client = openai.AsyncOpenAI(
+            api_key=settings.AZURE_FOUNDRY_API_KEY,
+            base_url=_build_foundry_openai_base_url(endpoint),
+        )
+        return client, model_name
 
     client = openai.AsyncAzureOpenAI(
         api_key=settings.AZURE_FOUNDRY_API_KEY,
-        azure_endpoint=_normalize_azure_foundry_endpoint(settings.AZURE_FOUNDRY_ENDPOINT),
+        azure_endpoint=f"{parsed.scheme}://{parsed.netloc}",
         api_version=settings.AZURE_FOUNDRY_API_VERSION,
     )
     return client, model_name
@@ -85,11 +96,18 @@ def _build_text_client():
     provider = _normalize_provider_name(settings.CARE_CIRCLE_TEXT_PROVIDER)
 
     if provider == "AZURE_FOUNDRY":
+        endpoint_value = (
+            settings.AZURE_FOUNDRY_TEXT_ENDPOINT
+            or settings.AZURE_FOUNDRY_ENDPOINT
+        )
+        if not endpoint_value:
+            raise RuntimeError("AZURE_FOUNDRY_TEXT_ENDPOINT or AZURE_FOUNDRY_ENDPOINT is not configured.")
+        endpoint = _normalize_azure_foundry_endpoint(endpoint_value, "AZURE_FOUNDRY_TEXT_ENDPOINT")
         model_name = (
             settings.AZURE_FOUNDRY_TEXT_DEPLOYMENT
             or settings.CARE_CIRCLE_DEFAULT_TEXT_MODEL
         )
-        return _build_azure_foundry_client(model_name)
+        return _build_azure_foundry_client(model_name, endpoint)
 
     if provider in {"LMSTUDIO", "AUTO"} and settings.LMSTUDIO_ENABLED:
         client = openai.AsyncOpenAI(
@@ -113,20 +131,24 @@ def _build_text_client():
         return client, model_name
 
     if provider in {"OPENAI", "AUTO"} and settings.OPENAI_API_KEY:
-        model_name = "gpt-4o-mini"
+        model_name = settings.DEFAULT_GENERATION_MODEL_NAME
         client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         return client, model_name
 
     if (
         provider == "AUTO"
         and settings.AZURE_FOUNDRY_API_KEY
-        and settings.AZURE_FOUNDRY_ENDPOINT
+        and (settings.AZURE_FOUNDRY_TEXT_ENDPOINT or settings.AZURE_FOUNDRY_ENDPOINT)
     ):
+        endpoint = _normalize_azure_foundry_endpoint(
+            settings.AZURE_FOUNDRY_TEXT_ENDPOINT or settings.AZURE_FOUNDRY_ENDPOINT,
+            "AZURE_FOUNDRY_TEXT_ENDPOINT",
+        )
         model_name = (
             settings.AZURE_FOUNDRY_TEXT_DEPLOYMENT
             or settings.CARE_CIRCLE_DEFAULT_TEXT_MODEL
         )
-        return _build_azure_foundry_client(model_name)
+        return _build_azure_foundry_client(model_name, endpoint)
 
     raise RuntimeError(
         "No Care Circle text provider is configured. Set CARE_CIRCLE_TEXT_PROVIDER with matching credentials."
@@ -141,11 +163,18 @@ def _build_image_client():
     provider = _normalize_provider_name(settings.CARE_CIRCLE_IMAGE_PROVIDER)
 
     if provider == "AZURE_FOUNDRY":
+        endpoint_value = (
+            settings.AZURE_FOUNDRY_IMAGE_ENDPOINT
+            or settings.AZURE_FOUNDRY_ENDPOINT
+        )
+        if not endpoint_value:
+            raise RuntimeError("AZURE_FOUNDRY_IMAGE_ENDPOINT or AZURE_FOUNDRY_ENDPOINT is not configured.")
+        endpoint = _normalize_azure_foundry_endpoint(endpoint_value, "AZURE_FOUNDRY_IMAGE_ENDPOINT")
         model_name = (
             settings.AZURE_FOUNDRY_IMAGE_DEPLOYMENT
             or settings.CARE_CIRCLE_DEFAULT_IMAGE_MODEL
         )
-        return _build_azure_foundry_client(model_name)
+        return _build_azure_foundry_client(model_name, endpoint)
 
     if provider in {"OPENAI", "AUTO"} and settings.OPENAI_API_KEY:
         return (
@@ -156,13 +185,17 @@ def _build_image_client():
     if (
         provider == "AUTO"
         and settings.AZURE_FOUNDRY_API_KEY
-        and settings.AZURE_FOUNDRY_ENDPOINT
+        and (settings.AZURE_FOUNDRY_IMAGE_ENDPOINT or settings.AZURE_FOUNDRY_ENDPOINT)
     ):
+        endpoint = _normalize_azure_foundry_endpoint(
+            settings.AZURE_FOUNDRY_IMAGE_ENDPOINT or settings.AZURE_FOUNDRY_ENDPOINT,
+            "AZURE_FOUNDRY_IMAGE_ENDPOINT",
+        )
         model_name = (
             settings.AZURE_FOUNDRY_IMAGE_DEPLOYMENT
             or settings.CARE_CIRCLE_DEFAULT_IMAGE_MODEL
         )
-        return _build_azure_foundry_client(model_name)
+        return _build_azure_foundry_client(model_name, endpoint)
 
     raise RuntimeError(
         "No Care Circle image provider is configured. Set CARE_CIRCLE_IMAGE_PROVIDER with matching credentials."

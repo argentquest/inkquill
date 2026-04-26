@@ -53,6 +53,8 @@ def reset_care_circle_provider_settings(monkeypatch):
     )
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", None, raising=False)
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_ENDPOINT", None, raising=False)
+    monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_TEXT_ENDPOINT", None, raising=False)
+    monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_IMAGE_ENDPOINT", None, raising=False)
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_VERSION", "2024-10-21", raising=False)
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_TEXT_DEPLOYMENT", None, raising=False)
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_IMAGE_DEPLOYMENT", None, raising=False)
@@ -67,7 +69,7 @@ def test_build_text_client_uses_azure_foundry_when_selected(
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", "azure-key", raising=False)
     monkeypatch.setattr(
         llm_helpers.settings,
-        "AZURE_FOUNDRY_ENDPOINT",
+        "AZURE_FOUNDRY_TEXT_ENDPOINT",
         "https://example-resource.openai.azure.com/",
         raising=False,
     )
@@ -96,7 +98,7 @@ def test_build_text_client_normalizes_project_endpoint_to_resource_root(
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", "azure-key", raising=False)
     monkeypatch.setattr(
         llm_helpers.settings,
-        "AZURE_FOUNDRY_ENDPOINT",
+        "AZURE_FOUNDRY_TEXT_ENDPOINT",
         "https://aiclassus2-resource.services.ai.azure.com/api/projects/aiclassus2",
         raising=False,
     )
@@ -109,8 +111,8 @@ def test_build_text_client_normalizes_project_endpoint_to_resource_root(
 
     client, _ = llm_helpers._build_text_client()
 
-    assert isinstance(client, fake_openai_module.AsyncAzureOpenAI)
-    assert client.kwargs["azure_endpoint"] == "https://aiclassus2-resource.services.ai.azure.com"
+    assert isinstance(client, fake_openai_module.AsyncOpenAI)
+    assert client.kwargs["base_url"] == "https://aiclassus2-resource.services.ai.azure.com/api/projects/aiclassus2/openai/v1/"
 
 
 def test_build_image_client_uses_azure_foundry_when_selected(
@@ -122,8 +124,8 @@ def test_build_image_client_uses_azure_foundry_when_selected(
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", "azure-key", raising=False)
     monkeypatch.setattr(
         llm_helpers.settings,
-        "AZURE_FOUNDRY_ENDPOINT",
-        "https://example-resource.openai.azure.com/",
+        "AZURE_FOUNDRY_IMAGE_ENDPOINT",
+        "https://example-resource.openai.azure.com/openai/v1",
         raising=False,
     )
     monkeypatch.setattr(
@@ -137,6 +139,7 @@ def test_build_image_client_uses_azure_foundry_when_selected(
 
     assert isinstance(client, fake_openai_module.AsyncAzureOpenAI)
     assert model_name == "care-circle-image"
+    assert client.kwargs["azure_endpoint"] == "https://example-resource.openai.azure.com"
 
 
 def test_build_text_client_auto_falls_back_to_openrouter_before_azure(
@@ -148,7 +151,7 @@ def test_build_text_client_auto_falls_back_to_openrouter_before_azure(
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", "azure-key", raising=False)
     monkeypatch.setattr(
         llm_helpers.settings,
-        "AZURE_FOUNDRY_ENDPOINT",
+        "AZURE_FOUNDRY_TEXT_ENDPOINT",
         "https://example-resource.openai.azure.com/",
         raising=False,
     )
@@ -169,5 +172,32 @@ def test_build_text_client_raises_when_azure_foundry_selected_without_endpoint(
     monkeypatch.setattr(llm_helpers.settings, "CARE_CIRCLE_TEXT_PROVIDER", "AZURE_FOUNDRY", raising=False)
     monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", "azure-key", raising=False)
 
-    with pytest.raises(RuntimeError, match="AZURE_FOUNDRY_ENDPOINT"):
+    with pytest.raises(RuntimeError, match="AZURE_FOUNDRY_TEXT_ENDPOINT"):
         llm_helpers._build_text_client()
+
+
+def test_build_image_client_supports_separate_openai_v1_endpoint(
+    monkeypatch,
+    fake_openai_module,
+    reset_care_circle_provider_settings,
+):
+    monkeypatch.setattr(llm_helpers.settings, "CARE_CIRCLE_IMAGE_PROVIDER", "AZURE_FOUNDRY", raising=False)
+    monkeypatch.setattr(llm_helpers.settings, "AZURE_FOUNDRY_API_KEY", "azure-key", raising=False)
+    monkeypatch.setattr(
+        llm_helpers.settings,
+        "AZURE_FOUNDRY_IMAGE_ENDPOINT",
+        "https://aiclassus2-resource.openai.azure.com/openai/v1",
+        raising=False,
+    )
+    monkeypatch.setattr(
+        llm_helpers.settings,
+        "AZURE_FOUNDRY_IMAGE_DEPLOYMENT",
+        "gpt-image-2-1",
+        raising=False,
+    )
+
+    client, model_name = llm_helpers._build_image_client()
+
+    assert isinstance(client, fake_openai_module.AsyncAzureOpenAI)
+    assert client.kwargs["azure_endpoint"] == "https://aiclassus2-resource.openai.azure.com"
+    assert model_name == "gpt-image-2-1"

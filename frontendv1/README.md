@@ -68,6 +68,7 @@ npm run test:e2e:ui
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | `http://localhost:8000/api/v1` |
+| `SCHEDULER_BASE_URL` | Server-side base URL used by `/api/admin/scheduler/*` proxy routes | `http://127.0.0.1:8001` |
 
 ## Project Structure
 

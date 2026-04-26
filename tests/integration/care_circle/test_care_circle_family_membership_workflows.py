@@ -408,14 +408,15 @@ def test_owner_rejects_request_mechanics(client, register_and_login, app_instanc
         try:
             async with session_factory() as session:
                 from app.crud.user import create_user
-                member_user = await create_user(
-                    session,
+                from app.schemas.user import UserCreate
+                user_create = UserCreate(
                     username=member_username,
                     email=member_email,
                     password=member_password,
-                    display_name=f"Reject Test User",
+                    display_name="Reject Test User",
                     terms_accepted=True,
                 )
+                member_user = await create_user(session, user_create)
                 await session.flush()
 
                 membership = CareCircleFamilyMembership(
@@ -501,14 +502,15 @@ def test_owner_removes_active_member_mechanics(client, register_and_login, app_i
         try:
             async with session_factory() as session:
                 from app.crud.user import create_user
-                member_user = await create_user(
-                    session,
+                from app.schemas.user import UserCreate
+                user_create = UserCreate(
                     username=member_username,
                     email=member_email,
                     password=member_password,
-                    display_name=f"Member Remove User",
+                    display_name="Member Remove User",
                     terms_accepted=True,
                 )
+                member_user = await create_user(session, user_create)
                 await session.flush()
 
                 membership = CareCircleFamilyMembership(

@@ -139,6 +139,33 @@ const careCircleProviders = [
   }
 ];
 
+const adminFamiliesSeed = [
+  {
+    id: 11,
+    name: "Story Maker household",
+    join_code: "STM111",
+    is_disabled: false,
+    owner_username: "storymaker",
+    owner_display_name: "Story Maker",
+    member_count: 3,
+    patient_count: 2,
+    pending_requests: 1,
+    created_at: "2026-04-24T18:00:00Z"
+  },
+  {
+    id: 12,
+    name: "Arthur's Circle",
+    join_code: "ART222",
+    is_disabled: true,
+    owner_username: "arthur_admin",
+    owner_display_name: "Arthur Admin",
+    member_count: 2,
+    patient_count: 1,
+    pending_requests: 0,
+    created_at: "2026-04-23T18:00:00Z"
+  }
+];
+
 const patientProviderConfigs: Record<string, Array<{
   id: number;
   patient_id: number;
@@ -235,6 +262,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
   const referrals = options.referrals ?? "ok";
   const onboarding = options.onboarding ?? "ok";
   const currentUser = { ...authenticatedUser };
+  let adminFamilies = adminFamiliesSeed.map((family) => ({ ...family }));
 
   await page.route("**/api/admin/scheduler/**", async (route) => {
     const url = route.request().url();
@@ -318,6 +346,29 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
           }
         })
       );
+      return;
+    }
+
+    if (url.endsWith("/care-circle/admin/families") && method === "GET") {
+      await route.fulfill(json({ success: true, data: adminFamilies }));
+      return;
+    }
+
+    if (/\/care-circle\/admin\/families\/\d+\/disable$/.test(url) && method === "PUT") {
+      const familyId = Number(url.split("/").slice(-2)[0]);
+      const body = route.request().postDataJSON() as { disabled?: boolean };
+      adminFamilies = adminFamilies.map((family) =>
+        family.id === familyId ? { ...family, is_disabled: Boolean(body.disabled) } : family
+      );
+      const family = adminFamilies.find((entry) => entry.id === familyId);
+      await route.fulfill(json({ success: true, data: { id: familyId, is_disabled: family?.is_disabled ?? false } }));
+      return;
+    }
+
+    if (/\/care-circle\/admin\/families\/\d+$/.test(url) && method === "DELETE") {
+      const familyId = Number(url.split("/").pop());
+      adminFamilies = adminFamilies.filter((family) => family.id !== familyId);
+      await route.fulfill(json({ success: true, data: { message: "Family deleted" } }));
       return;
     }
 

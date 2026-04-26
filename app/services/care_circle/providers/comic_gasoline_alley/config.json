@@ -1,0 +1,11 @@
+{
+  "name": "Gasoline Alley",
+  "description": "Long-running comic strip by Frank King about the Wallet family and their car. Public domain early strips.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

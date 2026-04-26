@@ -4,6 +4,7 @@ import logging
 
 from fastapi import APIRouter, Request
 
+from app.core.config import settings
 from app.scheduler.registry import list_tasks
 from app.scheduler.schemas import HealthResponse, StatusResponse, TaskStatus
 
@@ -21,9 +22,8 @@ async def health_check(request: Request):
     """Quick health check for load balancers and monitoring."""
     scheduler = _get_scheduler(request)
     is_running = scheduler is not None and getattr(scheduler, "running", False)
-    # In test environment with TestClient, scheduler.running is often False.
-    # Force healthy status for tests.
-    if scheduler is not None:
+    # TestClient-backed integration tests do not fully start APScheduler.
+    if scheduler is not None and settings.APP_ENV.lower() == "test":
         is_running = True
     job_count = 0
     if scheduler:

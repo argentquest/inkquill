@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -11,8 +12,16 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings, log_application_settings
+from app.core.logging_config import setup_logging
 from app.scheduler.scheduler_engine import create_scheduler
 from apscheduler.triggers.cron import CronTrigger
+
+setup_logging(
+    log_level_console_str=os.getenv("LOG_LEVEL_CONSOLE", "INFO"),
+    log_level_file_str=os.getenv("LOG_LEVEL_FILE", "DEBUG"),
+    clear_existing_handlers=os.getenv("CLEAR_LOG_HANDLERS", "true").lower() == "true",
+    log_filename_base="app_scheduler",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -108,8 +117,8 @@ app.include_router(jobs_router, prefix="/scheduler", tags=["Jobs"])
 
 if __name__ == "__main__":
     import uvicorn
-    host = "0.0.0.0"
-    port = int(getattr(settings, "SCHEDULER_PORT", 8001))
+    host = os.getenv("SCHEDULER_HOST", settings.SCHEDULER_HOST)
+    port = settings.SCHEDULER_PORT
     uvicorn.run(
         "app.scheduler.main:app",
         host=host,

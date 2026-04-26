@@ -1,0 +1,11 @@
+{
+  "name": "Buster Brown",
+  "description": "Classic comic strip by Richard F. Outcault featuring Buster Brown, his dog Tige, and sister Mary Jane. Public domain.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

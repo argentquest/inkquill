@@ -1,0 +1,11 @@
+{
+  "name": "Little Nemo in Slumberland",
+  "description": "Groundbreaking comic strip by Winsor McCay about a boy's dream adventures. Public domain.",
+  "enabled": true,
+  "common": false,
+  "patient_visible": true,
+  "family_visible": true,
+  "grid_width": 4,
+  "grid_height": 3,
+  "llm": false
+}

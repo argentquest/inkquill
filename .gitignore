@@ -128,3 +128,14 @@ __pycache__/
 
 # Generated newsletter/provider cache
 cache/
+
+# Local Docker/test runtime data
+.docker-data/
+
+# Local artifacts and generated frontend files
+artifacts/
+frontendv1/.env.*
+frontendv1/tsconfig.tsbuildinfo
+
+# Local tool state
+opencode.json

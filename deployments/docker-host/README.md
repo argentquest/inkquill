@@ -24,8 +24,15 @@ The stack contains:
 - `gateway`
 - `frontend`
 - `backend`
-- `scheduler`
 - `db`
+
+The scheduler runs as a **standalone host process** (not in Docker). Start it with:
+
+```bash
+python -m app.scheduler.main
+```
+
+The frontend container reaches it via `host.docker.internal:8001` (configured by `SCHEDULER_BASE_URL` in the compose file).
 
 ## Persistent data
 
@@ -39,13 +46,11 @@ Suggested layout:
     cache/
     logs/
       backend/
-      scheduler/
     postgres/
   prod/
     cache/
     logs/
       backend/
-      scheduler/
     postgres/
 ```
 
@@ -92,6 +97,5 @@ Notes:
 
 ## Notes
 
-- The scheduler image includes Python Playwright support for newsletter PDF generation.
-- Backend and scheduler both mount the same `/app/cache` path so newsletter artifacts are shared.
-- Backend and scheduler logs are separated at the host level.
+- The scheduler process requires Python Playwright (Chromium) for newsletter PDF generation — see `Dockerfile.scheduler` for the full dependency list.
+- The backend container mounts `CARE_CIRCLE_DATA_ROOT/cache` at `/app/cache`. The standalone scheduler should be configured with the same host path so newsletter artifacts are shared.

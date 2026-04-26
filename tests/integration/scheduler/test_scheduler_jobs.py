@@ -145,7 +145,7 @@ class TestRescheduleJob:
             "/scheduler/jobs/care_circle.daily_session/reschedule",
             json={"cron": invalid_cron}
         )
-        assert response.status_code == 200  # Backend currently succeeds on invalid cron (APScheduler accepts it)
+        assert response.status_code == 400
 
     def test_reschedule_nonexistent_task_fails(self, scheduler_client):
         """POST /scheduler/jobs/{invalid_key}/reschedule returns error."""

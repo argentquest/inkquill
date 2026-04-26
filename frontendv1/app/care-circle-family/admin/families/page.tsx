@@ -18,8 +18,6 @@ function FamilyRow({ family, onDisable, onDelete, isMutating }: {
   onDelete: () => void;
   isMutating: boolean;
 }) {
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
   return (
     <div className={`rounded-2xl border px-5 py-4 ${family.is_disabled ? "border-red-200 bg-red-50/50" : "border-black/10 bg-white/80"}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -50,32 +48,14 @@ function FamilyRow({ family, onDisable, onDelete, isMutating }: {
             {family.is_disabled ? <CheckCircle className="h-3.5 w-3.5 text-green-600" /> : <Ban className="h-3.5 w-3.5" />}
             {family.is_disabled ? "Enable" : "Disable"}
           </button>
-          {confirmDelete ? (
-            <div className="flex gap-1.5">
-              <button
-                className="rounded-xl bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
-                disabled={isMutating}
-                onClick={onDelete}
-              >
-                Confirm delete
-              </button>
-              <button
-                className="rounded-xl border border-black/10 px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-black/5"
-                onClick={() => setConfirmDelete(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              className="flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
-              disabled={isMutating}
-              onClick={() => setConfirmDelete(true)}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Delete
-            </button>
-          )}
+          <button
+            className="flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+            disabled={isMutating}
+            onClick={onDelete}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete...
+          </button>
         </div>
       </div>
     </div>
@@ -85,6 +65,7 @@ function FamilyRow({ family, onDisable, onDelete, isMutating }: {
 export default function AdminFamiliesPage() {
   const queryClient = useQueryClient();
   const { pushToast } = useToasts();
+  const [familyPendingDelete, setFamilyPendingDelete] = useState<AdminFamily | null>(null);
 
   const { data: families = [], isLoading } = useQuery({
     queryKey: ["admin-families"],
@@ -103,6 +84,7 @@ export default function AdminFamiliesPage() {
   const deleteMutation = useMutation({
     mutationFn: adminDeleteFamily,
     onSuccess: () => {
+      setFamilyPendingDelete(null);
       void queryClient.invalidateQueries({ queryKey: ["admin-families"] });
       pushToast({ title: "Family deleted", tone: "success", detail: "The family and all its data have been removed." });
     },
@@ -121,6 +103,41 @@ export default function AdminFamiliesPage() {
         </p>
       </div>
 
+      {familyPendingDelete ? (
+        <section className="rounded-[28px] border border-red-200 bg-red-50/70 px-5 py-5 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-2xl space-y-2">
+              <p className="text-xs uppercase tracking-[0.28em] text-red-700">Delete family</p>
+              <h2 className="font-display text-2xl text-ink-900">{familyPendingDelete.name}</h2>
+              <p className="text-sm leading-7 text-ink-700">
+                This permanently removes the family, patient profiles, memberships, and related Care Circle data.
+              </p>
+              <p className="text-xs text-red-700">
+                Join code {familyPendingDelete.join_code} will stop working immediately. This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <button
+                className="rounded-xl border border-black/10 px-4 py-2 text-sm font-medium text-ink-700 transition hover:bg-black/5 disabled:opacity-50"
+                disabled={deleteMutation.isPending}
+                onClick={() => setFamilyPendingDelete(null)}
+                type="button"
+              >
+                Keep family
+              </button>
+              <button
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+                disabled={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate(familyPendingDelete.id)}
+                type="button"
+              >
+                {deleteMutation.isPending ? "Deleting family..." : `Delete ${familyPendingDelete.name}`}
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {isLoading ? (
         <p className="text-sm text-ink-500">Loading families...</p>
       ) : families.length === 0 ? (
@@ -134,7 +151,7 @@ export default function AdminFamiliesPage() {
               family={family}
               isMutating={isMutating}
               onDisable={() => disableMutation.mutate({ id: family.id, disabled: !family.is_disabled })}
-              onDelete={() => deleteMutation.mutate(family.id)}
+              onDelete={() => setFamilyPendingDelete(family)}
             />
           ))}
         </div>

@@ -26,6 +26,12 @@ _DOWNLOAD_HEADERS = {
     "User-Agent": WIKIMEDIA_USER_AGENT,
 }
 
+# Special headers for Wikimedia URLs
+_WIKIMEDIA_DOWNLOAD_HEADERS = {
+    "User-Agent": WIKIMEDIA_USER_AGENT,
+    "Referer": "https://commons.wikimedia.org/",
+}
+
 logger = logging.getLogger(__name__)
 
 CACHE_ROOT = Path(__file__).resolve().parents[3] / "cache"
@@ -54,7 +60,10 @@ def _image_ext(url: str, content_type: str | None) -> str:
 def _download_image(url: str, dest: Path) -> bool:
     """Download image to dest. Returns True on success."""
     try:
-        with httpx.Client(follow_redirects=True, timeout=15, headers=_DOWNLOAD_HEADERS) as client:
+        # Use Wikimedia headers for Wikimedia URLs
+        headers = _WIKIMEDIA_DOWNLOAD_HEADERS if ("wikimedia.org" in url or "commons.wikimedia.org" in url) else _DOWNLOAD_HEADERS
+        
+        with httpx.Client(follow_redirects=True, timeout=15, headers=headers) as client:
             resp = client.get(url)
             resp.raise_for_status()
             dest.write_bytes(resp.content)
@@ -75,7 +84,10 @@ def _comic_image_filename(provider_key: str, suffix: str = "") -> str:
 def _download_and_optimize_comic_image(url: str, dest: Path) -> bool:
     """Download a comic image, resize it to fit the newsletter, and store it as JPEG."""
     try:
-        with httpx.Client(follow_redirects=True, timeout=20, headers=_DOWNLOAD_HEADERS) as client:
+        # Use Wikimedia headers for Wikimedia URLs
+        headers = _WIKIMEDIA_DOWNLOAD_HEADERS if ("wikimedia.org" in url or "commons.wikimedia.org" in url) else _DOWNLOAD_HEADERS
+        
+        with httpx.Client(follow_redirects=True, timeout=20, headers=headers) as client:
             resp = client.get(url)
             resp.raise_for_status()
 

@@ -3,12 +3,15 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
+from app.core.config import settings
 from app.scheduler.main import app as scheduler_app
 
 
 @pytest.fixture(autouse=True)
 def mock_scheduler_for_tests():
     """Mock the global scheduler for integration tests so it appears running."""
+    previous_app_env = settings.APP_ENV
+    settings.APP_ENV = "test"
     mock_sched = MagicMock()
     mock_sched.running = True
 
@@ -36,10 +39,13 @@ def mock_scheduler_for_tests():
 
     mock_sched.get_jobs.return_value = [mock_job1, mock_job2, mock_job3]
 
-    with patch('app.scheduler.main.scheduler', mock_sched):
-        with patch('app.scheduler.routers.health.scheduler', mock_sched):
-            with patch('app.scheduler.routers.jobs.scheduler', mock_sched):
-                yield mock_sched
+    try:
+        with patch('app.scheduler.main.scheduler', mock_sched):
+            scheduler_app.state.scheduler = mock_sched
+            yield mock_sched
+    finally:
+        scheduler_app.state.scheduler = None
+        settings.APP_ENV = previous_app_env
 
 
 @pytest.fixture(autouse=True)

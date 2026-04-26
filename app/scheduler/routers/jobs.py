@@ -1,13 +1,16 @@
 """Job management API — trigger, pause, resume, reschedule."""
 
 import logging
+import inspect
 from datetime import date
 
 from fastapi import APIRouter, HTTPException, Query, Request
 
+from app.core.config import settings
 from app.scheduler.registry import get_task
 from app.scheduler.schemas import JobListResponse, JobInfo, JobResult, RescheduleRequest
 from app.scheduler.logging import log_job_operation
+from apscheduler.triggers.cron import CronTrigger
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +29,27 @@ def _validate_scheduler_available(request: Request):
             status_code=503,
             detail="Scheduler service is not initialized",
         )
-    # For test environment with TestClient, force scheduler as available
     if not getattr(scheduler, "running", False):
-        scheduler.running = True
+        if settings.APP_ENV.lower() == "test":
+            scheduler.running = True
+        else:
+            raise HTTPException(
+                status_code=503,
+                detail="Scheduler service is not running",
+            )
     return scheduler
+
+
+async def _invoke_task(task_func, reference_date: date | None):
+    """Call a task function with only the arguments it actually accepts."""
+    signature = inspect.signature(task_func)
+    if "reference_date" in signature.parameters:
+        result = task_func(reference_date=reference_date)
+    else:
+        result = task_func()
+    if inspect.isawaitable(result):
+        return await result
+    return result
 
 
 @router.get("/jobs", response_model=JobListResponse)
@@ -64,7 +84,7 @@ async def trigger_job(request: Request, task_key: str, reference_date: date | No
         raise HTTPException(status_code=404, detail=f"Task not found: {task_key}")
 
     try:
-        result = await task_def.func(reference_date=reference_date)
+        await _invoke_task(task_def.func, reference_date)
         log_job_operation("trigger", task_key, success=True)
         return JobResult(
             success=True,
@@ -121,7 +141,8 @@ async def reschedule_job(request: Request, task_key: str, payload: RescheduleReq
         raise HTTPException(status_code=404, detail=f"Task not found: {task_key}")
 
     try:
-        scheduler.reschedule_job(task_key, trigger="cron", cron=payload.cron)
+        trigger = CronTrigger.from_crontab(payload.cron)
+        scheduler.reschedule_job(task_key, trigger=trigger)
         log_job_operation("reschedule", task_key, success=True, detail=f"new_cron={payload.cron}")
         return JobResult(
             success=True,
