@@ -6,10 +6,13 @@ export function Button({
   children,
   className,
   type = "button",
+  title,
+  tooltip,
   variant = "primary",
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "ghost";
+  tooltip?: string;
 }) {
   const variants = {
     primary: "bg-ink-900 text-paper hover:bg-ink-700",
@@ -25,6 +28,7 @@ export function Button({
         className
       )}
       type={type}
+      title={title ?? tooltip ?? props["aria-label"] ?? (typeof children === "string" ? children : undefined)}
       {...props}
     >
       {children}

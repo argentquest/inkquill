@@ -115,6 +115,7 @@ def test_patient_session_returns_highlights(client, register_and_login, run_db):
         assert "body" in highlight
         assert "kind" in highlight
         assert "providerKey" in highlight
+        assert "feedback" in highlight
 
 
 def test_patient_session_404_for_unknown_patient(client):
@@ -145,6 +146,45 @@ def test_patient_session_regenerates_fresh_content(client, register_and_login, r
     # Both calls should return highlights
     assert len(highlights1) > 0
     assert len(highlights2) > 0
+
+
+def test_patient_provider_feedback_persists_across_sessions(client, register_and_login, run_db):
+    """Patient provider feedback is stored and returned on later session loads."""
+    register_and_login("patient_feedback_test")
+
+    client.get("/api/v1/care-circle/family/patients")
+    patient_id = _fetch_first_patient_for_current_user(client, run_db)
+
+    session_response = client.get(f"/api/v1/care-circle/patient/session/{patient_id}")
+    assert session_response.status_code == 200
+    highlights = session_response.json()["data"]["highlights"]
+    provider_key = highlights[0]["providerKey"]
+
+    save_response = client.put(
+        f"/api/v1/care-circle/patient/session/{patient_id}/provider-feedback/{provider_key}",
+        json={"feedback": "like"},
+    )
+    assert save_response.status_code == 200
+    assert save_response.json()["data"]["feedback"] == "like"
+
+    later_session_response = client.get(f"/api/v1/care-circle/patient/session/{patient_id}")
+    assert later_session_response.status_code == 200
+    later_highlights = later_session_response.json()["data"]["highlights"]
+    saved_highlight = next(item for item in later_highlights if item["providerKey"] == provider_key)
+    assert saved_highlight["feedback"] == "like"
+
+    clear_response = client.put(
+        f"/api/v1/care-circle/patient/session/{patient_id}/provider-feedback/{provider_key}",
+        json={"feedback": None},
+    )
+    assert clear_response.status_code == 200
+    assert clear_response.json()["data"]["feedback"] is None
+
+    cleared_session_response = client.get(f"/api/v1/care-circle/patient/session/{patient_id}")
+    assert cleared_session_response.status_code == 200
+    cleared_highlights = cleared_session_response.json()["data"]["highlights"]
+    cleared_highlight = next(item for item in cleared_highlights if item["providerKey"] == provider_key)
+    assert cleared_highlight["feedback"] is None
 
 
 def test_patient_profile_has_expected_fields(client, register_and_login, run_db):

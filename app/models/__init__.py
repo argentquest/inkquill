@@ -99,5 +99,6 @@ from .care_circle import (
     CareCirclePatientContentCard,
     CareCircleProviderRunLog,
     CareCircleProviderPatientConfig,
+    CareCirclePatientProviderFeedback,
     CareCircleProviderSessionOutput,
 )

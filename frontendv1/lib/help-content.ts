@@ -802,10 +802,28 @@ export const helpContentMap: Record<string, PageHelpContent> = {
   "auth/register": registerHelp,
   "auth/forgot-password": forgotPasswordHelp,
   "care-circle-family": careCircleFamilyHelp,
+  "care-circle-family/account": accountHelp,
+  "care-circle-family/account/edit": accountHelp,
+  "care-circle-family/admin": adminHelp,
+  "care-circle-family/admin/families": adminHelp,
+  "care-circle-family/admin/scheduler": adminHelp,
+  "care-circle-family/admin/template-studio": adminHelp,
+  "care-circle-family/billing": billingHelp,
+  "care-circle-family/events": careCircleFamilyHelp,
+  "care-circle-family/media": careCircleFamilyHelp,
+  "care-circle-family/members": careCircleFamilyHelp,
   "care-circle-family/patients": careCirclePatientsHelp,
+  "care-circle-family/patients/new": careCirclePatientsHelp,
   "care-circle-family/providers": careCircleProvidersHelp,
+  "care-circle-family/referrals": referralsHelp,
+  "care-circle-patient": careCirclePatientLoginHelp,
   "care-circle-patient/home": careCirclePatientHomeHelp,
   "care-circle-patient/login": careCirclePatientLoginHelp,
+  "storytelling/account": accountHelp,
+  "storytelling/account/edit": accountHelp,
+  "storytelling/billing": billingHelp,
+  "storytelling/onboarding": onboardingHelp,
+  "storytelling/referrals": referralsHelp,
   "storytelling": storytellingHelp,
   "chatbot": chatbotHelp,
   "account": accountHelp,
@@ -815,3 +833,74 @@ export const helpContentMap: Record<string, PageHelpContent> = {
   "admin": adminHelp,
   "public": publicPageHelp
 };
+
+function createFallbackHelpContent(pathname: string): PageHelpContent {
+  const normalized = pathname === "/" ? "home" : pathname.replace(/^\/+|\/+$/g, "");
+  const segments = normalized.split("/").filter(Boolean);
+  const pageName = segments
+    .map((segment) => {
+      if (/^\[.+\]$/.test(segment) || /^\d+$/.test(segment)) {
+        return "detail";
+      }
+
+      return segment
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (character) => character.toUpperCase());
+    })
+    .join(" / ");
+
+  return {
+    title: `${pageName} Help`,
+    description: "This page includes contextual guidance, tooltips on controls, and direct actions that match the current workflow.",
+    sections: [
+      {
+        title: "Using this page",
+        items: [
+          {
+            title: "Controls and actions",
+            content: "Hover or focus buttons, inputs, selectors, and text areas to see quick guidance about what each control does before you interact with it."
+          },
+          {
+            title: "Saving and navigation",
+            content: "Use the primary action to commit changes and secondary actions to cancel, go back, or open related workflow areas without losing context."
+          }
+        ]
+      },
+      {
+        title: "Need more context?",
+        items: [
+          {
+            title: "Route-specific guidance",
+            content: "This help panel is generated for the current route so every page always has a guidance entry point, even while deeper documentation is still being refined."
+          }
+        ]
+      }
+    ]
+  };
+}
+
+export function resolveHelpContent(pathname: string): PageHelpContent {
+  const normalizedPath = pathname.replace(/^\/+|\/+$/g, "");
+
+  if (!normalizedPath) {
+    return publicPageHelp;
+  }
+
+  if (helpContentMap[normalizedPath]) {
+    return helpContentMap[normalizedPath];
+  }
+
+  if (/^care-circle-family\/patients\/[^/]+$/.test(normalizedPath)) {
+    return careCirclePatientsHelp;
+  }
+
+  if (/^care-circle-family\/providers\/[^/]+$/.test(normalizedPath)) {
+    return careCircleProvidersHelp;
+  }
+
+  if (/^auth\/password-reset\/confirm/.test(normalizedPath)) {
+    return forgotPasswordHelp;
+  }
+
+  return createFallbackHelpContent(pathname);
+}

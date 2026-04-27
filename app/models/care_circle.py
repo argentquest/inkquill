@@ -116,6 +116,18 @@ class CareCircleProviderPatientConfig(Base):
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 
+class CareCirclePatientProviderFeedback(Base):
+    __tablename__ = "care_circle_patient_provider_feedback"
+    __table_args__ = (UniqueConstraint("patient_id", "provider_key", name="uq_care_circle_patient_provider_feedback"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    patient_id: Mapped[int] = mapped_column(ForeignKey("care_circle_patient_profiles.id", ondelete="CASCADE"), nullable=False, index=True)
+    provider_key: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    feedback: Mapped[str] = mapped_column(String(20), nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
 class CareCircleProviderSessionOutput(Base):
     __tablename__ = "care_circle_provider_session_outputs"
 

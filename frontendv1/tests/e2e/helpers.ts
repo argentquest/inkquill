@@ -57,14 +57,16 @@ const careCirclePatients = [
         body: "Nina says the daffodils are opening and she saved the first photo for you.",
         kind: "family",
         providerKey: "family_greeting",
-        displayOrder: 1
+        displayOrder: 1,
+        feedback: null
       },
       {
         title: "Memory lane",
         body: "Today’s memory card revisits spring walks and favorite songs from the 1950s.",
         kind: "memory",
         providerKey: "nostalgia",
-        displayOrder: 2
+        displayOrder: 2,
+        feedback: null
       }
     ]
   },
@@ -95,7 +97,8 @@ const careCirclePatients = [
         body: "Chris left a short update about yesterday’s walk by the river.",
         kind: "family",
         providerKey: "family_greeting",
-        displayOrder: 1
+        displayOrder: 1,
+        feedback: null
       }
     ]
   }
@@ -458,6 +461,33 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
           },
           200
         )
+      );
+      return;
+    }
+
+    if (/\/care-circle\/patient\/session\/\d+\/provider-feedback\/[^/]+$/.test(url) && method === "PUT") {
+      const parts = url.split("/");
+      const providerKey = parts.at(-1) ?? "";
+      const patientId = parts.at(-3) ?? "";
+      const body = route.request().postDataJSON() as { feedback?: "like" | "dislike" | null };
+      const patient = careCirclePatients.find((entry) => entry.id === patientId && entry.accessState !== "archived");
+      const highlight = patient?.highlights?.find((entry) => entry.providerKey === providerKey);
+
+      if (!patient || !highlight) {
+        await route.fulfill(json({ detail: "Patient session not found" }, 404));
+        return;
+      }
+
+      highlight.feedback = body.feedback ?? null;
+      await route.fulfill(
+        json({
+          success: true,
+          data: {
+            patient_id: Number(patientId),
+            provider_key: providerKey,
+            feedback: highlight.feedback
+          }
+        })
       );
       return;
     }

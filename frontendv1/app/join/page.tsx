@@ -120,6 +120,7 @@ export default function JoinPage() {
               autoComplete="off"
               className="mt-2 w-full rounded-[20px] border border-black/10 bg-white/85 px-4 py-3 text-sm text-ink-900 outline-none transition font-mono uppercase tracking-[0.18em] placeholder:text-ink-500 focus:border-ink-400 focus:ring-2 focus:ring-ink-200"
               placeholder="e.g. AB12CD"
+              title="Join code. Enter or review this value."
               {...form.register("join_code")}
               onChange={(e) => form.setValue("join_code", normalizeJoinCode(e.target.value))}
             />
@@ -137,7 +138,12 @@ export default function JoinPage() {
           <TextField label="Display name" autoComplete="nickname" error={form.formState.errors.display_name?.message} {...form.register("display_name")} />
           <PasswordField label="Password" autoComplete="new-password" error={form.formState.errors.password?.message} {...form.register("password")} />
           <label className="flex items-start gap-3 text-sm text-ink-700">
-            <input className="mt-1 h-4 w-4" type="checkbox" {...form.register("terms_accepted")} />
+            <input
+              className="mt-1 h-4 w-4"
+              title="I accept the Terms of Service and want this account to be created. Toggle this option on or off."
+              type="checkbox"
+              {...form.register("terms_accepted")}
+            />
             <span>I accept the Terms of Service and want this account to be created.</span>
           </label>
           {form.formState.errors.terms_accepted?.message ? (

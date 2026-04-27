@@ -687,7 +687,8 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
       </section>
 
       {/* ── Newsletter preview ─────────────────────────────────────── */}
-      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+      <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 md:px-6">
+      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel md:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className={EYEBROW_CLS}>Newsletter preview</p>
@@ -751,16 +752,17 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
           ) : newsletterPreview?.has_content ? (
             <iframe
               srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;background:#fff}</style></head><body>${newsletterPreview.html}</body></html>`}
-              className="w-full rounded-2xl border border-black/10"
-              style={{ height: "800px" }}
-              title={`Newsletter for ${previewDate}`}
-              sandbox="allow-same-origin"
-            />
+                className="w-full rounded-2xl border border-black/10 bg-white"
+                style={{ height: "900px" }}
+                title={`Newsletter for ${previewDate}`}
+                sandbox="allow-same-origin"
+              />
           ) : (
             <p className="text-sm text-ink-600 italic">No newsletter content cached for this date.</p>
           )}
         </div>
       </section>
+      </div>
 
       {/* ── Profile summary ────────────────────────────────────────── */}
       <section className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">

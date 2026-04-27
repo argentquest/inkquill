@@ -19,9 +19,9 @@ import { normalizeNextPath } from "@/lib/auth-redirect";
 import { fetchSession, loginUser } from "@/lib/api";
 
 const DEBUG_ACCOUNTS = [
-  { label: "Maple Grove — Clara (owner)", username: "ericsilvertx+clara@gmail.com" },
-  { label: "Harbor Point — Olivia (owner)", username: "olivia.harbor@example.com" },
-  { label: "Sunset Ridge — Sophie (owner)", username: "ericsilvertx+sophie@gmail.com" },
+  { label: "Maple Grove - Clara (owner)", username: "ericsilvertx+clara@gmail.com" },
+  { label: "Harbor Point - Olivia (owner)", username: "olivia.harbor@example.com" },
+  { label: "Sunset Ridge - Sophie (owner)", username: "ericsilvertx+sophie@gmail.com" },
 ] as const;
 
 const DEBUG_PASSWORD = "password123";
@@ -38,11 +38,12 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const next = useMemo(() => normalizeNextPath(searchParams.get("next")), [searchParams]);
   const registerHref = useMemo(() => `/auth/register?next=${encodeURIComponent(next)}`, [next]);
-  const { setAuthenticated, status } = useSession();
+  const { setAuthenticated, status, user } = useSession();
   const { pushToast } = useToasts();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [debugAccount, setDebugAccount] = useState<string>(DEBUG_ACCOUNTS[0].username);
   const [debugLoading, setDebugLoading] = useState(false);
+  const isAdmin = status === "authenticated" && user?.is_admin === true;
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -62,9 +63,12 @@ export default function LoginPage() {
     setSubmitError(null);
     try {
       await loginUser({ username: debugAccount, password: DEBUG_PASSWORD });
-      const user = await fetchSession();
-      if (!user) throw new Error("Session unavailable after debug login.");
-      setAuthenticated(user);
+      const sessionUser = await fetchSession();
+      if (!sessionUser) {
+        throw new Error("Session unavailable after debug login.");
+      }
+
+      setAuthenticated(sessionUser);
       pushToast({ title: "Debug login", tone: "success", detail: `Signed in as ${debugAccount}` });
       router.replace("/care-circle-family");
     } catch (error) {
@@ -78,11 +82,12 @@ export default function LoginPage() {
     setSubmitError(null);
     try {
       await loginUser(values);
-      const user = await fetchSession();
-      if (!user) {
+      const sessionUser = await fetchSession();
+      if (!sessionUser) {
         throw new Error("Authenticated session was not available after login.");
       }
-      setAuthenticated(user);
+
+      setAuthenticated(sessionUser);
       pushToast({ title: "Signed in", tone: "success", detail: "Your account shell is ready." });
       router.replace(next);
     } catch (error) {
@@ -102,6 +107,7 @@ export default function LoginPage() {
         </div>
         <HelpModal helpContent={loginHelp} triggerLabel="Help" />
       </div>
+
       <form className="mt-8 space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
         {submitError ? <AlertBanner title="Login failed" detail={submitError} tone="error" /> : null}
         <TextField
@@ -124,9 +130,11 @@ export default function LoginPage() {
           {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </form>
+
       <div className="mt-6">
         <GoogleSigninButton />
       </div>
+
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-ink-700">
         <Link className="transition hover:text-ink-900" href="/auth/forgot-password">
           Forgot your password?
@@ -136,36 +144,37 @@ export default function LoginPage() {
         </Link>
       </div>
 
-      {/* ── Debug panel (dev only) ── */}
-      <div className="mt-8 rounded-2xl border border-dashed border-amber-300 bg-amber-50/60 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-          Dev · Quick login
-        </p>
-        <p className="mt-1 text-xs text-amber-600">
-          Seed accounts — password <span className="font-mono">password123</span>
-        </p>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <select
-            className="flex-1 rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-ink-900 outline-none focus:border-amber-400"
-            value={debugAccount}
-            onChange={(e) => setDebugAccount(e.target.value)}
-          >
-            {DEBUG_ACCOUNTS.map((account) => (
-              <option key={account.username} value={account.username}>
-                {account.label}
-              </option>
-            ))}
-          </select>
-          <button
-            className="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={debugLoading}
-            onClick={handleDebugLogin}
-            type="button"
-          >
-            {debugLoading ? "Logging in…" : "Login"}
-          </button>
+      {isAdmin ? (
+        <div className="mt-8 rounded-2xl border border-dashed border-amber-300 bg-amber-50/60 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">Dev · Quick login</p>
+          <p className="mt-1 text-xs text-amber-600">
+            Seed accounts - password <span className="font-mono">password123</span>
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <select
+              className="flex-1 rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-ink-900 outline-none focus:border-amber-400"
+              title="Choose a seeded admin debug account."
+              value={debugAccount}
+              onChange={(event) => setDebugAccount(event.target.value)}
+            >
+              {DEBUG_ACCOUNTS.map((account) => (
+                <option key={account.username} value={account.username}>
+                  {account.label}
+                </option>
+              ))}
+            </select>
+            <button
+              className="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={debugLoading}
+              onClick={handleDebugLogin}
+              title="Use the selected seeded account to log in quickly."
+              type="button"
+            >
+              {debugLoading ? "Logging in..." : "Login"}
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </section>
   );
 }

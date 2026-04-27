@@ -20,6 +20,7 @@ from app.schemas.care_circle import (
     AdminFamilyDisableRequest,
     CareCirclePatientCreateRequest,
     CareCirclePatientLoginRequest,
+    CareCirclePatientProviderFeedbackUpdate,
     CareCirclePatientUpdateRequest,
     CareCircleProviderPatientConfigUpdate,
     CareCircleProviderReorderRequest,
@@ -250,6 +251,34 @@ async def read_patient_session(
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient session not found")
     return ApiResponse.success_response(data=patient)
+
+
+@router.put("/patient/session/{patient_id}/provider-feedback/{provider_key}", response_model=ApiResponse)
+async def update_patient_provider_feedback(
+    patient_id: int,
+    provider_key: str,
+    payload: CareCirclePatientProviderFeedbackUpdate,
+    db: AsyncSession = Depends(get_db_session),
+):
+    patient = await db.get(CareCirclePatientProfile, patient_id)
+    if not patient or patient.access_state == "archived":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient session not found")
+
+    try:
+        saved_feedback = await care_circle_crud.set_patient_provider_feedback(
+            db,
+            patient_id,
+            provider_key,
+            payload.feedback,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+    return ApiResponse.success_response(data={
+        "patient_id": patient_id,
+        "provider_key": provider_key,
+        "feedback": saved_feedback,
+    })
 
 
 @router.get("/family/patients/{patient_id}/provider-configs", response_model=ApiResponse)

@@ -9,6 +9,7 @@ from app.models.care_circle import (
     CareCirclePatientProfile,
     CareCirclePatientContentCard,
     CareCircleProviderPatientConfig,
+    CareCirclePatientProviderFeedback,
     CareCircleProviderSessionOutput,
 )
 
@@ -26,6 +27,7 @@ async def hard_delete_patient(db: AsyncSession, patient_id: int) -> bool:
             CareCircleProviderSessionOutput,
             CareCirclePatientContentCard,
             CareCircleProviderPatientConfig,
+            CareCirclePatientProviderFeedback,
         ]
 
         for table in tables_to_clean:

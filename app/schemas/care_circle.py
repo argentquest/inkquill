@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -23,6 +23,7 @@ class CareCirclePatientHighlightRead(BaseModel):
     kind: str
     providerKey: str
     displayOrder: int
+    feedback: Optional[Literal["like", "dislike"]] = None
 
 
 class CareCirclePatientPreferences(BaseModel):
@@ -87,6 +88,10 @@ class CareCircleProviderPatientConfigUpdate(BaseModel):
     is_enabled: bool = True
     custom_parameters: Optional[dict] = None
     display_order: Optional[int] = None
+
+
+class CareCirclePatientProviderFeedbackUpdate(BaseModel):
+    feedback: Optional[Literal["like", "dislike"]] = None
 
 
 class ProviderReorderItem(BaseModel):

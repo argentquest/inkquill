@@ -109,13 +109,11 @@ test.describe("Sprint 2 auth", () => {
     await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });
   });
 
-  test("google sign-in entry points to the backend auth route", async ({ page }) => {
+  test("google sign-in entry point stays hidden for non-admin users", async ({ page }) => {
     await mockAppApis(page);
     await page.goto("/auth/login");
 
-    await expect(page.getByRole("link", { name: "Continue with Google" })).toHaveAttribute(
-      "href",
-      "http://127.0.0.1:8000/api/v1/auth/google"
-    );
+    await expect(page.getByRole("link", { name: "Continue with Google" })).toHaveCount(0);
+    await expect(page.getByText("Dev · Quick login")).toHaveCount(0);
   });
 });

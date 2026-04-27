@@ -43,6 +43,8 @@ export function HelpModal({
         type="button"
         onClick={() => setIsOpen(true)}
         className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-ink-600 transition hover:bg-black/5 hover:text-ink-900"
+        data-page-help-trigger="true"
+        title={`Open help for ${helpContent.title}`}
       >
         <HelpCircle className="size-4" />
         <span>{triggerLabel}</span>
@@ -143,6 +145,8 @@ export function HelpButton({
           ${positionClasses[position]}
         `}
         aria-label="Open help"
+        data-page-help-trigger="true"
+        title={`Open help for ${helpContent.title}`}
       >
         <HelpCircle className="size-5" />
       </button>

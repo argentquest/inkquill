@@ -115,8 +115,12 @@ def test_update_family_patient_detail_returns_wrapped_record(unit_client_factory
         "timezone": "America/Chicago",
         "deliveryTime": "08:30",
         "days": ["Mon", "Wed", "Fri"],
-        "familyMembers": ["Nina", "Paul"],
-        "preferences": ["gardening"],
+        "preferredLanguage": "en",
+        "country": "US",
+        "postalCode": None,
+        "email": None,
+        "phoneNumber": None,
+        "preferences": {"hobbies": ["gardening"]},
         "authImageKeys": ["sun", "dog", "house"],
         "highlights": [],
     }
@@ -133,8 +137,12 @@ def test_update_family_patient_detail_returns_wrapped_record(unit_client_factory
                 "timezone": "America/Chicago",
                 "deliveryTime": "08:30",
                 "days": ["Mon", "Wed", "Fri"],
-                "familyMembers": ["Nina", "Paul"],
-                "preferences": ["gardening"],
+                "preferredLanguage": "en",
+                "country": "US",
+                "postalCode": None,
+                "email": None,
+                "phoneNumber": None,
+                "preferences": {"hobbies": ["gardening"]},
                 "authImageKeys": ["sun", "dog", "house"],
             },
         )
@@ -160,8 +168,12 @@ def test_update_family_patient_detail_rejects_invalid_auth_keys(unit_client_fact
             "timezone": "America/Chicago",
             "deliveryTime": "08:30",
             "days": ["Mon", "Wed", "Fri"],
-            "familyMembers": ["Nina", "Paul"],
-            "preferences": ["gardening"],
+            "preferredLanguage": "en",
+            "country": "US",
+            "postalCode": None,
+            "email": None,
+            "phoneNumber": None,
+            "preferences": {"hobbies": ["gardening"]},
             "authImageKeys": ["sun", "sun", "house"],
         },
     )
@@ -254,7 +266,7 @@ def test_patient_session_returns_wrapped_patient(unit_client_factory):
         "familyMembers": ["Nina"],
         "preferences": ["gardening"],
         "authImageKeys": ["sun", "dog", "house"],
-        "highlights": [{"title": "Family hello", "body": "Hi", "kind": "family", "providerKey": "family_greeting", "displayOrder": 1}],
+        "highlights": [{"title": "Family hello", "body": "Hi", "kind": "family", "providerKey": "family_greeting", "displayOrder": 1, "feedback": "like"}],
     }
 
     with patch("app.services.care_circle.session_assembler.assemble_daily_patient_session", new=AsyncMock(return_value=True)), \
@@ -265,6 +277,38 @@ def test_patient_session_returns_wrapped_patient(unit_client_factory):
     body = response.json()
     assert body["success"] is True
     assert body["data"]["highlights"][0]["title"] == "Family hello"
+    assert body["data"]["highlights"][0]["feedback"] == "like"
+
+
+def test_update_patient_provider_feedback_returns_saved_choice(unit_client_factory, mock_db_session):
+    client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
+    mock_db_session.get = AsyncMock(return_value=MagicMock(id=1, access_state="active"))
+
+    with patch("app.routers.care_circle.care_circle_crud.set_patient_provider_feedback", new=AsyncMock(return_value="dislike")):
+        response = client.put(
+            "/api/v1/care-circle/patient/session/1/provider-feedback/weather",
+            json={"feedback": "dislike"},
+        )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["success"] is True
+    assert body["data"]["patient_id"] == 1
+    assert body["data"]["provider_key"] == "weather"
+    assert body["data"]["feedback"] == "dislike"
+
+
+def test_update_patient_provider_feedback_returns_404_for_missing_patient(unit_client_factory, mock_db_session):
+    client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
+    mock_db_session.get = AsyncMock(return_value=None)
+
+    response = client.put(
+        "/api/v1/care-circle/patient/session/999/provider-feedback/weather",
+        json={"feedback": "like"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Patient session not found"
 
 
 # ── Provider config — display_order ───────────────────────────────────────────

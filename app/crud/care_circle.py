@@ -14,6 +14,7 @@ from app.models.care_circle import (
     CareCirclePatientProfile,
     CareCircleProviderCatalog,
     CareCircleProviderPatientConfig,
+    CareCirclePatientProviderFeedback,
     CareCircleProviderRunLog,
     CareCircleProviderSessionOutput,
 )
@@ -128,8 +129,10 @@ def _patient_to_dict(
     family_name: str,
     family_join_code: str,
     highlights: list[CareCirclePatientContentCard] | None = None,
+    feedback_by_provider: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     raw = patient.preferences or {}
+    feedback_by_provider = feedback_by_provider or {}
     return {
         "id": str(patient.id),
         "displayName": patient.display_name,
@@ -173,6 +176,7 @@ def _patient_to_dict(
                 "kind": card.card_kind,
                 "providerKey": card.provider_key,
                 "displayOrder": card.display_order,
+                "feedback": feedback_by_provider.get(card.provider_key),
             }
             for card in (highlights or [])
         ],
@@ -237,6 +241,7 @@ async def remove_obsolete_provider_data(db: AsyncSession) -> None:
         CareCircleProviderRunLog,
         CareCirclePatientContentCard,
         CareCircleProviderPatientConfig,
+        CareCirclePatientProviderFeedback,
         CareCircleProviderCatalog,
     ):
         await db.execute(
@@ -554,11 +559,13 @@ async def authenticate_patient_by_images(db: AsyncSession, selected_keys: list[s
                     .order_by(CareCirclePatientContentCard.display_order.asc(), CareCirclePatientContentCard.id.asc())
                 )
             ).scalars().all()
+            feedback_by_provider = await get_patient_provider_feedback_map(db, patient.id)
             return _patient_to_dict(
                 patient,
                 family.name if family else "Care Circle",
                 family.join_code if family and family.join_code else "",
                 highlights,
+                feedback_by_provider,
             )
     return None
 
@@ -575,12 +582,76 @@ async def get_patient_session(db: AsyncSession, patient_id: int) -> dict[str, An
             .order_by(CareCirclePatientContentCard.display_order.asc(), CareCirclePatientContentCard.id.asc())
         )
     ).scalars().all()
+    feedback_by_provider = await get_patient_provider_feedback_map(db, patient.id)
     return _patient_to_dict(
         patient,
         family.name if family else "Care Circle",
         family.join_code if family and family.join_code else "",
         highlights,
+        feedback_by_provider,
     )
+
+
+async def get_patient_provider_feedback_map(
+    db: AsyncSession,
+    patient_id: int,
+) -> dict[str, str]:
+    rows = (
+        await db.execute(
+            select(CareCirclePatientProviderFeedback).where(
+                CareCirclePatientProviderFeedback.patient_id == patient_id
+            )
+        )
+    ).scalars().all()
+    return {row.provider_key: row.feedback for row in rows}
+
+
+async def set_patient_provider_feedback(
+    db: AsyncSession,
+    patient_id: int,
+    provider_key: str,
+    feedback: str | None,
+) -> str | None:
+    if provider_key in OBSOLETE_PROVIDER_KEYS:
+        raise ValueError(f"Provider '{provider_key}' is no longer available")
+
+    await ensure_provider_catalog_seeded(db)
+    provider = await db.scalar(
+        select(CareCircleProviderCatalog).where(
+            CareCircleProviderCatalog.provider_key == provider_key
+        )
+    )
+    if not provider:
+        raise ValueError(f"Provider '{provider_key}' was not found")
+
+    existing = await db.scalar(
+        select(CareCirclePatientProviderFeedback).where(
+            CareCirclePatientProviderFeedback.patient_id == patient_id,
+            CareCirclePatientProviderFeedback.provider_key == provider_key,
+        )
+    )
+
+    if feedback is None:
+        if existing:
+            await db.delete(existing)
+            await db.commit()
+        return None
+
+    if existing:
+        existing.feedback = feedback
+        await db.commit()
+        await db.refresh(existing)
+        return existing.feedback
+
+    new_feedback = CareCirclePatientProviderFeedback(
+        patient_id=patient_id,
+        provider_key=provider_key,
+        feedback=feedback,
+    )
+    db.add(new_feedback)
+    await db.commit()
+    await db.refresh(new_feedback)
+    return new_feedback.feedback
 
 
 async def get_patient_provider_configs(

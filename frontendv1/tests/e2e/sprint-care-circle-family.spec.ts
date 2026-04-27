@@ -187,6 +187,29 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByRole("heading", { name: "Loaded jobs" })).toBeVisible();
   });
 
+  test("pages without custom help still get a route-aware help button", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/admin");
+
+    const helpButton = page.getByRole("button", { name: "Open help" });
+    await expect(helpButton).toBeVisible();
+    await helpButton.click();
+
+    await expect(page.getByRole("heading", { name: "Admin Dashboard Help" })).toBeVisible();
+    await expect(page.getByText("Manage platform settings, users, and system configuration.")).toBeVisible();
+  });
+
+  test("buttons and form fields expose tooltip guidance", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/account/edit");
+
+    await expect(page.getByRole("button", { name: "Save profile" })).toHaveAttribute("title", "Save profile");
+    await expect(page.getByRole("button", { name: "Cancel" })).toHaveAttribute("title", "Cancel");
+    await expect(page.getByLabel("Display name")).toHaveAttribute("title", /Display name/);
+    await expect(page.getByLabel("Username")).toHaveAttribute("title", /Username/);
+    await expect(page.getByLabel("Email")).toHaveAttribute("title", /Email/);
+  });
+
   test("family admin families page requires explicit delete confirmation and removes the family", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/admin/families");

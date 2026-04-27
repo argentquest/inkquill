@@ -68,11 +68,10 @@ export function PatientImageLoginPanel() {
   return (
     <section className="rounded-[32px] border border-black/10 bg-white/82 p-6 shadow-panel md:p-8">
       <div className="max-w-2xl">
-        <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Friend sign-in</p>
-        <h2 className="mt-3 font-display text-3xl text-ink-900 md:text-4xl">Choose the 3 pictures that belong to you.</h2>
+        <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Picture login</p>
+        <h2 className="mt-3 font-display text-3xl text-ink-900 md:text-4xl">Choose your 3 pictures.</h2>
         <p className="mt-4 text-base leading-8 text-ink-700">
-          This direct-entry flow is imported from the DailyNewsletter picture sign-in pattern and adapted for the care-circle
-          friend surface.
+          Pick the three familiar pictures you use to sign in to Ink and Quill.
         </p>
       </div>
 

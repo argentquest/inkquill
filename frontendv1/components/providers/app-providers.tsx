@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 import { fetchBalance, fetchMaintenanceStatus, fetchSession } from "@/lib/api";
 import type { BalanceState, MaintenanceState, SessionState, SessionUser, ToastMessage } from "@/lib/types";
+import { RouteHelpButton } from "@/components/ui/route-help-button";
 
 const THEME_STORAGE_KEY = "frontendv1-theme";
 const COOKIE_STORAGE_KEY = "frontendv1-cookie-consent";
@@ -272,6 +273,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
               <BalanceContext.Provider value={{ ...balance, loading: balanceLoading, refreshBalance }}>
                 <MaintenanceContext.Provider value={{ ...maintenance, loading: maintenanceLoading, refreshMaintenance }}>
                   {children}
+                  <RouteHelpButton />
                 </MaintenanceContext.Provider>
               </BalanceContext.Provider>
             </SessionContext.Provider>

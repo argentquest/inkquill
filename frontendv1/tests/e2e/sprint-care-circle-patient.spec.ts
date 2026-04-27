@@ -141,4 +141,20 @@ test.describe("Care Circle Patient UI", () => {
     await expect(page.getByText("Family", { exact: true })).toBeVisible();
     await expect(page.getByText("Memory", { exact: true })).toBeVisible();
   });
+
+  test("patient home page saves provider feedback across reloads", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/care-circle-patient/home?patient=1");
+
+    const likeButton = page.getByRole("button", { name: "Like Family hello" });
+    await likeButton.click();
+    await expect(likeButton).toHaveAttribute("aria-pressed", "true");
+
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Like Family hello" })).toHaveAttribute("aria-pressed", "true");
+
+    const dislikeButton = page.getByRole("button", { name: "Dislike Family hello" });
+    await dislikeButton.click();
+    await expect(dislikeButton).toHaveAttribute("aria-pressed", "true");
+  });
 });

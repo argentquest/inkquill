@@ -1,30 +1,49 @@
-"""Base task class for scheduler tasks."""
+"""Abstract base class for scheduler tasks.
+
+NOTE — this class is not currently used.  All tasks in this project are
+registered as plain async functions via the @register_task decorator, which is
+simpler and works well with APScheduler's function-based job API.
+
+BaseTask is preserved here as an opt-in alternative for teams that prefer a
+class-based structure.  To use it:
+
+    class MyTask(BaseTask):
+        async def execute(self) -> dict:
+            ...
+
+    instance = MyTask()
+    scheduler.add_job(instance, ...)  # APScheduler calls instance.__call__()
+"""
 
 import logging
 from abc import ABC, abstractmethod
+from datetime import datetime, timezone
 from typing import Any, Dict
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 class BaseTask(ABC):
-    """Abstract base class for scheduled tasks."""
+    """Abstract base for scheduled tasks that prefer a class-based structure.
+
+    Subclasses implement execute(); the __call__ wrapper handles logging and
+    error propagation so individual tasks stay focused on their business logic.
+    """
 
     @abstractmethod
     async def execute(self) -> Dict[str, Any]:
-        """Execute the task and return results."""
+        """Perform the task work and return a result dict."""
         ...
 
     async def __call__(self) -> Dict[str, Any]:
-        """Make the task callable for the scheduler."""
-        logger.info(f"Starting task: {self.__class__.__name__}")
+        """Entry point called by APScheduler.  Wraps execute() with logging."""
+        logger.info("Starting task: %s", self.__class__.__name__)
         try:
             result = await self.execute()
             result["task_class"] = self.__class__.__name__
-            result["completed_at"] = datetime.utcnow().isoformat()
-            logger.info(f"Task completed: {self.__class__.__name__}")
+            result["completed_at"] = datetime.now(timezone.utc).isoformat()
+            logger.info("Task completed: %s", self.__class__.__name__)
             return result
         except Exception as exc:
-            logger.error(f"Task failed: {self.__class__.__name__}: {exc}", exc_info=True)
+            logger.error("Task failed: %s: %s", self.__class__.__name__, exc, exc_info=True)
             raise

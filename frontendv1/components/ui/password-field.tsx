@@ -25,6 +25,7 @@ export function PasswordField({
   ...props
 }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
+  const inputTitle = props.title ?? tooltip ?? `${label}. Enter a password securely.`;
 
   return (
     <label className="block">
@@ -40,6 +41,7 @@ export function PasswordField({
             "w-full rounded-[20px] border bg-white/85 px-4 py-3 pr-14 text-sm text-ink-900 outline-none transition placeholder:text-ink-500 focus:border-ink-400 focus:ring-2 focus:ring-ink-200",
             error ? "border-[#c65353]/50" : "border-black/10"
           )}
+          title={inputTitle}
           type={visible ? "text" : "password"}
           {...props}
         />
@@ -48,6 +50,7 @@ export function PasswordField({
           className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-2"
           onClick={() => setVisible((current) => !current)}
           type="button"
+          tooltip={visible ? "Hide password" : "Show password"}
           variant="ghost"
         >
           {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

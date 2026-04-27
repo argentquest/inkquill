@@ -1,3 +1,24 @@
+/**
+ * Scheduler Admin Console
+ *
+ * This component replaced the original standalone HTML management UI that was
+ * previously served directly by the scheduler FastAPI process at
+ * http://scheduler:8001/.  The static HTML bundle no longer exists; all admin
+ * interactions now go through this component via the server-side proxy at
+ * /api/admin/scheduler/[...schedulerPath]/route.ts.
+ *
+ * Data flow
+ * ---------
+ * Browser → Next.js page (app/care-circle-family/admin/scheduler/page.tsx)
+ *         → this component (TanStack Query fetches to /api/admin/scheduler/*)
+ *         → Next.js API proxy (requireAdmin check + forward to scheduler)
+ *         → scheduler FastAPI process (http://SCHEDULER_HOST:SCHEDULER_PORT)
+ *
+ * Access control is enforced in two places:
+ *   1. This component redirects non-admins client-side via useLayoutEffect.
+ *   2. The API proxy (require-admin.ts) independently verifies admin status
+ *      server-side before forwarding any request to the scheduler.
+ */
 "use client";
 
 import { useLayoutEffect, useState } from "react";
@@ -82,8 +103,13 @@ async function schedulerFetch<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 /**
- * Validate a cron expression with a basic check.
- * A valid cron expression has at least 5 space-separated fields.
+ * Lightweight cron syntax check — 5 space-separated fields, each containing
+ * only digits and the standard cron meta-characters (* - , /).
+ *
+ * This is intentionally a syntax check, not a semantic validator.  APScheduler's
+ * CronTrigger.from_crontab() on the backend performs the authoritative
+ * validation and will reject semantically invalid expressions (e.g. "60 * * * *")
+ * with a 400 response that surfaces via the mutation's onError toast.
  */
 function isValidCronExpression(cron: string): boolean {
   const parts = cron.trim().split(/\s+/);

@@ -20,6 +20,8 @@ export function TextField({
   showTooltip = false,
   ...props
 }: TextFieldProps) {
+  const inputTitle = props.title ?? tooltip ?? hint ?? `${label}. Enter or review this value.`;
+
   return (
     <label className="block">
       <div className="flex items-center gap-2">
@@ -33,6 +35,7 @@ export function TextField({
           "mt-2 w-full rounded-[20px] border bg-white/85 px-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-500 focus:border-ink-400 focus:ring-2 focus:ring-ink-200",
           error ? "border-[#c65353]/50" : "border-black/10"
         )}
+        title={inputTitle}
         {...props}
       />
       {hint ? <p className="mt-2 text-sm text-ink-600">{hint}</p> : null}
