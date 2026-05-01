@@ -4,6 +4,12 @@
 
 Bring characters, locations, lore items, and their associations into the React app.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- React delivery for world entities and associations has not started.
+- Storytelling data models and backend endpoints exist in the backend, but the React routes for characters, locations, lore, and associations are still pending.
+
 ## In Scope
 
 - character list/detail/form
@@ -73,3 +79,7 @@ Bring characters, locations, lore items, and their associations into the React a
 - user can manage world elements
 - associations can be created and removed
 - detail pages are usable and navigable
+
+## Implementation Status
+
+- Not started in the React app.

@@ -4,6 +4,12 @@
 
 Finish true admin and utility surfaces after the core user product and shared platform are already working.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- The original legacy `/app/admin/*` scope in this sprint has not been rebuilt.
+- Care Circle does now have separate admin delivery under `/care-circle-family/admin`, but that work should not be counted as completion for this storytelling-oriented legacy admin sprint.
+
 ## In Scope
 
 - admin users
@@ -81,3 +87,7 @@ Finish true admin and utility surfaces after the core user product and shared pl
 
 - required admin flows are available in React
 - low-value legacy pages are either rebuilt intentionally or explicitly retired
+
+## Implementation Status
+
+- Not started for the routes listed in this sprint.

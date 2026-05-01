@@ -72,7 +72,7 @@ Those sprints remain the source of truth for platform, route, and provider runti
 ## Sprint Tasks
 
 ### 1. Backend CareCircle architecture audit
-Status: `pending`
+Status: `completed`
 
 Implement:
 - compare backend CareCircle architecture doc to current router, CRUD, service, model, and schema code
@@ -89,7 +89,7 @@ Verification:
 - manual file-to-file comparison against active backend sources
 
 ### 2. Frontend CareCircle architecture audit
-Status: `pending`
+Status: `completed`
 
 Implement:
 - compare frontend CareCircle architecture doc to current `frontendv1` routes, components, and API client
@@ -106,7 +106,7 @@ Verification:
 - manual comparison against `frontendv1/app/care-circle-family/**`, `frontendv1/app/care-circle-patient/**`, and `frontendv1/lib/api.ts`
 
 ### 3. Backend/frontend contract clarification
-Status: `pending`
+Status: `completed`
 
 Implement:
 - add explicit notes about backend response envelopes where relevant
@@ -121,7 +121,7 @@ Verification:
 - read-through of both docs from route table to API section to ensure consistent terminology
 
 ### 4. Maintenance guidance for future doc edits
-Status: `pending`
+Status: `completed`
 
 Implement:
 - add a short accuracy-maintenance section or notes in the docs describing how to keep them current
@@ -138,6 +138,13 @@ Verification:
 - updated `docs/architecture/backend-carecircle.md`
 - updated `docs/architecture/frontend-carecircle.md`
 - clear implementation-status notes inside both docs
+
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- This sprint is complete.
+- `docs/architecture/backend-carecircle.md` and `docs/architecture/frontend-carecircle.md` both include accuracy-review sections, implemented-vs-scaffolded notes, and concrete source-of-truth file references.
+- The architecture docs now correctly distinguish shipped family/patient routes from scaffold pages such as events and media.
 
 ## Exit Criteria
 

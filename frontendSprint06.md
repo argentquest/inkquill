@@ -4,6 +4,12 @@
 
 Deliver the high-complexity authoring surfaces after the core object graph is stable.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- React delivery for editors, review, and document management has not started.
+- The planned editor abstraction, document manager, upload flows, and autosave behavior remain pending.
+
 ## In Scope
 
 - act editor
@@ -77,3 +83,7 @@ Deliver the high-complexity authoring surfaces after the core object graph is st
 - save state is trustworthy
 - document management works end-to-end
 - review flow is functional
+
+## Implementation Status
+
+- Not started in the React app.

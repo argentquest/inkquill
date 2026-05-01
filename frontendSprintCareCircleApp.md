@@ -4,6 +4,14 @@
 
 Establish `care-circle` as a second application on the shared platform, with separate family and patient route spaces, household ownership, and patient-safe interaction foundations.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- Core `care-circle-family` and `care-circle-patient` delivery is in place and most circle-friend workflows are now implemented.
+- The family dashboard, patient list/detail, provider management, patient sign-in, patient daily session, billing/referrals/account flows, join-code sharing, invite email, and admin surfaces are delivered.
+- `/care-circle-family/events` and `/care-circle-family/media` currently exist as scaffold routes rather than production-complete API-backed experiences.
+- The dedicated `/care-circle-patient/session` route is still not a separate delivered surface; the calm session experience currently lives on `/care-circle-patient/home`.
+
 ## In Scope
 
 - `care-circle-family` route and shell foundation
@@ -94,7 +102,7 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - care-circle exists as a distinct application with separate family and patient route spaces
 - patient direct-entry login and simplified shell are established
 - patient interaction model supports calm daily-content viewing driven by family-managed preferences
-- family-side patient management, event feed, and media foundations are reachable and stable
+- family-side patient management is reachable and stable, while event-feed and media surfaces remain scaffold foundations
 
 ## Exit Verification
 
@@ -103,11 +111,12 @@ Establish `care-circle` as a second application on the shared platform, with sep
 | care-circle exists as a distinct application with separate family and patient route spaces | Browser verification and code review confirm independent family and patient route trees with the correct shells | `cd frontendv1; npm run build`; `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-import.spec.ts --reporter=line` |
 | patient direct-entry login and simplified shell are established | Playwright covers patient login route, fixed image-grid interaction, and post-login patient shell rendering | `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-import.spec.ts --reporter=line` |
 | patient interaction model supports calm daily-content viewing driven by family-managed preferences | Playwright and code checks confirm family-side profile rendering, image-based sign-in, and simplified patient session rendering | `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-import.spec.ts --reporter=line` |
-| family-side patient management, event feed, and media foundations are reachable and stable | Code review plus backend and browser checks confirm family landing, patient list, patient detail, patient auth restrictions, and seeded provider-backed patient sessions; events and media remain pending | `cd frontendv1; npm run build`; `cd frontendv1; npm run test:e2e -- tests/e2e/sprint-care-circle-import.spec.ts --reporter=line`; `.\.venv\Scripts\python.exe -m pytest tests\unit\test_care_circle_unit.py -q` |
+| family-side patient management is reachable and stable, while event-feed and media surfaces remain scaffold foundations | Code review plus backend and browser checks confirm family landing, patient list, patient detail, patient auth restrictions, and provider-backed patient sessions; event and media routes currently remain scaffold pages | `cd frontendv1; npm run build`; `cd frontendv1; npm run test:e2e -- tests/e2e/sprint-care-circle-family.spec.ts --reporter=line`; `.\.venv\Scripts\python.exe -m pytest tests\unit\care_circle\test_care_circle_unit.py -q` |
 | family owners can share access through visible join-code and invite-email controls | Playwright covers owner account rendering and invite submission, and integration tests confirm owner summary plus invite-email backend behavior | `cd frontendv1; npx playwright test tests/e2e/sprint-care-circle-family.spec.ts --reporter=line`; `.\.venv\Scripts\python.exe -m pytest tests/integration/care_circle/test_family_membership_integration.py -q` |
 
 ## Implementation Status
 
+- Reviewed on 2026-04-27: most circle-friend delivery is complete, with event/media still explicitly scaffold-level.
 - Care-circle route import work is now active in `frontendv1/`.
 - Initial import work now brings `DailyNewsletter` concepts into `frontendv1/` as:
   - family-managed patient profile routes
@@ -117,6 +126,7 @@ Establish `care-circle` as a second application on the shared platform, with sep
 - Backend domain delivery now includes SQLAlchemy models, Alembic migration `7b8f4c2a1d10`, `care-circle` API routes, and unit coverage for provider, family patient, patient auth, and patient session routes.
 - Frontend verification now passes for `npm run build` and the targeted Playwright care-circle spec.
 - Owner account delivery now exposes the family join code and a simple invite-email form backed by owner-only Care Circle API endpoints and email delivery templates.
+- Additional family-owner surfaces now exist beyond the original minimum sprint scope, including account edit, members, referrals, template studio, scheduler admin, and family admin pages.
 
 ## DailyNewsletter Provider Import Scope
 

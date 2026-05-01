@@ -4,6 +4,13 @@
 
 Establish `chatbot` as an independent frontend application with a simple chat-first UI, shared platform access patterns, and explicit turn-level cost visibility requirements for later backend integration.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- This sprint is partially complete.
+- Delivered now: `/chatbot` route, app layout, authenticated shell guard, and a local-only chat prototype with starter prompts and transcript rendering.
+- Not delivered yet: multi-session chat routes, backend-backed message exchange, per-turn usage/cost data, failure/retry states, and Playwright coverage.
+
 ## In Scope
 
 - `chatbot` route-tree foundation
@@ -60,8 +67,8 @@ Establish `chatbot` as an independent frontend application with a simple chat-fi
 
 ## Task List
 
-- [ ] Define the `chatbot` top-level route tree.
-- [ ] Build the chatbot landing route and shell foundation.
+- [x] Define the `chatbot` top-level route tree.
+- [x] Build the chatbot landing route and shell foundation.
 - [ ] Build the session list rail and active conversation layout.
 - [ ] Implement composer submission, assistant pending state, and transcript append behavior.
 - [ ] Add per-turn cost and token display hooks in the transcript UI.
@@ -86,5 +93,6 @@ Establish `chatbot` as an independent frontend application with a simple chat-fi
 
 ## Implementation Status
 
-- Planning only.
-- This sprint defines the dedicated chat application track and should remain independent from the storytelling and care-circle sprints.
+- The independent `/chatbot` app surface exists in `frontendv1/app/chatbot/`.
+- `frontendv1/components/chatbot/chatbot-workspace.tsx` provides a narrow local UI prototype with starter prompts, a transcript, and client-side appended replies.
+- The current implementation is intentionally a prototype and does not yet satisfy the backend, cost-tracking, session-history, or browser-verification goals listed in this sprint.

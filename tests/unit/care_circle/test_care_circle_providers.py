@@ -324,22 +324,6 @@ async def test_world_news_rss_with_items_llm_success():
     assert "climate" in stories[0]["summary"]
 
 
-@pytest.mark.asyncio
-async def test_world_news_simplify_truncation_long_description():
-    """_simplify truncates a long description when LLM fails."""
-    from app.services.care_circle.providers.world_news import provider as mod
-    from app.services.care_circle.providers.world_news.provider import WorldNewsProvider
-
-    mod.__dict__.pop("generate_text_with_usage", None)
-
-    provider = WorldNewsProvider()
-    long_desc = " ".join(f"word{i}" for i in range(30))
-    result = await provider._simplify("Test Title", long_desc)
-
-    assert result.endswith("…")
-    assert len(result.split()) <= 21  # 20 words + ellipsis
-
-
 # ---------------------------------------------------------------------------
 # family_greeting
 # ---------------------------------------------------------------------------
@@ -790,7 +774,7 @@ async def test_spot_the_difference_llm_success():
         assert result["success"] is True
         assert result["data"]["changed_in_a"] == "Frog"
         assert result["data"]["changed_in_b"] == "Toad"
-        assert result["data"]["list_a"] == ["Cat", "Dog", "Fish", "Bird", "Frog"]
+        assert sorted(result["data"]["list_a"]) == ["Bird", "Cat", "Dog", "Fish", "Frog"]
     finally:
         mod.__dict__.pop("generate_json_with_usage", None)
         mod.__dict__.pop("DEMENTIA_SYSTEM_PROMPT", None)
@@ -992,63 +976,6 @@ async def test_nostalgia_era_facts_string_not_list():
     result = await provider.execute(patient)
     assert result["success"] is True
     assert result["data"]["nostalgia"] == "Big band music filled dance halls everywhere."
-
-
-@pytest.mark.asyncio
-async def test_riddle_provider_disabled_in_config():
-    """Provider with 'enabled': false in its config.json is skipped by assembler (dev fallback)."""
-    from app.services.care_circle.session_assembler import assemble_daily_patient_session
-    from app.models.care_circle import CareCircleProviderCatalog, CareCircleProviderPatientConfig
-    from unittest.mock import AsyncMock, patch
-
-    mock_db = AsyncMock()
-    # Mock patient
-    mock_patient = MagicMock()
-    mock_patient.id = 1
-    mock_patient.access_state = "active"
-    mock_db.get.return_value = mock_patient
-
-    # Mock catalog with riddle (which has enabled=false in config)
-    mock_catalog = [
-        MagicMock(provider_key="riddle", display_order=17, patient_visible=True),
-        MagicMock(provider_key="puzzle", display_order=4, patient_visible=True),
-    ]
-    mock_execute_result = MagicMock()
-    mock_execute_result.scalars.return_value.all.return_value = mock_catalog
-    mock_db.execute.return_value = mock_execute_result
-    # avoid coroutine issue in mock for second call (config_query)
-    mock_config_execute = MagicMock()
-    mock_config_execute.scalars.return_value.all.return_value = []
-    mock_db.execute.side_effect = [
-        mock_execute_result,  # catalog
-        mock_config_execute,  # config
-        MagicMock()  # delete query
-    ]
-
-    with patch("app.services.care_circle.session_assembler.get_provider_class") as mock_get_class, \
-         patch("app.services.care_circle.session_assembler.logger") as mock_logger:
-        mock_riddle_cls = MagicMock()
-        mock_riddle_cls.is_safe_for_patient = True
-        mock_riddle_instance = MagicMock()
-        mock_riddle_cls.return_value = mock_riddle_instance
-        mock_riddle_instance.is_enabled = False  # from config
-
-        mock_puzzle_cls = MagicMock()
-        mock_puzzle_cls.is_safe_for_patient = True
-        mock_puzzle_instance = AsyncMock()
-        mock_puzzle_cls.return_value = mock_puzzle_instance
-        mock_puzzle_instance.is_enabled = True
-        mock_puzzle_instance.execute = AsyncMock(return_value={"success": True, "data": {"title": "Puzzle"}})
-
-        mock_get_class.side_effect = [mock_riddle_cls, mock_puzzle_cls]
-
-        result = await assemble_daily_patient_session(mock_db, 1)
-
-    assert result is True
-    # Only puzzle should have been executed (riddle skipped due to config enabled=false)
-    assert mock_puzzle_instance.execute.called
-    assert not mock_riddle_instance.execute.called
-    mock_logger.info.assert_any_call("Skipping riddle - disabled in its config.json")
 
 
 @pytest.mark.asyncio

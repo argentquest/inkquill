@@ -41,7 +41,7 @@ class CareCirclePatientProfile(Base):
     family_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
     phone_number: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
-    stage: Mapped[str] = mapped_column(String(50), default="moderate", nullable=False)
+    stage: Mapped[str] = mapped_column(String(50), default="moderate", nullable=False)  # "early", "mild", "moderate", "severe"
     access_state: Mapped[str] = mapped_column(String(50), default="active", nullable=False)
     timezone: Mapped[str] = mapped_column(String(100), default="America/Chicago", nullable=False)
     preferred_language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)

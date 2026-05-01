@@ -29,7 +29,7 @@ const authenticatedUser = {
   is_active: true
 };
 
-const careCirclePatients = [
+const careCirclePatients: any[] = [
   {
     id: "1",
     displayName: "Rose Ellis",
@@ -140,6 +140,407 @@ const careCircleProviders = [
     patientVisible: true,
     familyVisible: true
   }
+];
+
+const careCircleActivityEvents = [
+  {
+    id: "session-output-1",
+    type: "provider_output_created",
+    title: "Daily content generated",
+    description: "Family Greeting generated content for Rose Ellis.",
+    tone: "success",
+    occurred_at: "2026-04-27T16:30:00Z",
+    patient_id: 1,
+    patient_name: "Rose Ellis",
+    provider_key: "family_greeting"
+  },
+  {
+    id: "provider-run-2",
+    type: "provider_run_failed",
+    title: "Provider fallback used",
+    description: "Weather could not finish for Arthur Bloom.",
+    tone: "warning",
+    occurred_at: "2026-04-27T15:00:00Z",
+    patient_id: 2,
+    patient_name: "Arthur Bloom",
+    provider_key: "weather"
+  }
+];
+
+const careCircleMediaSeed = [
+  {
+    id: "media-1",
+    filename: "7_rose-porch.jpg",
+    storage_path: "7_rose-porch.jpg",
+    original_filename: "rose-porch.jpg",
+    url: "/mock-media/rose-porch.jpg",
+    thumbnail_url: "/mock-media/rose-porch-thumb.jpg",
+    file_type: "image",
+    content_type: "image/jpeg",
+    file_size: 248000,
+    alt_text: "Rose on the front porch",
+    caption: "Spring porch visit",
+    uploaded_by: 7,
+    created_at: "2026-04-27T17:15:00Z",
+    width: 1600,
+    height: 1200,
+    format: "JPEG",
+    aspect_ratio_urls: {
+      "16x9": "/mock-media/rose-porch-16x9.jpg",
+      "5x4": "/mock-media/rose-porch-5x4.jpg",
+      "1x1": "/mock-media/rose-porch-1x1.jpg"
+    }
+  }
+];
+
+const userStoriesSeed = [
+  {
+    id: 1,
+    title: "The Silver Compass",
+    short_description: "An explorer discovers a map that leads to an ancient realm hidden inside a storm.",
+    story_genre: "Fantasy Adventure",
+    story_type: "advanced",
+    created_at: "2026-04-20T10:00:00Z",
+    updated_at: "2026-04-25T14:30:00Z",
+  },
+  {
+    id: 2,
+    title: "Ember Coast",
+    short_description: "A fishing village learns it sits atop a sleeping volcano with a memory.",
+    story_genre: "Literary Fiction",
+    story_type: "advanced",
+    created_at: "2026-04-22T08:00:00Z",
+    updated_at: "2026-04-26T09:45:00Z",
+  },
+];
+
+const userWorldsSeed = [
+  {
+    id: 1,
+    name: "Aethoria",
+    short_description: "A realm of floating islands and ancient sky bridges connecting lost civilisations.",
+    is_free_chat_enabled: false,
+    created_at: "2026-04-18T09:00:00Z",
+    updated_at: "2026-04-24T11:00:00Z",
+  },
+];
+
+const publishedStoriesSeed = [
+  {
+    id: 101,
+    story_id: 1,
+    user_id: 7,
+    title: "The Silver Compass — Published",
+    description: "An explorer discovers a map that leads to an ancient realm.",
+    published_url: "/published/the-silver-compass",
+    filename: "the-silver-compass.html",
+    word_count: 12400,
+    is_public: true,
+    is_featured: true,
+    view_count: 342,
+    like_count: 28,
+    comment_count: 5,
+    average_rating: 4.2,
+    published_at: "2026-04-20T10:00:00Z",
+    updated_at: "2026-04-25T14:30:00Z",
+    publisher_username: "storymaker",
+    publisher_display_name: "Story Maker",
+    world_name: "Aethoria",
+    story_title: "The Silver Compass",
+    story_short_description: "An explorer discovers a map.",
+    has_user_rated: false,
+    user_rating: null,
+  },
+];
+
+type PublishedStoryCommentSeed = {
+  id: number;
+  published_story_id: number;
+  user_id: number;
+  commenter_username: string | null;
+  commenter_display_name: string | null;
+  content: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+const publishedStoryCommentsSeed: Record<number, PublishedStoryCommentSeed[]> = {
+  101: [
+    {
+      id: 1,
+      published_story_id: 101,
+      user_id: 11,
+      commenter_username: "readerone",
+      commenter_display_name: "Reader One",
+      content: "The opening image really pulled me into the world.",
+      is_approved: true,
+      created_at: "2026-04-22T14:00:00Z",
+      updated_at: "2026-04-22T14:00:00Z"
+    }
+  ]
+};
+
+// ---------------------------------------------------------------------------
+// Sprint 11 seed data — Chatbot
+// ---------------------------------------------------------------------------
+
+const chatbotSessionsSeed: Array<{
+  id: number; user_id: number; title: string; created_at: string; updated_at: string;
+}> = [
+  { id: 10, user_id: 7, title: "Story scene discussion", created_at: "2026-04-25T10:00:00Z", updated_at: "2026-04-25T10:05:00Z" },
+  { id: 11, user_id: 7, title: "Care update draft", created_at: "2026-04-26T08:00:00Z", updated_at: "2026-04-26T08:10:00Z" },
+];
+
+const chatbotSessionWithMessages = {
+  ...chatbotSessionsSeed[0],
+  messages: [
+    {
+      id: 101,
+      session_id: 10,
+      role: "user",
+      content: "Can you help me outline a scene?",
+      input_tokens: null,
+      output_tokens: null,
+      cost_usd: null,
+      model_name: null,
+      created_at: "2026-04-25T10:01:00Z",
+    },
+    {
+      id: 102,
+      session_id: 10,
+      role: "assistant",
+      content: "Of course! Start with the setting, introduce the conflict, then end on an unresolved tension.",
+      input_tokens: 45,
+      output_tokens: 32,
+      cost_usd: 0.0003,
+      model_name: "gpt-4o",
+      created_at: "2026-04-25T10:01:05Z",
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Sprint 10 seed data
+// ---------------------------------------------------------------------------
+
+const promptsSeed = [
+  {
+    id: 1,
+    title: "Fantasy world opener",
+    prompt_content: "Write an opening paragraph that establishes an ancient fantasy world with a sense of deep history.",
+    reason_to_use: "Use this at the start of a new fantasy story to set the tone.",
+    comment: null,
+    is_active: true,
+    prompt_type: "STORY",
+    age_target: "ALL_AGES",
+    user_id: 7,
+    created_at: "2026-03-01T00:00:00Z",
+    updated_at: "2026-03-01T00:00:00Z",
+  },
+  {
+    id: 2,
+    title: "Character backstory hook",
+    prompt_content: "In one paragraph, reveal a key moment from this character's past that shaped who they are today.",
+    reason_to_use: "Use when introducing a new major character.",
+    comment: null,
+    is_active: true,
+    prompt_type: "CHARACTER",
+    age_target: "ALL_AGES",
+    user_id: 7,
+    created_at: "2026-03-05T00:00:00Z",
+    updated_at: "2026-03-05T00:00:00Z",
+  },
+];
+
+const llmModelsSeed = {
+  models: [
+    {
+      id: 1,
+      display_name: "GPT-4o",
+      model_name: "gpt-4o",
+      description: "OpenAI's flagship multimodal model.",
+      provider: "openai",
+      model_type: "chat",
+      is_active: true,
+      max_tokens: 4096,
+      temperature: 0.7,
+      user_price_input_usd_pm: 0.005,
+      user_price_output_usd_pm: 0.015,
+    },
+    {
+      id: 2,
+      display_name: "Claude 3 Haiku",
+      model_name: "claude-haiku-4-5-20251001",
+      description: "Fast and efficient Anthropic model.",
+      provider: "anthropic",
+      model_type: "chat",
+      is_active: true,
+      max_tokens: 2048,
+      temperature: 0.7,
+      user_price_input_usd_pm: 0.00025,
+      user_price_output_usd_pm: 0.00125,
+    },
+  ],
+  total_count: 2,
+  active_count: 2,
+  providers: ["openai", "anthropic"],
+};
+
+const authorBlogPostsSeed = [
+  {
+    id: 201,
+    title: "My First Blog Post",
+    slug: "my-first-blog-post",
+    content: "This is the content of my first blog post.",
+    excerpt: "An introductory post.",
+    featured_image_url: null,
+    status: "draft",
+    author_id: 7,
+    view_count: 0,
+    like_count: 0,
+    comment_count: 0,
+    published_at: null,
+    created_at: "2026-04-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 202,
+    title: "Writing Tips for Fantasy",
+    slug: "writing-tips-fantasy",
+    content: "Here are my top five writing tips for fantasy authors.",
+    excerpt: "Five tips for fantasy writing.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 42,
+    like_count: 5,
+    comment_count: 2,
+    published_at: "2026-04-10T00:00:00Z",
+    created_at: "2026-04-08T00:00:00Z",
+    updated_at: "2026-04-10T00:00:00Z",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Sprint 12 seed data — Admin
+// ---------------------------------------------------------------------------
+
+const adminUsersSeed = [
+  { id: 7, username: "storymaker", email: "storymaker@example.com", display_name: "Story Maker", is_active: true, is_admin: true, created_at: "2026-01-01T00:00:00Z" },
+  { id: 8, username: "alice", email: "alice@example.com", display_name: "Alice Winters", is_active: true, is_admin: false, created_at: "2026-02-01T00:00:00Z" },
+  { id: 9, username: "bobwriter", email: "bob@example.com", display_name: null, is_active: false, is_admin: false, created_at: "2026-03-01T00:00:00Z" },
+];
+
+const adminBillingDashboardSeed = {
+  system_stats: {
+    total_users: 42,
+    total_coins_issued: 18500,
+    total_coins_spent: 7300,
+    active_accounts: 38,
+  },
+  recent_transactions: [
+    { id: 1, user_id: 8, description: "Story generation", amount: -50, created_at: "2026-04-28T10:00:00Z" },
+    { id: 2, user_id: 7, description: "Monthly top-up", amount: 500, created_at: "2026-04-27T08:00:00Z" },
+  ],
+  user_accounts: [],
+};
+
+const adminCTASeed = [
+  { id: 1, title: "Join the Community", subtitle: "Connect with other writers.", position: "home_hero", style: "gradient", is_active: true, sort_order: 0, primary_button_text: "Sign up free", primary_button_url: "/register", show_for_anonymous: true, show_for_authenticated: false },
+  { id: 2, title: "Upgrade Your Plan", subtitle: "Get more coins every month.", position: "sidebar", style: "minimal", is_active: false, sort_order: 1, primary_button_text: "View plans", primary_button_url: "/billing", show_for_anonymous: false, show_for_authenticated: true },
+];
+
+const maintenanceStatusOffSeed = { enabled: false, message: null, estimated_end_time: null };
+const maintenanceStatusOnSeed = { enabled: true, message: "Scheduled maintenance — back in 5 minutes.", estimated_end_time: null };
+
+const forumCategoriesSeed = [
+  {
+    id: 1,
+    name: "World Building",
+    description: "Discuss settings, maps, and fictional worlds.",
+    slug: "world-building",
+    sort_order: 1,
+    is_active: true,
+    icon: "🌍",
+    thread_count: 12,
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 2,
+    name: "Story Craft",
+    description: "Plot, character, dialogue, and narrative structure.",
+    slug: "story-craft",
+    sort_order: 2,
+    is_active: true,
+    icon: "✍️",
+    thread_count: 8,
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+];
+
+const forumThreadsSeed = [
+  {
+    id: 1,
+    title: "How do you structure a magic system?",
+    slug: "how-do-you-structure-a-magic-system",
+    status: "open",
+    category_id: 1,
+    category_name: "World Building",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 120,
+    post_count: 7,
+    last_post_at: "2026-04-26T09:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-20T08:00:00Z",
+    updated_at: "2026-04-26T09:00:00Z",
+    posts: [
+      {
+        id: 1,
+        content: "I always start with the limitations before the powers.",
+        content_html: "<p>I always start with the limitations before the powers.</p>",
+        thread_id: 1,
+        user_id: 7,
+        username: "storymaker",
+        user_display_name: "Story Maker",
+        upvote_count: 15,
+        downvote_count: 1,
+        score: 14,
+        edit_count: 0,
+        is_deleted: false,
+        created_at: "2026-04-20T08:00:00Z",
+        updated_at: "2026-04-20T08:00:00Z",
+      },
+    ],
+  },
+];
+
+const blogPostsSeed = [
+  {
+    id: 1,
+    title: "Introducing World Builder 2.0",
+    slug: "introducing-world-builder-2",
+    content: "<p>We've rebuilt the world builder from the ground up.</p>",
+    excerpt: "A major update to how you create and manage fictional worlds.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 890,
+    like_count: 42,
+    comment_count: 11,
+    published_at: "2026-04-15T12:00:00Z",
+    created_at: "2026-04-15T10:00:00Z",
+    updated_at: "2026-04-15T12:00:00Z",
+  },
 ];
 
 const adminFamiliesSeed = [
@@ -266,6 +667,14 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
   const onboarding = options.onboarding ?? "ok";
   const currentUser = { ...authenticatedUser };
   let adminFamilies = adminFamiliesSeed.map((family) => ({ ...family }));
+  let careCircleMedia = careCircleMediaSeed.map((item) => ({ ...item, aspect_ratio_urls: { ...(item.aspect_ratio_urls ?? {}) } }));
+  let publishedStories: any[] = publishedStoriesSeed.map((story) => ({ ...story }));
+  let publishedStoryComments = Object.fromEntries(
+    Object.entries(publishedStoryCommentsSeed).map(([storyId, comments]) => [
+      Number(storyId),
+      comments.map((comment) => ({ ...comment })),
+    ])
+  ) as Record<number, PublishedStoryCommentSeed[]>;
 
   await page.route("**/api/admin/scheduler/**", async (route) => {
     const url = route.request().url();
@@ -303,6 +712,189 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     await route.fallback();
   });
 
+  await page.route("**/api/forum/**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    if (url.includes("/api/forum/categories") && method === "GET") {
+      await route.fulfill(json({ success: true, data: forumCategoriesSeed }));
+      return;
+    }
+
+    const threadDetailMatch = url.match(/\/api\/forum\/threads\/(\d+)$/);
+    if (threadDetailMatch && method === "GET") {
+      const threadId = Number(threadDetailMatch[1]);
+      const thread = forumThreadsSeed.find((t) => t.id === threadId);
+      if (!thread) {
+        await route.fulfill(json({ detail: "Thread not found" }, 404));
+        return;
+      }
+      await route.fulfill(json({ success: true, data: thread }));
+      return;
+    }
+
+    if (url.includes("/api/forum/threads") && method === "POST") {
+      const body = JSON.parse(route.request().postData() ?? "{}") as {
+        title?: string;
+        category_id?: number;
+        initial_post_content?: string;
+      };
+      const newThread = {
+        ...forumThreadsSeed[0],
+        id: 99,
+        title: body.title ?? "New thread",
+        category_id: body.category_id ?? 1,
+        post_count: 1,
+        posts: [
+          {
+            id: 999,
+            content: body.initial_post_content ?? "",
+            content_html: null,
+            thread_id: 99,
+            user_id: 1,
+            username: "testuser",
+            user_display_name: "Test User",
+            upvote_count: 0,
+            downvote_count: 0,
+            score: 0,
+            edit_count: 0,
+            is_deleted: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+      };
+      await route.fulfill(json({ success: true, data: newThread }, 201));
+      return;
+    }
+
+    if (url.includes("/api/forum/threads") && method === "GET") {
+      await route.fulfill(json({ success: true, data: forumThreadsSeed }));
+      return;
+    }
+
+    if (url.includes("/api/forum/posts") && method === "POST") {
+      const body = JSON.parse(route.request().postData() ?? "{}") as {
+        thread_id?: number;
+        content?: string;
+      };
+      const newPost = {
+        id: 888,
+        content: body.content ?? "",
+        content_html: null,
+        thread_id: body.thread_id ?? 1,
+        user_id: 1,
+        username: "testuser",
+        user_display_name: "Test User",
+        upvote_count: 0,
+        downvote_count: 0,
+        score: 0,
+        edit_count: 0,
+        is_deleted: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      await route.fulfill(json({ success: true, data: newPost }, 201));
+      return;
+    }
+
+    await route.fallback();
+  });
+
+  await page.route("**/api/blog/search/**", async (route) => {
+    const url = route.request().url();
+    const searchParams = new URL(url).searchParams;
+    const q = searchParams.get("q") ?? "";
+    const results = blogPostsSeed.filter(
+      (p) => p.title.toLowerCase().includes(q.toLowerCase()) || (p.excerpt ?? "").toLowerCase().includes(q.toLowerCase())
+    );
+    await route.fulfill(json({ success: true, data: results }));
+  });
+
+  await page.route("**/api/blog/posts/**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    const pathMatch = url.match(/\/api\/blog\/posts\/([^?]+)$/);
+    if (pathMatch && method === "GET") {
+      const slug = pathMatch[1];
+      const post = blogPostsSeed.find((p) => p.slug === slug);
+      if (!post) {
+        await route.fulfill(json({ detail: "Blog post not found" }, 404));
+        return;
+      }
+      await route.fulfill(json({ success: true, data: post }));
+      return;
+    }
+
+    await route.fallback();
+  });
+
+  await page.route("**/api/blog/posts*", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    if (method === "GET") {
+      const searchParams = new URL(url).searchParams;
+      const search = searchParams.get("search");
+      const posts = search
+        ? blogPostsSeed.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()))
+        : blogPostsSeed;
+      await route.fulfill(json({ success: true, data: posts }));
+      return;
+    }
+
+    await route.fallback();
+  });
+
+  await page.route("**/api/blog/media/**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    if (url.endsWith("/api/blog/media/list") && method === "GET") {
+      await route.fulfill(json({ success: true, data: careCircleMedia }));
+      return;
+    }
+
+    if (url.endsWith("/api/blog/media/upload") && method === "POST") {
+      const uploaded = {
+        id: `media-${careCircleMedia.length + 1}`,
+        filename: `7_upload-${careCircleMedia.length + 1}.jpg`,
+        storage_path: `7_upload-${careCircleMedia.length + 1}.jpg`,
+        original_filename: `upload-${careCircleMedia.length + 1}.jpg`,
+        url: `/mock-media/upload-${careCircleMedia.length + 1}.jpg`,
+        thumbnail_url: `/mock-media/upload-${careCircleMedia.length + 1}-thumb.jpg`,
+        file_type: "image",
+        content_type: "image/jpeg",
+        file_size: 128000,
+        alt_text: "",
+        caption: "",
+        uploaded_by: 7,
+        created_at: "2026-04-28T18:00:00Z",
+        width: 1080,
+        height: 1080,
+        format: "JPEG",
+        aspect_ratio_urls: {
+          "16x9": `/mock-media/upload-${careCircleMedia.length + 1}-16x9.jpg`,
+          "5x4": `/mock-media/upload-${careCircleMedia.length + 1}-5x4.jpg`,
+          "1x1": `/mock-media/upload-${careCircleMedia.length + 1}-1x1.jpg`
+        }
+      };
+      careCircleMedia = [uploaded, ...careCircleMedia];
+      await route.fulfill(json({ success: true, data: { message: "File uploaded successfully", media: uploaded } }));
+      return;
+    }
+
+    if (url.includes("/api/blog/media/") && method === "DELETE") {
+      const storagePath = decodeURIComponent(url.split("/api/blog/media/")[1] ?? "");
+      careCircleMedia = careCircleMedia.filter((item) => item.storage_path !== storagePath);
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+
+    await route.fallback();
+  });
+
   await page.route("**/api/v1/**", async (route) => {
     const url = route.request().url();
     const method = route.request().method();
@@ -331,8 +923,106 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
+    if (url.endsWith("/stories/") && method === "GET") {
+      await route.fulfill(json({ success: true, data: userStoriesSeed }));
+      return;
+    }
+
+    const publishedStoryDetailMatch = url.match(/\/published-stories\/(\d+)(?:\/comments|\/rate)?$/);
+    if (publishedStoryDetailMatch) {
+      const storyId = Number(publishedStoryDetailMatch[1]);
+      const story = publishedStories.find((s) => s.id === storyId);
+
+      if (url.endsWith("/comments") && method === "GET") {
+        await route.fulfill(json({ success: true, data: publishedStoryComments[storyId] ?? [] }));
+        return;
+      }
+
+      if (url.endsWith("/comments") && method === "POST") {
+        const body = route.request().postDataJSON() as { content?: string };
+        const nextComment = {
+          id: (publishedStoryComments[storyId]?.length ?? 0) + 1,
+          published_story_id: storyId,
+          user_id: currentUser.id,
+          commenter_username: currentUser.username,
+          commenter_display_name: currentUser.display_name,
+          content: body.content ?? "",
+          is_approved: true,
+          created_at: "2026-04-28T19:30:00Z",
+          updated_at: "2026-04-28T19:30:00Z"
+        };
+        publishedStoryComments[storyId] = [...(publishedStoryComments[storyId] ?? []), nextComment];
+        publishedStories = publishedStories.map((entry) =>
+          entry.id === storyId
+            ? {
+                ...entry,
+                comment_count: (publishedStoryComments[storyId] ?? []).length
+              }
+            : entry
+        );
+        await route.fulfill(json({ success: true, data: nextComment }));
+        return;
+      }
+
+      if (url.endsWith("/rate") && method === "POST") {
+        const body = route.request().postDataJSON() as { rating?: number };
+        if (!story) {
+          await route.fulfill(json({ detail: "Published story not found" }, 404));
+          return;
+        }
+        publishedStories = publishedStories.map((entry) =>
+          entry.id === storyId
+            ? {
+                ...entry,
+                has_user_rated: true,
+                user_rating: body.rating ?? entry.user_rating,
+                average_rating: body.rating ?? entry.average_rating
+              }
+            : entry
+        );
+        await route.fulfill(json({ success: true, data: { rating: body.rating ?? null } }));
+        return;
+      }
+
+      if (method === "GET") {
+        const refreshedStory = publishedStories.find((s) => s.id === storyId);
+        if (!refreshedStory) {
+          await route.fulfill(json({ detail: "Published story not found" }, 404));
+          return;
+        }
+        await route.fulfill(json({ success: true, data: refreshedStory }));
+        return;
+      }
+
+      if (!story) {
+        await route.fulfill(json({ detail: "Published story not found" }, 404));
+        return;
+      }
+    }
+
+    if (url.includes("/published-stories/") && method === "GET") {
+      const searchParams = new URL(url).searchParams;
+      const page = Number(searchParams.get("page") ?? "1");
+      const perPage = Number(searchParams.get("per_page") ?? "20");
+      await route.fulfill(json({
+        success: true,
+        data: { stories: publishedStories, total: publishedStories.length, page, per_page: perPage }
+      }));
+      return;
+    }
+
+    if (url.endsWith("/worlds/") && method === "GET") {
+      await route.fulfill(json({ success: true, data: userWorldsSeed }));
+      return;
+    }
+
     if (url.endsWith("/care-circle/family/patients")) {
       await route.fulfill(json({ success: true, data: careCirclePatients }));
+      return;
+    }
+
+    if (url.endsWith("/care-circle/family/events")) {
+      await route.fulfill(json({ success: true, data: careCircleActivityEvents }));
       return;
     }
 
@@ -470,8 +1160,8 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       const providerKey = parts.at(-1) ?? "";
       const patientId = parts.at(-3) ?? "";
       const body = route.request().postDataJSON() as { feedback?: "like" | "dislike" | null };
-      const patient = careCirclePatients.find((entry) => entry.id === patientId && entry.accessState !== "archived");
-      const highlight = patient?.highlights?.find((entry) => entry.providerKey === providerKey);
+      const patient = careCirclePatients.find((entry: any) => entry.id === patientId && entry.accessState !== "archived");
+      const highlight = patient?.highlights?.find((entry: any) => entry.providerKey === providerKey);
 
       if (!patient || !highlight) {
         await route.fulfill(json({ detail: "Patient session not found" }, 404));
@@ -630,6 +1320,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
           success: true,
           data: {
             referral_code: "STORY123",
+            referral_url: "https://inkandquill.example/join?ref=STORY123",
             total_referrals: 4,
             converted_referrals: 2,
             conversion_rate: 50,
@@ -725,6 +1416,205 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
+    // Sprint 11 — Chatbot sessions
+    const chatSessionDetailMatch = url.match(/\/chatbot\/sessions\/(\d+)$/);
+    const chatMessageMatch = url.match(/\/chatbot\/sessions\/(\d+)\/messages/);
+
+    if (url.includes("/chatbot/sessions") && method === "GET" && !chatSessionDetailMatch) {
+      await route.fulfill(json({ success: true, data: chatbotSessionsSeed }));
+      return;
+    }
+
+    if (chatSessionDetailMatch && method === "GET") {
+      const id = Number(chatSessionDetailMatch[1]);
+      if (id === chatbotSessionWithMessages.id) {
+        await route.fulfill(json({ success: true, data: chatbotSessionWithMessages }));
+      } else {
+        const session = chatbotSessionsSeed.find((s) => s.id === id);
+        if (session) {
+          await route.fulfill(json({ success: true, data: { ...session, messages: [] } }));
+        } else {
+          await route.fulfill(json({ detail: "Session not found" }, 404));
+        }
+      }
+      return;
+    }
+
+    if (url.includes("/chatbot/sessions") && method === "POST" && !chatMessageMatch) {
+      const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string };
+      const created = { id: 99, user_id: 7, title: body.title ?? "New conversation", created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+      await route.fulfill(json({ success: true, data: created }, 201));
+      return;
+    }
+
+    if (chatMessageMatch && method === "POST") {
+      const sessionId = Number(chatMessageMatch[1]);
+      const body = JSON.parse(route.request().postData() ?? "{}") as { message?: string };
+      const userMsg = { id: 800, session_id: sessionId, role: "user", content: body.message ?? "", input_tokens: null, output_tokens: null, cost_usd: null, model_name: null, created_at: new Date().toISOString() };
+      const aiMsg = { id: 801, session_id: sessionId, role: "assistant", content: "Understood. Here is a helpful response.", input_tokens: 50, output_tokens: 30, cost_usd: 0.0004, model_name: "gpt-4o", created_at: new Date().toISOString() };
+      await route.fulfill(json({ success: true, data: { user_message: userMsg, ai_message: aiMsg, input_tokens: 50, output_tokens: 30, cost_usd: 0.0004, model_name: "gpt-4o" } }));
+      return;
+    }
+
+    if (chatSessionDetailMatch && method === "DELETE") {
+      await route.fulfill({ status: 204 });
+      return;
+    }
+
+    if (chatSessionDetailMatch && method === "PUT") {
+      const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string };
+      const id = Number(chatSessionDetailMatch[1]);
+      const s = chatbotSessionsSeed.find((x) => x.id === id) ?? chatbotSessionsSeed[0];
+      await route.fulfill(json({ success: true, data: { ...s, title: body.title ?? s.title } }));
+      return;
+    }
+
+    // Sprint 10 — Prompts
+    if (url.includes("/prompts/my-prompts") && method === "GET") {
+      await route.fulfill(json({ success: true, data: promptsSeed }));
+      return;
+    }
+
+    if (url.includes("/prompts/shared") && method === "GET") {
+      await route.fulfill(json({ success: true, data: [] }));
+      return;
+    }
+
+    if (url.includes("/prompts/") && method === "POST") {
+      const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string; prompt_content?: string; prompt_type?: string };
+      const newPrompt = {
+        ...promptsSeed[0],
+        id: 99,
+        title: body.title ?? "New prompt",
+        prompt_content: body.prompt_content ?? "",
+        prompt_type: body.prompt_type ?? "GENERAL",
+      };
+      await route.fulfill(json({ success: true, data: newPrompt }, 201));
+      return;
+    }
+
+    if (url.match(/\/prompts\/\d+/) && method === "DELETE") {
+      await route.fulfill({ status: 204 });
+      return;
+    }
+
+    // Sprint 10 — LLM models
+    if (url.includes("/llm-models/") && method === "GET") {
+      await route.fulfill(json({ success: true, data: llmModelsSeed }));
+      return;
+    }
+
+    // Sprint 12 — Admin users
+    if (url.includes("/users/") && url.includes("toggle-active") && method === "PATCH") {
+      const idMatch = url.match(/\/users\/(\d+)\/toggle-active/);
+      const userId = idMatch ? Number(idMatch[1]) : 0;
+      const user = adminUsersSeed.find((u) => u.id === userId) ?? adminUsersSeed[1];
+      await route.fulfill(json({ success: true, data: { ...user, is_active: !user.is_active } }));
+      return;
+    }
+
+    if (url.includes("/users/") && method === "GET" && !url.includes("/users/me")) {
+      await route.fulfill(json({ success: true, data: adminUsersSeed }));
+      return;
+    }
+
+    // Sprint 12 — Admin billing
+    if (url.includes("/admin/billing/dashboard") && method === "GET") {
+      await route.fulfill(json({ success: true, data: adminBillingDashboardSeed }));
+      return;
+    }
+
+    if (url.includes("/admin/billing/adjust-credits") && method === "POST") {
+      await route.fulfill(json({ success: true, data: { success: true, message: "Credits adjusted successfully", transaction_id: 999 } }));
+      return;
+    }
+
+    // Sprint 12 — Maintenance enable/disable
+    if (url.includes("/maintenance/enable") && method === "POST") {
+      await route.fulfill(json({ success: true, data: { status: "Maintenance mode enabled", message: "Scheduled maintenance" } }));
+      return;
+    }
+
+    if (url.includes("/maintenance/disable") && method === "POST") {
+      await route.fulfill(json({ success: true, data: { status: "Maintenance mode disabled" } }));
+      return;
+    }
+
+    // Sprint 12 — Admin CTA
+    if (url.includes("/admin/cta-content") && url.includes("toggle-active") && method === "POST") {
+      const idMatch = url.match(/\/admin\/cta-content\/(\d+)\/toggle-active/);
+      const ctaId = idMatch ? Number(idMatch[1]) : 0;
+      const cta = adminCTASeed.find((c) => c.id === ctaId) ?? adminCTASeed[0];
+      await route.fulfill(json({ success: true, data: { is_active: !cta.is_active, message: "CTA toggled" } }));
+      return;
+    }
+
+    if (url.match(/\/admin\/cta-content\/\d+/) && method === "DELETE") {
+      await route.fulfill(json({ success: true, data: { message: "CTA deleted successfully" } }));
+      return;
+    }
+
+    if (url.includes("/admin/cta-content") && method === "GET") {
+      await route.fulfill(json({ success: true, data: adminCTASeed }));
+      return;
+    }
+
     await route.fallback();
+  });
+
+  // Sprint 10 — Blog authoring routes (same-origin /api/blog/posts with author_id filter)
+  await page.route("**/api/blog/posts**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    const postIdMatch = url.match(/\/api\/blog\/posts\/(\d+)/);
+
+    if (method === "GET" && !postIdMatch) {
+      // Return author's posts (or all posts seed)
+      await route.fulfill(json({ success: true, data: authorBlogPostsSeed }));
+      return;
+    }
+
+    if (method === "GET" && postIdMatch) {
+      const id = Number(postIdMatch[1]);
+      const found = authorBlogPostsSeed.find((p) => p.id === id);
+      if (found) {
+        await route.fulfill(json({ success: true, data: found }));
+      } else {
+        await route.fulfill(json({ detail: "Not found" }, 404));
+      }
+      return;
+    }
+
+    if (method === "POST" && !postIdMatch) {
+      const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string; content?: string; status?: string };
+      const created = { ...authorBlogPostsSeed[0], id: 299, title: body.title ?? "New post", status: body.status ?? "draft" };
+      await route.fulfill(json({ success: true, data: created }, 201));
+      return;
+    }
+
+    if (method === "PUT" && postIdMatch) {
+      const id = Number(postIdMatch[1]);
+      const base = authorBlogPostsSeed.find((p) => p.id === id) ?? authorBlogPostsSeed[0];
+      const body = JSON.parse(route.request().postData() ?? "{}") as Partial<typeof base>;
+      await route.fulfill(json({ success: true, data: { ...base, ...body } }));
+      return;
+    }
+
+    if (method === "DELETE" && postIdMatch) {
+      await route.fulfill({ status: 204 });
+      return;
+    }
+
+    await route.fallback();
+  });
+
+  await page.route("**/api/blog/posts/*/publish", async (route) => {
+    if (route.request().method() !== "POST") { await route.fallback(); return; }
+    const url = route.request().url();
+    const match = url.match(/\/api\/blog\/posts\/(\d+)\/publish/);
+    const id = match ? Number(match[1]) : 0;
+    const base = authorBlogPostsSeed.find((p) => p.id === id) ?? authorBlogPostsSeed[0];
+    await route.fulfill(json({ success: true, data: { ...base, status: "published" } }));
   });
 }

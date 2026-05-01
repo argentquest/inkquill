@@ -4,6 +4,12 @@
 
 Bring conversational and world-structure tools online after authoring is stable.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- React delivery for the storytelling-specific chat, builder, hierarchy, and spatial tools in this sprint has not started.
+- The separate `/chatbot` prototype is being tracked in `frontendSprintChat.md` and should not be counted as completion for this sprint's world/story/public chat scope.
+
 ## In Scope
 
 - world chat
@@ -77,3 +83,7 @@ Bring conversational and world-structure tools online after authoring is stable.
 - user can chat in world and story contexts
 - builder flow is usable
 - hierarchy and map can be navigated
+
+## Implementation Status
+
+- Not started in the React app for the routes listed in this sprint.

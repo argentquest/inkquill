@@ -234,16 +234,72 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/events");
 
-    // Verify the page loads by checking URL
     await expect(page).toHaveURL(/\/care-circle-family\/events/, { timeout: 15000 });
+    await expect(page.getByTestId("care-circle-activity-feed")).toBeVisible();
+    await expect(page.getByText("Daily content generated")).toBeVisible();
+    await expect(page.getByText("Provider fallback used")).toBeVisible();
+    await expect(page.getByText("Rose Ellis")).toBeVisible();
   });
 
   test("family media library page loads", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/media");
 
-    // Verify the page loads by checking URL
     await expect(page).toHaveURL(/\/care-circle-family\/media/, { timeout: 15000 });
+    await expect(page.getByText("Upload family photos for Care Circle prompts")).toBeVisible();
+    await expect(page.getByTestId("care-circle-media-grid")).toBeVisible();
+    await expect(page.getByText("rose-porch.jpg")).toBeVisible();
+    await expect(page.getByText("Prompt-ready crops")).toBeVisible();
+  });
+
+  test("family media library allows upload and delete", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/media");
+
+    await page.getByTestId("care-circle-media-input").setInputFiles({
+      name: "porch-memory.jpg",
+      mimeType: "image/jpeg",
+      buffer: Buffer.from("fake-image"),
+    });
+
+    await expect(page.getByText("Photo uploaded")).toBeVisible();
+    await expect(page.getByText("upload-2.jpg")).toBeVisible();
+
+    await page.getByRole("button", { name: "Delete upload-2.jpg" }).click();
+    await expect(page.getByText("Photo removed")).toBeVisible();
+    await expect(page.getByText("upload-2.jpg")).not.toBeVisible();
+  });
+
+  test("family media library shows empty state when no media exists", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.route("**/api/blog/media/list", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, data: [] }),
+      });
+    });
+    await page.goto("/care-circle-family/media");
+
+    await expect(page).toHaveURL(/\/care-circle-family\/media/, { timeout: 15000 });
+    await expect(page.getByText("No media uploaded yet")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Upload photos" })).toBeVisible();
+  });
+
+  test("family media library shows error state when list API fails", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.route("**/api/blog/media/list", async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ success: false, error: { message: "Storage unavailable" } }),
+      });
+    });
+    await page.goto("/care-circle-family/media");
+
+    await expect(page).toHaveURL(/\/care-circle-family\/media/, { timeout: 15000 });
+    await expect(page.getByText("Media library unavailable")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Reload library" })).toBeVisible();
   });
 
   test("owner account page shows the join code and can send an invite email", async ({ page }) => {

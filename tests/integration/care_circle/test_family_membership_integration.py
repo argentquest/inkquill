@@ -114,6 +114,20 @@ def test_owner_can_get_family_summary(client, register_and_login):
     assert data["pending_request_count"] == 0
 
 
+def test_owner_can_list_family_activity_events(client, register_and_login):
+    register_and_login("owner_events")
+    _get_join_code(client)
+
+    resp = client.get("/api/v1/care-circle/family/events")
+
+    assert resp.status_code == 200, resp.text
+    data = resp.json()["data"]
+    assert isinstance(data, list)
+    assert len(data) >= 1
+    assert {"id", "type", "title", "description", "tone", "occurred_at"}.issubset(data[0].keys())
+    assert any(event["type"] in {"family_created", "patient_created"} for event in data)
+
+
 def test_owner_can_send_invite_email(client, register_and_login, app_instance):
     register_and_login("owner_invite")
     join_code = _get_join_code(client)

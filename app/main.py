@@ -115,7 +115,8 @@ from app.routers import (
     blog_integration,
     blog_seo,
     referrals,
-    care_circle
+    care_circle,
+    chatbot
 )
 from app.routers.act import story_acts_router, acts_router
 
@@ -152,8 +153,11 @@ async def lifespan(app_instance: FastAPI):
     
     # Load AI model configurations into cache
     from app.services.ai_model_cache import model_cache
-    await model_cache.load_models_from_db()
-    logger.info("Lifespan: AI Model Cache loaded from database.")
+    try:
+        await model_cache.load_models_from_db()
+        logger.info("Lifespan: AI Model Cache loaded from database.")
+    except Exception as e_cache:
+        logger.critical(f"Lifespan: CRITICAL - Failed to load AI Model Cache from database: {e_cache}", exc_info=True)
     
     orchestration_backend = get_ai_orchestration_backend()
     if orchestration_backend_is_semantic_kernel():

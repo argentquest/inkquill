@@ -85,6 +85,10 @@ from .story_chat_message import StoryChatMessage
 # CTA Content models
 from .cta_content import CTAContent, CTAPosition, CTAStyle
 
+# Chatbot models
+from .chatbot_session import ChatbotSession
+from .chatbot_message import ChatbotMessage
+
 # By importing all models here, we ensure that SQLAlchemy's declarative base
 # has a complete picture of all tables and their relationships before the
 # application starts trying to use them, preventing NameError issues with

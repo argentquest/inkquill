@@ -54,7 +54,7 @@ class CareCirclePatientRead(BaseModel):
     displayName: str
     familyName: str
     joinCode: str
-    stage: str
+    stage: str  # "early", "mild", "moderate", "severe"
     accessState: str
     timezone: str
     preferredLanguage: str = Field(default="en")
@@ -106,7 +106,7 @@ class CareCircleProviderReorderRequest(BaseModel):
 class CareCirclePatientCreateRequest(BaseModel):
     displayName: str = Field(min_length=1, max_length=255)
     familyName: Optional[str] = None
-    stage: str = Field(default="moderate", min_length=1, max_length=50)
+    stage: str = Field(default="moderate", min_length=1, max_length=50)  # "early", "mild", "moderate", "severe"
     accessState: str = Field(default="active", min_length=1, max_length=50)
     timezone: str = Field(default="America/Chicago", min_length=1, max_length=100)
     preferredLanguage: str = Field(default="en", min_length=2, max_length=10)
@@ -119,7 +119,7 @@ class CareCirclePatientUpdateRequest(BaseModel):
     familyName: str = Field(min_length=1, max_length=255)
     joinCode: str = Field(min_length=3, max_length=20)
     displayName: str = Field(min_length=1, max_length=255)
-    stage: str = Field(min_length=1, max_length=50)
+    stage: str = Field(min_length=1, max_length=50)  # "early", "mild", "moderate", "severe"
     accessState: str = Field(min_length=1, max_length=50)
     timezone: str = Field(min_length=1, max_length=100)
     preferredLanguage: str = Field(default="en", min_length=2, max_length=10)

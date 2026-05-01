@@ -178,7 +178,7 @@ care_circle_patient_profiles (
     family_id INT REFERENCES care_circle_families(id) ON DELETE CASCADE,
     created_by_user_id INT REFERENCES users(id) ON DELETE SET NULL,
     display_name VARCHAR(255) NOT NULL,
-    stage VARCHAR(50) DEFAULT 'moderate' NOT NULL,
+    stage VARCHAR(50) DEFAULT 'moderate' NOT NULL, -- 'early', 'mild', 'moderate', 'severe'
     access_state VARCHAR(50) DEFAULT 'active' NOT NULL,
     timezone VARCHAR(100) DEFAULT 'America/Chicago' NOT NULL,
     delivery_time VARCHAR(20),

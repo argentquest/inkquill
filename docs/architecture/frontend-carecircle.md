@@ -145,7 +145,7 @@ interface CareCirclePatientRecord {
   id: string;
   displayName: string;
   familyName: string;
-  stage: string;                    // "mild", "moderate", "severe"
+  stage: string;                    // "early", "mild", "moderate", "severe"
   accessState: string;              // "active", "inactive", "archived"
   timezone: string;                 // IANA timezone
   deliveryTime?: string | null;     // HH:MM format

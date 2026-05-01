@@ -4,6 +4,12 @@
 
 Expose public-facing reading and community surfaces after the authoring core is usable.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- React delivery for publishing, community, and public discovery has not started.
+- Public storytelling/community routes remain planned only.
+
 ## In Scope
 
 - published stories list and reader
@@ -79,3 +85,7 @@ Expose public-facing reading and community surfaces after the authoring core is 
 - public reading surfaces are usable
 - forum works end-to-end
 - blog reading and key interaction flows work
+
+## Implementation Status
+
+- Not started in the React app.

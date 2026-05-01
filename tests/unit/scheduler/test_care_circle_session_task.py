@@ -81,7 +81,7 @@ async def test_pregenerate_daily_sessions_creates_job_and_passes_job_id(monkeypa
         )
         return True
 
-    monkeypatch.setattr(care_circle_session, "_fetch_active_patients", fake_fetch_active_patients)
+    monkeypatch.setattr(care_circle_session, "fetch_active_patients", fake_fetch_active_patients)
     monkeypatch.setattr(care_circle_session, "async_session_local", lambda: _DB())
     monkeypatch.setattr(care_circle_session.crud_job_status, "create_job", fake_create_job)
     monkeypatch.setattr(care_circle_session.crud_job_status, "update_job_status", fake_update_job_status)

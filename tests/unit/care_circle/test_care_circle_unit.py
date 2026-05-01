@@ -66,6 +66,32 @@ def test_family_patients_returns_wrapped_profiles(unit_client_factory):
     assert body["data"][0]["joinCode"] == "STM111"
 
 
+def test_family_activity_events_returns_wrapped_feed(unit_client_factory):
+    client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
+    events = [
+        {
+            "id": "family-1-created",
+            "type": "family_created",
+            "title": "Care Circle created",
+            "description": "Story Maker household is ready.",
+            "tone": "success",
+            "occurred_at": "2026-04-27T12:00:00+00:00",
+            "patient_id": None,
+            "patient_name": None,
+            "provider_key": None,
+        }
+    ]
+
+    with patch("app.routers.care_circle.care_circle_crud.list_family_activity_events", new=AsyncMock(return_value=events)) as mock_events:
+        response = client.get("/api/v1/care-circle/family/events?limit=10")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["success"] is True
+    assert body["data"][0]["type"] == "family_created"
+    mock_events.assert_awaited_once()
+
+
 def test_family_patient_detail_returns_404_when_missing(unit_client_factory):
     client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
 
@@ -464,7 +490,7 @@ def test_reorder_provider_configs_passes_correct_ordering_to_crud(unit_client_fa
 def test_reorder_provider_configs_returns_404_when_patient_not_found(unit_client_factory, mock_db_session):
     """POST /provider-configs/reorder returns 404 if patient doesn't belong to family."""
     client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
-    mock_db_session.scalar.return_value = None  # patient not found / not owned
+    mock_db_session.scalar = AsyncMock(return_value=None)  # patient not found / not owned
 
     with patch("app.routers.care_circle.care_circle_crud.get_or_create_family_for_user", new=AsyncMock(return_value=MagicMock(id=1))):
         response = client.post(

@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch, MagicMock
 import uuid
 
 import pytest
@@ -95,11 +95,15 @@ def _story_class_obj(sc_id: int = 1, world_id: int = 10):
     )
 
 
-def test_users_router_me_and_admin_paths(unit_client_factory, mock_admin_user):
+def test_users_router_me_and_admin_paths(unit_client_factory, mock_admin_user, mock_db_session):
     """Users router supports self profile and admin-only user management paths."""
     client = unit_client_factory(users_router, router_prefix="/api/v1", user_override=mock_admin_user)
     mock_admin_user.updated_at = datetime.now(timezone.utc)
     target_user = _user_obj(2, is_admin=False)
+
+    mock_scalar_result = MagicMock()
+    mock_scalar_result.scalar.return_value = False
+    mock_db_session.execute.return_value = mock_scalar_result
 
     with patch("app.routers.users.crud_user.get_user", new=AsyncMock(return_value=target_user)), patch(
         "app.routers.users.crud_user.get_users", new=AsyncMock(return_value=[target_user])

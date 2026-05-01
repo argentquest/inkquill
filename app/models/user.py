@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from .blog_subscription import BlogSubscription 
     from .refresh_token import RefreshToken
     from .world_collaborator import WorldCollaborator
+    from .chatbot_session import ChatbotSession
 
 class User(Base):
     """SQLAlchemy model for user."""
@@ -306,6 +307,12 @@ class User(Base):
         "WorldCollaborator",
         foreign_keys="[WorldCollaborator.invited_by_user_id]",
         back_populates="invited_by"
+    )
+
+    chatbot_sessions: Mapped[List["ChatbotSession"]] = relationship(
+        "ChatbotSession",
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
     @property

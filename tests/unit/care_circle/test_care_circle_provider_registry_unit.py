@@ -88,7 +88,7 @@ def test_update_provider_returns_404_for_unknown_key(unit_client_factory):
 # Per-patient provider config CRUD tests
 # ---------------------------------------------------------------------------
 
-def test_upsert_patient_provider_config_creates_new_record(unit_client_factory):
+def test_upsert_patient_provider_config_creates_new_record(unit_client_factory, mock_db_session):
     """`PUT /family/patients/{id}/provider-configs/{key}` creates a new config."""
     client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
 
@@ -99,6 +99,8 @@ def test_upsert_patient_provider_config_creates_new_record(unit_client_factory):
         is_enabled=False,
         custom_parameters={},
     )
+
+    mock_db_session.scalar.return_value = MagicMock(id=1, family_id=1)
 
     with patch(
         "app.routers.care_circle.care_circle_crud.get_or_create_family_for_user",
@@ -119,9 +121,11 @@ def test_upsert_patient_provider_config_creates_new_record(unit_client_factory):
     assert body["data"]["is_enabled"] is False
 
 
-def test_list_patient_provider_configs_returns_empty_for_new_patient(unit_client_factory):
+def test_list_patient_provider_configs_returns_empty_for_new_patient(unit_client_factory, mock_db_session):
     """`GET /family/patients/{id}/provider-configs` returns empty list when no configs exist."""
     client = unit_client_factory(care_circle_router, router_prefix="/api/v1")
+
+    mock_db_session.scalar.return_value = MagicMock(id=1, family_id=1)
 
     with patch(
         "app.routers.care_circle.care_circle_crud.get_or_create_family_for_user",

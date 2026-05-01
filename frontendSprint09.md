@@ -4,6 +4,13 @@
 
 Add the commercial and support surfaces once the core product loop already works.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- This sprint is partially complete.
+- Delivered now: billing, referrals, and onboarding foundations under both the historical `/app/*` routes and the newer `/storytelling/*` routes.
+- Not delivered yet: referral intro, prompt library, AI-model routes, and blog authoring/media routes.
+
 ## In Scope
 
 - billing dashboard
@@ -63,11 +70,11 @@ Add the commercial and support surfaces once the core product loop already works
 
 ## Task List
 
-- [ ] Build billing dashboard route.
-- [ ] Build transaction history and package-selection UI.
-- [ ] Build referrals dashboard route.
+- [x] Build billing dashboard route.
+- [x] Build transaction history and package-selection UI.
+- [x] Build referrals dashboard route.
 - [ ] Build referral intro route or section.
-- [ ] Build welcome interview route.
+- [x] Build welcome interview route.
 - [ ] Build prompt library route.
 - [ ] Build AI models route.
 - [ ] Build blog dashboard route.
@@ -81,3 +88,11 @@ Add the commercial and support surfaces once the core product loop already works
 - onboarding flow is reachable
 - prompt library works
 - blog author tools are functional
+
+## Implementation Status
+
+- Partially delivered through `frontendv1/app/app/billing`, `frontendv1/app/app/referrals`, `frontendv1/app/app/onboarding`, and their storytelling-scoped equivalents under `frontendv1/app/storytelling/`.
+- Billing includes transaction history and package tables.
+- Referrals include dashboard stats, history, and rewards.
+- Onboarding currently exists as a routed preview/status surface rather than a full multi-step interview completion flow.
+- Prompt, AI-model, and blog tools remain not started in the React app.

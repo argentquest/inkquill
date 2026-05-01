@@ -4,7 +4,7 @@ from secrets import choice
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.care_circle import (
@@ -361,6 +361,143 @@ async def list_family_patients(db: AsyncSession, user: User) -> list[dict[str, A
         )
     ).scalars().all()
     return [_patient_to_dict(patient, family.name, family.join_code) for patient in patients]
+
+
+async def list_family_activity_events(
+    db: AsyncSession,
+    user: User,
+    limit: int = 25,
+) -> list[dict[str, Any]]:
+    """Build a recent family activity feed from existing Care Circle state."""
+    family = await get_or_create_family_for_user(db, user)
+    events: list[dict[str, Any]] = []
+
+    def add_event(
+        *,
+        event_id: str,
+        event_type: str,
+        title: str,
+        description: str,
+        tone: str,
+        occurred_at,
+        patient_id: int | None = None,
+        patient_name: str | None = None,
+        provider_key: str | None = None,
+    ) -> None:
+        if not occurred_at:
+            return
+        events.append({
+            "id": event_id,
+            "type": event_type,
+            "title": title,
+            "description": description,
+            "tone": tone,
+            "occurred_at": occurred_at.isoformat(),
+            "patient_id": patient_id,
+            "patient_name": patient_name,
+            "provider_key": provider_key,
+            "_sort": occurred_at,
+        })
+
+    add_event(
+        event_id=f"family-{family.id}-created",
+        event_type="family_created",
+        title="Care Circle created",
+        description=f"{family.name} is ready for family members and friend profiles.",
+        tone="success",
+        occurred_at=family.created_at,
+    )
+
+    patient_rows = (
+        await db.execute(
+            select(CareCirclePatientProfile)
+            .where(CareCirclePatientProfile.family_id == family.id)
+            .order_by(desc(CareCirclePatientProfile.created_at))
+            .limit(limit)
+        )
+    ).scalars().all()
+    for patient in patient_rows:
+        add_event(
+            event_id=f"patient-{patient.id}-created",
+            event_type="patient_created",
+            title=f"{patient.display_name} was added",
+            description=f"Friend profile is {patient.access_state} with {len(patient.auth_image_keys or [])} sign-in images configured.",
+            tone="info" if patient.access_state == "active" else "warning",
+            occurred_at=patient.created_at,
+            patient_id=patient.id,
+            patient_name=patient.display_name,
+        )
+
+    output_rows = (
+        await db.execute(
+            select(CareCircleProviderSessionOutput, CareCirclePatientProfile)
+            .join(CareCirclePatientProfile, CareCirclePatientProfile.id == CareCircleProviderSessionOutput.patient_id)
+            .where(CareCirclePatientProfile.family_id == family.id)
+            .order_by(desc(CareCircleProviderSessionOutput.created_at))
+            .limit(limit)
+        )
+    ).all()
+    for output, patient in output_rows:
+        add_event(
+            event_id=f"session-output-{output.id}",
+            event_type="provider_output_created",
+            title="Daily content generated",
+            description=f"{output.provider_key.replace('_', ' ').title()} generated content for {patient.display_name}.",
+            tone="success",
+            occurred_at=output.created_at,
+            patient_id=patient.id,
+            patient_name=patient.display_name,
+            provider_key=output.provider_key,
+        )
+
+    run_rows = (
+        await db.execute(
+            select(CareCircleProviderRunLog, CareCirclePatientProfile)
+            .join(CareCirclePatientProfile, CareCirclePatientProfile.id == CareCircleProviderRunLog.patient_id)
+            .where(CareCirclePatientProfile.family_id == family.id)
+            .order_by(desc(CareCircleProviderRunLog.created_at))
+            .limit(limit)
+        )
+    ).all()
+    for run, patient in run_rows:
+        if run.status == "succeeded":
+            continue
+        add_event(
+            event_id=f"provider-run-{run.id}",
+            event_type="provider_run_failed",
+            title="Provider fallback used",
+            description=f"{run.provider_key.replace('_', ' ').title()} could not finish for {patient.display_name}.",
+            tone="warning",
+            occurred_at=run.created_at,
+            patient_id=patient.id,
+            patient_name=patient.display_name,
+            provider_key=run.provider_key,
+        )
+
+    member_rows = (
+        await db.execute(
+            select(CareCircleFamilyMembership, User)
+            .join(User, User.id == CareCircleFamilyMembership.user_id)
+            .where(CareCircleFamilyMembership.family_id == family.id)
+            .order_by(desc(CareCircleFamilyMembership.created_at))
+            .limit(limit)
+        )
+    ).all()
+    for membership, member in member_rows:
+        if membership.role == "owner":
+            continue
+        status_label = "requested access" if membership.status == "pending" else f"became {membership.status}"
+        add_event(
+            event_id=f"membership-{membership.id}-{membership.status}",
+            event_type=f"membership_{membership.status}",
+            title="Family member update",
+            description=f"{member.display_name or member.username} {status_label}.",
+            tone="info" if membership.status == "active" else "warning",
+            occurred_at=membership.created_at,
+        )
+
+    events.sort(key=lambda event: event["_sort"], reverse=True)
+    return [{key: value for key, value in event.items() if key != "_sort"} for event in events[:limit]]
 
 
 async def get_family_patient_detail(db: AsyncSession, user: User, patient_id: int) -> dict[str, Any] | None:

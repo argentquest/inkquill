@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Copy, Gift, Users } from "lucide-react";
 
 import { PageHeader } from "@/components/shell/page-header";
 import { DataTable } from "@/components/ui/data-table";
@@ -9,6 +10,70 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { StatCard } from "@/components/ui/stat-card";
 import { fetchReferralHistory, fetchReferralRewards, fetchReferralStats } from "@/lib/api";
 import type { ReferralHistoryResponse, ReferralRewardsResponse, ReferralStats } from "@/lib/types";
+
+function ReferralIntroPanel({ stats }: { stats: ReferralStats }) {
+  const [copied, setCopied] = useState(false);
+  const url = stats.referral_url ?? "";
+  const code = stats.referral_code ?? "";
+
+  function copy() {
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => undefined);
+  }
+
+  return (
+    <div className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-sm" data-testid="referral-intro-panel">
+      <div className="flex flex-wrap items-start gap-8">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+            <Gift className="size-6" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-ink-900">Invite friends, earn coins</h2>
+            <p className="mt-1 max-w-xs text-sm text-ink-500">
+              Share your referral link. When a friend signs up and activates their account, you both receive coins to spend on AI generation.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-paper text-ink-400">
+            <Users className="size-6" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-ink-900">How it works</h2>
+            <ol className="mt-1 space-y-1 text-sm text-ink-500 list-decimal list-inside">
+              <li>Copy your unique referral link below.</li>
+              <li>Share it with writers and storytellers.</li>
+              <li>When they join and activate, coins are credited to both accounts.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      {url || code ? (
+        <div className="mt-6 rounded-2xl border border-black/10 bg-paper px-4 py-3 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-ink-600 uppercase tracking-wide">Your referral link</p>
+            <p className="mt-0.5 truncate text-sm text-ink-900 font-mono" data-testid="referral-url">{url || code}</p>
+          </div>
+          <button
+            className="shrink-0 flex items-center gap-1.5 rounded-full border border-black/10 px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-black/[0.04]"
+            data-testid="copy-referral-link"
+            onClick={copy}
+            type="button"
+          >
+            <Copy className="size-3" />
+            {copied ? "Copied!" : "Copy"}
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export function ReferralsDashboardRoute() {
   const [stats, setStats] = useState<ReferralStats | null>(null);
@@ -62,6 +127,7 @@ export function ReferralsDashboardRoute() {
       {!loading && error ? <ErrorState title="Referral data could not be loaded." detail={error} /> : null}
       {!loading && !error && stats && history && rewards ? (
         <>
+          <ReferralIntroPanel stats={stats} />
           <div className="grid gap-4 md:grid-cols-4">
             <StatCard label="Total referrals" value={`${stats.total_referrals}`} />
             <StatCard label="Converted referrals" value={`${stats.converted_referrals}`} />

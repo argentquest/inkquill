@@ -4,6 +4,13 @@
 
 Make stories usable end-to-end before rich editing begins.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- React delivery for this sprint has not started.
+- The backend and legacy template-era storytelling surfaces still exist, but the React routes in this sprint have not been rebuilt yet.
+- Keep every task in this sprint open until real `/storytelling/stories` work lands in `frontendv1/`.
+
 ## In Scope
 
 - stories list
@@ -73,3 +80,7 @@ Make stories usable end-to-end before rich editing begins.
 - user can create and manage standard stories
 - story wizard works at a usable level
 - basic story mode is reachable and functional
+
+## Implementation Status
+
+- Not started in the React app.

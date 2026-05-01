@@ -4,6 +4,13 @@
 
 Refit the current React rebuild so storytelling becomes an explicit top-level application on the shared platform without regressing existing creative-product flows.
 
+## Current Review Status
+
+- Last reviewed against the repo on 2026-04-27.
+- This sprint is partially complete.
+- Delivered now: `/storytelling`, `/storytelling/account`, `/storytelling/account/edit`, `/storytelling/billing`, `/storytelling/referrals`, `/storytelling/onboarding`, the storytelling layout shell, and the legacy `/app/*` bridge routes.
+- Not delivered yet: `/storytelling/worlds`, `/storytelling/stories`, `/storytelling/community`, and the deeper storytelling authoring routes planned in later sprints.
+
 ## In Scope
 
 - storytelling route-tree normalization
@@ -54,15 +61,15 @@ Refit the current React rebuild so storytelling becomes an explicit top-level ap
 
 ## Task List
 
-- [ ] Define the storytelling top-level route tree under `/storytelling`.
-- [ ] Add a dedicated storytelling landing experience.
-- [ ] Move or bridge current rebuild routes into storytelling-safe path space.
-- [ ] Add storytelling shell and navigation wrappers on the shared platform.
-- [ ] Preserve user-scoped billing and balance behavior under storytelling routes.
-- [ ] Add redirect handling for any legacy or interim route paths that should resolve into storytelling.
-- [ ] Add Playwright smoke coverage for storytelling entry, shell, and protected route access.
+- [x] Define the storytelling top-level route tree under `/storytelling`.
+- [x] Add a dedicated storytelling landing experience.
+- [x] Move or bridge current rebuild routes into storytelling-safe path space.
+- [x] Add storytelling shell and navigation wrappers on the shared platform.
+- [x] Preserve user-scoped billing and balance behavior under storytelling routes.
+- [x] Add redirect handling for any legacy or interim route paths that should resolve into storytelling.
+- [x] Add Playwright smoke coverage for storytelling entry, shell, and protected route access.
 - [ ] Capture storytelling route-bridge and shell behavior in `uiBehaviorCapture.md`.
-- [ ] Verify storytelling routing against current backend contracts and existing React route assumptions.
+- [x] Verify storytelling routing against current backend contracts and existing React route assumptions.
 
 ## Exit Criteria
 
@@ -80,5 +87,8 @@ Refit the current React rebuild so storytelling becomes an explicit top-level ap
 
 ## Implementation Status
 
-- Planning only.
-- This sprint focuses on turning the current rebuild into an explicit standalone storytelling application on the shared platform.
+- Partial delivery is complete for the app boundary and account/commercial foundations.
+- `frontendv1/app/storytelling/` now contains the storytelling entry route, dedicated layout, account route, account edit route, billing route, referrals route, and onboarding route.
+- Legacy `/app/account`, `/app/billing`, `/app/referrals`, and `/app/onboarding` routes remain as migration bridges via `PlatformRouteBridge`.
+- Playwright already exercises protected storytelling entry and the delivered account, billing, referrals, and onboarding routes in `frontendv1/tests/e2e/sprint-common-platform.spec.ts` and `frontendv1/tests/e2e/sprint3-framework.spec.ts`.
+- Story, world, and community route groups are still pending and should stay open in this sprint until real storytelling product routes are moved under `/storytelling`.

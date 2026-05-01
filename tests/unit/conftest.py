@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Callable
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from fastapi import FastAPI
@@ -52,14 +52,25 @@ def mock_admin_user(mock_user: SimpleNamespace) -> SimpleNamespace:
 
 @pytest.fixture
 def mock_db_session() -> AsyncMock:
-    """Return a mock async DB session."""
-    db = AsyncMock()
-    db.commit = AsyncMock()
-    db.rollback = AsyncMock()
-    db.refresh = AsyncMock()
-    db.execute = AsyncMock()
-    db.add = Mock()
-    return db
+    """Return a mock async DB session that can be properly awaited."""
+    mock_db = MagicMock()
+
+    async def mock_execute(query, **kwargs):
+        result = MagicMock()
+        result.scalars.return_value.all.return_value = []
+        result.scalars.return_value.first.return_value = None
+        result.scalar_one_or_none.return_value = None
+        result.scalar.return_value = 0
+        return result
+
+    mock_db.execute = mock_execute
+    mock_db.scalar = AsyncMock(return_value=None)
+    mock_db.get = AsyncMock(return_value=None)
+    mock_db.commit = AsyncMock()
+    mock_db.rollback = AsyncMock()
+    mock_db.refresh = AsyncMock()
+    mock_db.add = Mock()
+    return mock_db
 
 
 @pytest.fixture

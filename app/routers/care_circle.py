@@ -152,6 +152,16 @@ async def read_family_patients(
     return ApiResponse.success_response(data=patients)
 
 
+@router.get("/family/events", response_model=ApiResponse)
+async def read_family_activity_events(
+    limit: int = Query(default=25, ge=1, le=100),
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    events = await care_circle_crud.list_family_activity_events(db, current_user, limit=limit)
+    return ApiResponse.success_response(data=events)
+
+
 @router.post("/family/patients", response_model=ApiResponse, status_code=201)
 async def create_family_patient(
     payload: CareCirclePatientCreateRequest,

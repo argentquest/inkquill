@@ -1141,6 +1141,115 @@ Management:
 - logs: `docker compose -f docker-compose.postgres-single.yml logs -f`
 - status: `docker compose -f docker-compose.postgres-single.yml ps`
 
+## Frontend Browser Smoke Checklist
+
+Run these browser checks after every production deployment to verify the React frontend is working end to end. Go through each item in order. If a check fails, review container logs before proceeding.
+
+### Auth and platform shell
+
+- [ ] Open the root URL. The public landing page or login page loads without a blank screen or 500 error.
+- [ ] Navigate to a protected route while unauthenticated (e.g. `/care-circle-family`). You are redirected to login.
+- [ ] Log in with a known test account. You are redirected to the family landing page.
+- [ ] Reload the page. The session is preserved (no redirect to login).
+- [ ] Open the account edit page at `/care-circle-family/account/edit`, make a minor change, and save. The profile saves and a success toast appears.
+- [ ] Log out. You are redirected to login. Navigating to a protected route confirms the session is gone.
+
+### Family: core flows
+
+- [ ] Go to `/care-circle-family/patients`. At least one patient profile row loads.
+- [ ] Click a patient row. The patient detail page loads with name, stage, timezone, and image sign-in keys visible.
+- [ ] Open the edit view (`?edit=1`). Provider toggles for that patient are visible and respond to clicks.
+- [ ] Go to `/care-circle-family/providers`. The provider catalog loads with at least two provider cards.
+- [ ] Click a provider. The provider detail page loads with the patient mapping table and enabled/disabled toggles.
+
+### Family: account and membership
+
+- [ ] Go to `/care-circle-family/account`. The join code is visible. The invite-by-email field and "Send invite email" button are present.
+- [ ] Go to `/care-circle-family/members`. The member list loads (even if empty for a new family).
+- [ ] Go to `/care-circle-family/billing`. The billing surface loads without an error state.
+- [ ] Go to `/care-circle-family/referrals`. The referrals surface loads without an error state.
+
+### Family: activity feed and media
+
+- [ ] Go to `/care-circle-family/events`. The activity feed loads. If events exist they are listed; if not, the empty state is shown.
+- [ ] Go to `/care-circle-family/media`. The media library loads. If no photos exist the empty-state card is shown with the upload button.
+- [ ] Upload a small JPEG. A success toast appears and the new photo appears in the grid.
+- [ ] Delete the uploaded photo. A success toast appears and the photo is removed from the grid.
+
+### Family: admin surfaces
+
+- [ ] Go to `/care-circle-family/admin`. The admin dashboard loads.
+- [ ] Go to `/care-circle-family/admin/scheduler`. The Scheduler Console heading is visible, jobs are listed, and "Run now" buttons are present.
+- [ ] Click "Run now" for one job. A success or in-progress response toast appears.
+- [ ] Go to `/care-circle-family/admin/template-studio?provider=weather&theme=classic`. The GrapesJS editor frame loads and the "Save template" button is visible.
+- [ ] Go to `/care-circle-family/admin/families` (admin accounts only). The families table loads.
+
+### Patient: sign-in and daily session
+
+- [ ] Go to `/care-circle-patient/login`. The image-based sign-in grid loads with emoji tiles.
+- [ ] Select the correct image combination for a known patient. The patient home page loads.
+- [ ] Verify provider highlights are shown on `/care-circle-patient/home` (at least one card).
+- [ ] Submit a like or dislike feedback on a highlight card. The UI updates without a full page reload.
+
+### Backend and scheduler health
+
+- [ ] Open `/health` on the backend port. The health JSON response shows `status: ok`.
+- [ ] Open `/api/admin/scheduler/health`. The scheduler health JSON response shows `scheduler_running: true`.
+- [ ] Open `/api/admin/scheduler/status`. At least two scheduled task entries are listed.
+
+### Cache, PDF, and email
+
+- [ ] Trigger manual provider pre-cache from the scheduler console ("Run now" on the precache task).
+- [ ] Confirm expected HTML or image output appears in the mounted `cache/` path on the host within 60 seconds.
+- [ ] Trigger newsletter generation for one patient from the scheduler console or API.
+- [ ] Confirm a `.pdf` file appears in `cache/` for that patient.
+- [ ] If SMTP is configured, confirm the email arrives or appears in the test email route/log.
+
+---
+
+## Frontend Verification Commands
+
+### Run Playwright e2e tests locally (against the local build)
+
+These tests use mocked API responses and verify UI behavior without a live backend.
+
+```bash
+cd frontendv1
+npm run test:e2e
+```
+
+To open the interactive Playwright UI:
+
+```bash
+cd frontendv1
+npm run test:e2e:ui
+```
+
+### Run e2e tests against a specific deployed URL
+
+Point `PLAYWRIGHT_BASE_URL` at the deployed gateway and run against live API responses:
+
+```bash
+cd frontendv1
+PLAYWRIGHT_BASE_URL=https://care-circle.example.com npx playwright test
+```
+
+Note: live-API runs will fail auth-dependent tests unless you add a test user setup fixture or disable auth-only specs. For production smoke purposes, use the manual browser checklist above and reserve Playwright for pre-deployment CI verification.
+
+### Run backend unit and integration tests before deployment
+
+```powershell
+# Unit tests only
+.\.venv\Scripts\python.exe -m pytest tests\unit -q
+
+# Unit + integration (skip heavy AI/storage tests)
+.\.venv\Scripts\python.exe -m pytest tests\unit tests\integration `
+  --ignore=tests/integration/shared/test_document_upload_integration.py `
+  --ignore=tests/integration/shared/test_image_generation_integration.py -q
+```
+
+---
+
 ## Final Recommendation
 
 If you are moving Care Circle to production now and have chosen Option A, the best fit for this repo is:
