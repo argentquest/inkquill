@@ -158,3 +158,171 @@ class TestListPublishedStories:
         assert len(stories) == 1
         assert stories[0]["title"] == "My Story"
         assert stories[0]["average_rating"] == 4.5
+
+
+class TestGetPublishedStory:
+    def test_get_returns_200_and_detail_shape(self, unit_client_factory):
+        client = unit_client_factory(published_stories_router)
+        story = _published_story(id=3, title="Detail Story")
+        mock_db = _sync_mock_db([story])
+        # second execute for refreshed story after commit
+        refreshed_result = MagicMock()
+        refreshed_result.scalar_one.return_value = story
+        call_count = [0]
+        orig_execute = mock_db.execute
+
+        async def _execute(q, **kwargs):
+            call_count[0] += 1
+            if call_count[0] >= 2:
+                return refreshed_result
+            return await orig_execute(q, **kwargs)
+
+        mock_db.execute = _execute
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.get("/published-stories/3")
+        assert response.status_code == 200
+        body = response.json()
+        assert body.get("success") is True
+        assert "data" in body
+        assert body["data"]["title"] == "Detail Story"
+
+    def test_get_public_no_auth_required(self, unit_client_factory):
+        client = unit_client_factory(published_stories_router, user_override=None)
+        story = _published_story(id=4)
+        mock_db = _sync_mock_db([story])
+        refreshed_result = MagicMock()
+        refreshed_result.scalar_one.return_value = story
+        call_count = [0]
+        orig_execute = mock_db.execute
+
+        async def _execute(q, **kwargs):
+            call_count[0] += 1
+            if call_count[0] >= 2:
+                return refreshed_result
+            return await orig_execute(q, **kwargs)
+
+        mock_db.execute = _execute
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.get("/published-stories/4")
+        assert response.status_code == 200
+
+    def test_get_returns_404_for_missing(self, unit_client_factory):
+        client = unit_client_factory(published_stories_router, user_override=None)
+        mock_db = _sync_mock_db([])
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.get("/published-stories/999")
+        assert response.status_code == 404
+
+
+class TestRatePublishedStory:
+    def test_rate_creates_new_rating(self, unit_client_factory, mock_user):
+        client = unit_client_factory(published_stories_router, user_override=mock_user)
+        story = _published_story(id=2)
+        mock_db = _sync_mock_db([story])
+        rating_mock = MagicMock()
+        rating_mock.id = 1
+        rating_mock.published_story_id = 2
+        rating_mock.user_id = mock_user.id
+        rating_mock.rating = 5
+        rating_mock.created_at = datetime.now(timezone.utc)
+        rating_mock.updated_at = datetime.now(timezone.utc)
+        rating_result = MagicMock()
+        rating_result.scalar_one.return_value = rating_mock
+        call_count = [0]
+        orig_execute = mock_db.execute
+
+        async def _execute(q, **kwargs):
+            call_count[0] += 1
+            if call_count[0] >= 3:
+                return rating_result
+            return await orig_execute(q, **kwargs)
+
+        mock_db.execute = _execute
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.post(
+            "/published-stories/2/rate",
+            json={"published_story_id": 2, "rating": 5},
+        )
+        assert response.status_code in (200, 201)
+        body = response.json()
+        assert body.get("success") is True
+
+    def test_rate_rejects_unauthenticated(self, unit_client_factory):
+        client = unit_client_factory(published_stories_router, user_override=None)
+        # Force current_user to None since conftest defaults None to mock_user
+        from app.core.deps import get_current_user
+        client.app.dependency_overrides[get_current_user] = lambda: None
+        story = _published_story(id=2)
+        mock_db = _sync_mock_db([story])
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.post(
+            "/published-stories/2/rate",
+            json={"published_story_id": 2, "rating": 5},
+        )
+        assert response.status_code == 401
+
+
+class TestCreateStoryComment:
+    def test_create_comment_returns_success(self, unit_client_factory, mock_user):
+        client = unit_client_factory(published_stories_router, user_override=mock_user)
+        story = _published_story(id=6)
+        mock_db = _sync_mock_db([story])
+        commenter = SimpleNamespace(username="reader", display_name="A Reader")
+        comment_mock = MagicMock()
+        comment_mock.id = 1
+        comment_mock.published_story_id = 6
+        comment_mock.user_id = mock_user.id
+        comment_mock.content = "Nice read!"
+        comment_mock.parent_comment_id = None
+        comment_mock.is_approved = True
+        comment_mock.is_deleted = False
+        comment_mock.created_at = datetime.now(timezone.utc)
+        comment_mock.updated_at = datetime.now(timezone.utc)
+        comment_mock.commenter = commenter
+        comment_result = MagicMock()
+        comment_result.scalar_one.return_value = comment_mock
+        call_count = [0]
+        orig_execute = mock_db.execute
+
+        async def _execute(q, **kwargs):
+            call_count[0] += 1
+            if call_count[0] >= 2:
+                return comment_result
+            return await orig_execute(q, **kwargs)
+
+        mock_db.execute = _execute
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.post(
+            "/published-stories/6/comments",
+            json={"published_story_id": 6, "content": "Nice read!"},
+        )
+        assert response.status_code in (200, 201)
+        body = response.json()
+        assert body.get("success") is True
+
+    def test_create_comment_rejects_unauthenticated(self, unit_client_factory):
+        client = unit_client_factory(published_stories_router, user_override=None)
+        from app.core.deps import get_current_user
+        client.app.dependency_overrides[get_current_user] = lambda: None
+        story = _published_story(id=6)
+        mock_db = _sync_mock_db([story])
+        async def _db_gen():
+            yield mock_db
+        client.app.dependency_overrides[get_db_session] = _db_gen
+        response = client.post(
+            "/published-stories/6/comments",
+            json={"published_story_id": 6, "content": "Nice read!"},
+        )
+        assert response.status_code == 401

@@ -48,6 +48,7 @@ async def get_blog_posts(
     tag_ids: Optional[str] = Query(None, description="Comma-separated tag IDs"),
     search: Optional[str] = Query(None, min_length=1),
     author_id: Optional[int] = Query(None),
+    app_source: Optional[str] = Query(None, pattern="^(storytelling|care-circle)$"),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Get published blog posts with filtering and pagination."""
@@ -70,7 +71,8 @@ async def get_blog_posts(
             category_id=category_id,
             tag_ids=tag_id_list,
             search_query=search,
-            author_id=author_id
+            author_id=author_id,
+            app_source=app_source
         )
         return ApiResponse.success_response(
             data=[_build_blog_post_read(post) for post in posts]
@@ -204,6 +206,7 @@ async def get_my_blog_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     include_drafts: bool = Query(True),
+    app_source: Optional[str] = Query(None, pattern="^(storytelling|care-circle)$"),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
@@ -214,7 +217,8 @@ async def get_my_blog_posts(
             user_id=current_user.id,
             include_drafts=include_drafts,
             skip=skip,
-            limit=limit
+            limit=limit,
+            app_source=app_source
         )
         return ApiResponse.success_response(
             data=[_build_blog_post_read(post) for post in posts]

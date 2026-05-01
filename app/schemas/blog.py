@@ -81,6 +81,7 @@ class BlogPostBase(BaseModel):
     allow_comments: bool = True
     is_ai_generated: bool = False
     is_featured: bool = False
+    app_source: str = Field(default="storytelling", pattern="^(storytelling|care-circle)$")
 
 
 class BlogPostCreate(BlogPostBase):
@@ -110,6 +111,7 @@ class BlogPostUpdate(BaseModel):
     allow_comments: Optional[bool] = None
     status: Optional[BlogPostStatus] = None
     is_featured: Optional[bool] = None
+    app_source: Optional[str] = Field(None, pattern="^(storytelling|care-circle)$")
     tags: Optional[List[str]] = Field(None, max_length=10)
     
     @field_validator("tags")
@@ -134,6 +136,7 @@ class BlogPostRead(BlogPostBase):
     published_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+    app_source: str
     
     # Relationships
     author: Optional['UserRead'] = None
@@ -159,6 +162,7 @@ class BlogPostSummary(BaseModel):
     comment_count: int
     published_at: Optional[datetime]
     reading_time_minutes: int
+    app_source: str
 
     model_config = ConfigDict(from_attributes=True)
 

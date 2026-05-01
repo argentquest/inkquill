@@ -3,7 +3,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,10 @@ import { createForumThread, fetchForumCategories } from "@/lib/api";
 
 export default function NewThreadPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const appSource = searchParams.get("app_source") ?? undefined;
+  const backHref = appSource === "care-circle" ? "/care-circle-family" : "/community/forums";
+
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<number | "">("");
   const [content, setContent] = useState("");
@@ -26,6 +30,7 @@ export default function NewThreadPage() {
         title: title.trim(),
         category_id: Number(categoryId),
         initial_post_content: content.trim(),
+        app_source: appSource,
       }),
     onSuccess: (thread) => {
       router.push(`/community/forums/${thread.id}`);
@@ -39,7 +44,7 @@ export default function NewThreadPage() {
       <div className="flex items-center gap-4">
         <Link
           className="flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-900"
-          href="/community/forums"
+          href={backHref}
         >
           <ArrowLeft className="size-4" />
           Back to forums
@@ -123,7 +128,7 @@ export default function NewThreadPage() {
           ) : null}
 
           <div className="flex items-center justify-between gap-4">
-            <Link className="text-sm text-ink-500 hover:text-ink-900" href="/community/forums">
+            <Link className="text-sm text-ink-500 hover:text-ink-900" href={backHref}>
               Cancel
             </Link>
             <Button className="gap-2" disabled={isPending || !canSubmit} type="submit">

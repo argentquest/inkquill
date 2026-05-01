@@ -1,18 +1,63 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, MessageSquare, Pin, Send } from "lucide-react";
+import { ArrowDown, ArrowUp, Loader2, MessageSquare, Pin, Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
-import { createForumPost, fetchForumThread, type ForumPost } from "@/lib/api";
+import { createForumPost, fetchForumThread, voteForumPost, type ForumPost } from "@/lib/api";
 
-function PostCard({ post }: { post: ForumPost }) {
+function VoteBar({ post, threadId }: { post: ForumPost; threadId: number }) {
+  const queryClient = useQueryClient();
+  const [optimisticVote, setOptimisticVote] = useState<"upvote" | "downvote" | null>(post.user_vote ?? null);
+  const [optimisticUp, setOptimisticUp] = useState(post.upvote_count);
+  const [optimisticDown, setOptimisticDown] = useState(post.downvote_count);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (voteType: "upvote" | "downvote") => voteForumPost(post.id, voteType),
+    onSuccess: (data) => {
+      setOptimisticVote(data.user_vote as "upvote" | "downvote");
+      setOptimisticUp(data.upvote_count);
+      setOptimisticDown(data.downvote_count);
+      void queryClient.invalidateQueries({ queryKey: ["forum-thread", threadId] });
+    },
+  });
+
+  return (
+    <div className="flex items-center gap-1" data-testid={`post-votes-${post.id}`}>
+      <button
+        className={`flex items-center gap-0.5 rounded-lg px-2 py-1 text-xs transition ${
+          optimisticVote === "upvote" ? "bg-amber-100 text-amber-700" : "text-ink-500 hover:bg-black/[0.03]"
+        }`}
+        disabled={isPending}
+        onClick={() => mutate("upvote")}
+        type="button"
+      >
+        <ArrowUp className="size-3" />
+        {optimisticUp}
+      </button>
+      <button
+        className={`flex items-center gap-0.5 rounded-lg px-2 py-1 text-xs transition ${
+          optimisticVote === "downvote" ? "bg-red-100 text-red-700" : "text-ink-500 hover:bg-black/[0.03]"
+        }`}
+        disabled={isPending}
+        onClick={() => mutate("downvote")}
+        type="button"
+      >
+        <ArrowDown className="size-3" />
+        {optimisticDown}
+      </button>
+    </div>
+  );
+}
+
+function PostCard({ post, threadId }: { post: ForumPost; threadId: number }) {
   return (
     <article
       className={`rounded-2xl border p-5 shadow-sm ${post.is_deleted ? "border-black/5 bg-white/40 opacity-60" : "border-black/10 bg-white/80"}`}
+      data-testid={`post-card-${post.id}`}
     >
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-paper text-ink-400 text-xs font-bold">
@@ -34,8 +79,8 @@ function PostCard({ post }: { post: ForumPost }) {
           ) : (
             <p className="mt-2 text-sm text-ink-800">{post.content}</p>
           )}
-          <div className="mt-3 flex items-center gap-4 text-xs text-ink-500">
-            <span>+{post.upvote_count} / -{post.downvote_count}</span>
+          <div className="mt-3 flex items-center gap-4">
+            <VoteBar post={post} threadId={threadId} />
           </div>
         </div>
       </div>
@@ -165,7 +210,7 @@ export default function ForumThreadPage() {
       {visiblePosts.length > 0 ? (
         <section className="space-y-3" data-testid="thread-posts">
           {visiblePosts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} threadId={threadId} />
           ))}
         </section>
       ) : (

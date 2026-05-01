@@ -263,10 +263,7 @@ async def ensure_provider_catalog_seeded(db: AsyncSession) -> None:
             existing.label = item["label"]
             existing.icon = item["icon"]
             existing.category = item["category"]
-            existing.enabled = item["enabled"]
             existing.display_order = item["display_order"]
-            existing.patient_visible = item["patient_visible"]
-            existing.family_visible = item["family_visible"]
             continue
 
         db.add(CareCircleProviderCatalog(**item, source_app="daily_newsletter"))

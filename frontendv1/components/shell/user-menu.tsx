@@ -6,8 +6,8 @@ import { ChevronDown, LogOut, UserRound } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { resolvePlatformContext } from "@/components/platform/platform-context";
 import { useSession, useToasts } from "@/components/providers/app-providers";
+import { getAppAccountBase } from "@/lib/apps";
 import { logoutUser } from "@/lib/api";
 
 export function UserMenu() {
@@ -16,8 +16,11 @@ export function UserMenu() {
   const { pushToast } = useToasts();
   const session = useSession();
   const { setAnonymous, status, user } = session;
-  const context = resolvePlatformContext(pathname, session);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const accountBase = getAppAccountBase(pathname);
+  const accountHref = accountBase;
+  const accountEditHref = `${accountBase}/edit`;
 
   if (status !== "authenticated" || !user) {
     return (
@@ -70,12 +73,12 @@ export function UserMenu() {
             Signed In
           </DropdownMenu.Label>
           <DropdownMenu.Item asChild>
-            <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href="/app/account">
+            <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href={accountHref}>
               Account
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
-            <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href="/app/account/edit">
+            <Link className="block rounded-xl px-3 py-2 text-sm outline-none hover:bg-black/5" href={accountEditHref}>
               Edit profile
             </Link>
           </DropdownMenu.Item>

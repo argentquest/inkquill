@@ -108,10 +108,11 @@ Use this for fast discovery passes before writing full detail.
 | `/public/stories/:storyId` | Published story reader | Full detail view for a single published story; shows metadata, word count, publisher, world, star rating, and comment list | route load | spinner while query runs; detail view appears on success; comments load in separate query | error state with "Reload story" retry | `GET /api/v1/published-stories/:id`, `GET /api/v1/published-stories/:id/comments` | Keep | rating POST requires auth; comments GET is public |
 | `/storytelling/published` | User published stories | Authenticated surface showing only the current user's published stories; filters full list by user_id from session | route load | awaits session query then published list query; user-scoped filter applied client-side | error state with "Reload published stories" retry; empty state when user has no published stories | `GET /api/v1/published-stories/`, `GET /api/v1/users/me` | Keep | session user_id used to filter list; no user-specific backend endpoint exists yet |
 | `/public/blog` | Blog post list | Public list of published blog posts with title, excerpt, featured image, and publication date | route load | spinner while posts load; cards appear on success | error state with retry; empty state when no posts exist | `GET /api/blog/posts` | Keep | sameOriginFetch (not under /api/v1) |
-| `/public/blog/:slug` | Blog post reader | Full blog post content rendered from HTML field; shows title, excerpt, publication date, view count | route load | spinner while post loads; content rendered on success | error state for missing/unpublished posts | `GET /api/blog/posts/:slug` | Keep | sameOriginFetch; dangerouslySetInnerHTML for HTML content field |
+| `/public/blog/:slug` | Blog post reader | Full blog post content rendered from HTML field; shows title, excerpt, publication date, view count, comment count, and comment section | route load | spinner while post loads; content rendered on success; comments load in separate query | error state for missing/unpublished posts; comment section has its own loading/error/empty states | `GET /api/blog/posts/:slug`, `GET /api/blog/posts/:id/comments`, `POST /api/blog/posts/:id/comments` | Keep | sameOriginFetch; dangerouslySetInnerHTML for HTML content field; CommentComposer for authenticated comment creation |
 | `/public/search` | Global search | Search box over blog posts using full-text search; URL query param `q` drives active query; shows result cards with title, excerpt, date | manual submit or URL-driven on load | no fetch until query is at least 2 chars; spinner shown while results load | error state for search failure; no-results state for empty results | `GET /api/blog/search/?q=...` | Keep | sameOriginFetch; uses `useSearchParams` with Suspense boundary for SSR safety |
 | `/community/forums` | Forum categories and recent threads | Public forum landing showing category cards with thread counts and a list of recent threads across all categories | route load | two parallel queries for categories and threads; both needed before rendering | error state with "Reload forums" retry; empty state when no categories exist | `GET /api/forum/categories/`, `GET /api/forum/threads/` | Keep | sameOriginFetch (not under /api/v1) |
-| `/community/forums/:threadId` | Forum thread detail | Thread header with title, category, author, and stats; list of post cards with content, author, and vote counts | route load | spinner while thread loads; posts rendered on success | error state for unknown or deleted threads | `GET /api/forum/threads/:id` | Keep | sameOriginFetch; supports deleted-post rendering with visual fade |
+| `/community/forums/:threadId` | Forum thread detail | Thread header with title, category, author, and stats; list of post cards with content, author, and vote counts | route load | spinner while thread loads; posts rendered on success | error state for unknown or deleted threads | `GET /api/forum/threads/:id` | Keep | sameOriginFetch; supports deleted-post rendering with visual fade; VoteBar on each post calls `POST /api/forum/posts/:id/vote` |
+| `/public/share/image` | Image share preview | Public image preview page with download link; accepts `?url=` and `?title=` query params | route load | immediate render when URL present | error state when no `url` param provided | none directly | Keep | lightweight share/preview surface for media URLs |
 | `/help`, `/about`, `/privacy`, `/terms` | Public content shell pages | Proves shared public framework for support/legal content | route load | static shell render | standard app/global error only | none for Sprint 3 | Keep | content can deepen later without changing shell structure |
 
 ---
@@ -906,4 +907,80 @@ Use this for fast discovery passes before writing full detail.
   - `ChatbotWorkspace` receives `initialSessionId` prop
   - `activeSessionId` state is initialized from prop
   - Session is fetched via `fetchChatbotSession(initialSessionId)` on mount
+
+---
+
+## Sprint 09 — Forum Voting And Blog Comments Behavior Capture
+
+### Forum Vote Bar (`/community/forums/:threadId`)
+- Route: `/community/forums/:threadId`
+- Screen name: Forum Thread Detail
+
+- Element name: VoteBar
+- Element type: button group
+- Legacy location: `frontendv1/app/community/forums/[threadId]/page.tsx`
+- What job does this element do for the user?
+  - Lets users upvote or downvote individual forum posts to signal quality/agreement.
+- Trigger: Click upvote or downvote button on a post card.
+- Inputs: `post.id` and `voteType` ("upvote" | "downvote").
+- States:
+  - Default: shows current upvote/downvote counts in neutral text color.
+  - Active upvote: upvote button gets amber highlight background.
+  - Active downvote: downvote button gets red highlight background.
+  - Loading: buttons disabled while mutation is in-flight.
+- Behavior details:
+  - Click sends `POST /api/forum/posts/:postId/vote` with `{post_id, vote_type}`.
+  - On success, local optimistic state updates to new counts and user_vote.
+  - Thread query is invalidated on success to keep data consistent.
+- APIs:
+  - `POST /api/forum/posts/:postId/vote`
+- React rebuild decision: Keep
+
+### Blog Comment Section (`/public/blog/:slug`)
+- Route: `/public/blog/:slug`
+- Screen name: Blog Post Reader
+
+- Element name: Blog comment list and CommentComposer
+- Element type: list + form
+- Legacy location: `frontendv1/app/public/blog/[slug]/page.tsx`
+- What job does this element do for the user?
+  - Displays approved blog comments with nested replies and allows authenticated users to add new comments.
+- Trigger: Route load for comments; manual submit for composer.
+- Inputs: `postId` from loaded blog post; comment text from textarea.
+- States:
+  - Loading: centered spinner in comment section.
+  - Empty: dashed-border card with "No comments yet" message.
+  - Error: ErrorState with retry for comment load failures.
+  - Populated: list of CommentCard components with author avatar, name, date, content, and nested replies.
+  - Composer default: enabled textarea with placeholder.
+  - Composer pending: disabled textarea with spinner on submit button.
+  - Composer error: inline red error text below textarea.
+- Behavior details:
+  - Comments load via `GET /api/blog/posts/:postId/comments` after post detail loads.
+  - Comment submission via `POST /api/blog/posts/:postId/comments` with `{content, parent_comment_id}`.
+  - On successful create, composer clears and comment query invalidates.
+- APIs:
+  - `GET /api/blog/posts/:postId/comments`
+  - `POST /api/blog/posts/:postId/comments`
+- React rebuild decision: Keep
+
+### Image Share Preview (`/public/share/image`)
+- Route: `/public/share/image`
+- Screen name: Image Share Preview
+
+- Element name: Share image preview page
+- Element type: route / preview
+- Legacy location: `frontendv1/app/public/share/image/page.tsx`
+- What job does this element do for the user?
+  - Provides a public linkable page for previewing and downloading a shared image via URL query params.
+- Trigger: Direct navigation with `?url=` query param.
+- Inputs: `url` (image URL) and optional `title` from query params.
+- States:
+  - Loaded: shows image preview (if supported format) or placeholder icon, plus download button.
+  - Missing URL: ErrorState with "No image URL was provided."
+- Behavior details:
+  - `useSearchParams` reads `url` and `title` on client mount.
+  - Download button links to image URL with `download` attribute.
+- APIs: none directly
+- React rebuild decision: Keep
 

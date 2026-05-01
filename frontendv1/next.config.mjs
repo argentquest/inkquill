@@ -2,7 +2,7 @@
 const configuredApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
 const BACKEND_ORIGIN =
   !configuredApiBaseUrl || configuredApiBaseUrl.startsWith("/")
-    ? "http://localhost:8000"
+    ? "http://127.0.0.1:8000"
     : configuredApiBaseUrl.replace(/\/api\/v1\/?$/, "");
 
 const nextConfig = {

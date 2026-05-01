@@ -43,6 +43,9 @@ class BlogPost(Base):
     excerpt: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     featured_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     
+    # App source - distinguishes between storytelling and care-circle blog posts
+    app_source: Mapped[str] = mapped_column(String(32), nullable=False, default="storytelling", index=True)
+    
     # Status and publishing
     status: Mapped[BlogPostStatus] = mapped_column(
         SQLAlchemyEnum(BlogPostStatus), 

@@ -66,6 +66,7 @@ class BlogService:
                 allow_comments=post_data.allow_comments,
                 is_ai_generated=post_data.is_ai_generated or False,
                 is_featured=post_data.is_featured or False,
+                app_source=post_data.app_source,
                 status=BlogPostStatus.DRAFT
             )
             
@@ -137,7 +138,8 @@ class BlogService:
         tag_ids: Optional[List[int]] = None,
         search_query: Optional[str] = None,
         author_id: Optional[int] = None,
-        author_ids: Optional[List[int]] = None
+        author_ids: Optional[List[int]] = None,
+        app_source: Optional[str] = None
     ) -> List[BlogPost]:
         """Get published blog posts with filtering and pagination."""
         try:
@@ -156,6 +158,9 @@ class BlogService:
             )
             
             # Apply filters
+            if app_source:
+                query = query.where(BlogPost.app_source == app_source)
+            
             if category_id:
                 query = query.where(BlogPost.category_id == category_id)
             
@@ -354,7 +359,8 @@ class BlogService:
         user_id: int,
         include_drafts: bool = True,
         skip: int = 0,
-        limit: int = 20
+        limit: int = 20,
+        app_source: Optional[str] = None
     ) -> List[BlogPost]:
         """Get all posts for a specific user."""
         try:
@@ -370,6 +376,9 @@ class BlogService:
                 )
                 .order_by(BlogPost.updated_at.desc())
             )
+            
+            if app_source:
+                query = query.where(BlogPost.app_source == app_source)
             
             if not include_drafts:
                 query = query.where(BlogPost.status == BlogPostStatus.PUBLISHED)

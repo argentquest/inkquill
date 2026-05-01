@@ -26,7 +26,7 @@ test.describe("Admin hub", () => {
     await mockAppApis(page, { session: "anonymous" });
     await page.goto("/admin");
 
-    await expect(page).not.toHaveURL(/\/admin$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 15000 });
   });
 });
 
@@ -43,8 +43,8 @@ test.describe("Admin users", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/admin/users");
 
-    await expect(page.getByText("storymaker")).toBeVisible();
-    await expect(page.getByText("alice")).toBeVisible();
+    await expect(page.getByText("storymaker", { exact: true })).toBeVisible();
+    await expect(page.getByText("alice", { exact: true })).toBeVisible();
     await expect(page.getByText("bobwriter")).toBeVisible();
   });
 
@@ -75,7 +75,7 @@ test.describe("Admin users", () => {
     await mockAppApis(page, { session: "anonymous" });
     await page.goto("/admin/users");
 
-    await expect(page).not.toHaveURL(/\/admin\/users$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 15000 });
   });
 });
 
@@ -121,7 +121,7 @@ test.describe("Admin billing", () => {
     await mockAppApis(page, { session: "anonymous" });
     await page.goto("/admin/billing");
 
-    await expect(page).not.toHaveURL(/\/admin\/billing$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 15000 });
   });
 });
 
@@ -154,7 +154,7 @@ test.describe("Admin maintenance", () => {
     await mockAppApis(page, { session: "anonymous" });
     await page.goto("/admin/maintenance");
 
-    await expect(page).not.toHaveURL(/\/admin\/maintenance$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 15000 });
   });
 });
 
@@ -214,6 +214,6 @@ test.describe("Admin CTA", () => {
     await mockAppApis(page, { session: "anonymous" });
     await page.goto("/admin/cta");
 
-    await expect(page).not.toHaveURL(/\/admin\/cta$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 15000 });
   });
 });

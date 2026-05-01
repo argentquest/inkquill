@@ -105,7 +105,7 @@ def test_upload_response_includes_aspect_ratio_crops(client, register_and_login)
 # User isolation
 # ---------------------------------------------------------------------------
 
-def test_media_list_is_scoped_to_current_user(client, register_and_login, app_instance):
+def test_media_list_is_scoped_to_current_user(client, register_and_login):
     """Files uploaded by user A are not visible in user B's media library."""
     register_and_login("cc_isolation_a")
     upload_resp = client.post(
@@ -115,16 +115,16 @@ def test_media_list_is_scoped_to_current_user(client, register_and_login, app_in
     assert upload_resp.status_code == 200
     a_path = upload_resp.json()["data"]["media"]["storage_path"]
 
-    user_b_client = _make_fresh_client(app_instance)
-    _register(user_b_client, "cc_isolation_b")
+    client.cookies.clear()
+    register_and_login("cc_isolation_b")
 
-    b_list = user_b_client.get("/api/blog/media/list")
+    b_list = client.get("/api/blog/media/list")
     assert b_list.status_code == 200
     b_items = b_list.json()["data"]
     assert not any(item["storage_path"] == a_path for item in b_items)
 
 
-def test_user_cannot_delete_another_users_media(client, register_and_login, app_instance):
+def test_user_cannot_delete_another_users_media(client, register_and_login):
     """Attempting to delete another user's media file returns 403."""
     register_and_login("cc_del_owner")
     upload_resp = client.post(
@@ -134,8 +134,8 @@ def test_user_cannot_delete_another_users_media(client, register_and_login, app_
     assert upload_resp.status_code == 200
     a_path = upload_resp.json()["data"]["media"]["storage_path"]
 
-    user_b_client = _make_fresh_client(app_instance)
-    _register(user_b_client, "cc_del_thief")
+    client.cookies.clear()
+    register_and_login("cc_del_thief")
 
-    del_resp = user_b_client.delete(f"/api/blog/media/{a_path}")
+    del_resp = client.delete(f"/api/blog/media/{a_path}")
     assert del_resp.status_code == 403

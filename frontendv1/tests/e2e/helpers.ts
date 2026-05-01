@@ -1270,7 +1270,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
-    if (url.endsWith("/billing/dashboard")) {
+    if (url.match(/\/api\/v1\/billing\/dashboard$/)) {
       if (billingDashboard === "error") {
         await route.fulfill(json({ success: false, error: { message: "Billing dashboard failed" } }, 500));
         return;
@@ -1309,7 +1309,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
-    if (url.endsWith("/referrals/stats")) {
+    if (url.endsWith("/referrals")) {
       if (referrals === "error") {
         await route.fulfill(json({ success: false, error: { message: "Referral stats failed" } }, 500));
         return;

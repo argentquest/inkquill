@@ -45,6 +45,7 @@ async def get_forum_threads(
     story_id: Optional[int] = None,
     user_id: Optional[int] = None,
     status: Optional[ThreadStatus] = None,
+    app_source: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
     order_by: str = "recent"  # recent, popular, updated
@@ -63,6 +64,8 @@ async def get_forum_threads(
         query = query.where(ForumThread.user_id == user_id)
     if status:
         query = query.where(ForumThread.status == status)
+    if app_source:
+        query = query.where(ForumThread.app_source == app_source)
     
     # Apply ordering
     if order_by == "popular":
@@ -125,6 +128,7 @@ async def create_forum_thread(
         user_id=user_id,
         world_id=thread.world_id,
         story_id=thread.story_id,
+        app_source=thread.app_source,
         status=ThreadStatus.OPEN
     )
     

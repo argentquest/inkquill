@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 import pytest
 
 from app.routers.blog import router as blog_router
+from app.routers.blog_search import router as blog_search_router
 
 
 pytestmark = pytest.mark.unit
@@ -92,14 +93,18 @@ class TestBlogPostDetail:
     def test_get_blog_post_returns_200(self, unit_client_factory):
         client = unit_client_factory(blog_router)
         mock_post = _blog_post()
-        with patch("app.routers.blog.blog_service.get_post_by_slug", new=AsyncMock(return_value=mock_post)):
+        with patch("app.routers.blog.blog_service.get_post_by_slug", new=AsyncMock(return_value=mock_post)), \
+             patch("app.routers.blog.blog_service.get_post_by_id", new=AsyncMock(return_value=mock_post)), \
+             patch("app.routers.blog._build_blog_post_read", new=lambda p: {"id": p.id, "title": p.title, "slug": p.slug, "content": p.content, "excerpt": p.excerpt, "featured_image_url": p.featured_image_url, "category_id": p.category_id, "meta_title": None, "meta_description": None, "meta_keywords": None, "allow_comments": True, "is_ai_generated": False, "is_featured": False, "status": "published", "author_id": p.author_id, "view_count": p.view_count, "like_count": p.like_count, "comment_count": p.comment_count, "published_at": None, "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00", "author": None, "category": None, "tags": []}):
             response = client.get("/api/blog/posts/test-blog-post")
         assert response.status_code == 200
 
     def test_get_blog_post_is_public(self, unit_client_factory):
         client = unit_client_factory(blog_router, user_override=None)
         mock_post = _blog_post()
-        with patch("app.routers.blog.blog_service.get_post_by_slug", new=AsyncMock(return_value=mock_post)):
+        with patch("app.routers.blog.blog_service.get_post_by_slug", new=AsyncMock(return_value=mock_post)), \
+             patch("app.routers.blog.blog_service.get_post_by_id", new=AsyncMock(return_value=mock_post)), \
+             patch("app.routers.blog._build_blog_post_read", new=lambda p: {"id": p.id, "title": p.title, "slug": p.slug, "content": p.content, "excerpt": p.excerpt, "featured_image_url": p.featured_image_url, "category_id": p.category_id, "meta_title": None, "meta_description": None, "meta_keywords": None, "allow_comments": True, "is_ai_generated": False, "is_featured": False, "status": "published", "author_id": p.author_id, "view_count": p.view_count, "like_count": p.like_count, "comment_count": p.comment_count, "published_at": None, "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00", "author": None, "category": None, "tags": []}):
             response = client.get("/api/blog/posts/test-blog-post")
         assert response.status_code == 200
 
@@ -112,13 +117,13 @@ class TestBlogPostDetail:
 
 class TestBlogSearch:
     def test_blog_search_returns_200(self, unit_client_factory):
-        client = unit_client_factory(blog_router, user_override=None)
+        client = unit_client_factory(blog_search_router, user_override=None)
         with patch("app.routers.blog_search.blog_search_service.search_posts", new=AsyncMock(return_value=[])):
             response = client.get("/api/blog/search/?q=test")
         assert response.status_code == 200
 
     def test_blog_search_is_public(self, unit_client_factory):
-        client = unit_client_factory(blog_router, user_override=None)
+        client = unit_client_factory(blog_search_router, user_override=None)
         with patch("app.routers.blog_search.blog_search_service.search_posts", new=AsyncMock(return_value=[])):
             response = client.get("/api/blog/search/?q=test")
         assert response.status_code == 200

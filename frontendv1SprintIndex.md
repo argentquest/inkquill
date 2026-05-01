@@ -6,12 +6,12 @@ This series supersedes the older `frontendSprint*.md` numbering as the working o
 
 ## Current Status Snapshot
 
-- Last reviewed against the repo on 2026-04-27.
+- Last reviewed against the repo on 2026-05-01.
 - Shared platform, auth, shell, and framework foundations are complete.
 - Care Circle is the most complete product surface; family/friend and patient flows are mostly delivered.
-- Storytelling has a route boundary and account/commercial shell, but the actual story, world, editor, community, and publishing workflows are largely not started in React.
-- Chatbot has a local UI prototype only.
-- Legacy admin and blog tooling are not active React delivery yet.
+- Storytelling has a route boundary, account/commercial shell, and partial community/publishing surfaces (public reading, forums, blog, search), but core story, world, editor, chat, builder, and map workflows are still pending.
+- Chatbot backend-backed app is complete with session history, per-turn usage, and restore behavior.
+- Legacy admin and blog tooling are partially rebuilt in React (users, billing, CTA, maintenance); low-value pages were explicitly retired.
 
 ## Shirt Size Legend
 
@@ -24,17 +24,17 @@ This series supersedes the older `frontendSprint*.md` numbering as the working o
 ## Active Sprint Order
 
 1. [frontendv1Sprint01PlatformBaseline.md](frontendv1Sprint01PlatformBaseline.md) - completed shared platform baseline
-2. [frontendv1Sprint02CareCircleCore.md](frontendv1Sprint02CareCircleCore.md) - mostly completed Care Circle family/friend and patient flows
-3. [frontendv1Sprint03CareCirclePolishAndProduction.md](frontendv1Sprint03CareCirclePolishAndProduction.md) - active Care Circle hardening, scaffold completion, deployment readiness
-4. [frontendv1Sprint04StorytellingBoundary.md](frontendv1Sprint04StorytellingBoundary.md) - partially completed storytelling app boundary
+2. [frontendv1Sprint02CareCircleCore.md](frontendv1Sprint02CareCircleCore.md) - completed Care Circle family/friend and patient flows
+3. [frontendv1Sprint03CareCirclePolishAndProduction.md](frontendv1Sprint03CareCirclePolishAndProduction.md) - completed Care Circle hardening, event feed, media library, and deployment smoke checklist
+4. [frontendv1Sprint04StorytellingBoundary.md](frontendv1Sprint04StorytellingBoundary.md) - completed storytelling app boundary with stories/worlds/community entry routes
 5. [frontendv1Sprint05StoryBackbone.md](frontendv1Sprint05StoryBackbone.md) - next major storytelling product sprint
 6. [frontendv1Sprint06WorldElements.md](frontendv1Sprint06WorldElements.md) - pending world entities and associations
 7. [frontendv1Sprint07EditorsDocuments.md](frontendv1Sprint07EditorsDocuments.md) - pending rich editors, AI review, documents
 8. [frontendv1Sprint08StoryChatBuilderSpatial.md](frontendv1Sprint08StoryChatBuilderSpatial.md) - pending story/world chat, builder, hierarchy, map
-9. [frontendv1Sprint09PublishingCommunity.md](frontendv1Sprint09PublishingCommunity.md) - pending public reading, publishing, forum/community
-10. [frontendv1Sprint10CommercialSupport.md](frontendv1Sprint10CommercialSupport.md) - partially completed billing/referrals/onboarding plus pending prompts/blog
-11. [frontendv1Sprint11ChatbotApp.md](frontendv1Sprint11ChatbotApp.md) - partially completed independent chatbot app
-12. [frontendv1Sprint12AdminAndOps.md](frontendv1Sprint12AdminAndOps.md) - pending legacy admin and operations tools
+9. [frontendv1Sprint09PublishingCommunity.md](frontendv1Sprint09PublishingCommunity.md) - completed: public reading, forums, blog, search, forum voting, blog comments, image share, and backend unit tests
+10. [frontendv1Sprint10CommercialSupport.md](frontendv1Sprint10CommercialSupport.md) - completed billing/referrals/onboarding/prompts/AI-models/blog
+11. [frontendv1Sprint11ChatbotApp.md](frontendv1Sprint11ChatbotApp.md) - completed independent chatbot app with session history and per-turn usage
+12. [frontendv1Sprint12AdminAndOps.md](frontendv1Sprint12AdminAndOps.md) - completed: rebuilt 5 admin routes, explicitly retired 6 low-value legacy pages
 
 ## Mapping From Older Sprint Files
 

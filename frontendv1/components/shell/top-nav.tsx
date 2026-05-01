@@ -7,7 +7,7 @@ import { useSession } from "@/components/providers/app-providers";
 import { CoinBalanceBadge } from "@/components/shell/coin-balance-badge";
 import { ThemeToggle } from "@/components/shell/theme-toggle";
 import { UserMenu } from "@/components/shell/user-menu";
-import { resolveApp } from "@/lib/apps";
+import { resolveApp, publicNavLinks } from "@/lib/apps";
 
 function NibMark({ className }: { className?: string }) {
   return (
@@ -31,13 +31,7 @@ export function TopNav() {
   const pathname = usePathname();
   const session = useSession();
   const activeApp = resolveApp(pathname);
-  const primaryLinks = activeApp?.primaryLinks ?? [
-    { href: "/", label: "Home" },
-    { href: "/app/account", label: "Account" },
-    { href: "/app/billing", label: "Billing" },
-    { href: "/app/referrals", label: "Referrals" },
-    { href: "/help", label: "Help" }
-  ];
+  const primaryLinks = activeApp?.primaryLinks ?? publicNavLinks;
 
   const isAdmin = session.status === "authenticated" && session.user?.is_admin === true;
   const isFamilyOwner = session.status === "authenticated" && session.user?.is_family_owner === true;

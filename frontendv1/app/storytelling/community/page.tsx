@@ -54,13 +54,13 @@ export default function CommunityPage() {
   });
 
   const { data: forumThreads = [], isLoading: forumLoading } = useQuery({
-    queryKey: ["community-forum-threads"],
-    queryFn: () => fetchForumThreads(),
+    queryKey: ["community-forum-threads", "storytelling"],
+    queryFn: () => fetchForumThreads({ app_source: "storytelling" }),
   });
 
   const { data: blogPosts = [], isLoading: blogLoading } = useQuery({
-    queryKey: ["community-blog-posts"],
-    queryFn: () => fetchBlogPosts(),
+    queryKey: ["community-blog-posts", "storytelling"],
+    queryFn: () => fetchBlogPosts({ app_source: "storytelling" }),
   });
 
   const isLoading = storiesLoading || forumLoading || blogLoading;

@@ -42,6 +42,7 @@ def _build_thread_list_response(thread) -> ForumThreadListResponse:
         is_pinned=thread.is_pinned,
         is_locked=thread.is_locked,
         created_at=thread.created_at,
+        app_source=getattr(thread, "app_source", "storytelling"),
     )
 
 
@@ -86,6 +87,7 @@ async def get_threads(
     story_id: Optional[int] = None,
     user_id: Optional[int] = None,
     status: Optional[ThreadStatus] = None,
+    app_source: Optional[str] = Query(None, pattern="^(storytelling|care-circle)$"),
     order_by: str = Query("recent", pattern="^(recent|popular|updated)$"),
     skip: int = 0,
     limit: int = 20,
@@ -99,6 +101,7 @@ async def get_threads(
         story_id=story_id,
         user_id=user_id,
         status=status,
+        app_source=app_source,
         order_by=order_by,
         skip=skip,
         limit=limit
@@ -166,6 +169,7 @@ async def get_thread(
         is_locked=thread.is_locked,
         created_at=thread.created_at,
         updated_at=thread.updated_at,
+        app_source=getattr(thread, "app_source", "storytelling"),
         is_subscribed=is_subscribed,
         posts=response_posts
     )
@@ -222,6 +226,7 @@ async def create_thread(
             is_locked=False,
             created_at=new_thread.created_at,
             updated_at=new_thread.updated_at,
+            app_source=getattr(new_thread, "app_source", "storytelling"),
             is_subscribed=True,
             posts=[
                 ForumPostResponse(

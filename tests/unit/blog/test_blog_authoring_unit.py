@@ -22,6 +22,7 @@ def _post(
     excerpt="Test excerpt",
     status="draft",
     author_id=1,
+    app_source="storytelling",
 ):
     now = datetime.now(timezone.utc)
     return SimpleNamespace(
@@ -33,6 +34,7 @@ def _post(
         featured_image_url=None,
         status=status,
         author_id=author_id,
+        app_source=app_source,
         view_count=0,
         like_count=0,
         comment_count=0,

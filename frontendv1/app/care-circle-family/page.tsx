@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Users, Puzzle, CreditCard, Gift, UserCircle, Camera, Activity, UserCheck, UserPlus } from "lucide-react";
+import { Users, Puzzle, CreditCard, Gift, UserCircle, Camera, Activity, UserCheck, UserPlus, FileText, MessageSquare } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
@@ -11,6 +11,8 @@ import { careCircleFamilyHelp } from "@/lib/help-content";
 const ownerLinks = [
   { href: "/care-circle-family/patients", label: "Friends", description: "View and manage all friend profiles.", icon: Users },
   { href: "/care-circle-family/providers", label: "Providers", description: "Configure content providers for daily highlights.", icon: Puzzle },
+  { href: "/care-circle-family/blog", label: "Blog", description: "Write and manage care-circle blog posts.", icon: FileText },
+  { href: "/community/forums", label: "Forum", description: "Join discussions and community threads.", icon: MessageSquare },
   { href: "/care-circle-family/billing", label: "Billing", description: "Review your balance and transaction history.", icon: CreditCard },
   { href: "/care-circle-family/referrals", label: "Referrals", description: "Track invitations and earned credits.", icon: Gift },
   { href: "/care-circle-family/account", label: "Account", description: "Edit your profile and contact details.", icon: UserCircle },
@@ -23,6 +25,8 @@ const ownerLinks = [
 const memberLinks = [
   { href: "/care-circle-family/patients", label: "Friends", description: "View all friend profiles in this care circle.", icon: Users },
   { href: "/care-circle-family/providers", label: "Providers", description: "View content providers for daily highlights.", icon: Puzzle },
+  { href: "/care-circle-family/blog", label: "Blog", description: "Write and manage care-circle blog posts.", icon: FileText },
+  { href: "/community/forums", label: "Forum", description: "Join discussions and community threads.", icon: MessageSquare },
   { href: "/care-circle-family/account", label: "Account", description: "Edit your profile and contact details.", icon: UserCircle },
   { href: "/care-circle-patient/login", label: "Friend sign-in", description: "Preview the picture-based sign-in flow.", icon: UserCheck },
 ];

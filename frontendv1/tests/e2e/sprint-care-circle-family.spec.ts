@@ -48,7 +48,7 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients");
 
-    await page.getByRole("link", { name: "Open and edit patient" }).first().click();
+    await page.getByRole("link", { name: "Edit" }).first().click();
     await expect(page).toHaveURL(/\/care-circle-family\/patients\/1/);
   });
 
@@ -56,8 +56,8 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients/1");
 
-    await expect(page.getByRole("heading", { name: "Patient profile" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Back to patients" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Friend profile" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Back to friends" })).toBeVisible();
     await expect(page.getByText("Profile summary")).toBeVisible();
   });
 

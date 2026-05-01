@@ -9,9 +9,6 @@ from app.services.email_service import get_email_service
 pytestmark = pytest.mark.integration
 
 
-def _make_client(app_instance):
-    """Create a fresh TestClient (new cookie jar = new session)."""
-    return TestClient(app_instance, raise_server_exceptions=True)
 
 
 def _register(client, prefix="member"):
@@ -40,14 +37,14 @@ def _get_join_code(client):
 # Join flow
 # ---------------------------------------------------------------------------
 
-def test_join_request_with_valid_code(client, register_and_login, app_instance):
+def test_join_request_with_valid_code(client, register_and_login):
     """A registered user can submit a join request using a valid join code."""
     register_and_login("owner_join")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "member_join")
-    resp = second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    client.cookies.clear()
+    _register(client, "member_join")
+    resp = client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
     assert resp.status_code == 201
     data = resp.json()["data"]
     assert data["status"] == "pending"
@@ -61,15 +58,15 @@ def test_join_request_with_invalid_code(client, register_and_login):
     assert resp.status_code == 400
 
 
-def test_duplicate_join_request_returns_400(client, register_and_login, app_instance):
+def test_duplicate_join_request_returns_400(client, register_and_login):
     """Submitting a second pending request for the same family returns 400."""
     register_and_login("owner_dup")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "member_dup")
-    second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
-    resp = second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    client.cookies.clear()
+    _register(client, "member_dup")
+    client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    resp = client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
     assert resp.status_code == 400
     assert "pending" in resp.json()["detail"].lower()
 
@@ -86,14 +83,17 @@ def test_already_owner_join_request_returns_400(client, register_and_login):
 # Owner: list and resolve join requests
 # ---------------------------------------------------------------------------
 
-def test_owner_can_list_join_requests(client, register_and_login, app_instance):
+def test_owner_can_list_join_requests(client, register_and_login):
     register_and_login("owner_list")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "req_list_member")
-    second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    owner_cookies = dict(client.cookies)
+    client.cookies.clear()
+    _register(client, "req_list_member")
+    client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
 
+    client.cookies.clear()
+    client.cookies.update(owner_cookies)
     resp = client.get("/api/v1/care-circle/family/join-requests")
     assert resp.status_code == 200
     data = resp.json()["data"]
@@ -128,7 +128,7 @@ def test_owner_can_list_family_activity_events(client, register_and_login):
     assert any(event["type"] in {"family_created", "patient_created"} for event in data)
 
 
-def test_owner_can_send_invite_email(client, register_and_login, app_instance):
+def test_owner_can_send_invite_email(client, register_and_login):
     register_and_login("owner_invite")
     join_code = _get_join_code(client)
 
@@ -141,11 +141,11 @@ def test_owner_can_send_invite_email(client, register_and_login, app_instance):
             return True
 
     recorder = RecordingEmailService()
-    app_instance.dependency_overrides[get_email_service] = lambda: recorder
+    client.app.dependency_overrides[get_email_service] = lambda: recorder
     try:
         resp = client.post("/api/v1/care-circle/family/invite-email", json={"email": "invitee@example.com"})
     finally:
-        app_instance.dependency_overrides.pop(get_email_service, None)
+        client.app.dependency_overrides.pop(get_email_service, None)
 
     assert resp.status_code == 201, resp.text
     data = resp.json()["data"]
@@ -157,14 +157,17 @@ def test_owner_can_send_invite_email(client, register_and_login, app_instance):
     assert recorder.calls[0]["join_code"] == join_code
 
 
-def test_owner_can_approve_request(client, register_and_login, app_instance):
+def test_owner_can_approve_request(client, register_and_login):
     register_and_login("owner_approve")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "req_approve_member")
-    second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    owner_cookies = dict(client.cookies)
+    client.cookies.clear()
+    _register(client, "req_approve_member")
+    client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
 
+    client.cookies.clear()
+    client.cookies.update(owner_cookies)
     requests = client.get("/api/v1/care-circle/family/join-requests").json()["data"]
     membership_id = requests[0]["id"]
 
@@ -176,14 +179,17 @@ def test_owner_can_approve_request(client, register_and_login, app_instance):
     assert not any(r["id"] == membership_id for r in after)
 
 
-def test_owner_can_reject_request(client, register_and_login, app_instance):
+def test_owner_can_reject_request(client, register_and_login):
     register_and_login("owner_reject")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "req_reject_member")
-    second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    owner_cookies = dict(client.cookies)
+    client.cookies.clear()
+    _register(client, "req_reject_member")
+    client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
 
+    client.cookies.clear()
+    client.cookies.update(owner_cookies)
     requests = client.get("/api/v1/care-circle/family/join-requests").json()["data"]
     membership_id = requests[0]["id"]
 
@@ -203,14 +209,17 @@ def test_approve_nonexistent_request_returns_400(client, register_and_login):
 # Owner: list and remove active members
 # ---------------------------------------------------------------------------
 
-def test_owner_can_list_members_after_approval(client, register_and_login, app_instance):
+def test_owner_can_list_members_after_approval(client, register_and_login):
     register_and_login("owner_members")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "active_member")
-    second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    owner_cookies = dict(client.cookies)
+    client.cookies.clear()
+    _register(client, "active_member")
+    client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
 
+    client.cookies.clear()
+    client.cookies.update(owner_cookies)
     requests = client.get("/api/v1/care-circle/family/join-requests").json()["data"]
     client.put(f"/api/v1/care-circle/family/join-requests/{requests[0]['id']}/approve")
 
@@ -221,14 +230,17 @@ def test_owner_can_list_members_after_approval(client, register_and_login, app_i
     assert all("username" in m for m in members)
 
 
-def test_owner_can_remove_member(client, register_and_login, app_instance):
+def test_owner_can_remove_member(client, register_and_login):
     register_and_login("owner_remove")
     join_code = _get_join_code(client)
 
-    second_client = _make_client(app_instance)
-    _register(second_client, "remove_member")
-    second_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    owner_cookies = dict(client.cookies)
+    client.cookies.clear()
+    _register(client, "remove_member")
+    client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
 
+    client.cookies.clear()
+    client.cookies.update(owner_cookies)
     requests = client.get("/api/v1/care-circle/family/join-requests").json()["data"]
     membership_id = requests[0]["id"]
     client.put(f"/api/v1/care-circle/family/join-requests/{membership_id}/approve")
@@ -269,13 +281,13 @@ def test_new_user_before_family_created_has_is_family_owner_false(client, regist
 # Admin: family management
 # ---------------------------------------------------------------------------
 
-def _register_admin(app_instance, run_db, prefix="admin_fam"):
+def _register_admin(client, run_db, prefix="admin_fam"):
     """Register a new user in a fresh client session and promote them to admin."""
     from sqlalchemy import select
     from app.models.user import User
 
-    admin_client = _make_client(app_instance)
-    payload, _ = _register(admin_client, prefix)
+    client.cookies.clear()
+    payload, _ = _register(client, prefix)
     username = payload["username"]
 
     async def promote(session):
@@ -284,16 +296,19 @@ def _register_admin(app_instance, run_db, prefix="admin_fam"):
         await session.commit()
 
     run_db(promote)
-    return admin_client
+    admin_cookies = dict(client.cookies)
+    return admin_cookies
 
 
-def test_admin_can_list_all_families(client, register_and_login, app_instance, run_db):
+def test_admin_can_list_all_families(client, register_and_login, run_db):
     register_and_login("admin_list_owner")
     _get_join_code(client)
 
-    admin_client = _register_admin(app_instance, run_db, "admin_list")
+    admin_cookies = _register_admin(client, run_db, "admin_list")
+    client.cookies.clear()
+    client.cookies.update(admin_cookies)
 
-    resp = admin_client.get("/api/v1/care-circle/admin/families")
+    resp = client.get("/api/v1/care-circle/admin/families")
     assert resp.status_code == 200
     data = resp.json()["data"]
     assert isinstance(data, list)
@@ -308,23 +323,25 @@ def test_non_admin_cannot_list_families(client, register_and_login):
     assert resp.status_code == 403
 
 
-def test_admin_can_disable_and_reenable_family(client, register_and_login, app_instance, run_db):
+def test_admin_can_disable_and_reenable_family(client, register_and_login, run_db):
     register_and_login("disable_owner")
     join_code = _get_join_code(client)
 
-    admin_client = _register_admin(app_instance, run_db, "admin_disable")
-    families = admin_client.get("/api/v1/care-circle/admin/families").json()["data"]
+    admin_cookies = _register_admin(client, run_db, "admin_disable")
+    client.cookies.clear()
+    client.cookies.update(admin_cookies)
+    families = client.get("/api/v1/care-circle/admin/families").json()["data"]
     target = next((f for f in families if f["join_code"] == join_code), None)
     assert target is not None
 
-    resp = admin_client.put(
+    resp = client.put(
         f"/api/v1/care-circle/admin/families/{target['id']}/disable",
         json={"disabled": True},
     )
     assert resp.status_code == 200
     assert resp.json()["data"]["is_disabled"] is True
 
-    re_enable = admin_client.put(
+    re_enable = client.put(
         f"/api/v1/care-circle/admin/families/{target['id']}/disable",
         json={"disabled": False},
     )
@@ -332,36 +349,40 @@ def test_admin_can_disable_and_reenable_family(client, register_and_login, app_i
     assert re_enable.json()["data"]["is_disabled"] is False
 
 
-def test_admin_can_delete_family(client, register_and_login, app_instance, run_db):
+def test_admin_can_delete_family(client, register_and_login, run_db):
     register_and_login("delete_owner")
     join_code = _get_join_code(client)
 
-    admin_client = _register_admin(app_instance, run_db, "admin_delete")
-    families = admin_client.get("/api/v1/care-circle/admin/families").json()["data"]
+    admin_cookies = _register_admin(client, run_db, "admin_delete")
+    client.cookies.clear()
+    client.cookies.update(admin_cookies)
+    families = client.get("/api/v1/care-circle/admin/families").json()["data"]
     target = next((f for f in families if f["join_code"] == join_code), None)
     assert target is not None
 
-    resp = admin_client.delete(f"/api/v1/care-circle/admin/families/{target['id']}")
+    resp = client.delete(f"/api/v1/care-circle/admin/families/{target['id']}")
     assert resp.status_code == 200
 
-    after = admin_client.get("/api/v1/care-circle/admin/families").json()["data"]
+    after = client.get("/api/v1/care-circle/admin/families").json()["data"]
     assert not any(f["id"] == target["id"] for f in after)
 
 
-def test_disabled_family_blocks_join_requests(client, register_and_login, app_instance, run_db):
+def test_disabled_family_blocks_join_requests(client, register_and_login, run_db):
     register_and_login("disabled_join_owner")
     join_code = _get_join_code(client)
 
-    admin_client = _register_admin(app_instance, run_db, "admin_block")
-    families = admin_client.get("/api/v1/care-circle/admin/families").json()["data"]
+    admin_cookies = _register_admin(client, run_db, "admin_block")
+    client.cookies.clear()
+    client.cookies.update(admin_cookies)
+    families = client.get("/api/v1/care-circle/admin/families").json()["data"]
     target = next((f for f in families if f["join_code"] == join_code), None)
-    admin_client.put(
+    client.put(
         f"/api/v1/care-circle/admin/families/{target['id']}/disable",
         json={"disabled": True},
     )
 
-    member_client = _make_client(app_instance)
-    _register(member_client, "blocked_member")
-    resp = member_client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
+    client.cookies.clear()
+    _register(client, "blocked_member")
+    resp = client.post("/api/v1/care-circle/family/join", json={"join_code": join_code})
     assert resp.status_code == 400
     assert "disabled" in resp.json()["detail"].lower()

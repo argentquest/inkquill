@@ -191,8 +191,10 @@ def test_family_patient_detail_update_persists_configuration(client, register_an
             "timezone": "America/Denver",
             "deliveryTime": "10:45",
             "days": ["Tue", "Thu"],
-            "familyMembers": ["Lena", "Marco"],
-            "preferences": ["jazz", "photo albums"],
+            "preferences": {
+                "hobbies": ["jazz", "photo albums"],
+                "familyMembers": ["Lena", "Marco"]
+            },
             "authImageKeys": ["sun", "dog", "house"],
         },
     )
@@ -206,8 +208,8 @@ def test_family_patient_detail_update_persists_configuration(client, register_an
     assert data["timezone"] == "America/Denver"
     assert data["deliveryTime"] == "10:45"
     assert data["days"] == ["Tue", "Thu"]
-    assert data["familyMembers"] == ["Lena", "Marco"]
-    assert data["preferences"] == ["jazz", "photo albums"]
+    assert data["preferences"]["familyMembers"] == ["Lena", "Marco"]
+    assert data["preferences"]["hobbies"] == ["jazz", "photo albums"]
 
     refreshed = client.get(f"/api/v1/care-circle/family/patients/{patient_id}")
     assert refreshed.status_code == 200

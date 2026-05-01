@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import { AppRouteLanding } from "@/components/platform/platform-route-landing";
 import { AppShell } from "@/components/shell/app-shell";
+import { SubNav } from "@/components/shell/sub-nav";
 import { useSession } from "@/components/providers/app-providers";
 import { resolvePlatformContext } from "@/components/platform/platform-context";
 
@@ -18,6 +19,7 @@ export function AppShellResolver({ children }: { children: React.ReactNode }) {
   return (
     <AppShell>
       <div className="space-y-6">
+        <SubNav />
         {showLanding ? <AppRouteLanding context={context} /> : null}
         {children}
       </div>

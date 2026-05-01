@@ -63,6 +63,9 @@ class ForumThread(Base):
         default=ThreadStatus.OPEN
     )
     
+    # App source - distinguishes between storytelling and care-circle forum threads
+    app_source: Mapped[str] = mapped_column(String(32), nullable=False, default="storytelling", index=True)
+    
     # Foreign keys
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("forum_categories.id", ondelete="CASCADE"), nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
@@ -113,6 +116,7 @@ class ForumThread(Base):
     # Indexes
     __table_args__ = (
         Index("idx_thread_category_status", "category_id", "status"),
+        Index("idx_thread_app_source_status", "app_source", "status"),
         Index("idx_thread_world", "world_id"),
         Index("idx_thread_story", "story_id"),
         UniqueConstraint("category_id", "slug", name="uq_thread_category_slug"),

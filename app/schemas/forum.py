@@ -46,6 +46,7 @@ class ForumThreadBase(BaseModel):
     category_id: int
     world_id: Optional[int] = None
     story_id: Optional[int] = None
+    app_source: str = Field(default="storytelling", pattern="^(storytelling|care-circle)$")
 
 
 class ForumThreadCreate(ForumThreadBase):
@@ -60,6 +61,7 @@ class ForumThreadUpdate(BaseModel):
     is_pinned: Optional[bool] = None
     is_locked: Optional[bool] = None
     status: Optional[ThreadStatus] = None
+    app_source: Optional[str] = Field(None, pattern="^(storytelling|care-circle)$")
 
 
 class ForumThreadListResponse(BaseModel):
@@ -83,6 +85,7 @@ class ForumThreadListResponse(BaseModel):
     is_pinned: bool
     is_locked: bool
     created_at: datetime
+    app_source: str
 
     model_config = ConfigDict(from_attributes=True)
 class ForumThreadDetailResponse(ForumThreadListResponse):

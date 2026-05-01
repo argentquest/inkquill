@@ -154,6 +154,7 @@ class TestForumThreadDetail:
         mock_thread.title = "Test Thread"
         mock_thread.slug = "test-thread"
         mock_thread.status = "open"
+        mock_thread.app_source = "storytelling"
         mock_thread.category_id = 1
         mock_thread.category = None
         mock_thread.user_id = 1
@@ -187,6 +188,7 @@ class TestForumThreadDetail:
         mock_thread.title = "Test Thread"
         mock_thread.slug = "test-thread"
         mock_thread.status = "open"
+        mock_thread.app_source = "storytelling"
         mock_thread.category_id = 1
         mock_thread.category = None
         mock_thread.user_id = 1
@@ -230,3 +232,134 @@ class TestForumPosts:
             json={"thread_id": 1, "content": ""},
         )
         assert response.status_code in (400, 422)
+
+    def test_get_post_returns_200(self, unit_client_factory):
+        """GET /api/forum/posts/1 returns 200 for a known post."""
+        client = unit_client_factory(forum_post_router)
+        now = datetime.now(timezone.utc)
+
+        mock_post = MagicMock()
+        mock_post.id = 1
+        mock_post.content = "Test post"
+        mock_post.content_html = "<p>Test post</p>"
+        mock_post.thread_id = 1
+        mock_post.user_id = 1
+        mock_post.parent_post_id = None
+        mock_post.character_id = None
+        mock_post.location_id = None
+        mock_post.upvote_count = 2
+        mock_post.downvote_count = 0
+        mock_post.score = 2
+        mock_post.edit_count = 0
+        mock_post.is_deleted = False
+        mock_post.deleted_at = None
+        mock_post.deletion_reason = None
+        mock_post.thread = None
+        mock_post.user = None
+        mock_post.character = None
+        mock_post.location = None
+        mock_post.edited_by = None
+        mock_post.created_at = now
+        mock_post.updated_at = now
+
+        with patch("app.routers.forum_post.crud_post.get_forum_post", new=AsyncMock(return_value=mock_post)), \
+             patch("app.routers.forum_post.crud_post.get_user_vote_on_post", new=AsyncMock(return_value=None)):
+            response = client.get("/api/forum/posts/1")
+        assert response.status_code == 200
+        body = response.json()
+        assert body.get("success") is True
+        assert body["data"]["content"] == "Test post"
+
+    def test_get_post_returns_404_for_missing(self, unit_client_factory):
+        """GET /api/forum/posts/999 returns 404."""
+        client = unit_client_factory(forum_post_router)
+        with patch("app.routers.forum_post.crud_post.get_forum_post", new=AsyncMock(return_value=None)):
+            response = client.get("/api/forum/posts/999")
+        assert response.status_code == 404
+
+    def test_update_post_returns_200(self, unit_client_factory, mock_user):
+        """PUT /api/forum/posts/1 updates and returns the post."""
+        client = unit_client_factory(forum_post_router, user_override=mock_user)
+        now = datetime.now(timezone.utc)
+
+        mock_post = MagicMock()
+        mock_post.id = 1
+        mock_post.content = "Updated content"
+        mock_post.content_html = "<p>Updated content</p>"
+        mock_post.thread_id = 1
+        mock_post.user_id = 1
+        mock_post.parent_post_id = None
+        mock_post.character_id = None
+        mock_post.location_id = None
+        mock_post.upvote_count = 0
+        mock_post.downvote_count = 0
+        mock_post.score = 0
+        mock_post.edit_count = 1
+        mock_post.is_deleted = False
+        mock_post.deleted_at = None
+        mock_post.deletion_reason = None
+        mock_post.thread = None
+        mock_post.user = None
+        mock_post.character = None
+        mock_post.location = None
+        mock_post.edited_by = None
+        mock_post.created_at = now
+        mock_post.updated_at = now
+
+        with patch("app.routers.forum_post.crud_post.update_forum_post", new=AsyncMock(return_value=mock_post)), \
+             patch("app.routers.forum_post.crud_post.get_user_vote_on_post", new=AsyncMock(return_value=None)):
+            response = client.put(
+                "/api/forum/posts/1",
+                json={"content": "Updated content"},
+            )
+        assert response.status_code == 200
+        body = response.json()
+        assert body.get("success") is True
+        assert body["data"]["content"] == "Updated content"
+
+    def test_delete_post_returns_204(self, unit_client_factory, mock_user):
+        """DELETE /api/forum/posts/1 returns 204 on success."""
+        client = unit_client_factory(forum_post_router, user_override=mock_user)
+        with patch("app.routers.forum_post.crud_post.delete_forum_post", new=AsyncMock(return_value=True)):
+            response = client.delete("/api/forum/posts/1")
+        assert response.status_code == 204
+
+    def test_delete_post_returns_404_when_missing(self, unit_client_factory, mock_user):
+        """DELETE /api/forum/posts/999 returns 404."""
+        client = unit_client_factory(forum_post_router, user_override=mock_user)
+        with patch("app.routers.forum_post.crud_post.delete_forum_post", new=AsyncMock(return_value=False)):
+            response = client.delete("/api/forum/posts/999")
+        assert response.status_code == 404
+
+
+class TestForumVotes:
+    def test_vote_on_post_returns_200(self, unit_client_factory, mock_user):
+        """POST /api/forum/posts/1/vote returns updated counts."""
+        client = unit_client_factory(forum_post_router, user_override=mock_user)
+        now = datetime.now(timezone.utc)
+
+        mock_post = MagicMock()
+        mock_post.id = 1
+        mock_post.upvote_count = 3
+        mock_post.downvote_count = 0
+        mock_post.score = 3
+
+        with patch("app.routers.forum_post.crud_post.vote_on_post", new=AsyncMock(return_value=mock_post)):
+            response = client.post(
+                "/api/forum/posts/1/vote",
+                json={"post_id": 1, "vote_type": "upvote"},
+            )
+        assert response.status_code == 200
+        body = response.json()
+        assert body.get("success") is True
+        assert body["data"]["upvote_count"] == 3
+        assert body["data"]["user_vote"] == "upvote"
+
+    def test_vote_rejects_mismatched_post_id(self, unit_client_factory, mock_user):
+        """POST /api/forum/posts/1/vote with post_id=2 returns 400."""
+        client = unit_client_factory(forum_post_router, user_override=mock_user)
+        response = client.post(
+            "/api/forum/posts/1/vote",
+            json={"post_id": 2, "vote_type": "upvote"},
+        )
+        assert response.status_code == 400
