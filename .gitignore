@@ -140,3 +140,17 @@ frontendv1/tsconfig.tsbuildinfo
 
 # Local tool state
 opencode.json
+
+# IDE / Editor local settings
+.claude/
+
+# User-uploaded media / runtime data
+data/uploads/
+
+# Test output artifacts and logs
+error_output.txt
+stdout_output.txt
+test_output.txt
+test_failures.txt
+e2e_results.txt
+test-results/
