@@ -4,10 +4,10 @@
 
 from fastapi import (
     APIRouter, Depends, UploadFile, File, Form, 
-    HTTPException, BackgroundTasks, status
+    HTTPException, BackgroundTasks, status, Query
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional 
+from typing import Optional, List
 import shutil
 import tempfile
 import os
@@ -42,6 +42,18 @@ ALLOWED_MIME_TYPES = [
 ]
 ALLOWED_EXTENSIONS = [".pdf", ".txt", ".docx"] 
 
+
+@router.get("/", response_model=ApiResponse, name="list_my_documents")
+async def list_my_documents(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=200),
+    db: AsyncSession = Depends(get_db_session),
+    current_user: ModelUser = Depends(get_current_active_user)
+):
+    """Handle GET /."""
+    logger.info(f"User '{current_user.username}' listing their documents (skip: {skip}, limit: {limit}).")
+    documents = await crud_document_db.get_documents_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
+    return ApiResponse.success_response(data=[UploadedDocumentRead.model_validate(d) for d in documents])
 
 @router.post(
     "/upload", 

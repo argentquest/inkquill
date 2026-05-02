@@ -439,6 +439,10 @@ export async function updateAct(actId: number, payload: Partial<ActCreatePayload
   });
 }
 
+export async function fetchAct(actId: number): Promise<ActEntry> {
+  return apiFetch<ActEntry>(`/acts/${actId}`);
+}
+
 export async function deleteAct(actId: number): Promise<void> {
   return apiFetch<void>(`/acts/${actId}`, { method: "DELETE" });
 }
@@ -456,6 +460,11 @@ export interface SceneEntry {
   scene_number: number;
   act_id: number;
   image_url?: string | null;
+  mood?: string | null;
+  characters_present?: string | null;
+  plot_points?: string | null;
+  image_prompt_definition?: string | null;
+  story_class_id?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -465,6 +474,11 @@ export interface SceneCreatePayload {
   content?: string | null;
   summary?: string | null;
   scene_number: number;
+  mood?: string | null;
+  characters_present?: string | null;
+  plot_points?: string | null;
+  image_prompt_definition?: string | null;
+  story_class_id?: number | null;
 }
 
 export async function fetchScenesForAct(actId: number): Promise<SceneEntry[]> {
@@ -483,6 +497,10 @@ export async function updateScene(sceneId: number, payload: Partial<SceneCreateP
     method: "PUT",
     body: JSON.stringify(payload),
   });
+}
+
+export async function fetchScene(sceneId: number): Promise<SceneEntry> {
+  return apiFetch<SceneEntry>(`/scenes/${sceneId}`);
 }
 
 export async function deleteScene(sceneId: number): Promise<void> {
@@ -717,6 +735,61 @@ export async function updateLoreItem(loreItemId: number, payload: Partial<LoreIt
 
 export async function deleteLoreItem(loreItemId: number): Promise<void> {
   return apiFetch<void>(`/lore-items/${loreItemId}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — Documents
+// ---------------------------------------------------------------------------
+
+export interface UploadedDocument {
+  id: number;
+  user_id: number;
+  filename: string;
+  content_type?: string | null;
+  blob_storage_path?: string | null;
+  status: string;
+  error_message?: string | null;
+  world_id?: number | null;
+  uploaded_at: string;
+  updated_at: string;
+  processed_at?: string | null;
+  blob_url?: string | null;
+}
+
+export async function fetchDocuments(): Promise<UploadedDocument[]> {
+  return apiFetch<UploadedDocument[]>("/documents/");
+}
+
+export async function uploadDocument(file: File, worldId: number): Promise<{ success: boolean; data?: unknown }> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("world_id", String(worldId));
+
+  const res = await fetch("/api/v1/documents/upload", {
+    credentials: "include",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    let message = `Upload failed: ${res.status} ${res.statusText}`;
+    try {
+      const body = (await res.json()) as { detail?: unknown; message?: string };
+      if (typeof body.detail === "string") {
+        message = body.detail;
+      } else if (body.message) {
+        message = body.message;
+      }
+    } catch {
+      // ignore
+    }
+    throw new Error(message);
+  }
+
+  return res.json();
+}
+
+export async function deleteDocument(documentId: number): Promise<void> {
+  return apiFetch<void>(`/documents/${documentId}`, { method: "DELETE" });
 }
 
 export interface PublishedStoryEntry {

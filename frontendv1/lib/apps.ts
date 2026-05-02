@@ -27,6 +27,7 @@ export const apps: AppDefinition[] = [
     primaryLinks: [
       { href: "/storytelling/stories", label: "Stories" },
       { href: "/storytelling/worlds", label: "Worlds" },
+      { href: "/storytelling/documents", label: "Documents" },
       { href: "/storytelling/community", label: "Community" },
       { href: "/storytelling/published", label: "Published" },
       { href: "/public/blog", label: "Blog" },
