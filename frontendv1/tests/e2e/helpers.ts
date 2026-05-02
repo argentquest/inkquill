@@ -1016,6 +1016,18 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
+    const worldDetailMatch = url.match(/\/worlds\/(\d+)$/);
+    if (worldDetailMatch && method === "GET") {
+      const worldId = Number(worldDetailMatch[1]);
+      const world = userWorldsSeed.find((w) => w.id === worldId);
+      if (!world) {
+        await route.fulfill(json({ detail: "World not found" }, 404));
+        return;
+      }
+      await route.fulfill(json({ success: true, data: { ...world, user_id: 7, description: world.short_description } }));
+      return;
+    }
+
     if (url.endsWith("/care-circle/family/patients")) {
       await route.fulfill(json({ success: true, data: careCirclePatients }));
       return;

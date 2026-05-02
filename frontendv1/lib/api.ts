@@ -506,9 +506,218 @@ export async function fetchUserWorlds(): Promise<WorldEntry[]> {
   return apiFetch<WorldEntry[]>("/worlds/");
 }
 
+export async function fetchWorld(worldId: number): Promise<WorldEntry & { user_id: number; description?: string | null; image_url?: string | null }> {
+  return apiFetch<WorldEntry & { user_id: number; description?: string | null; image_url?: string | null }>(`/worlds/${worldId}`);
+}
+
 // ---------------------------------------------------------------------------
-// Publishing — Published Stories
+// Storytelling — Characters
 // ---------------------------------------------------------------------------
+
+export interface CharacterEntry {
+  id: number;
+  world_id: number;
+  name: string;
+  gender?: string | null;
+  species?: string | null;
+  description?: string | null;
+  personality_traits?: string | null;
+  backstory?: string | null;
+  image_prompt_definition?: string | null;
+  image_url?: string | null;
+  current_location_id?: number | null;
+  placement_note?: string | null;
+  importance_rating?: number | null;
+  relationships?: string | null;
+  profession?: string | null;
+  age_category?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CharacterCreatePayload {
+  name: string;
+  gender?: string | null;
+  species?: string | null;
+  description?: string | null;
+  personality_traits?: string | null;
+  backstory?: string | null;
+  image_prompt_definition?: string | null;
+  current_location_id?: number | null;
+  placement_note?: string | null;
+  importance_rating?: number | null;
+  relationships?: string | null;
+  profession?: string | null;
+  age_category?: string | null;
+}
+
+export async function fetchCharactersForWorld(worldId: number): Promise<CharacterEntry[]> {
+  return apiFetch<CharacterEntry[]>(`/worlds/${worldId}/characters/`);
+}
+
+export async function createCharacterForWorld(worldId: number, payload: CharacterCreatePayload): Promise<CharacterEntry> {
+  return apiFetch<CharacterEntry>(`/worlds/${worldId}/characters/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchCharacter(characterId: number): Promise<CharacterEntry> {
+  return apiFetch<CharacterEntry>(`/characters/${characterId}`);
+}
+
+export async function updateCharacter(characterId: number, payload: Partial<CharacterCreatePayload>): Promise<CharacterEntry> {
+  return apiFetch<CharacterEntry>(`/characters/${characterId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteCharacter(characterId: number): Promise<void> {
+  return apiFetch<void>(`/characters/${characterId}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — Locations
+// ---------------------------------------------------------------------------
+
+export type LocationScale =
+  | "REGION"
+  | "CITY"
+  | "BUILDING"
+  | "ROOM"
+  | "AREA"
+  | "OBJECT"
+  | "POINT"
+  | "OTHER";
+
+export interface LocationEntry {
+  id: number;
+  world_id: number;
+  name: string;
+  description?: string | null;
+  atmosphere?: string | null;
+  significance?: string | null;
+  image_prompt_definition?: string | null;
+  image_url?: string | null;
+  geography?: string | null;
+  cultural_context?: string | null;
+  importance_rating?: number | null;
+  connected_elements?: string | null;
+  scale?: LocationScale | null;
+  parent_location_id?: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LocationCreatePayload {
+  name: string;
+  description?: string | null;
+  atmosphere?: string | null;
+  significance?: string | null;
+  image_prompt_definition?: string | null;
+  geography?: string | null;
+  cultural_context?: string | null;
+  importance_rating?: number | null;
+  connected_elements?: string | null;
+  scale?: LocationScale | null;
+  parent_location_id?: number | null;
+}
+
+export async function fetchLocationsForWorld(worldId: number): Promise<LocationEntry[]> {
+  return apiFetch<LocationEntry[]>(`/worlds/${worldId}/locations/`);
+}
+
+export async function createLocationForWorld(worldId: number, payload: LocationCreatePayload): Promise<LocationEntry> {
+  return apiFetch<LocationEntry>(`/worlds/${worldId}/locations/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchLocation(locationId: number): Promise<LocationEntry> {
+  return apiFetch<LocationEntry>(`/locations/${locationId}`);
+}
+
+export async function updateLocation(locationId: number, payload: Partial<LocationCreatePayload>): Promise<LocationEntry> {
+  return apiFetch<LocationEntry>(`/locations/${locationId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteLocation(locationId: number): Promise<void> {
+  return apiFetch<void>(`/locations/${locationId}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — Lore Items
+// ---------------------------------------------------------------------------
+
+export type LoreItemCategory =
+  | "MAGIC_SYSTEM"
+  | "HISTORICAL_EVENT"
+  | "ARTIFACT"
+  | "DEITY"
+  | "CREATURE"
+  | "FACTION_ORGANIZATION"
+  | "CULTURE_CUSTOM"
+  | "TECHNOLOGY"
+  | "PHILOSOPHY_BELIEF"
+  | "OTHER_LORE";
+
+export interface LoreItemEntry {
+  id: number;
+  world_id: number;
+  title: string;
+  description?: string | null;
+  category: LoreItemCategory;
+  image_prompt_definition?: string | null;
+  image_url?: string | null;
+  current_location_id?: number | null;
+  placement_note?: string | null;
+  importance_rating?: number | null;
+  related_elements?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LoreItemCreatePayload {
+  title: string;
+  description?: string | null;
+  category: LoreItemCategory;
+  image_prompt_definition?: string | null;
+  current_location_id?: number | null;
+  placement_note?: string | null;
+  importance_rating?: number | null;
+  related_elements?: string | null;
+}
+
+export async function fetchLoreItemsForWorld(worldId: number): Promise<LoreItemEntry[]> {
+  return apiFetch<LoreItemEntry[]>(`/worlds/${worldId}/lore-items/`);
+}
+
+export async function createLoreItemForWorld(worldId: number, payload: LoreItemCreatePayload): Promise<LoreItemEntry> {
+  return apiFetch<LoreItemEntry>(`/worlds/${worldId}/lore-items/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchLoreItem(loreItemId: number): Promise<LoreItemEntry> {
+  return apiFetch<LoreItemEntry>(`/lore-items/${loreItemId}`);
+}
+
+export async function updateLoreItem(loreItemId: number, payload: Partial<LoreItemCreatePayload>): Promise<LoreItemEntry> {
+  return apiFetch<LoreItemEntry>(`/lore-items/${loreItemId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteLoreItem(loreItemId: number): Promise<void> {
+  return apiFetch<void>(`/lore-items/${loreItemId}`, { method: "DELETE" });
+}
 
 export interface PublishedStoryEntry {
   id: number;

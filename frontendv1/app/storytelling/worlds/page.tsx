@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Globe, Loader2, PlusCircle } from "lucide-react";
 
@@ -10,26 +11,28 @@ import { fetchUserWorlds, type WorldEntry } from "@/lib/api";
 
 function WorldCard({ world }: { world: WorldEntry }) {
   return (
-    <article className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-panel">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate text-base font-semibold text-ink-900">{world.name}</h2>
-          {world.short_description ? (
-            <p className="mt-1 line-clamp-2 text-sm leading-6 text-ink-600">{world.short_description}</p>
-          ) : null}
-          {world.is_free_chat_enabled ? (
-            <div className="mt-3">
-              <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                Public chat enabled
-              </span>
-            </div>
-          ) : null}
+    <Link href={`/storytelling/worlds/${world.id}`}>
+      <article className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-panel transition hover:border-black/20 hover:shadow-lg">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate text-base font-semibold text-ink-900">{world.name}</h2>
+            {world.short_description ? (
+              <p className="mt-1 line-clamp-2 text-sm leading-6 text-ink-600">{world.short_description}</p>
+            ) : null}
+            {world.is_free_chat_enabled ? (
+              <div className="mt-3">
+                <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                  Public chat enabled
+                </span>
+              </div>
+            ) : null}
+          </div>
+          <div className="flex shrink-0 items-center justify-center rounded-full bg-paper p-3 text-ink-400">
+            <Globe className="size-5" />
+          </div>
         </div>
-        <div className="flex shrink-0 items-center justify-center rounded-full bg-paper p-3 text-ink-400">
-          <Globe className="size-5" />
-        </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }
 
