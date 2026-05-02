@@ -1109,12 +1109,12 @@ You still do these next on the VM:
 
 ## Standalone Postgres Docker Container
 
-For local development, testing, or a dedicated single-VM database host, use [docker-compose.postgres-single.yml](C:/Code/inkandquill/inkquill/docker-compose.postgres-single.yml).
+For local development, testing, or a dedicated single-VM database host, use [infra/docker-compose.postgres-single.yml](C:/Code/inkandquill/inkquill/infra/docker-compose.postgres-single.yml).
 
 Quick start:
 
 ```bash
-docker compose -f docker-compose.postgres-single.yml up -d
+docker compose -f infra/docker-compose.postgres-single.yml up -d
 ```
 
 Details:
@@ -1137,9 +1137,9 @@ psql -h localhost -p 5433 -U inkquill -d inkquill
 
 Management:
 
-- stop: `docker compose -f docker-compose.postgres-single.yml down`
-- logs: `docker compose -f docker-compose.postgres-single.yml logs -f`
-- status: `docker compose -f docker-compose.postgres-single.yml ps`
+- stop: `docker compose -f infra/docker-compose.postgres-single.yml down`
+- logs: `docker compose -f infra/docker-compose.postgres-single.yml logs -f`
+- status: `docker compose -f infra/docker-compose.postgres-single.yml ps`
 
 ## Frontend Browser Smoke Checklist
 

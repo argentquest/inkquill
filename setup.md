@@ -32,13 +32,13 @@ Everything else has sensible defaults for local dev.
 **2. Start the dev stack**
 
 ```powershell
-docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+docker compose -p inkandquill-dev -f docker-compose.yml -f infra/docker-compose.dev.yml up --build -d
 ```
 
 **3. Run database migrations**
 
 ```powershell
-docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml run --rm backend alembic upgrade head
+docker compose -p inkandquill-dev -f docker-compose.yml -f infra/docker-compose.dev.yml run --rm backend alembic upgrade head
 ```
 
 **4. Open the app**
@@ -51,7 +51,7 @@ docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.ym
 **Stop the stack:**
 
 ```powershell
-docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml down
+docker compose -p inkandquill-dev -f docker-compose.yml -f infra/docker-compose.dev.yml down
 ```
 
 ---

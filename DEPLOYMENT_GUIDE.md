@@ -41,49 +41,49 @@ Use the shared base file plus an environment-specific override.
 ### Start Dev
 
 ```powershell
-docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+docker compose -p inkandquill-dev -f docker-compose.yml -f infra/docker-compose.dev.yml up --build -d
 ```
 
 ### Start Stage
 
 ```powershell
-docker compose -p inkandquill-stage -f docker-compose.yml -f docker-compose.stage.yml up --build -d
+docker compose -p inkandquill-stage -f docker-compose.yml -f infra/docker-compose.stage.yml up --build -d
 ```
 
 ### Start Test
 
 ```powershell
-docker compose -p inkandquill-test -f docker-compose.yml -f docker-compose.test.yml up --build -d
+docker compose -p inkandquill-test -f docker-compose.yml -f infra/docker-compose.test.yml up --build -d
 ```
 
 ### Start Prod
 
 ```powershell
-docker compose -p inkandquill-prod -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+docker compose -p inkandquill-prod -f docker-compose.yml -f infra/docker-compose.prod.yml up --build -d
 ```
 
 ### Stop Dev
 
 ```powershell
-docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml down
+docker compose -p inkandquill-dev -f docker-compose.yml -f infra/docker-compose.dev.yml down
 ```
 
 ### Stop Stage
 
 ```powershell
-docker compose -p inkandquill-stage -f docker-compose.yml -f docker-compose.stage.yml down
+docker compose -p inkandquill-stage -f docker-compose.yml -f infra/docker-compose.stage.yml down
 ```
 
 ### Stop Test
 
 ```powershell
-docker compose -p inkandquill-test -f docker-compose.yml -f docker-compose.test.yml down
+docker compose -p inkandquill-test -f docker-compose.yml -f infra/docker-compose.test.yml down
 ```
 
 ### Stop Prod
 
 ```powershell
-docker compose -p inkandquill-prod -f docker-compose.yml -f docker-compose.prod.yml down
+docker compose -p inkandquill-prod -f docker-compose.yml -f infra/docker-compose.prod.yml down
 ```
 
 ### Promote Test To Prod
@@ -121,25 +121,25 @@ The better long-term path is CI/CD using a self-hosted GitHub Actions runner on 
 Dev:
 
 ```powershell
-docker compose -p inkandquill-dev -f docker-compose.yml -f docker-compose.dev.yml run --rm backend alembic upgrade head
+docker compose -p inkandquill-dev -f docker-compose.yml -f infra/docker-compose.dev.yml run --rm backend alembic upgrade head
 ```
 
 Stage:
 
 ```powershell
-docker compose -p inkandquill-stage -f docker-compose.yml -f docker-compose.stage.yml run --rm backend alembic upgrade head
+docker compose -p inkandquill-stage -f docker-compose.yml -f infra/docker-compose.stage.yml run --rm backend alembic upgrade head
 ```
 
 Test:
 
 ```powershell
-docker compose -p inkandquill-test -f docker-compose.yml -f docker-compose.test.yml run --rm backend alembic upgrade head
+docker compose -p inkandquill-test -f docker-compose.yml -f infra/docker-compose.test.yml run --rm backend alembic upgrade head
 ```
 
 Prod:
 
 ```powershell
-docker compose -p inkandquill-prod -f docker-compose.yml -f docker-compose.prod.yml run --rm backend alembic upgrade head
+docker compose -p inkandquill-prod -f docker-compose.yml -f infra/docker-compose.prod.yml run --rm backend alembic upgrade head
 ```
 
 ### Environment Notes

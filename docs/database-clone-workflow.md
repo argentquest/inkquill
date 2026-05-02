@@ -20,8 +20,8 @@ With the current `.env`, that means:
 
 The Docker overrides now use those clone targets automatically:
 
-- [docker-compose.test.yml](C:/code2025a/inbkandquill2/docker-compose.test.yml) -> `POSTGRES_TEST_DB`
-- [docker-compose.prod.yml](C:/code2025a/inbkandquill2/docker-compose.prod.yml) -> `POSTGRES_PROD_DB`
+- [infra/docker-compose.test.yml](C:/code2025a/inbkandquill2/infra/docker-compose.test.yml) -> `POSTGRES_TEST_DB`
+- [infra/docker-compose.prod.yml](C:/code2025a/inbkandquill2/infra/docker-compose.prod.yml) -> `POSTGRES_PROD_DB`
 
 ## Run it
 

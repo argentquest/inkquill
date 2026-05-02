@@ -12,8 +12,8 @@ $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $testProject = "inkandquill-test"
 $prodProject = "inkandquill-prod"
-$testComposeArgs = @("-p", $testProject, "-f", "docker-compose.yml", "-f", "docker-compose.test.yml")
-$prodComposeArgs = @("-p", $prodProject, "-f", "docker-compose.yml", "-f", "docker-compose.prod.yml")
+$testComposeArgs = @("-p", $testProject, "-f", "docker-compose.yml", "-f", "infra/docker-compose.test.yml")
+$prodComposeArgs = @("-p", $prodProject, "-f", "docker-compose.yml", "-f", "infra/docker-compose.prod.yml")
 $testGatewayUrl = "http://localhost:8082/health"
 $prodGatewayUrl = "http://localhost:8083/health"
 
