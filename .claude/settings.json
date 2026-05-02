@@ -46,7 +46,11 @@
       "Bash(.venv/Scripts/python.exe -c ' *)",
       "Bash(.venv/Scripts/python scripts/test_care_circle_providers.py --patient-id 20)",
       "Bash(.venv/Scripts/python -c ' *)",
-      "Bash(find /c/Code/inkandquill/inkquill/frontendv1/app/care-circle* -type f)"
+      "Bash(find /c/Code/inkandquill/inkquill/frontendv1/app/care-circle* -type f)",
+      "Bash(.\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests/unit/blog/test_blog_media_unit.py -v -q)",
+      "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests/unit/blog/test_blog_media_unit.py -v -q 2>&1)",
+      "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit -q 2>&1)",
+      "Bash(.venv/Scripts/alembic.exe heads *)"
     ]
   }
 }
