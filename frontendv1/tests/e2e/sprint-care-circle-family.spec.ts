@@ -108,7 +108,7 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients/1");
 
-    await expect(page.getByText("Family members")).toBeVisible();
+    await expect(page.getByText("Family members", { exact: true })).toBeVisible();
     await expect(page.getByText("Nina")).toBeVisible();
     await expect(page.getByText("Paul")).toBeVisible();
     await expect(page.getByText("Maggie")).toBeVisible();
@@ -226,9 +226,9 @@ test.describe("Care Circle Family UI", () => {
 
     await page.getByRole("button", { name: "Delete Story Maker household" }).click();
 
-    await expect(page.getByText("Story Maker household")).not.toBeVisible();
     await expect(page.getByText("Arthur's Circle")).toBeVisible();
     await expect(page.getByText("The family and all its data have been removed.")).toBeVisible();
+    await expect(page.getByTestId("admin-families-list").getByText("Story Maker household")).not.toBeVisible();
   });
 
   test("family events page loads", async ({ page }) => {

@@ -143,7 +143,7 @@ export default function AdminFamiliesPage() {
       ) : families.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-black/10 px-5 py-6 text-center text-sm text-ink-500">No families yet.</p>
       ) : (
-        <div className="space-y-3">
+        <div data-testid="admin-families-list" className="space-y-3">
           <p className="text-xs text-ink-500">{families.length} famil{families.length !== 1 ? "ies" : "y"}</p>
           {families.map((family) => (
             <FamilyRow

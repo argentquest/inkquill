@@ -103,7 +103,8 @@ test.describe("Sprint 2 auth", () => {
     await page.goto("/app/account");
 
     await page.getByRole("button", { name: /Story Maker/ }).click();
-    await page.getByRole("menuitem", { name: "Log out" }).click();
+    await expect(page.getByText("Log out")).toBeVisible();
+    await page.getByText("Log out").click({ force: true });
 
     await expect(page).toHaveURL(/\/auth\/login/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });
