@@ -13,7 +13,7 @@ Use the Python helper at [validate_care_circle_newsletter_uniqueness.py](/C:/Cod
 ### What it does
 
 - Generates Care Circle sessions for consecutive dates using the real session assembly path
-- Reads cached provider JSON under `cache/{patient_id}/{YYYY-MM-DD}/`
+- Reads cached provider JSON under `runtime/cache/{patient_id}/{YYYY-MM-DD}/`
 - Compares normalized provider `data` payloads across days for the same patient
 - Ignores layout-only and volatile fields such as:
   - `newsletter_header`
@@ -73,7 +73,7 @@ Each finding is grouped by patient and reports the provider key plus the dates w
 Each provider runs at most once per patient per day. Results are stored at:
 
 ```
-cache/{patient_id}/{YYYY-MM-DD}/{provider_key}.json
+runtime/cache/{patient_id}/{YYYY-MM-DD}/{provider_key}.json
 ```
 
 A new cache directory is created each calendar day, so a provider will regenerate its content fresh on a new date — **unless** the content is driven by a small random pool or a deterministic external API. In those cases, the new cache entry can easily contain the same content as the previous day.
@@ -733,7 +733,7 @@ The most widespread issue. `random.choice()` has no memory, so with a pool of N 
 Create `app/services/care_circle/variety_utils.py` with a shared helper:
 
 ```python
-# History stored at: cache/_history/{key}.json (common) or cache/{patient_id}/history/{key}.json (patient-specific)
+# History stored at: runtime/cache/_history/{key}.json (common) or runtime/cache/{patient_id}/history/{key}.json (patient-specific)
 def pick_avoiding_recent(pool: list, history_path: Path, lookback: int = 14) -> Any:
     history = load_history(history_path)  # list of recent selections
     recent = set(history[-lookback:])
@@ -865,7 +865,7 @@ These providers can show the same output every single day:
 New file: `app/services/care_circle/variety_utils.py`
 
 Provides a single function used by any provider that selects from a pool:
-- Reads a rolling history JSON from `cache/_history/{key}.json` (common) or `cache/{patient_id}/history/{key}.json` (patient-specific)
+- Reads a rolling history JSON from `runtime/cache/_history/{key}.json` (common) or `runtime/cache/{patient_id}/history/{key}.json` (patient-specific)
 - Excludes items seen in the last N days (configurable, default 14)
 - Falls back to full pool if all items are in history (pool exhausted)
 - Saves the chosen item back to history

@@ -622,9 +622,9 @@ async def main():
     patient_name = patient.display_name or f"Patient {patient.id}"
     safe_name = patient_name.lower().replace(" ", "_").replace(",", "")
 
-    # One folder per run: logs/<safe_name>_<YYYYMMDD_HHMMSS>/
+    # One folder per run: runtime/logs/<safe_name>_<YYYYMMDD_HHMMSS>/
     run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = ROOT / "logs" / f"{safe_name}_{run_ts}"
+    run_dir = ROOT / "runtime" / "logs" / f"{safe_name}_{run_ts}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
     today = date.today().isoformat()

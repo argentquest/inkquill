@@ -65,7 +65,7 @@ Any developer cloning the repo needed an active Azure subscription to run anythi
 - [app/main.py](app/main.py) — Startup lifespan now initialises `ContextSearchService` and injects it via `context_retrieval_module.set_search_service(...)`.
 - [requirements.txt](requirements.txt) — Added `chromadb==0.6.3`
 
-**Data directory:** ChromaDB persists to `./data/chromadb` by default (configurable via `VECTOR_DB_PATH`).
+**Data directory:** ChromaDB persists to `./runtime/data/chromadb` by default (configurable via `VECTOR_DB_PATH`).
 
 ---
 
@@ -80,7 +80,7 @@ Any developer cloning the repo needed an active Azure subscription to run anythi
 
 **Local storage layout:**
 ```
-./data/uploads/
+./runtime/data/uploads/
   context_docs/          # uploaded Context source documents
   published/         # exported HTML stories
   generated_images/  # AI-generated images
@@ -197,8 +197,8 @@ These are kept in `requirements.txt` because several router files still import t
 The app will:
 - Use OpenRouter for all LLM calls
 - Download `all-MiniLM-L6-v2` on first startup for embeddings (~90 MB)
-- Store vector data in `./data/chromadb`
-- Store uploaded files in `./data/uploads`
+- Store vector data in `./runtime/data/chromadb`
+- Store uploaded files in `./runtime/data/uploads`
 
 ---
 

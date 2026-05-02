@@ -30,7 +30,7 @@ def build_storage_url(container_name: str, blob_name: Optional[str]) -> Optional
     if not blob_name:
         return None
     subpath = resolve_storage_subpath(container_name)
-    return f"/data/uploads/{subpath}/{blob_name}".replace("\\", "/")
+    return f"/runtime/data/uploads/{subpath}/{blob_name}".replace("\\", "/")
 
 
 class LocalDownloadStream:

@@ -129,7 +129,7 @@ $ResolvedDbPort = $DbPort
 $ResolvedDbUser = $DbUser
 $ResolvedDockerHost = if ($DbHost -in @("localhost", "127.0.0.1", "::1")) { "host.docker.internal" } else { $DbHost }
 
-$artifactDir = Join-Path $RepoRoot "artifacts\db-clones"
+$artifactDir = Join-Path $RepoRoot "runtime\artifacts\db-clones"
 New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 $dumpFile = Join-Path $artifactDir "$SourceDb.sql"
 
@@ -155,7 +155,7 @@ Write-Host "Creating dump file $dumpFile"
 Invoke-DockerPostgresClient -ClientArgs @(
     "sh",
     "-lc",
-    "pg_dump -h '$ResolvedDockerHost' -p '$ResolvedDbPort' -U '$ResolvedDbUser' -d '$SourceDb' --no-owner --no-privileges > '/workspace/artifacts/db-clones/$SourceDb.sql'"
+    "pg_dump -h '$ResolvedDockerHost' -p '$ResolvedDbPort' -U '$ResolvedDbUser' -d '$SourceDb' --no-owner --no-privileges > '/workspace/runtime/artifacts/db-clones/$SourceDb.sql'"
 )
 
 foreach ($targetDb in $TargetDbs) {
@@ -171,7 +171,7 @@ foreach ($targetDb in $TargetDbs) {
     Invoke-DockerPostgresClient -ClientArgs @(
         "sh",
         "-lc",
-        "psql -v ON_ERROR_STOP=1 -h '$ResolvedDockerHost' -p '$ResolvedDbPort' -U '$ResolvedDbUser' -d '$targetDb' < '/workspace/artifacts/db-clones/$SourceDb.sql'"
+        "psql -v ON_ERROR_STOP=1 -h '$ResolvedDockerHost' -p '$ResolvedDbPort' -U '$ResolvedDbUser' -d '$targetDb' < '/workspace/runtime/artifacts/db-clones/$SourceDb.sql'"
     )
 }
 

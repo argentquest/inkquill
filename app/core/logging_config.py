@@ -6,7 +6,7 @@ import sys
 import os
 from pathlib import Path
 
-DEFAULT_LOG_DIR = Path(__file__).resolve().parent.parent.parent / "logs"
+DEFAULT_LOG_DIR = Path(__file__).resolve().parent.parent.parent / "runtime" / "logs"
 APP_LOG_DIR = Path(os.getenv("APP_LOG_DIR", str(DEFAULT_LOG_DIR)))
 
 try:

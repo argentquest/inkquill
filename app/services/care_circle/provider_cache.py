@@ -1,8 +1,8 @@
 """File-based provider output cache.
 
 Cache layout:
-  cache/{patient_id}/{YYYY-MM-DD}/{provider_key}.json
-  cache/{patient_id}/{YYYY-MM-DD}/{provider_key}_image.{ext}   (if image_url present)
+  runtime/cache/{patient_id}/{YYYY-MM-DD}/{provider_key}.json
+  runtime/cache/{patient_id}/{YYYY-MM-DD}/{provider_key}_image.{ext}   (if image_url present)
 
 Each JSON file includes a top-level _cache_meta block with timing and token cost.
 """
@@ -34,7 +34,7 @@ _WIKIMEDIA_DOWNLOAD_HEADERS = {
 
 logger = logging.getLogger(__name__)
 
-CACHE_ROOT = Path(__file__).resolve().parents[3] / "cache"
+CACHE_ROOT = Path(__file__).resolve().parents[3] / "runtime" / "cache"
 
 _IMAGE_KEYS = ("image_url",)
 _IMG_SRC_RE = re.compile(r'src=(["\'])(https?://[^"\'> ]+)\1', re.IGNORECASE)

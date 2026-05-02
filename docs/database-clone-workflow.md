@@ -39,6 +39,6 @@ If the target databases already exist and you want to replace them:
 
 - The script uses a temporary `postgres:16-alpine` Docker container as the `pg_dump` and `psql` client.
 - Localhost database hosts are translated to `host.docker.internal` so the Docker client container can reach your local PostgreSQL server.
-- Dumps are written to `artifacts/db-clones/`.
+- Dumps are written to `runtime/artifacts/db-clones/`.
 - `-Force` drops and recreates target databases before restore.
 - This is safe for creating isolated `test` and `prod` clones on the same server, but it will overwrite the target databases when `-Force` is used.

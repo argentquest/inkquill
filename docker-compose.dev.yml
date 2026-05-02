@@ -10,8 +10,8 @@ services:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     volumes:
       - ./app:/app/app
-      - ./data:/app/data
-      - ./logs:/app/logs
+      - ./runtime/data:/app/runtime/data
+      - ./runtime/logs:/app/runtime/logs
       - ./maintenance_status.json:/app/maintenance_status.json:ro
       - ./story_wizard_system_prompt.txt:/app/story_wizard_system_prompt.txt:ro
     ports:

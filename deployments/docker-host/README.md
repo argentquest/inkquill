@@ -43,14 +43,16 @@ Suggested layout:
 ```text
 /srv/care-circle/
   test/
-    cache/
-    logs/
-      backend/
+    runtime/
+      cache/
+      logs/
+        backend/
     postgres/
   prod/
-    cache/
-    logs/
-      backend/
+    runtime/
+      cache/
+      logs/
+        backend/
     postgres/
 ```
 
@@ -98,4 +100,4 @@ Notes:
 ## Notes
 
 - The scheduler process requires Python Playwright (Chromium) for newsletter PDF generation — see `Dockerfile.scheduler` for the full dependency list.
-- The backend container mounts `CARE_CIRCLE_DATA_ROOT/cache` at `/app/cache`. The standalone scheduler should be configured with the same host path so newsletter artifacts are shared.
+- The backend container mounts `CARE_CIRCLE_DATA_ROOT/runtime/cache` at `/app/runtime/cache`. The standalone scheduler should be configured with the same host path so newsletter artifacts are shared.

@@ -28,7 +28,7 @@
     Skip the confirmation prompt before dropping the target database.
 
 .EXAMPLE
-    .\scripts\restore_postgres_backup.ps1 -BackupFile artifacts\db-backups\inkquill_db_20260408_120000.sql
+    .\scripts\restore_postgres_backup.ps1 -BackupFile runtime\artifacts\db-backups\inkquill_db_20260408_120000.sql
 
 .EXAMPLE
     .\scripts\restore_postgres_backup.ps1 -BackupFile .\mybackup.sql -Database inkquill_db_test -Force

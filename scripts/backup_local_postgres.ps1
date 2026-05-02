@@ -6,7 +6,7 @@
     Runs pg_dump against the local Docker Compose 'db' container using a
     temporary postgres client container.  No local pg_dump installation needed.
     Credentials and database name fall back to values in .env.
-    The dump is saved to artifacts\db-backups\<dbname>_<timestamp>.sql
+    The dump is saved to runtime\artifacts\db-backups\<dbname>_<timestamp>.sql
 
 .PARAMETER Port
     PostgreSQL port exposed on localhost. Default: 5432.
@@ -21,7 +21,7 @@
     Database name to dump. Falls back to POSTGRES_DB in .env.
 
 .PARAMETER OutDir
-    Output directory. Default: artifacts\db-backups
+    Output directory. Default: runtime\artifacts\db-backups
 
 .EXAMPLE
     .\scripts\backup_local_postgres.ps1
@@ -72,7 +72,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 if (-not $PSBoundParameters.ContainsKey("User")     -or [string]::IsNullOrWhiteSpace($User))     { $User     = Get-DotEnvValue "POSTGRES_USER" }
 if (-not $PSBoundParameters.ContainsKey("Password") -or [string]::IsNullOrWhiteSpace($Password)) { $Password = Get-DotEnvValue "POSTGRES_PASSWORD" }
 if (-not $PSBoundParameters.ContainsKey("Database") -or [string]::IsNullOrWhiteSpace($Database)) { $Database = Get-DotEnvValue "POSTGRES_DB" }
-if (-not $PSBoundParameters.ContainsKey("OutDir")   -or [string]::IsNullOrWhiteSpace($OutDir))   { $OutDir   = Join-Path $RepoRoot "artifacts\db-backups" }
+if (-not $PSBoundParameters.ContainsKey("OutDir")   -or [string]::IsNullOrWhiteSpace($OutDir))   { $OutDir   = Join-Path $RepoRoot "runtime\runtime\artifacts\db-backups" }
 
 if ([string]::IsNullOrWhiteSpace($User))     { throw "-User is required (or set POSTGRES_USER in .env)" }
 if ([string]::IsNullOrWhiteSpace($Password)) { throw "-Password is required (or set POSTGRES_PASSWORD in .env)" }

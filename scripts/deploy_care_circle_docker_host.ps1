@@ -61,9 +61,9 @@ if (-not $dataRoot) {
 
 $requiredDirs = @(
     $dataRoot,
-    (Join-Path $dataRoot "cache"),
-    (Join-Path $dataRoot "logs"),
-    (Join-Path $dataRoot "logs/backend"),
+    (Join-Path $dataRoot "runtime/cache"),
+    (Join-Path $dataRoot "runtime/logs"),
+    (Join-Path $dataRoot "runtime/logs/backend"),
     (Join-Path $dataRoot "postgres")
 )
 

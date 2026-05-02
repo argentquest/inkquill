@@ -12,7 +12,7 @@ from app.core.logging_config import setup_logging
 LOG_LEVEL_CONSOLE_ENV = os.getenv("LOG_LEVEL_CONSOLE", "DEBUG")
 LOG_LEVEL_FILE_ENV = os.getenv("LOG_LEVEL_FILE", "DEBUG")
 CLEAR_EXISTING_HANDLERS_ENV = os.getenv("CLEAR_LOG_HANDLERS", "true").lower() == "true"
-APP_LOG_DIR_MAIN = os.getenv("APP_LOG_DIR", "./logs")
+APP_LOG_DIR_MAIN = os.getenv("APP_LOG_DIR", "./runtime/logs")
 
 setup_logging(
     log_level_console_str=LOG_LEVEL_CONSOLE_ENV,

@@ -69,7 +69,7 @@ async def run_preview(patient, today: date):
 
     if not body_html.strip():
         print("  ✗  No content — is the cache populated for today?")
-        print(f"     Expected cache dir: cache/{patient.id}/{today.isoformat()}/")
+        print(f"     Expected cache dir: runtime/cache/{patient.id}/{today.isoformat()}/")
         return
 
     subject = _build_subject(
@@ -78,7 +78,7 @@ async def run_preview(patient, today: date):
     )
     full_html = _build_email_html(body_html, subject)
 
-    out_path = ROOT / "logs" / f"mini_newsletter_preview_patient{patient.id}.html"
+    out_path = ROOT / "runtime" / "logs" / f"mini_newsletter_preview_patient{patient.id}.html"
     out_path.parent.mkdir(exist_ok=True)
     out_path.write_text(full_html, encoding="utf-8")
 

@@ -105,7 +105,7 @@ class Settings(BaseSettings):
     SCHEDULER_MISFIRE_GRACE_TIME: int = Field(default=300, alias="SCHEDULER_MISFIRE_GRACE_TIME")
 
     # --- Local File Storage Configuration ---
-    LOCAL_STORAGE_BASE_PATH: str = Field(default="./data/uploads", alias="LOCAL_STORAGE_BASE_PATH")
+    LOCAL_STORAGE_BASE_PATH: str = Field(default="./runtime/data/uploads", alias="LOCAL_STORAGE_BASE_PATH")
     LOCAL_STORAGE_DOCUMENTS_PATH: str = Field(default="documents", alias="LOCAL_STORAGE_DOCUMENTS_PATH")
     LOCAL_STORAGE_PUBLISHED_STORIES_PATH: str = Field(default="published", alias="LOCAL_STORAGE_PUBLISHED_STORIES_PATH")
     LOCAL_STORAGE_GENERATED_IMAGES_PATH: str = Field(default="generated_images", alias="LOCAL_STORAGE_GENERATED_IMAGES_PATH")

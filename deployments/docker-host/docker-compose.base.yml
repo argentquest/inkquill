@@ -10,7 +10,7 @@ services:
       APP_PORT: "8000"
       POSTGRES_SERVER: db
       POSTGRES_PORT: "5432"
-      APP_LOG_DIR: /app/logs
+      APP_LOG_DIR: /app/runtime/logs
     depends_on:
       db:
         condition: service_healthy
@@ -23,8 +23,8 @@ services:
       retries: 10
       start_period: 180s
     volumes:
-      - ${CARE_CIRCLE_DATA_ROOT}/cache:/app/cache
-      - ${CARE_CIRCLE_DATA_ROOT}/logs/backend:/app/logs
+      - ${CARE_CIRCLE_DATA_ROOT}/runtime/cache:/app/runtime/cache
+      - ${CARE_CIRCLE_DATA_ROOT}/runtime/logs/backend:/app/runtime/logs
     restart: unless-stopped
 
   frontend:
