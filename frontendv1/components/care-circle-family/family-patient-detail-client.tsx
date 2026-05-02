@@ -808,7 +808,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
                 <dd className="mt-2 text-base text-ink-900">{patient.postalCode}</dd>
               </div>
             ) : null}
-            {patient.latitude !== null && patient.longitude !== null ? (
+            {typeof patient.latitude === "number" && typeof patient.longitude === "number" ? (
               <div className="md:col-span-2">
                 <dt className={EYEBROW_CLS}>Resolved coordinates</dt>
                 <dd className="mt-2 text-base text-ink-900">

@@ -7,10 +7,10 @@ test.describe("Care Circle DailyNewsletter import", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients");
 
-    await expect(page.getByRole("heading", { name: "Patient profiles now behave like managed family-side care records." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Friend profiles now behave like managed family-side care records." })).toBeVisible();
     await expect(page.getByText("Rose Ellis")).toBeVisible();
     await expect(page.getByText("Arthur Bloom")).toBeVisible();
-    await expect(page.getByText("Patient sign-in", { exact: false })).toHaveCount(0);
+    await expect(page.getByText("Friend sign-in", { exact: false })).toHaveCount(0);
   });
 
   test("patient picture sign-in reaches the calm daily highlights view", async ({ page }) => {

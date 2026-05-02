@@ -7,18 +7,18 @@ test.describe("Care Circle Patient UI", () => {
     await mockAppApis(page);
     await page.goto("/care-circle-patient");
 
-    await expect(page.getByRole("heading", { name: "Direct-entry patient access stays separate and calm by design." })).toBeVisible();
-    await expect(page.getByText(/This patient-facing route now imports DailyNewsletter/)).toBeVisible();
-    await expect(page.getByRole("link", { name: "Start picture sign-in" })).toBeVisible();
+    await expect(page).toHaveURL(/\/care-circle-patient\/login/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: "Log in with your pictures." })).toBeVisible();
+    await expect(page.getByText("Choose your pictures to log in to Ink and Quill.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sun" })).toBeVisible();
   });
 
   test("patient login page renders image selection panel", async ({ page }) => {
     await mockAppApis(page);
     await page.goto("/care-circle-patient/login");
 
-    await expect(page.getByRole("heading", { name: "Picture sign-in gives patients a simpler route into their daily content." })).toBeVisible();
-    await expect(page.getByText("Patient sign-in")).toBeVisible();
-    await expect(page.getByText("Choose the 3 pictures that belong to you.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Choose your 3 pictures." })).toBeVisible();
+    await expect(page.getByText("Pick the three familiar pictures you use to sign in to Ink and Quill.")).toBeVisible();
     // Verify image catalog buttons render
     await expect(page.getByRole("button", { name: "Sun" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dog" })).toBeVisible();
@@ -146,14 +146,14 @@ test.describe("Care Circle Patient UI", () => {
     await mockAppApis(page);
     await page.goto("/care-circle-patient/home?patient=1");
 
-    const likeButton = page.getByRole("button", { name: "Like Family hello" });
+    const likeButton = page.getByRole("button", { name: "Like Family hello", exact: true });
     await likeButton.click();
     await expect(likeButton).toHaveAttribute("aria-pressed", "true");
 
     await page.reload();
-    await expect(page.getByRole("button", { name: "Like Family hello" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Like Family hello", exact: true })).toHaveAttribute("aria-pressed", "true");
 
-    const dislikeButton = page.getByRole("button", { name: "Dislike Family hello" });
+    const dislikeButton = page.getByRole("button", { name: "Dislike Family hello", exact: true });
     await dislikeButton.click();
     await expect(dislikeButton).toHaveAttribute("aria-pressed", "true");
   });

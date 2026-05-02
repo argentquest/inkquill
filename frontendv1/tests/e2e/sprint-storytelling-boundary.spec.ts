@@ -109,9 +109,9 @@ test.describe("Storytelling boundary routes", () => {
     await page.goto("/storytelling/community");
 
     await expect(page).toHaveURL(/\/storytelling\/community/, { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Storytelling Community" })).toBeVisible();
-    await expect(page.getByTestId("community-placeholder")).toBeVisible();
-    await expect(page.getByText("Community features are coming")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Storytelling Community", level: 1 })).toBeVisible();
+    await expect(page.getByTestId("storytelling-community-hub")).toBeVisible();
+    await expect(page.getByText("Move from private drafting into public readership.")).toBeVisible();
   });
 
   // ---------------------------------------------------------------------------

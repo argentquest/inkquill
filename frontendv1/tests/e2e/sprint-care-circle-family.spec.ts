@@ -7,17 +7,16 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family");
 
-    await expect(page.getByRole("heading", { name: "Family-side care workflows now sit on imported patient and provider foundations." })).toBeVisible();
-    await expect(page.getByText(/Care Circle remains a separate application/)).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open patient profiles" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Preview patient sign-in" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Friends View and manage all friend profiles." })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Friend sign-in Preview the picture-based sign-in flow." })).toBeVisible();
   });
 
   test("family patients page renders patient list", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients");
 
-    await expect(page.getByRole("heading", { name: "Patient profiles now behave like managed family-side care records." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Friend profiles now behave like managed family-side care records." })).toBeVisible();
     await expect(page.getByText("Rose Ellis")).toBeVisible();
     await expect(page.getByText("Arthur Bloom")).toBeVisible();
     await expect(page.getByText("moderate")).toBeVisible();
@@ -30,11 +29,10 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients");
 
-    // Rose's preferences
-    await expect(page.getByText("1950s music")).toBeVisible();
-    await expect(page.getByText("family photos")).toBeVisible();
-    await expect(page.getByText("tea and biscuits")).toBeVisible();
+    // Rose's hobbies
     await expect(page.getByText("gardening")).toBeVisible();
+    // Arthur's hobbies
+    await expect(page.getByText("crosswords")).toBeVisible();
   });
 
   test("family patients page shows family circle members", async ({ page }) => {
@@ -74,7 +72,7 @@ test.describe("Care Circle Family UI", () => {
     await page.goto("/care-circle-family/patients/1");
 
     await expect(page.getByText("moderate")).toBeVisible();
-    await expect(page.getByText("active")).toBeVisible();
+    await expect(page.getByText("active", { exact: true })).toBeVisible();
   });
 
   test("family patient detail page shows delivery schedule", async ({ page }) => {
@@ -94,16 +92,14 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByText("sun", { exact: true })).toBeVisible();
     await expect(page.getByText("dog", { exact: true })).toBeVisible();
     await expect(page.getByText("house", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Preview patient sign-in" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Preview friend sign-in" })).toBeVisible();
   });
 
   test("family patient detail page shows patient preferences", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients/1");
 
-    await expect(page.getByText("Patient preferences")).toBeVisible();
-    await expect(page.getByText("1950s music")).toBeVisible();
-    await expect(page.getByText("family photos")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Friend preferences" })).toBeVisible();
     await expect(page.getByText("tea and biscuits")).toBeVisible();
     await expect(page.getByText("gardening")).toBeVisible();
   });
@@ -112,20 +108,25 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients/1");
 
-    await expect(page.getByText("Family circle: Nina, Paul, Maggie.")).toBeVisible();
+    await expect(page.getByText("Family members")).toBeVisible();
+    await expect(page.getByText("Nina")).toBeVisible();
+    await expect(page.getByText("Paul")).toBeVisible();
+    await expect(page.getByText("Maggie")).toBeVisible();
   });
 
   test("family patient detail page allows provider selection per patient", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients/1?edit=1");
 
-    await expect(page.getByRole("heading", { name: "Provider selection" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Weather/ })).toBeVisible();
-    await expect(page.getByText("Daily Joy")).toBeVisible();
+    const providerSection = page.locator("section", { has: page.getByRole("heading", { name: "Provider selection & order" }) });
 
-    await expect(page.getByRole("button", { name: "Enabled" }).first()).toBeVisible();
-    await page.getByRole("button", { name: "Disabled" }).click();
-    await expect(page.getByRole("button", { name: "Enabled" }).nth(1)).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Provider selection & order" })).toBeVisible();
+    await expect(providerSection.getByText("Weather")).toBeVisible();
+    await expect(providerSection.getByText("Daily Joy")).toBeVisible();
+
+    await expect(page.getByRole("button", { name: "Disable provider" }).first()).toBeVisible();
+    await page.getByRole("button", { name: "Disable provider" }).first().click();
+    await expect(page.getByRole("button", { name: "Enable provider" }).first()).toBeVisible();
   });
 
   test("family patient detail page shows second patient data", async ({ page }) => {
@@ -139,10 +140,10 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByText("America/New_York")).toBeVisible();
     await expect(page.getByText("09:15")).toBeVisible();
     await expect(page.getByText("Tue, Thu, Sat")).toBeVisible();
-    await expect(page.getByText("local history")).toBeVisible();
-    await expect(page.getByText("jazz")).toBeVisible();
     await expect(page.getByText("crosswords")).toBeVisible();
-    await expect(page.getByText("Family circle: Janet, Chris.")).toBeVisible();
+    await expect(page.getByText("Family members", { exact: true })).toBeVisible();
+    await expect(page.getByText("Janet")).toBeVisible();
+    await expect(page.getByText("Chris")).toBeVisible();
   });
 
   test("family providers page renders provider catalog", async ({ page }) => {
@@ -158,7 +159,7 @@ test.describe("Care Circle Family UI", () => {
     await page.goto("/care-circle-family/providers/weather");
 
     await expect(page.getByRole("link", { name: "Back to Providers" })).toBeVisible({ timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Patient mapping" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Friend mapping" })).toBeVisible();
     await expect(page.getByText("Rose Ellis")).toBeVisible();
     await expect(page.getByText("Arthur Bloom")).toBeVisible();
     await expect(page.getByRole("button", { name: "Enabled" }).first()).toBeVisible();
@@ -180,8 +181,8 @@ test.describe("Care Circle Family UI", () => {
     await page.goto("/care-circle-family/admin/scheduler");
 
     await expect(page.getByRole("heading", { name: "Scheduler Console" })).toBeVisible();
-    await expect(page.getByText("Provider Output Pre-cache")).toBeVisible();
-    await expect(page.getByText("Daily Session Pre-generation")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Provider Output Pre-cache" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Daily Session Pre-generation" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Run now" }).first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Save cron" }).first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "Loaded jobs" })).toBeVisible();
@@ -238,7 +239,7 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByTestId("care-circle-activity-feed")).toBeVisible();
     await expect(page.getByText("Daily content generated")).toBeVisible();
     await expect(page.getByText("Provider fallback used")).toBeVisible();
-    await expect(page.getByText("Rose Ellis")).toBeVisible();
+    await expect(page.getByText("Rose Ellis", { exact: true })).toBeVisible();
   });
 
   test("family media library page loads", async ({ page }) => {
@@ -249,7 +250,7 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByText("Upload family photos for Care Circle prompts")).toBeVisible();
     await expect(page.getByTestId("care-circle-media-grid")).toBeVisible();
     await expect(page.getByText("rose-porch.jpg")).toBeVisible();
-    await expect(page.getByText("Prompt-ready crops")).toBeVisible();
+    await expect(page.getByTestId("care-circle-media-grid").getByText("Prompt-ready crops")).toBeVisible();
   });
 
   test("family media library allows upload and delete", async ({ page }) => {

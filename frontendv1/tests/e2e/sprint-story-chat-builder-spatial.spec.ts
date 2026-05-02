@@ -103,6 +103,7 @@ test.describe("Sprint 08: Story Chat, Builder, and Spatial", () => {
       }
 
       if (url.endsWith("/world-builder/generate") && method === "POST") {
+        await new Promise((resolve) => setTimeout(resolve, 400));
         await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ success: true, data: worldBuilderGeneratedSeed }) });
         return;
       }

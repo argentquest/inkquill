@@ -71,16 +71,17 @@ test.describe("AI models", () => {
     await expect(page).toHaveURL(/\/storytelling\/ai-models/, { timeout: 15000 });
     await expect(page.getByRole("heading", { name: "AI Models" })).toBeVisible();
     await expect(page.getByTestId("active-models-list")).toBeVisible();
-    await expect(page.getByText("GPT-4o")).toBeVisible();
-    await expect(page.getByText("Claude 3 Haiku")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "GPT-4o" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Claude 3 Haiku" })).toBeVisible();
   });
 
   test("AI models page shows summary stats", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/storytelling/ai-models");
 
+    await expect(page).toHaveURL(/\/storytelling\/ai-models/, { timeout: 15000 });
     await expect(page.getByTestId("models-summary")).toBeVisible();
-    await expect(page.getByText("2")).toBeVisible();
+    await expect(page.getByTestId("models-summary").getByText("2").first()).toBeVisible();
   });
 
   test("AI models page shows empty state when no models", async ({ page }) => {
@@ -113,7 +114,7 @@ test.describe("Blog authoring", () => {
     await page.goto("/storytelling/blog");
 
     await expect(page).toHaveURL(/\/storytelling\/blog$/, { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Blog" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Blog", exact: true })).toBeVisible();
     await expect(page.getByTestId("blog-drafts-list")).toBeVisible();
     await expect(page.getByTestId("blog-published-list")).toBeVisible();
     await expect(page.getByText("My First Blog Post")).toBeVisible();
@@ -166,8 +167,8 @@ test.describe("Blog authoring", () => {
     await page.goto("/storytelling/blog/201");
 
     await expect(page).toHaveURL(/\/storytelling\/blog\/201/, { timeout: 15000 });
-    await expect(page.getByTestId("edit-title-input")).toHaveValue("My First Blog Post");
-    await expect(page.getByTestId("edit-content-input")).toBeVisible();
+    await expect(page.getByTestId("post-title-input")).toHaveValue("My First Blog Post");
+    await expect(page.getByTestId("post-content-input")).toBeVisible();
   });
 
   test("blog media manager renders upload button and empty state", async ({ page }) => {

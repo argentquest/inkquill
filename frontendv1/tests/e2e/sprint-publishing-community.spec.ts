@@ -52,7 +52,7 @@ test.describe("Published stories routes", () => {
     await expect(page).toHaveURL(/\/public\/stories\/101/, { timeout: 15000 });
     await expect(page.getByTestId("story-reader")).toBeVisible();
     await expect(page.getByText("The Silver Compass — Published")).toBeVisible();
-    await expect(page.getByText("Story Maker")).toBeVisible();
+    await expect(page.getByTestId("story-reader").getByText("Story Maker")).toBeVisible();
     await expect(page.getByText("Aethoria")).toBeVisible();
   });
 
@@ -136,7 +136,7 @@ test.describe("Storytelling community hub", () => {
     await expect(page.getByText("Move from private drafting into public readership.")).toBeVisible();
     await expect(page.getByRole("link", { name: /Published Stories/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /Forums/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Blog/i })).toBeVisible();
+    await expect(page.getByTestId("storytelling-community-hub").getByRole("link", { name: "Blog" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Discovery Search/i })).toBeVisible();
   });
 });
@@ -147,7 +147,7 @@ test.describe("Blog routes", () => {
     await page.goto("/public/blog");
 
     await expect(page).toHaveURL(/\/public\/blog$/, { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Blog" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Blog", exact: true })).toBeVisible();
     await expect(page.getByTestId("blog-list")).toBeVisible();
     await expect(page.getByText("Introducing World Builder 2.0")).toBeVisible();
   });
@@ -228,19 +228,19 @@ test.describe("Forum routes", () => {
     await expect(page).toHaveURL(/\/community\/forums$/, { timeout: 15000 });
     await expect(page.getByRole("heading", { name: "Forums" })).toBeVisible();
     await expect(page.getByTestId("forum-categories")).toBeVisible();
-    await expect(page.getByText("World Building")).toBeVisible();
-    await expect(page.getByText("Story Craft")).toBeVisible();
+    await expect(page.getByTestId("forum-categories").getByText("World Building")).toBeVisible();
+    await expect(page.getByTestId("forum-categories").getByText("Story Craft")).toBeVisible();
     await expect(page.getByTestId("forum-recent-threads")).toBeVisible();
     await expect(page.getByText("How do you structure a magic system?")).toBeVisible();
   });
 
   test("forums page shows empty state when no categories", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/forum/categories*", async (route) => {
+    await page.route("**/api/forum/categories**", async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json",
         body: JSON.stringify({ success: true, data: [] }) });
     });
-    await page.route("**/api/forum/threads*", async (route) => {
+    await page.route("**/api/forum/threads**", async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json",
         body: JSON.stringify({ success: true, data: [] }) });
     });

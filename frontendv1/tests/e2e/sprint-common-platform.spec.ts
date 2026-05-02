@@ -15,7 +15,8 @@ test.describe("Sprint common platform routes", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/storytelling");
 
-    await expect(page.getByRole("heading", { name: "Creative authoring remains a separate app surface." })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: "Storytelling" })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText("Creative authoring stays on the user-owned storytelling surface.")).toBeVisible();
     await expect(page.getByText("User scope")).toBeVisible();
     await expect(page.getByText("Realtime ready")).toBeVisible();
 
@@ -38,10 +39,10 @@ test.describe("Sprint common platform routes", () => {
     await mockAppApis(page);
     await page.goto("/care-circle-patient");
 
-    await expect(page).toHaveURL(/\/care-circle-patient/, { timeout: 30000 });
-    await expect(page.getByRole("heading", { name: "Direct-entry patient access stays separate and calm by design." })).toBeVisible({
+    await expect(page).toHaveURL(/\/care-circle-patient\/login/, { timeout: 30000 });
+    await expect(page.getByRole("heading", { name: "Log in with your pictures." })).toBeVisible({
       timeout: 30000
     });
-    await expect(page.getByRole("link", { name: "Start picture sign-in" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sun" })).toBeVisible();
   });
 });

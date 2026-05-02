@@ -646,6 +646,24 @@ const schedulerJobs = {
   ]
 };
 
+const templateInventory = {
+  providers: [
+    { name: "weather", label: "Weather", icon: "⛅", order: 1, enabled: true },
+    { name: "joke", label: "Daily Joy", icon: "😄", order: 2, enabled: true },
+  ],
+  themes: ["classic"],
+};
+
+const templateDocument = {
+  providerKey: "weather",
+  label: "Weather",
+  theme: "classic",
+  templateHtml: "<div>Weather template</div>",
+  providerThemeCss: "body { color: blue; }",
+  sharedThemeCss: "body { background: white; }",
+  availableThemes: ["classic"],
+};
+
 function json(body: unknown, status = 200) {
   return {
     status,
@@ -675,6 +693,18 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       comments.map((comment) => ({ ...comment })),
     ])
   ) as Record<number, PublishedStoryCommentSeed[]>;
+
+  let mutableForumThreads: any[] = forumThreadsSeed.map((t) => ({
+    ...t,
+    posts: t.posts.map((p) => ({ ...p })),
+  }));
+
+  let mutableChatbotSession = {
+    ...chatbotSessionWithMessages,
+    messages: chatbotSessionWithMessages.messages.map((m: any) => ({ ...m })),
+  };
+  let mutableChatbotSessions: any[] = chatbotSessionsSeed.map((s) => ({ ...s }));
+  const mutableChatbotMessages: Record<number, any[]> = {};
 
   await page.route("**/api/admin/scheduler/**", async (route) => {
     const url = route.request().url();
@@ -712,6 +742,29 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     await route.fallback();
   });
 
+  await page.route("**/api/admin/care-circle/templates**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+
+    if (url.endsWith("/api/admin/care-circle/templates") && method === "GET") {
+      await route.fulfill(json(templateInventory));
+      return;
+    }
+
+    const docMatch = url.match(/\/api\/admin\/care-circle\/templates\/([^?]+)/);
+    if (docMatch && method === "GET") {
+      await route.fulfill(json(templateDocument));
+      return;
+    }
+
+    if (docMatch && method === "PUT") {
+      await route.fulfill(json({ message: "Template saved." }));
+      return;
+    }
+
+    await route.fallback();
+  });
+
   await page.route("**/api/forum/**", async (route) => {
     const url = route.request().url();
     const method = route.request().method();
@@ -724,7 +777,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     const threadDetailMatch = url.match(/\/api\/forum\/threads\/(\d+)$/);
     if (threadDetailMatch && method === "GET") {
       const threadId = Number(threadDetailMatch[1]);
-      const thread = forumThreadsSeed.find((t) => t.id === threadId);
+      const thread = mutableForumThreads.find((t) => t.id === threadId);
       if (!thread) {
         await route.fulfill(json({ detail: "Thread not found" }, 404));
         return;
@@ -764,12 +817,13 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
           },
         ],
       };
+      mutableForumThreads.push(newThread);
       await route.fulfill(json({ success: true, data: newThread }, 201));
       return;
     }
 
     if (url.includes("/api/forum/threads") && method === "GET") {
-      await route.fulfill(json({ success: true, data: forumThreadsSeed }));
+      await route.fulfill(json({ success: true, data: mutableForumThreads }));
       return;
     }
 
@@ -1158,10 +1212,9 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       await route.fulfill(
         json(
           {
-            success: false,
-            errors: [{ code: "INVALID_PATIENT_AUTH", message: "Those pictures did not match an active friend profile." }]
+            detail: "Those pictures did not match an active patient profile."
           },
-          200
+          401
         )
       );
       return;
@@ -1433,18 +1486,18 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     const chatMessageMatch = url.match(/\/chatbot\/sessions\/(\d+)\/messages/);
 
     if (url.includes("/chatbot/sessions") && method === "GET" && !chatSessionDetailMatch) {
-      await route.fulfill(json({ success: true, data: chatbotSessionsSeed }));
+      await route.fulfill(json({ success: true, data: mutableChatbotSessions }));
       return;
     }
 
     if (chatSessionDetailMatch && method === "GET") {
       const id = Number(chatSessionDetailMatch[1]);
-      if (id === chatbotSessionWithMessages.id) {
-        await route.fulfill(json({ success: true, data: chatbotSessionWithMessages }));
+      if (id === mutableChatbotSession.id) {
+        await route.fulfill(json({ success: true, data: mutableChatbotSession }));
       } else {
-        const session = chatbotSessionsSeed.find((s) => s.id === id);
+        const session = mutableChatbotSessions.find((s) => s.id === id);
         if (session) {
-          await route.fulfill(json({ success: true, data: { ...session, messages: [] } }));
+          await route.fulfill(json({ success: true, data: { ...session, messages: mutableChatbotMessages[id] ?? [] } }));
         } else {
           await route.fulfill(json({ detail: "Session not found" }, 404));
         }
@@ -1455,6 +1508,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     if (url.includes("/chatbot/sessions") && method === "POST" && !chatMessageMatch) {
       const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string };
       const created = { id: 99, user_id: 7, title: body.title ?? "New conversation", created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+      mutableChatbotSessions.push(created);
       await route.fulfill(json({ success: true, data: created }, 201));
       return;
     }
@@ -1464,11 +1518,23 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       const body = JSON.parse(route.request().postData() ?? "{}") as { message?: string };
       const userMsg = { id: 800, session_id: sessionId, role: "user", content: body.message ?? "", input_tokens: null, output_tokens: null, cost_usd: null, model_name: null, created_at: new Date().toISOString() };
       const aiMsg = { id: 801, session_id: sessionId, role: "assistant", content: "Understood. Here is a helpful response.", input_tokens: 50, output_tokens: 30, cost_usd: 0.0004, model_name: "gpt-4o", created_at: new Date().toISOString() };
+      if (sessionId === mutableChatbotSession.id) {
+        mutableChatbotSession.messages.push(userMsg, aiMsg);
+      } else {
+        mutableChatbotMessages[sessionId] = [...(mutableChatbotMessages[sessionId] ?? []), userMsg, aiMsg];
+      }
+      await new Promise((r) => setTimeout(r, 400));
       await route.fulfill(json({ success: true, data: { user_message: userMsg, ai_message: aiMsg, input_tokens: 50, output_tokens: 30, cost_usd: 0.0004, model_name: "gpt-4o" } }));
       return;
     }
 
     if (chatSessionDetailMatch && method === "DELETE") {
+      const id = Number(chatSessionDetailMatch[1]);
+      mutableChatbotSessions = mutableChatbotSessions.filter((s) => s.id !== id);
+      if (id === mutableChatbotSession.id) {
+        mutableChatbotSession.messages = [];
+      }
+      delete mutableChatbotMessages[id];
       await route.fulfill({ status: 204 });
       return;
     }
@@ -1476,8 +1542,12 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     if (chatSessionDetailMatch && method === "PUT") {
       const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string };
       const id = Number(chatSessionDetailMatch[1]);
-      const s = chatbotSessionsSeed.find((x) => x.id === id) ?? chatbotSessionsSeed[0];
-      await route.fulfill(json({ success: true, data: { ...s, title: body.title ?? s.title } }));
+      const idx = mutableChatbotSessions.findIndex((x) => x.id === id);
+      if (idx !== -1) {
+        mutableChatbotSessions[idx] = { ...mutableChatbotSessions[idx], title: body.title ?? mutableChatbotSessions[idx].title };
+      }
+      const s = mutableChatbotSessions.find((x) => x.id === id) ?? mutableChatbotSessions[0];
+      await route.fulfill(json({ success: true, data: s }));
       return;
     }
 
@@ -1580,10 +1650,16 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     const method = route.request().method();
 
     const postIdMatch = url.match(/\/api\/blog\/posts\/(\d+)/);
+    const slugMatch = url.match(/\/api\/blog\/posts\/([^/?]+)/);
+    const urlObj = new URL(url);
+    const hasAuthorId = urlObj.searchParams.has("author_id");
 
-    if (method === "GET" && !postIdMatch) {
-      // Return author's posts (or all posts seed)
-      await route.fulfill(json({ success: true, data: authorBlogPostsSeed }));
+    if (method === "GET" && !postIdMatch && !slugMatch) {
+      if (hasAuthorId) {
+        await route.fulfill(json({ success: true, data: authorBlogPostsSeed }));
+        return;
+      }
+      await route.fallback();
       return;
     }
 

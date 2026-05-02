@@ -23,7 +23,7 @@ test.describe("Sprint 2 auth", () => {
     await mockAppApis(page);
     await page.goto("/auth/login?next=%2Fstorytelling%2Faccount");
 
-    await page.getByLabel("Username").fill("storymaker");
+    await page.locator('input[name="username"]').fill("storymaker");
     await page.locator('input[name="password"]').fill("password123");
     await page.getByRole("button", { name: "Sign in" }).click();
 
@@ -36,7 +36,7 @@ test.describe("Sprint 2 auth", () => {
     await mockAppApis(page);
     await page.goto("/auth/login?next=https%3A%2F%2Fevil.example%2Fsteal");
 
-    await page.getByLabel("Username").fill("storymaker");
+    await page.locator('input[name="username"]').fill("storymaker");
     await page.locator('input[name="password"]').fill("password123");
     await page.getByRole("button", { name: "Sign in" }).click();
 
@@ -48,7 +48,7 @@ test.describe("Sprint 2 auth", () => {
     await mockAppApis(page, { login: "error" });
     await page.goto("/auth/login");
 
-    await page.getByLabel("Username").fill("storymaker");
+    await page.locator('input[name="username"]').fill("storymaker");
     await page.locator('input[name="password"]').fill("wrongpass1");
     await page.getByRole("button", { name: "Sign in" }).click();
 
@@ -59,9 +59,9 @@ test.describe("Sprint 2 auth", () => {
     await mockAppApis(page);
     await page.goto("/auth/register?next=%2Fstorytelling%2Faccount");
 
-    await page.getByLabel("Username").fill("storymaker");
-    await page.getByLabel("Email").fill("storymaker@example.com");
-    await page.getByLabel("Display name").fill("Story Maker");
+    await page.locator('input[name="username"]').fill("storymaker");
+    await page.locator('input[name="email"]').fill("storymaker@example.com");
+    await page.locator('input[name="display_name"]').fill("Story Maker");
     await page.locator('input[name="password"]').fill("password123");
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Create account" }).click();
@@ -74,14 +74,14 @@ test.describe("Sprint 2 auth", () => {
     await mockAppApis(page);
     await page.goto("/join?code=ab-12 cd");
 
-    await expect(page.getByLabel("Join code")).toHaveValue("AB12CD");
+    await expect(page.locator('input[name="join_code"]')).toHaveValue("AB12CD");
   });
 
   test("forgot password flow shows success messaging", async ({ page }) => {
     await mockAppApis(page);
     await page.goto("/auth/forgot-password");
 
-    await page.getByLabel("Email").fill("storymaker@example.com");
+    await page.locator('input[name="email"]').fill("storymaker@example.com");
     await page.getByRole("button", { name: "Send reset link" }).click();
 
     await expect(page.getByText("Reset email requested", { exact: true })).toBeVisible({ timeout: 20000 });
@@ -103,7 +103,7 @@ test.describe("Sprint 2 auth", () => {
     await page.goto("/app/account");
 
     await page.getByRole("button", { name: /Story Maker/ }).click();
-    await page.getByText("Log out").click();
+    await page.getByRole("menuitem", { name: "Log out" }).click();
 
     await expect(page).toHaveURL(/\/auth\/login/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });

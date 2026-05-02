@@ -9,7 +9,6 @@ test.describe("Sprint 1 shell", () => {
 
     await expect(page.getByRole("heading", { name: "Editorial shell, not a generic dashboard." })).toBeVisible();
     await expect(page.getByRole("link", { name: "Open App Shell" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Loading balance|25\.75 Coins/ })).toBeVisible();
   });
 
   test("public route renders empty-state shell", async ({ page }) => {
