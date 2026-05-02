@@ -11,7 +11,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./requirements.txt
-COPY requirements.scheduler.txt ./requirements.scheduler.txt
+COPY infra/requirements.scheduler.txt ./requirements.scheduler.txt
 
 RUN pip wheel --wheel-dir /wheels -r requirements.scheduler.txt
 
@@ -69,7 +69,7 @@ COPY alembic.ini /app/alembic.ini
 COPY maintenance_status.json /app/maintenance_status.json
 COPY story_wizard_system_prompt.txt /app/story_wizard_system_prompt.txt
 
-RUN mkdir -p /app/data/uploads /app/logs /app/cache && \
+RUN mkdir -p /app/runtime/data/uploads /app/runtime/logs /app/runtime/cache && \
     addgroup --system --gid 1001 appgroup && \
     adduser --system --uid 1001 --ingroup appgroup --home /app appuser && \
     chown -R appuser:appgroup /app /ms-playwright
