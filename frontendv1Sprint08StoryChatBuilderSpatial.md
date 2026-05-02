@@ -2,7 +2,19 @@
 
 ## Status
 
-Not started.
+Completed.
+
+### Final Summary
+- World chat (`/storytelling/worlds/[worldId]/chat`): session list, create, delete, message send via REST, `wsStatus` indicator. Uses mutable mock array for messages so dynamic send/reply is testable.
+- Story chat (`/storytelling/stories/[storyId]/chat`): session list, create, delete, message send/receive via WebSocket (`fetchWsTicket` + `buildStoryChatWsUrl`), typing indicator, retry on failed WebSocket open.
+- World builder (`/storytelling/world-builder`): step-driven wizard (questions → generating → review → done; currently abortable).
+- Location hierarchy (`/storytelling/worlds/[worldId]/hierarchy`): tree view from `/api/v1/worlds/{worldId}/location-connections/hierarchy`.
+- Map (`/storytelling/worlds/[worldId]/map`): scatter plot using `map_x`/`map_y` with a fallback when no coordinates exist.
+- Navigation: chat/hierarchy/map links integrated into world detail; chat link added to story detail; World Builder hub card added to Storytelling hub and primary apps list.
+- `frontendv1/lib/api.ts`: extended with world chat, story chat, WebSocket helpers, world builder, location connection and hierarchy types/functions.
+- `LocationEntry` type updated to include `map_x`, `map_y`, `map_z`.
+- Playwright tests: 5 tests (world builder, world chat, story chat, hierarchy, map). All pass.
+- Build passes clean; no new lint warnings introduced.
 
 ## Goal
 

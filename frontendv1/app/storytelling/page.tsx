@@ -14,6 +14,7 @@ import {
   Gift,
   UserCircle,
   Sparkles,
+  Hammer,
 } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
@@ -24,6 +25,7 @@ import { storytellingHelp } from "@/lib/help-content";
 const productLinks = [
   { href: "/storytelling/stories", label: "Stories", description: "Create, edit, and manage your stories.", icon: BookOpen },
   { href: "/storytelling/worlds", label: "Worlds", description: "Build and explore your story worlds.", icon: Globe },
+  { href: "/storytelling/world-builder", label: "World Builder", description: "Generate a world by answering guided questions.", icon: Hammer },
   { href: "/storytelling/documents", label: "Documents", description: "Upload and manage reference documents.", icon: FileUp },
   { href: "/storytelling/community", label: "Community", description: "Discover published works and connect with writers.", icon: MessageCircle },
   { href: "/storytelling/published", label: "Published", description: "View and manage your published stories.", icon: FileText },

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Globe, Loader2, Users, MapPin, BookOpen, Plus } from "lucide-react";
+import { ArrowLeft, Globe, Loader2, Users, MapPin, BookOpen, Plus, MessageSquare, GitBranch, Map } from "lucide-react";
 
 import { PageHeader } from "@/components/shell/page-header";
 import { Button } from "@/components/ui/button";
@@ -137,6 +137,42 @@ export default function WorldDetailPage() {
             <Link href={`/storytelling/worlds/${worldId}/lore-items`}>
               <Plus className="size-4" />
               View lore
+            </Link>
+          </Button>
+        </div>
+
+        <div className="rounded-[20px] border border-dashed border-black/15 bg-white/60 p-6 text-center">
+          <MessageSquare className="mx-auto size-8 text-ink-400" />
+          <h3 className="mt-3 text-sm font-semibold text-ink-900">Chat</h3>
+          <p className="mt-1 text-xs text-ink-500">Discuss your world with AI.</p>
+          <Button asChild className="mt-4 gap-2" size="sm">
+            <Link href={`/storytelling/worlds/${worldId}/chat`}>
+              <Plus className="size-4" />
+              Open chat
+            </Link>
+          </Button>
+        </div>
+
+        <div className="rounded-[20px] border border-dashed border-black/15 bg-white/60 p-6 text-center">
+          <GitBranch className="mx-auto size-8 text-ink-400" />
+          <h3 className="mt-3 text-sm font-semibold text-ink-900">Hierarchy</h3>
+          <p className="mt-1 text-xs text-ink-500">Explore location parent-child relationships.</p>
+          <Button asChild className="mt-4 gap-2" size="sm">
+            <Link href={`/storytelling/worlds/${worldId}/hierarchy`}>
+              <Plus className="size-4" />
+              View hierarchy
+            </Link>
+          </Button>
+        </div>
+
+        <div className="rounded-[20px] border border-dashed border-black/15 bg-white/60 p-6 text-center">
+          <Map className="mx-auto size-8 text-ink-400" />
+          <h3 className="mt-3 text-sm font-semibold text-ink-900">Map</h3>
+          <p className="mt-1 text-xs text-ink-500">Visualise locations in 2-D space.</p>
+          <Button asChild className="mt-4 gap-2" size="sm">
+            <Link href={`/storytelling/worlds/${worldId}/map`}>
+              <Plus className="size-4" />
+              Open map
             </Link>
           </Button>
         </div>

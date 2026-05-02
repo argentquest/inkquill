@@ -13,6 +13,7 @@ import {
   Rocket,
   Trash2,
   Zap,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -151,6 +152,12 @@ export default function StoryDetailPage() {
               <Button className="gap-2" variant="secondary">
                 <Edit3 className="size-4" />
                 Edit
+              </Button>
+            </Link>
+            <Link href={`/storytelling/stories/${story.id}/chat`}>
+              <Button className="gap-2" variant="secondary">
+                <MessageSquare className="size-4" />
+                Chat
               </Button>
             </Link>
             {story.story_type === "basic" && (

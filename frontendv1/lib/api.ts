@@ -624,6 +624,9 @@ export interface LocationEntry {
   connected_elements?: string | null;
   scale?: LocationScale | null;
   parent_location_id?: number | null;
+  map_x?: number | null;
+  map_y?: number | null;
+  map_z?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -1853,4 +1856,248 @@ export async function fetchIsoCodes(): Promise<IsoCodesResponse> {
     languages: normalizeIsoCodeMap(data.languages),
     countries: normalizeIsoCodeMap(data.countries),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — World Chat
+// ---------------------------------------------------------------------------
+
+export interface ChatSessionRead {
+  id: number;
+  world_id: number;
+  user_id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChatMessageRead {
+  id: number;
+  session_id: number;
+  role: string;
+  content: string;
+  element_type?: string | null;
+  element_id?: number | null;
+  full_context?: Record<string, unknown> | null;
+  cost_log_id?: number | null;
+  created_at: string;
+  context_sources?: Array<Record<string, unknown>> | null;
+}
+
+export interface ChatSessionWithMessages extends ChatSessionRead {
+  messages: ChatMessageRead[];
+}
+
+export interface SendMessageRequest {
+  message: string;
+  element_type?: string | null;
+  element_id?: number | null;
+  ai_model_config_id?: number | null;
+}
+
+export interface AICallStats {
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  cost: number;
+  model_name: string;
+  duration_ms: number;
+}
+
+export interface SendMessageResponse {
+  user_message: ChatMessageRead;
+  ai_response: ChatMessageRead;
+  session_updated_at: string;
+  call_stats?: AICallStats | null;
+}
+
+export interface ChatSample {
+  id: number;
+  title: string;
+  prompt_text: string;
+  category?: string | null;
+  sort_order?: number | null;
+}
+
+export async function fetchWorldChatSamples(): Promise<ChatSample[]> {
+  return apiFetch<ChatSample[]>("/world-chat/chat/samples");
+}
+
+export async function fetchWorldChatSessions(worldId: number): Promise<{ sessions: ChatSessionRead[]; total: number }> {
+  return apiFetch<{ sessions: ChatSessionRead[]; total: number }>(`/world-chat/sessions/${worldId}`);
+}
+
+export async function createWorldChatSession(worldId: number): Promise<ChatSessionRead> {
+  return apiFetch<ChatSessionRead>(`/world-chat/sessions/${worldId}`, { method: "POST" });
+}
+
+export async function fetchWorldChatSession(worldId: number, sessionId: number): Promise<ChatSessionWithMessages> {
+  return apiFetch<ChatSessionWithMessages>(`/world-chat/sessions/${worldId}/${sessionId}`);
+}
+
+export async function sendWorldChatMessage(worldId: number, sessionId: number, payload: SendMessageRequest): Promise<SendMessageResponse> {
+  return apiFetch<SendMessageResponse>(`/world-chat/sessions/${worldId}/${sessionId}/messages`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteWorldChatSession(worldId: number, sessionId: number): Promise<void> {
+  await apiFetch<void>(`/world-chat/sessions/${worldId}/${sessionId}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — Story Chat
+// ---------------------------------------------------------------------------
+
+export interface StoryChatSessionRead {
+  id: number;
+  story_id: number;
+  user_id: number;
+  title: string;
+  description?: string | null;
+  focus_area?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StoryChatMessageRead {
+  id: number;
+  session_id: number;
+  role: string;
+  content: string;
+  target_element?: string | null;
+  target_element_id?: number | null;
+  created_at: string;
+}
+
+export interface StoryChatSessionWithMessages extends StoryChatSessionRead {
+  messages: StoryChatMessageRead[];
+}
+
+export interface StoryChatSessionCreatePayload {
+  title: string;
+  description?: string | null;
+  focus_area?: string | null;
+}
+
+export async function fetchStoryChatSessions(storyId: number): Promise<StoryChatSessionRead[]> {
+  return apiFetch<StoryChatSessionRead[]>(`/story-chat/stories/${storyId}/sessions`);
+}
+
+export async function createStoryChatSession(storyId: number, payload: StoryChatSessionCreatePayload): Promise<StoryChatSessionRead> {
+  return apiFetch<StoryChatSessionRead>(`/story-chat/stories/${storyId}/sessions`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchStoryChatSession(storyId: number, sessionId: number): Promise<StoryChatSessionWithMessages> {
+  return apiFetch<StoryChatSessionWithMessages>(`/story-chat/stories/${storyId}/sessions/${sessionId}`);
+}
+
+export async function deleteStoryChatSession(storyId: number, sessionId: number): Promise<void> {
+  await apiFetch<void>(`/story-chat/stories/${storyId}/sessions/${sessionId}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// WebSocket helpers
+// ---------------------------------------------------------------------------
+
+export async function fetchWsTicket(): Promise<string> {
+  const data = await apiFetch<{ ticket: string }>("/auth/ws-ticket");
+  return data.ticket;
+}
+
+export function buildStoryChatWsUrl(storyId: number, sessionId: number, ticket: string): string {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${protocol}//${window.location.host}/api/v1/story-chat/ws/stories/${storyId}/sessions/${sessionId}/chat?ticket=${encodeURIComponent(ticket)}`;
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — World Builder
+// ---------------------------------------------------------------------------
+
+export interface WorldBuilderQuestion {
+  id: number;
+  short_label: string;
+  full_question: string;
+  answers: Array<Record<string, unknown>>;
+}
+
+export interface WorldBuilderQuestionsResponse {
+  questions: WorldBuilderQuestion[];
+}
+
+export interface WorldBuilderGenerationResponse {
+  short_description: string;
+  description: string;
+  visual_prompt: string;
+  answer_summary: Array<Record<string, string>>;
+}
+
+export interface WorldBuilderCreatePayload {
+  name: string;
+  answers: Record<number, number>;
+}
+
+export async function fetchWorldBuilderQuestions(): Promise<WorldBuilderQuestion[]> {
+  const res = await apiFetch<WorldBuilderQuestionsResponse>("/world-builder/questions");
+  return res.questions;
+}
+
+export async function validateWorldBuilderAnswers(answers: Record<number, number>): Promise<{ valid: boolean; errors: string[]; answer_count: number }> {
+  return apiFetch<{ valid: boolean; errors: string[]; answer_count: number }>("/world-builder/validate", {
+    method: "POST",
+    body: JSON.stringify({ answers }),
+  });
+}
+
+export async function generateWorldBuilderWorld(answers: Record<number, number>): Promise<WorldBuilderGenerationResponse> {
+  return apiFetch<WorldBuilderGenerationResponse>("/world-builder/generate", {
+    method: "POST",
+    body: JSON.stringify({ answers }),
+  });
+}
+
+export async function createWorldFromBuilder(payload: WorldBuilderCreatePayload): Promise<WorldEntry> {
+  return apiFetch<WorldEntry>("/world-builder/create", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateWorldFromBuilder(worldId: number, answers: Record<number, number>): Promise<WorldEntry> {
+  return apiFetch<WorldEntry>(`/world-builder/worlds/${worldId}`, {
+    method: "PUT",
+    body: JSON.stringify({ answers }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Storytelling — Location Connections / Hierarchy
+// ---------------------------------------------------------------------------
+
+export interface LocationConnectionRead {
+  from_location_id: number;
+  to_location_id: number;
+  path_description?: string | null;
+  reverse_path_description?: string | null;
+  is_bidirectional: boolean;
+  dm_notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LocationHierarchyNode {
+  parent: { id: number | null; name: string; scale: string | null };
+  children: Array<{ id: number; name: string; scale: string | null }>;
+}
+
+export async function fetchLocationConnections(worldId: number): Promise<LocationConnectionRead[]> {
+  return apiFetch<LocationConnectionRead[]>(`/worlds/${worldId}/location-connections/`);
+}
+
+export async function fetchLocationHierarchy(worldId: number): Promise<LocationHierarchyNode[]> {
+  return apiFetch<LocationHierarchyNode[]>(`/worlds/${worldId}/location-connections/hierarchy`);
 }
