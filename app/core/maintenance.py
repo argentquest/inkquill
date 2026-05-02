@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 logger = logging.getLogger(__name__)
 
 # Maintenance file path
-MAINTENANCE_FILE_PATH = Path("maintenance_status.json")
+MAINTENANCE_FILE_PATH = Path("config/maintenance_status.json")
 
 class MaintenanceManager:
     """Simple maintenance mode manager using a JSON file"""

@@ -47,7 +47,7 @@ plans/         Planning and implementation notes
 
 1. Create and activate the virtual environment.
 2. Install dependencies with `pip install -r requirements.txt`.
-3. Copy `.env_template` to `.env` and fill in the required settings.
+3. Copy `config/.env_template` to `.env` and fill in the required settings.
 4. Run migrations with `alembic upgrade head`.
 5. Start the app with `.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`.
 

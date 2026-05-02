@@ -72,6 +72,7 @@ instance/
 
 # --- Environments ---
 .env # IMPORTANT: Ignore environment file containing secrets
+config/.env # In case .env is placed in config directory
 .venv/ # Common name for virtual environments
 venv/
 env/

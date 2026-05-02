@@ -16,7 +16,7 @@ This is the easiest path. Docker handles the database, backend, and frontend tog
 **1. Copy and configure environment**
 
 ```powershell
-cp .env_template .env
+cp config/.env_template .env
 ```
 
 Open `.env` and fill in at minimum:
@@ -73,7 +73,7 @@ pip install -r requirements.txt
 **2. Configure environment**
 
 ```powershell
-cp .env_template .env
+cp config/.env_template .env
 # Edit .env — set AUTH_SECRET_KEY, database connection, and LLM key
 ```
 
@@ -128,7 +128,7 @@ npm run test:e2e
 
 ## Environment Variables Reference
 
-See [.env_template](.env_template) for the full list with descriptions. Key variables:
+See [config/.env_template](config/.env_template) for the full list with descriptions. Key variables:
 
 | Variable | Required | Description |
 |----------|----------|-------------|

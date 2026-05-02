@@ -32,7 +32,7 @@ Any developer cloning the repo needed an active Azure subscription to run anythi
 **Files changed:**
 - [app/core/config.py](app/core/config.py) — Added `OPENROUTER_*` settings as primary, demoted Azure OpenAI fields to optional/legacy
 - [app/services/semantic_kernel_setup.py](app/services/semantic_kernel_setup.py) — Rewrote kernel initialisation to branch on `ACTIVE_LLM_PROVIDER`, using the OpenAI connector pointed at the OpenRouter base URL for the `OPENROUTER` case
-- [.env_template](.env_template) — Restructured to lead with OpenRouter configuration; Azure sections moved to clearly-marked optional blocks at the bottom
+- [config/.env_template](config/.env_template) — Restructured to lead with OpenRouter configuration; Azure sections moved to clearly-marked optional blocks at the bottom
 
 **Key design decision:** The Semantic Kernel `OpenAIChatCompletion` connector accepts a custom `base_url`, which lets us point it at OpenRouter's OpenAI-compatible endpoint. No new SDK dependency needed.
 
@@ -189,7 +189,7 @@ These are kept in `requirements.txt` because several router files still import t
 
 ## Running Without Azure
 
-1. Copy `.env_template` to `.env`
+1. Copy `config/.env_template` to `.env`
 2. Set `OPENROUTER_API_KEY` to your OpenRouter key (free tier available)
 3. Leave all `USE_AZURE_*` flags as `false`
 4. Run `alembic upgrade head` then `uvicorn app.main:app --reload`

@@ -12,8 +12,8 @@ services:
       - ./app:/app/app
       - ./runtime/data:/app/runtime/data
       - ./runtime/logs:/app/runtime/logs
-      - ./maintenance_status.json:/app/maintenance_status.json:ro
-      - ./story_wizard_system_prompt.txt:/app/story_wizard_system_prompt.txt:ro
+      - ./config/maintenance_status.json:/app/maintenance_status.json:ro
+      - ./config/story_wizard_system_prompt.txt:/app/story_wizard_system_prompt.txt:ro
     ports:
       - "18000:8000"
 

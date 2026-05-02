@@ -66,8 +66,8 @@ RUN python -m playwright install chromium
 COPY app /app/app
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
-COPY maintenance_status.json /app/maintenance_status.json
-COPY story_wizard_system_prompt.txt /app/story_wizard_system_prompt.txt
+COPY config/maintenance_status.json /app/maintenance_status.json
+COPY config/story_wizard_system_prompt.txt /app/story_wizard_system_prompt.txt
 
 RUN mkdir -p /app/runtime/data/uploads /app/runtime/logs /app/runtime/cache && \
     addgroup --system --gid 1001 appgroup && \

@@ -291,7 +291,7 @@ az webapp config set \
 
 ### Environment Variables
 
-Create `.env.production` with your production values:
+Create `config/.env.production` from `config/.env_template` with your production values:
 
 ```env
 # Database
