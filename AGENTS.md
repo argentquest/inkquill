@@ -1,5 +1,24 @@
 # AGENTS.md
 
+## Project Structure (as of May 2026 reorganization)
+
+The repository was reorganized into logical directories:
+
+- `planning/` — Sprint docs, design specs, and planning markdowns (formerly at root).
+- `content/` — Brand assets and marketing content.
+- `runtime/` — Ephemeral data: `cache/`, `logs/`, `data/uploads`, `artifacts/`, `test-results/`. This directory is `.gitignore`d.
+- `infra/` — Docker Compose files (`docker-compose.dev.yml`, `docker-compose.prod.yml`, etc.) and `requirements.scheduler.txt`.
+- `config/` — Configuration templates and files: `.env_template`, `.env.production`, `.deployment`, `app_service_config.json`, `maintenance_status.json`, `story_wizard_system_prompt.txt`.
+- `scripts/` — Helper scripts (e.g., `fix_tests.py`).
+- `tests/` — `pytest.ini` and coverage config live here. Run pytest from the repo root.
+
+Important path changes agents should know:
+- `LOCAL_STORAGE_BASE_PATH` default is `./runtime/data/uploads`.
+- `MAINTENANCE_FILE_PATH` is `config/maintenance_status.json`.
+- `DEFAULT_LOG_DIR` is `./runtime/logs`.
+- `archiveold/` remains locally but is git-ignored; do not delete it.
+- `.env` stays at repository root because Docker Compose expects it there.
+
 ## Purpose
 This file defines how coding agents should operate in this repository.
 
