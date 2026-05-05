@@ -64,6 +64,7 @@ $requiredDirs = @(
     (Join-Path $dataRoot "runtime/cache"),
     (Join-Path $dataRoot "runtime/logs"),
     (Join-Path $dataRoot "runtime/logs/backend"),
+    (Join-Path $dataRoot "runtime/data/uploads"),
     (Join-Path $dataRoot "postgres")
 )
 

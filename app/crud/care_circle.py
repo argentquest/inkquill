@@ -168,6 +168,8 @@ def _patient_to_dict(
             "favouriteFoods": raw.get("favourite_foods", []),
             "favouriteTvShows": raw.get("favourite_tv_shows", []),
         },
+        "created_at": patient.created_at.isoformat() if patient.created_at else None,
+        "newsletters_sent": 0,
         "highlights": [
             {
                 "title": card.title,
@@ -357,7 +359,31 @@ async def list_family_patients(db: AsyncSession, user: User) -> list[dict[str, A
             .order_by(CareCirclePatientProfile.id.asc())
         )
     ).scalars().all()
-    return [_patient_to_dict(patient, family.name, family.join_code) for patient in patients]
+
+    # Count successful newsletter runs per patient
+    patient_ids = [p.id for p in patients]
+    newsletter_counts: dict[int, int] = {}
+    if patient_ids:
+        rows = (
+            await db.execute(
+                select(
+                    CareCircleProviderRunLog.patient_id,
+                    func.count(CareCircleProviderRunLog.id).label("cnt"),
+                )
+                .where(
+                    CareCircleProviderRunLog.patient_id.in_(patient_ids),
+                    CareCircleProviderRunLog.status == "succeeded",
+                )
+                .group_by(CareCircleProviderRunLog.patient_id)
+            )
+        ).all()
+        newsletter_counts = {row.patient_id: row.cnt for row in rows}
+
+    results = [_patient_to_dict(patient, family.name, family.join_code) for patient in patients]
+    for item in results:
+        pid = int(item["id"])
+        item["newsletters_sent"] = newsletter_counts.get(pid, 0)
+    return results
 
 
 async def list_family_activity_events(

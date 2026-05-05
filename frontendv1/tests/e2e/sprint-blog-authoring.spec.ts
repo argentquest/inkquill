@@ -2,60 +2,9 @@ import { expect, test } from "@playwright/test";
 
 import { mockAppApis } from "./helpers";
 
-const authorBlogPostsSeed = [
-  {
-    id: 201,
-    title: "My First Blog Post",
-    slug: "my-first-blog-post",
-    content: "This is the content of my first blog post.",
-    excerpt: "An introductory post.",
-    featured_image_url: null,
-    status: "draft",
-    author_id: 7,
-    view_count: 0,
-    like_count: 0,
-    comment_count: 0,
-    published_at: null,
-    created_at: "2026-04-01T00:00:00Z",
-    updated_at: "2026-04-01T00:00:00Z",
-  },
-  {
-    id: 202,
-    title: "Writing Tips for Fantasy",
-    slug: "writing-tips-fantasy",
-    content: "Here are my top five writing tips for fantasy authors.",
-    excerpt: "Five tips for fantasy writing.",
-    featured_image_url: null,
-    status: "published",
-    author_id: 7,
-    view_count: 42,
-    like_count: 5,
-    comment_count: 2,
-    published_at: "2026-04-10T00:00:00Z",
-    created_at: "2026-04-08T00:00:00Z",
-    updated_at: "2026-04-10T00:00:00Z",
-  },
-];
-
-async function mockAuthorBlogPosts(page: any) {
-  await page.route("**/api/blog/posts?*", async (route: any) => {
-    const url = route.request().url();
-    if (url.includes("author_id")) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ success: true, data: authorBlogPostsSeed }),
-      });
-      return;
-    }
-    await route.fallback();
-  });
-}
-
 test.describe("Blog authoring surface", () => {
   test("storytelling blog dashboard loads posts", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await mockAuthorBlogPosts(page);
     await page.goto("/storytelling/blog");
 
     await expect(page).toHaveURL(/\/storytelling\/blog/, { timeout: 15000 });
@@ -66,7 +15,6 @@ test.describe("Blog authoring surface", () => {
 
   test("care circle blog dashboard loads posts", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await mockAuthorBlogPosts(page);
     await page.goto("/care-circle-family/blog");
 
     await expect(page).toHaveURL(/\/care-circle-family\/blog/, { timeout: 15000 });
@@ -76,18 +24,7 @@ test.describe("Blog authoring surface", () => {
   });
 
   test("storytelling blog dashboard shows empty state", async ({ page }) => {
-    await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/blog/posts?*", async (route) => {
-      if (route.request().url().includes("author_id")) {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({ success: true, data: [] }),
-        });
-        return;
-      }
-      await route.fallback();
-    });
+    await mockAppApis(page, { session: "authenticated", authorBlogPosts: "empty" });
     await page.goto("/storytelling/blog");
 
     await expect(page).toHaveURL(/\/storytelling\/blog/, { timeout: 15000 });

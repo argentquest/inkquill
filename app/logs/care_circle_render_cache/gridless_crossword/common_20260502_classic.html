@@ -1,0 +1,540 @@
+<style>
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: none !important;
+}
+
+table td,
+table th {
+    border: none !important;
+    padding: 10px !important;
+}
+
+
+/*
+ * Theme: Classic
+ * A warm, familiar design with soft colors and high readability.
+ * Designed for memory-care / dementia-friendly newsletters.
+ *
+ * BEM Pattern:
+ *   .section                 — card container
+ *   .section--{provider}     — color variant
+ *   .section__title          — heading
+ *   .section__body           — paragraph text
+ */
+
+/* === Base Reset === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Verdana', 'Arial', sans-serif;
+    font-size: 22px;
+    line-height: 1.6;
+    color: #1e293b;
+    background: #ffffff;
+}
+
+/* === Section Card === */
+.section {
+    width: 100%;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.section__title {
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid currentColor;
+}
+
+.section__body {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.7;
+}
+
+.section__body--italic {
+    font-style: italic;
+}
+
+.section__body--large {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.section__subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+/* === Provider Color Variants === */
+
+/* Slate — weather */
+.section--weather {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+.section--weather .section__title {
+    color: #1e293b;
+    border-color: #cbd5e1;
+}
+
+/* Blue — news and history */
+.section--world-news,
+.section--this_day_history,
+.section--local_history {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+.section--world-news .section__title,
+.section--this_day_history .section__title,
+.section--local_history .section__title {
+    color: #1e3a8a;
+    border-color: #bfdbfe;
+}
+
+/* Amber — nostalgia, trivia, quotes, music */
+.section--nostalgia,
+.section--ai_trivia,
+.section--daily_quote,
+.section--song-of-the-day {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__title,
+.section--ai_trivia .section__title,
+.section--daily_quote .section__title,
+.section--song-of-the-day .section__title {
+    color: #78350f;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__body,
+.section--ai_trivia .section__body {
+    color: #92400e;
+}
+
+/* Orange — hobbies, pets, recipes */
+.section--hobby_spotlight,
+.section--simple_recipe,
+.section--cat_fact,
+.section--dog_photo {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.section--hobby_spotlight .section__title,
+.section--simple_recipe .section__title,
+.section--cat_fact .section__title,
+.section--dog_photo .section__title {
+    color: #7c2d12;
+    border-color: #fed7aa;
+}
+
+/* Green — brain games and logic puzzles */
+.section--puzzle,
+.section--brain_booster,
+.section--riddle,
+.section--spot-the-difference,
+.section--finish-phrase {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+.section--puzzle .section__title,
+.section--brain_booster .section__title,
+.section--riddle .section__title,
+.section--spot-the-difference .section__title,
+.section--finish-phrase .section__title {
+    color: #064e3b;
+    border-color: #a7f3d0;
+}
+
+/* Teal — word puzzles */
+.section--missing-vowels,
+.section--word-scramble,
+.section--gridless-crossword,
+.section--complete-the-duo,
+.section--odd-one-out {
+    background: #f0fdfa;
+    border-color: #99f6e4;
+}
+.section--missing-vowels .section__title,
+.section--word-scramble .section__title,
+.section--gridless-crossword .section__title,
+.section--complete-the-duo .section__title,
+.section--odd-one-out .section__title {
+    color: #134e4a;
+    border-color: #99f6e4;
+}
+
+/* Lime — nature, movement, and activity */
+.section--nature_scene,
+.section--gentle_exercise,
+.section--activity_suggestion {
+    background: #f7fee7;
+    border-color: #d9f99d;
+}
+.section--nature_scene .section__title,
+.section--gentle_exercise .section__title,
+.section--activity_suggestion .section__title {
+    color: #365314;
+    border-color: #d9f99d;
+}
+
+/* Indigo — jokes and sensory */
+.section--joke,
+.section--sensory {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+.section--joke .section__title,
+.section--sensory .section__title {
+    color: #312e81;
+    border-color: #c7d2fe;
+}
+
+/* Purple — affirmations and gratitude */
+.section--gratitude,
+.section--daily_affirmation,
+.section--personal_affirmation {
+    background: #faf5ff;
+    border-color: #e9d5ff;
+}
+.section--gratitude .section__title,
+.section--daily_affirmation .section__title,
+.section--personal_affirmation .section__title {
+    color: #581c87;
+    border-color: #e9d5ff;
+}
+
+/* Rose — personal letters and family */
+.section--family_greeting,
+.section--family {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    text-align: center;
+}
+.section--family_greeting .section__title,
+.section--family .section__title {
+    color: #881337;
+    border-color: #fecdd3;
+}
+.section--family_greeting .section__body,
+.section--family .section__body {
+    color: #9f1239;
+    font-weight: 700;
+}
+.section--pen-pal-letter {
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+.section--pen-pal-letter .section__title {
+    color: #881337;
+    border-color: #fecdd3;
+}
+
+/* === Utilities === */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #64748b;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 30px;
+}
+
+.text-2xl {
+    font-size: 38px;
+}
+
+.mt-md {
+    margin-top: 16px;
+}
+
+.mb-md {
+    margin-bottom: 16px;
+}
+
+.divider {
+    border-top: 2px solid #e2e8f0;
+    margin: 20px 0;
+}
+
+/* === Print === */
+@media print {
+    body {
+        background: #fff;
+    }
+
+    .section {
+        break-inside: avoid;
+    }
+}
+
+.gridless-crossword__word-bank {
+    margin-bottom: 24px;
+    padding: 16px;
+    text-align: center;
+    border-radius: 8px;
+    background: #e0f2fe;
+}
+
+.gridless-crossword__bank-title {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0369a1;
+}
+
+.gridless-crossword__bank-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.gridless-crossword__bank-chip {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: #fff;
+    color: #1e40af;
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.gridless-crossword__clue {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+.gridless-crossword__clue-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.gridless-crossword__clue-number {
+    min-width: 24px;
+    color: #3b82f6;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.gridless-crossword__clue-length {
+    min-width: 45px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.gridless-crossword__clue-text {
+    font-size: 15px;
+}
+
+.gridless-crossword__secret-hint {
+    margin-top: 20px;
+    padding: 12px;
+    text-align: center;
+    border-radius: 6px;
+    background: #fef3c7;
+}
+
+.gridless-crossword__secret-text {
+    margin: 0;
+    color: #92400e;
+    font-size: 13px;
+}
+
+.gridless-crossword__answers {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.gridless-crossword__answers-note {
+    font-size: 12px;
+}
+
+.gridless-crossword__answers-list {
+    margin-top: 8px;
+    text-align: center;
+    transform: rotate(180deg);
+}
+
+.gridless-crossword__answer-chip {
+    display: inline-block;
+    margin: 3px;
+    font-size: 16px;
+}
+
+.gridless-crossword__secret-answer {
+    margin-top: 16px;
+    color: #059669;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+</style>
+<table class="section section--gridless-crossword" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
+    <h2 class="section__title">📝 Gridless Crossword</h2>
+    <p class="section__subtitle">
+        Solve the 10 clues below. The first letters of all answers spell a secret word!
+    </p>
+    <div class="section__body">
+        <div class="gridless-crossword__word-bank">
+            <p class="gridless-crossword__bank-title">🔤 WORD BANK (scrambled letters)</p>
+            <table class="gridless-crossword__bank-list" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">BEREZE</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">LAEF</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">OWL</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">SRATEM</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">SUNSET</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">OAECN</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">MLAPE</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">OIBRT</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">COMET</td>
+                    
+                    <td class="gridless-crossword__bank-chip" valign="top" style="padding:2px 4px">NBULEA</td>
+                    
+                </tr>
+            </table>
+        </div>
+
+        <table class="gridless-crossword__clues" width="100%" cellpadding="0" cellspacing="0" border="0">
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">1.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[6 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A gentle wind that feels nice, especially on a warm day.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">2.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[4 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">This green part of a plant grows on branches and trees.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">3.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[3 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A bird of prey known for hooting and large eyes, often seen at night.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">4.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[6 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A small, flowing body of water that moves through the landscape.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">5.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[6 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">The time of day when the sun goes down and the sky turns colorful.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">6.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[5 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A vast body of salt water covering much of the Earth.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">7.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[5 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A tree known for its lobed leaves and sweet syrup.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">8.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[5 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">The curved path of a celestial object around a star or planet.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">9.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[5 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A &#39;dirty snowball&#39; that develops a tail when near the sun.</td>
+            </tr>
+            
+            <tr class="gridless-crossword__clue">
+                <td class="gridless-crossword__clue-number" valign="top" style="padding:4px 6px 4px 0; white-space:nowrap">10.</td>
+                <td class="gridless-crossword__clue-length" valign="top" style="padding:4px 6px; white-space:nowrap">[6 letters]</td>
+                <td class="gridless-crossword__clue-text" valign="top" style="padding:4px 0">A giant cloud of dust and gas in space where stars are born.</td>
+            </tr>
+            
+        </table>
+
+        <div class="gridless-crossword__secret-hint">
+            <p class="gridless-crossword__secret-text">
+                🔮 <strong>Secret Word:</strong> The first letter of each answer spells a hidden word!
+            </p>
+        </div>
+
+        <div class="gridless-crossword__answers">
+            <p class="section__body section__body--italic text-muted gridless-crossword__answers-note">(Answers are upside down below)</p>
+            <table class="gridless-crossword__answers-list" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">BREEZE</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">LEAF</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">OWL</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">STREAM</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">SUNSET</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">OCEAN</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">MAPLE</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">ORBIT</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">COMET</td>
+                    
+                    <td class="gridless-crossword__answer-chip" valign="top" style="padding:2px 4px">NEBULA</td>
+                    
+                </tr>
+            </table>
+            <p class="gridless-crossword__secret-answer">
+                Secret Word: BLOSSOM
+            </p>
+        </div>
+    </div>
+  </td></tr>
+</table>

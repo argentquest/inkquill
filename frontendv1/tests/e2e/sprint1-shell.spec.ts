@@ -3,12 +3,15 @@ import { expect, test } from "@playwright/test";
 import { mockAppApis } from "./helpers";
 
 test.describe("Sprint 1 shell", () => {
-  test("home route renders editorial shell and account entry", async ({ page }) => {
+  test("home route renders app cards and account entry", async ({ page }) => {
     await mockAppApis(page);
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: "Editorial shell, not a generic dashboard." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your creative and care platform." })).toBeVisible();
     await expect(page.getByRole("link", { name: "Open App Shell" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Storytelling/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Care Circle/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Chatbot/ })).toHaveCount(0);
   });
 
   test("public route renders empty-state shell", async ({ page }) => {

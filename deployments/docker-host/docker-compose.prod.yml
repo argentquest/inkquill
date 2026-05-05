@@ -1,4 +1,12 @@
 services:
   backend:
+    # Bind to loopback only — not accessible externally.
+    # External traffic enters via host nginx on 443 → localhost:8083 → gateway.
     ports:
       - "127.0.0.1:${CARE_CIRCLE_BACKEND_PORT}:8000"
+
+  gateway:
+    # Bind to loopback only so port 8083 is not reachable from outside.
+    # Host nginx terminates TLS on 443 and proxies here.
+    ports:
+      - "127.0.0.1:${CARE_CIRCLE_PUBLIC_PORT}:80"

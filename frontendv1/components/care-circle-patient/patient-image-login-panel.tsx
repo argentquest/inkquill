@@ -66,21 +66,21 @@ export function PatientImageLoginPanel() {
   }
 
   return (
-    <section className="rounded-[32px] border border-black/10 bg-white/82 p-6 shadow-panel md:p-8">
-      <div className="max-w-2xl">
+    <section className="rounded-[32px] border border-black/10 bg-white/82 p-8 shadow-panel md:p-12">
+      <div className="max-w-3xl">
         <p className="text-xs uppercase tracking-[0.32em] text-ink-600">Picture login</p>
-        <h2 className="mt-3 font-display text-3xl text-ink-900 md:text-4xl">Choose your 3 pictures.</h2>
-        <p className="mt-4 text-base leading-8 text-ink-700">
+        <h2 className="mt-3 font-display text-3xl text-ink-900 md:text-5xl">Choose your 3 pictures.</h2>
+        <p className="mt-4 text-lg leading-8 text-ink-700">
           Pick the three familiar pictures you use to sign in to Ink and Quill.
         </p>
       </div>
 
-      <p className="mt-6 text-sm font-semibold text-ink-700">
+      <p className="mt-8 text-base font-semibold text-ink-700">
         {selectedKeys.length === 0 ? "No pictures selected yet." : `${selectedKeys.length} of 3 selected`}
       </p>
-      {error ? <p className="mt-3 text-sm font-semibold text-[#a63c27]">{error}</p> : null}
+      {error ? <p className="mt-3 text-base font-semibold text-[#a63c27]">{error}</p> : null}
 
-      <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-4">
         {catalog.map((item) => {
           const selected = selectedKeys.includes(item.key);
           return (
@@ -88,7 +88,7 @@ export function PatientImageLoginPanel() {
               key={item.key}
               aria-label={item.label}
               aria-pressed={selected}
-              className="grid min-h-28 place-items-center rounded-[24px] border bg-[#fffdf9] p-4 text-center transition hover:border-black/20"
+              className="grid min-h-52 place-items-center rounded-[28px] border bg-[#fffdf9] p-6 text-center transition hover:border-black/20"
               onClick={() => toggleKey(item.key)}
               style={{
                 borderColor: selected ? accentByKey[item.key] ?? "#231913" : "rgba(35, 25, 19, 0.12)",
@@ -96,8 +96,8 @@ export function PatientImageLoginPanel() {
               }}
               type="button"
             >
-              <span className="text-4xl">{item.emoji}</span>
-              <span className="mt-2 text-sm font-semibold text-ink-900">{item.label}</span>
+              <span className="text-7xl">{item.emoji}</span>
+              <span className="mt-3 text-base font-semibold text-ink-900">{item.label}</span>
             </button>
           );
         })}

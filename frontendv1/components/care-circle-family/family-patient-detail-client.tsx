@@ -54,6 +54,59 @@ const EMPTY_PATIENT_FORM: CareCirclePatientUpdateInput = {
   preferences: { ...EMPTY_PREFERENCES },
 };
 
+type TabId = "overview" | "edit" | "preferences" | "providers" | "newsletter";
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "edit", label: "Edit Profile" },
+  { id: "preferences", label: "Preferences" },
+  { id: "providers", label: "Providers" },
+  { id: "newsletter", label: "Newsletter" },
+];
+
+type EditSubTabId = "family" | "schedule" | "identity" | "people" | "signin";
+
+const EDIT_SUB_TABS: { id: EditSubTabId; label: string }[] = [
+  { id: "family", label: "Family & Access" },
+  { id: "schedule", label: "Schedule & Location" },
+  { id: "identity", label: "Identity & Background" },
+  { id: "people", label: "People & Interests" },
+  { id: "signin", label: "Image Sign-in" },
+];
+
+function EditSubTabBar({
+  active,
+  onChange,
+}: {
+  active: EditSubTabId;
+  onChange: (id: EditSubTabId) => void;
+}) {
+  return (
+    <nav
+      aria-label="Edit profile sections"
+      className="flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/70 p-1.5 shadow-sm"
+    >
+      {EDIT_SUB_TABS.map((tab) => (
+        <button
+          key={tab.id}
+          aria-selected={active === tab.id}
+          className={[
+            "rounded-xl px-4 py-2 text-sm font-medium transition",
+            active === tab.id
+              ? "bg-ink-900 text-white shadow-sm"
+              : "text-ink-700 hover:bg-black/[0.05] hover:text-ink-900",
+          ].join(" ")}
+          onClick={() => onChange(tab.id)}
+          role="tab"
+          type="button"
+        >
+          {tab.label}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
 function FormField({
   label,
   children,
@@ -188,10 +241,6 @@ function AuthImagePicker({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Section divider used inside the form
-// ---------------------------------------------------------------------------
-
 function FormSection({ title }: { title: string }) {
   return (
     <div className="md:col-span-2 border-t border-black/8 pt-4 mt-1">
@@ -199,10 +248,6 @@ function FormSection({ title }: { title: string }) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function setPrefs(
   current: CareCirclePatientUpdateInput,
@@ -248,6 +293,48 @@ function patientToForm(patient: {
 }
 
 // ---------------------------------------------------------------------------
+// Tab bar
+// ---------------------------------------------------------------------------
+
+function TabBar({
+  active,
+  onChange,
+  ownerOnly,
+}: {
+  active: TabId;
+  onChange: (id: TabId) => void;
+  ownerOnly: boolean;
+}) {
+  const visibleTabs = TABS.filter((t) => ownerOnly || !["edit", "newsletter"].includes(t.id));
+
+  return (
+    <nav
+      aria-label="Patient profile sections"
+      className="flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/70 p-1.5 shadow-sm"
+      data-testid="patient-tab-bar"
+    >
+      {visibleTabs.map((tab) => (
+        <button
+          key={tab.id}
+          aria-selected={active === tab.id}
+          className={[
+            "rounded-xl px-4 py-2 text-sm font-medium transition",
+            active === tab.id
+              ? "bg-ink-900 text-white shadow-sm"
+              : "text-ink-700 hover:bg-black/[0.05] hover:text-ink-900",
+          ].join(" ")}
+          onClick={() => onChange(tab.id)}
+          role="tab"
+          type="button"
+        >
+          {tab.label}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -256,6 +343,11 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   const queryClient = useQueryClient();
   const session = useSession();
   const isOwner = session.user?.is_family_owner === true;
+
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [activeEditTab, setActiveEditTab] = useState<EditSubTabId>("family");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [formState, setFormState] = useState<CareCirclePatientUpdateInput>(EMPTY_PATIENT_FORM);
 
   const { data: patient, isLoading, isError, error } = useQuery({
     queryKey: ["care-circle-family-patient", patientId],
@@ -278,33 +370,16 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
     queryFn: fetchIsoCodes,
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [formState, setFormState] = useState<CareCirclePatientUpdateInput>(EMPTY_PATIENT_FORM);
-
-  useEffect(() => {
-    if (patient) setFormState(patientToForm(patient));
-  }, [patient]);
-
-  useEffect(() => {
-    setFormState(EMPTY_PATIENT_FORM);
-    setSaveError(null);
-  }, [patientId]);
-
-  useEffect(() => {
-    if (searchParams.get("edit") === "1" && isOwner) { setIsEditing(true); setSaveError(null); }
-  }, [searchParams, isOwner]);
-
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const [previewDate, setPreviewDate] = useState(todayStr);
   const [sendResult, setSendResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [regenerationJobId, setRegenerationJobId] = useState<string | null>(null);
   const [regenerationMessage, setRegenerationMessage] = useState<string | null>(null);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const [previewDate, setPreviewDate] = useState(todayStr);
-
   const { data: newsletterPreview, isLoading: isLoadingPreview } = useQuery({
     queryKey: ["care-circle-newsletter-preview", patientId, previewDate],
     queryFn: () => fetchPatientNewsletterPreview(patientId, previewDate),
+    enabled: activeTab === "newsletter",
   });
 
   const { data: regenerationStatus } = useQuery({
@@ -318,23 +393,35 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   });
 
   useEffect(() => {
-    if (!regenerationStatus) {
-      return;
-    }
+    if (patient) setFormState(patientToForm(patient));
+  }, [patient]);
 
+  useEffect(() => {
+    setFormState(EMPTY_PATIENT_FORM);
+    setSaveError(null);
+    setActiveTab("overview");
+    setActiveEditTab("family");
+  }, [patientId]);
+
+  useEffect(() => {
+    if (searchParams.get("edit") === "1" && isOwner) {
+      setActiveTab("edit");
+    }
+  }, [searchParams, isOwner]);
+
+  useEffect(() => {
+    if (!regenerationStatus) return;
     if (regenerationStatus.state === "COMPLETED") {
       setRegenerationMessage(regenerationStatus.result_message || "Newsletter regeneration finished.");
       setRegenerationJobId(null);
       queryClient.invalidateQueries({ queryKey: ["care-circle-newsletter-preview", patientId, previewDate] });
       return;
     }
-
     if (regenerationStatus.state === "FAILED") {
       setRegenerationMessage(regenerationStatus.result_message || "Newsletter regeneration failed.");
       setRegenerationJobId(null);
       return;
     }
-
     setRegenerationMessage(regenerationStatus.status_message || "Newsletter regeneration in progress...");
   }, [patientId, previewDate, queryClient, regenerationStatus]);
 
@@ -376,7 +463,7 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
       queryClient.setQueryData(["care-circle-family-patient", patientId], updatedPatient);
       queryClient.invalidateQueries({ queryKey: ["care-circle-family-patients"] });
       setSaveError(null);
-      setIsEditing(false);
+      setActiveTab("overview");
     },
     onError: (err) => setSaveError(err instanceof Error ? err.message : "Could not save friend settings."),
   });
@@ -389,570 +476,358 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   const prefs = formState.preferences;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      <TabBar active={activeTab} onChange={setActiveTab} ownerOnly={isOwner} />
 
-      {/* ── Edit form ──────────────────────────────────────────────── */}
-      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className={EYEBROW_CLS}>Family configuration</p>
-            <h2 className="mt-2 font-display text-3xl text-ink-900">Managed friend settings</h2>
-          </div>
-          {isOwner && (
-            <button
-              className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-              onClick={() => { setIsEditing((v) => !v); setSaveError(null); }}
-              type="button"
-            >
-              {isEditing ? "Close editor" : "Edit friend profile"}
-            </button>
+      {/* ── Overview tab ─────────────────────────────────────────────── */}
+      {activeTab === "overview" && (
+        <div className="space-y-6">
+          <section className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+            <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="font-display text-3xl text-ink-900">Profile summary</h2>
+                <PatientAccessStateBadge state={patient.accessState as "active" | "inactive" | "archived"} />
+              </div>
+              <dl className="mt-6 grid gap-5 md:grid-cols-2">
+                <div><dt className={EYEBROW_CLS}>Family</dt><dd className="mt-2 text-base text-ink-900">{patient.familyName}</dd></div>
+                <div><dt className={EYEBROW_CLS}>Join code</dt><dd className="mt-2 font-mono text-base uppercase tracking-[0.18em] text-ink-900">{patient.joinCode}</dd></div>
+                <div><dt className={EYEBROW_CLS}>Stage</dt><dd className="mt-2 text-base capitalize text-ink-900">{patient.stage}</dd></div>
+                <div>
+                  <dt className={EYEBROW_CLS}>Delivery</dt>
+                  <dd className="mt-2 text-base text-ink-900">
+                    {patient.deliveryTime ?? "Flexible"}{patient.days.length > 0 ? ` · ${patient.days.join(", ")}` : ""}
+                  </dd>
+                </div>
+                <div><dt className={EYEBROW_CLS}>Timezone</dt><dd className="mt-2 text-base text-ink-900">{patient.timezone}</dd></div>
+                <div><dt className={EYEBROW_CLS}>Language</dt><dd className="mt-2 text-base text-ink-900">{patient.preferredLanguage}</dd></div>
+                <div><dt className={EYEBROW_CLS}>Country</dt><dd className="mt-2 text-base text-ink-900">{patient.country}</dd></div>
+                {patient.postalCode ? (
+                  <div><dt className={EYEBROW_CLS}>Postal code / ZIP</dt><dd className="mt-2 text-base text-ink-900">{patient.postalCode}</dd></div>
+                ) : null}
+                {typeof patient.latitude === "number" && typeof patient.longitude === "number" ? (
+                  <div className="md:col-span-2">
+                    <dt className={EYEBROW_CLS}>Resolved coordinates</dt>
+                    <dd className="mt-2 text-base text-ink-900">{patient.latitude.toFixed(5)}, {patient.longitude.toFixed(5)}</dd>
+                  </div>
+                ) : null}
+                {patient.email ? <div><dt className={EYEBROW_CLS}>Email</dt><dd className="mt-2 text-base text-ink-900">{patient.email}</dd></div> : null}
+                {patient.phoneNumber ? <div><dt className={EYEBROW_CLS}>Phone</dt><dd className="mt-2 text-base text-ink-900">{patient.phoneNumber}</dd></div> : null}
+              </dl>
+              {isOwner && (
+                <button
+                  className="mt-6 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
+                  onClick={() => setActiveTab("edit")}
+                  type="button"
+                >
+                  Edit profile
+                </button>
+              )}
+            </article>
+
+            <div className="space-y-6">
+              <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+                <h2 className="font-display text-3xl text-ink-900">Image sign-in</h2>
+                <p className="mt-4 text-sm leading-7 text-ink-700">Three familiar images assigned for direct friend access.</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {patient.authImageKeys.map((key) => (
+                    <span key={key} className="rounded-full border border-black/10 bg-[#fcfaf6] px-3 py-2 text-sm font-semibold capitalize text-ink-900">{key}</span>
+                  ))}
+                </div>
+                <Link className="mt-6 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20" href="/care-circle-patient/login">
+                  Preview friend sign-in
+                </Link>
+              </article>
+
+              <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+                <h2 className="font-display text-3xl text-ink-900">Friend preferences</h2>
+                <dl className="mt-5 grid gap-4">
+                  {patient.preferences.hometown ? <div><dt className={EYEBROW_CLS}>Hometown</dt><dd className="mt-1 text-base text-ink-900">{patient.preferences.hometown}</dd></div> : null}
+                  {patient.preferences.eraOfYouth ? <div><dt className={EYEBROW_CLS}>Era of youth</dt><dd className="mt-1 text-base text-ink-900">{patient.preferences.eraOfYouth}</dd></div> : null}
+                  {patient.preferences.nationalityOrBackground ? <div><dt className={EYEBROW_CLS}>Background</dt><dd className="mt-1 text-base text-ink-900">{patient.preferences.nationalityOrBackground}</dd></div> : null}
+                  {patient.preferences.cityForWeather ? <div><dt className={EYEBROW_CLS}>Weather city</dt><dd className="mt-1 text-base text-ink-900">{patient.preferences.cityForWeather}</dd></div> : null}
+                  {patient.preferences.mobilityLevel ? <div><dt className={EYEBROW_CLS}>Mobility</dt><dd className="mt-1 text-base capitalize text-ink-900">{patient.preferences.mobilityLevel.replace(/_/g, " ")}</dd></div> : null}
+                  {patient.preferences.preferredPronoun ? <div><dt className={EYEBROW_CLS}>Pronoun</dt><dd className="mt-1 text-base text-ink-900">{patient.preferences.preferredPronoun}</dd></div> : null}
+                </dl>
+                {[
+                  { label: "Hobbies", items: patient.preferences.hobbies },
+                  { label: "Favourite activities", items: patient.preferences.favoriteActivities },
+                  { label: "Favourite foods", items: patient.preferences.favouriteFoods },
+                  { label: "Favourite singers", items: patient.preferences.favoriteSingers },
+                  { label: "Favourite TV shows", items: patient.preferences.favouriteTvShows },
+                ].filter(({ items }) => items.length > 0).map(({ label, items }) => (
+                  <div key={label} className="mt-4">
+                    <p className={EYEBROW_CLS}>{label}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {items.map((item) => (
+                        <span key={item} className="rounded-full border border-black/10 bg-[#fcfaf6] px-3 py-2 text-sm text-ink-700">{item}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </article>
+            </div>
+          </section>
+
+          {patient.preferences.familyMembers.length > 0 && (
+            <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+              <h2 className="font-display text-3xl text-ink-900">Family members</h2>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {patient.preferences.familyMembers.map((member) => (
+                  <span key={member} className="rounded-full border border-black/10 bg-[#fcfaf6] px-4 py-2 text-sm font-semibold text-ink-900">{member}</span>
+                ))}
+              </div>
+            </article>
           )}
         </div>
+      )}
 
-        {isEditing ? (
+      {/* ── Edit Profile tab ─────────────────────────────────────────── */}
+      {activeTab === "edit" && isOwner && (
+        <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+          <h2 className="font-display text-3xl text-ink-900">Edit friend profile</h2>
           <form
-            className="mt-6 grid gap-5 md:grid-cols-2"
+            className="mt-6 space-y-6"
             onSubmit={(e) => { e.preventDefault(); setSaveError(null); updateMutation.mutate(formState); }}
           >
-            {/* — Family & access ——————————————————————————————— */}
-            <FormSection title="Family & access" />
+            <EditSubTabBar active={activeEditTab} onChange={setActiveEditTab} />
 
-            <FormField label="Family name">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, familyName: e.target.value }))} value={formState.familyName} />
-            </FormField>
-            <FormField label="Join code">
-              <input className={`${INPUT_CLS} font-mono uppercase tracking-[0.18em]`} onChange={(e) => setFormState((c) => ({ ...c, joinCode: e.target.value.toUpperCase() }))} value={formState.joinCode} />
-            </FormField>
-            <FormField label="Friend display name">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, displayName: e.target.value }))} value={formState.displayName} />
-            </FormField>
-            <FormField label="Newsletter name">
-              <input
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { recipientName: e.target.value || null }))}
-                placeholder="Name used in newsletters (defaults to display name)"
-                value={prefs.recipientName ?? ""}
-              />
-            </FormField>
-            <FormField label="Stage">
-              <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, stage: e.target.value }))} value={formState.stage}>
-                <option value="mild">Mild</option>
-                <option value="moderate">Moderate</option>
-                <option value="severe">Severe</option>
-              </select>
-            </FormField>
-            <FormField label="Access state">
-              <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, accessState: e.target.value }))} value={formState.accessState}>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="archived">Archived</option>
-              </select>
-            </FormField>
-            <FormField label="Email address">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, email: e.target.value || null }))} placeholder="friend@example.com" type="email" value={formState.email ?? ""} />
-            </FormField>
-            <FormField label="Phone number">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, phoneNumber: e.target.value || null }))} placeholder="+1 555 000 0000" type="tel" value={formState.phoneNumber ?? ""} />
-            </FormField>
+            {activeEditTab === "family" && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <FormSection title="Family & access" />
+                <FormField label="Family name"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, familyName: e.target.value }))} value={formState.familyName} /></FormField>
+                <FormField label="Join code"><input className={`${INPUT_CLS} font-mono uppercase tracking-[0.18em]`} onChange={(e) => setFormState((c) => ({ ...c, joinCode: e.target.value.toUpperCase() }))} value={formState.joinCode} /></FormField>
+                <FormField label="Friend display name"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, displayName: e.target.value }))} value={formState.displayName} /></FormField>
+                <FormField label="Newsletter name">
+                  <input className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { recipientName: e.target.value || null }))} placeholder="Name used in newsletters (defaults to display name)" value={prefs.recipientName ?? ""} />
+                </FormField>
+                <FormField label="Stage">
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, stage: e.target.value }))} value={formState.stage}>
+                    <option value="mild">Mild</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="severe">Severe</option>
+                  </select>
+                </FormField>
+                <FormField label="Access state">
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, accessState: e.target.value }))} value={formState.accessState}>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </FormField>
+                <FormField label="Email address"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, email: e.target.value || null }))} placeholder="friend@example.com" type="email" value={formState.email ?? ""} /></FormField>
+                <FormField label="Phone number"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, phoneNumber: e.target.value || null }))} placeholder="+1 555 000 0000" type="tel" value={formState.phoneNumber ?? ""} /></FormField>
+              </div>
+            )}
 
-            {/* — Delivery ——————————————————————————————————————— */}
-            <FormSection title="Delivery schedule" />
+            {activeEditTab === "schedule" && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <FormSection title="Delivery schedule" />
+                <FormField label="Timezone"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, timezone: e.target.value }))} value={formState.timezone} /></FormField>
+                <FormField label="Language">
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, preferredLanguage: e.target.value }))} value={formState.preferredLanguage}>
+                    <option value="">Select language</option>
+                    {(isoCodes?.languages ?? []).map((lang: IsoCodeEntry) => <option key={lang.code} value={lang.code}>{lang.name} ({lang.code})</option>)}
+                  </select>
+                </FormField>
+                <FormField label="Country">
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, country: e.target.value }))} value={formState.country}>
+                    <option value="">Select country</option>
+                    {(isoCodes?.countries ?? []).map((country: IsoCodeEntry) => <option key={country.code} value={country.code}>{country.name} ({country.code})</option>)}
+                  </select>
+                </FormField>
+                <FormField label="Postal code / ZIP"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, postalCode: e.target.value || null }))} placeholder="Used to resolve latitude and longitude" value={formState.postalCode ?? ""} /></FormField>
+                <FormField label="Delivery time"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, deliveryTime: e.target.value }))} placeholder="08:30" value={formState.deliveryTime ?? ""} /></FormField>
+                <TagInput label="Delivery days" onChange={(next) => setFormState((c) => ({ ...c, days: next }))} placeholder="Mon, Wed, Fri…" values={formState.days} />
 
-            <FormField label="Timezone">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, timezone: e.target.value }))} value={formState.timezone} />
-            </FormField>
-            <FormField label="Language">
-              <select
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => ({ ...c, preferredLanguage: e.target.value }))}
-                value={formState.preferredLanguage}
-              >
-                <option value="">Select language</option>
-                {(isoCodes?.languages ?? []).map((lang: IsoCodeEntry) => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.name} ({lang.code})
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <FormField label="Country">
-              <select
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => ({ ...c, country: e.target.value }))}
-                value={formState.country}
-              >
-                <option value="">Select country</option>
-                {(isoCodes?.countries ?? []).map((country: IsoCodeEntry) => (
-                  <option key={country.code} value={country.code}>
-                    {country.name} ({country.code})
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <FormField label="Postal code / ZIP">
-              <input
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => ({ ...c, postalCode: e.target.value || null }))}
-                placeholder="Used to resolve latitude and longitude"
-                value={formState.postalCode ?? ""}
-              />
-            </FormField>
-            <FormField label="Delivery time">
-              <input className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, deliveryTime: e.target.value }))} placeholder="08:30" value={formState.deliveryTime ?? ""} />
-            </FormField>
-            <TagInput
-              label="Delivery days"
-              onChange={(next) => setFormState((c) => ({ ...c, days: next }))}
-              placeholder="Mon, Wed, Fri…"
-              values={formState.days}
-            />
+                <FormSection title="Location & health" />
+                <FormField label="City for weather"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { cityForWeather: e.target.value || null }))} placeholder="City used for the weather provider" value={prefs.cityForWeather ?? ""} /></FormField>
+                <FormField label="Mobility level">
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { mobilityLevel: e.target.value || null }))} value={prefs.mobilityLevel ?? ""}>
+                    <option value="">Not specified</option>
+                    <option value="full">Full mobility</option>
+                    <option value="limited">Limited mobility</option>
+                    <option value="wheelchair">Wheelchair user</option>
+                    <option value="bedbound">Bedbound</option>
+                  </select>
+                </FormField>
+              </div>
+            )}
 
-            {/* — Image sign-in ————————————————————————————————— */}
-            <FormSection title="Image sign-in" />
-            <AuthImagePicker
-              catalog={authCatalog}
-              onChange={(next) => setFormState((c) => ({ ...c, authImageKeys: next }))}
-              values={formState.authImageKeys}
-            />
+            {activeEditTab === "identity" && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <FormSection title="Identity & background" />
+                <FormField label="Preferred pronoun">
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { preferredPronoun: e.target.value || null }))} value={prefs.preferredPronoun ?? ""}>
+                    <option value="">Not specified</option>
+                    <option value="she/her">She / Her</option>
+                    <option value="he/him">He / Him</option>
+                    <option value="they/them">They / Them</option>
+                  </select>
+                </FormField>
+                <FormField label="Era of youth"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { eraOfYouth: e.target.value || null }))} placeholder="e.g. 1950s" value={prefs.eraOfYouth ?? ""} /></FormField>
+                <FormField label="Hometown"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { hometown: e.target.value || null }))} placeholder="City or town they grew up in" value={prefs.hometown ?? ""} /></FormField>
+                <FormField label="Nationality / background"><input className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { nationalityOrBackground: e.target.value || null }))} placeholder="e.g. Irish-American" value={prefs.nationalityOrBackground ?? ""} /></FormField>
+              </div>
+            )}
 
-            {/* — Identity & background ————————————————————————— */}
-            <FormSection title="Identity & background" />
+            {activeEditTab === "people" && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <FormSection title="People & relationships" />
+                <TagInput label="Family members" onChange={(next) => setFormState((c) => setPrefs(c, { familyMembers: next }))} placeholder="Nina, Paul, Maggie…" values={prefs.familyMembers} />
+                <TagInput label="Life roles" onChange={(next) => setFormState((c) => setPrefs(c, { lifeRoles: next }))} placeholder="mother, teacher, nurse…" values={prefs.lifeRoles} />
+                <TagInput label="Pets" onChange={(next) => setFormState((c) => setPrefs(c, { pets: next }))} placeholder="Biscuit the dog, Mittens the cat…" values={prefs.pets} />
 
-            <FormField label="Preferred pronoun">
-              <select
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { preferredPronoun: e.target.value || null }))}
-                value={prefs.preferredPronoun ?? ""}
-              >
-                <option value="">Not specified</option>
-                <option value="she/her">She / Her</option>
-                <option value="he/him">He / Him</option>
-                <option value="they/them">They / Them</option>
-              </select>
-            </FormField>
-            <FormField label="Era of youth">
-              <input
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { eraOfYouth: e.target.value || null }))}
-                placeholder="e.g. 1950s"
-                value={prefs.eraOfYouth ?? ""}
-              />
-            </FormField>
-            <FormField label="Hometown">
-              <input
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { hometown: e.target.value || null }))}
-                placeholder="City or town they grew up in"
-                value={prefs.hometown ?? ""}
-              />
-            </FormField>
-            <FormField label="Nationality / background">
-              <input
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { nationalityOrBackground: e.target.value || null }))}
-                placeholder="e.g. Irish-American"
-                value={prefs.nationalityOrBackground ?? ""}
-              />
-            </FormField>
+                <FormSection title="Interests & preferences" />
+                <TagInput label="Hobbies" onChange={(next) => setFormState((c) => setPrefs(c, { hobbies: next }))} placeholder="gardening, knitting, crosswords…" values={prefs.hobbies} />
+                <TagInput label="Favourite activities" onChange={(next) => setFormState((c) => setPrefs(c, { favoriteActivities: next }))} placeholder="walking, baking, reading…" values={prefs.favoriteActivities} />
+                <TagInput label="Favourite foods" onChange={(next) => setFormState((c) => setPrefs(c, { favouriteFoods: next }))} placeholder="tea and biscuits, apple pie…" values={prefs.favouriteFoods} />
+                <TagInput label="Favourite singers / musicians" onChange={(next) => setFormState((c) => setPrefs(c, { favoriteSingers: next }))} placeholder="Frank Sinatra, Doris Day…" values={prefs.favoriteSingers} />
+                <TagInput label="Favourite TV shows" onChange={(next) => setFormState((c) => setPrefs(c, { favouriteTvShows: next }))} placeholder="Lawrence Welk, Ed Sullivan…" values={prefs.favouriteTvShows} />
+              </div>
+            )}
 
-            {/* — Location & health ————————————————————————————— */}
-            <FormSection title="Location & health" />
+            {activeEditTab === "signin" && (
+              <div className="grid gap-5 md:grid-cols-2">
+                <FormSection title="Image sign-in" />
+                <AuthImagePicker catalog={authCatalog} onChange={(next) => setFormState((c) => ({ ...c, authImageKeys: next }))} values={formState.authImageKeys} />
+              </div>
+            )}
 
-            <FormField label="City for weather">
-              <input
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { cityForWeather: e.target.value || null }))}
-                placeholder="City used for the weather provider"
-                value={prefs.cityForWeather ?? ""}
-              />
-            </FormField>
-            <FormField label="Mobility level">
-              <select
-                className={INPUT_CLS}
-                onChange={(e) => setFormState((c) => setPrefs(c, { mobilityLevel: e.target.value || null }))}
-                value={prefs.mobilityLevel ?? ""}
-              >
-                <option value="">Not specified</option>
-                <option value="full">Full mobility</option>
-                <option value="limited">Limited mobility</option>
-                <option value="wheelchair">Wheelchair user</option>
-                <option value="bedbound">Bedbound</option>
-              </select>
-            </FormField>
-
-            {/* — People ————————————————————————————————————————— */}
-            <FormSection title="People & relationships" />
-
-            <TagInput
-              label="Family members"
-              onChange={(next) => setFormState((c) => setPrefs(c, { familyMembers: next }))}
-              placeholder="Nina, Paul, Maggie…"
-              values={prefs.familyMembers}
-            />
-            <TagInput
-              label="Life roles"
-              onChange={(next) => setFormState((c) => setPrefs(c, { lifeRoles: next }))}
-              placeholder="mother, teacher, nurse…"
-              values={prefs.lifeRoles}
-            />
-            <TagInput
-              label="Pets"
-              onChange={(next) => setFormState((c) => setPrefs(c, { pets: next }))}
-              placeholder="Biscuit the dog, Mittens the cat…"
-              values={prefs.pets}
-            />
-
-            {/* — Interests ————————————————————————————————————— */}
-            <FormSection title="Interests & preferences" />
-
-            <TagInput
-              label="Hobbies"
-              onChange={(next) => setFormState((c) => setPrefs(c, { hobbies: next }))}
-              placeholder="gardening, knitting, crosswords…"
-              values={prefs.hobbies}
-            />
-            <TagInput
-              label="Favourite activities"
-              onChange={(next) => setFormState((c) => setPrefs(c, { favoriteActivities: next }))}
-              placeholder="walking, baking, reading…"
-              values={prefs.favoriteActivities}
-            />
-            <TagInput
-              label="Favourite foods"
-              onChange={(next) => setFormState((c) => setPrefs(c, { favouriteFoods: next }))}
-              placeholder="tea and biscuits, apple pie…"
-              values={prefs.favouriteFoods}
-            />
-            <TagInput
-              label="Favourite singers / musicians"
-              onChange={(next) => setFormState((c) => setPrefs(c, { favoriteSingers: next }))}
-              placeholder="Frank Sinatra, Doris Day…"
-              values={prefs.favoriteSingers}
-            />
-            <TagInput
-              label="Favourite TV shows"
-              onChange={(next) => setFormState((c) => setPrefs(c, { favouriteTvShows: next }))}
-              placeholder="Lawrence Welk, Ed Sullivan…"
-              values={prefs.favouriteTvShows}
-            />
-
-            {/* — Actions ——————————————————————————————————————— */}
-            {saveError ? <p className="md:col-span-2 text-sm text-[#a0382b]">{saveError}</p> : null}
-            <div className="md:col-span-2 flex flex-wrap gap-3 pt-2">
-              <button
-                className="inline-flex rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-800 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={updateMutation.isPending}
-                type="submit"
-              >
+            {saveError ? <p className="text-sm text-[#a0382b]">{saveError}</p> : null}
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button className="inline-flex rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-800 disabled:cursor-not-allowed disabled:opacity-60" disabled={updateMutation.isPending} type="submit">
                 {updateMutation.isPending ? "Saving…" : "Save friend profile"}
               </button>
-              <button
-                className="inline-flex rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-                onClick={() => { setIsEditing(false); setSaveError(null); setFormState(patientToForm(patient)); }}
-                type="button"
-              >
+              <button className="inline-flex rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-ink-900 transition hover:border-black/20" onClick={() => { setSaveError(null); setFormState(patientToForm(patient)); setActiveTab("overview"); setActiveEditTab("family"); }} type="button">
                 Cancel
               </button>
             </div>
           </form>
-        ) : null}
-      </section>
+        </section>
+      )}
 
-      {/* ── Send newsletter ────────────────────────────────────────── */}
-      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className={EYEBROW_CLS}>Manual dispatch</p>
-            <h2 className="mt-2 font-display text-3xl text-ink-900">Send newsletter now</h2>
-            <p className="mt-2 text-sm leading-7 text-ink-700">
-              Assembles and sends today&apos;s newsletter for this friend immediately. Requires an email or phone number on the profile.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <button
-              className="inline-flex rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-800 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={sendNewsletterMutation.isPending}
-              onClick={() => { setSendResult(null); sendNewsletterMutation.mutate(); }}
-              type="button"
-            >
-              {sendNewsletterMutation.isPending ? "Sending…" : "Send newsletter"}
-            </button>
-            {sendResult ? (
-              <p className={`text-sm ${sendResult.ok ? "text-green-700" : "text-[#a0382b]"}`}>
-                {sendResult.ok ? "✓ " : "✗ "}{sendResult.message}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      </section>
+      {/* ── Preferences tab ──────────────────────────────────────────── */}
+      {activeTab === "preferences" && (
+        <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+          <h2 className="font-display text-3xl text-ink-900">Friend preferences</h2>
+          <dl className="mt-5 grid gap-5 md:grid-cols-2">
+            {patient.preferences.hometown ? <div><dt className={EYEBROW_CLS}>Hometown</dt><dd className="mt-2 text-base text-ink-900">{patient.preferences.hometown}</dd></div> : null}
+            {patient.preferences.eraOfYouth ? <div><dt className={EYEBROW_CLS}>Era of youth</dt><dd className="mt-2 text-base text-ink-900">{patient.preferences.eraOfYouth}</dd></div> : null}
+            {patient.preferences.nationalityOrBackground ? <div><dt className={EYEBROW_CLS}>Background</dt><dd className="mt-2 text-base text-ink-900">{patient.preferences.nationalityOrBackground}</dd></div> : null}
+            {patient.preferences.cityForWeather ? <div><dt className={EYEBROW_CLS}>Weather city</dt><dd className="mt-2 text-base text-ink-900">{patient.preferences.cityForWeather}</dd></div> : null}
+            {patient.preferences.mobilityLevel ? <div><dt className={EYEBROW_CLS}>Mobility</dt><dd className="mt-2 text-base capitalize text-ink-900">{patient.preferences.mobilityLevel.replace(/_/g, " ")}</dd></div> : null}
+            {patient.preferences.preferredPronoun ? <div><dt className={EYEBROW_CLS}>Pronoun</dt><dd className="mt-2 text-base text-ink-900">{patient.preferences.preferredPronoun}</dd></div> : null}
+          </dl>
+          {[
+            { label: "Family members", items: patient.preferences.familyMembers },
+            { label: "Life roles", items: patient.preferences.lifeRoles },
+            { label: "Pets", items: patient.preferences.pets },
+            { label: "Hobbies", items: patient.preferences.hobbies },
+            { label: "Favourite activities", items: patient.preferences.favoriteActivities },
+            { label: "Favourite foods", items: patient.preferences.favouriteFoods },
+            { label: "Favourite singers", items: patient.preferences.favoriteSingers },
+            { label: "Favourite TV shows", items: patient.preferences.favouriteTvShows },
+          ].filter(({ items }) => items.length > 0).map(({ label, items }) => (
+            <div key={label} className="mt-5">
+              <p className={EYEBROW_CLS}>{label}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {items.map((item) => (
+                  <span key={item} className="rounded-full border border-black/10 bg-[#fcfaf6] px-3 py-2 text-sm text-ink-700">{item}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
 
-      {/* ── Newsletter preview ─────────────────────────────────────── */}
-      <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 md:px-6">
-      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel md:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className={EYEBROW_CLS}>Newsletter preview</p>
-            <h2 className="mt-2 font-display text-3xl text-ink-900">Daily newsletter</h2>
+      {/* ── Providers tab ────────────────────────────────────────────── */}
+      {activeTab === "providers" && (
+        <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-3xl text-ink-900">Provider selection & order</h2>
+              <p className="mt-2 text-sm leading-7 text-ink-700">Toggle providers on or off, then drag or use the arrows to set the order they appear in the newsletter.</p>
+            </div>
+            <Link className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20" href="/care-circle-family/providers">
+              Open provider catalog
+            </Link>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => shiftPreviewDate(-1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-ink-900 transition hover:border-black/20 hover:bg-[#f8f5f0]"
-              title="Previous day"
-              type="button"
-            >
-              ←
-            </button>
-            <span className="min-w-[120px] text-center text-sm font-semibold text-ink-900">
-              {previewDate === todayStr ? "Today" : previewDate}
-            </span>
-            <button
-              onClick={() => shiftPreviewDate(1)}
-              disabled={previewDate >= todayStr}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-ink-900 transition hover:border-black/20 hover:bg-[#f8f5f0] disabled:cursor-not-allowed disabled:opacity-40"
-              title="Next day"
-              type="button"
-            >
-              →
-            </button>
-            {previewDate === todayStr && (
-              <div className="flex flex-col items-end gap-1">
-                <button
-                  onClick={() => {
-                    setRegenerationMessage(null);
-                    regenerateMutation.mutate();
-                  }}
-                  disabled={regenerateMutation.isPending || Boolean(regenerationJobId)}
-                  className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20 hover:bg-[#f8f5f0] disabled:cursor-not-allowed disabled:opacity-60"
-                  title="Re-run all providers with fresh data"
-                  type="button"
-                >
-                  {regenerateMutation.isPending || regenerationJobId ? "Regenerating…" : "↺ Regenerate"}
+          {isLoadingProviderCatalog || isLoadingProviderConfigs ? (
+            <div className="mt-6"><LoadingState label="Loading provider options" /></div>
+          ) : isProviderCatalogError || isProviderConfigError ? (
+            <div className="mt-6">
+              <ErrorState detail={providerCatalogError instanceof Error ? providerCatalogError.message : providerConfigError instanceof Error ? providerConfigError.message : "Could not load provider settings."} title="Provider settings unavailable" />
+            </div>
+          ) : (
+            <ProviderOrderingPanel patientId={patientId} providerCatalog={providerCatalog ?? []} providerConfigs={providerConfigs ?? []} readOnly={!isOwner} />
+          )}
+        </section>
+      )}
+
+      {/* ── Newsletter tab ───────────────────────────────────────────── */}
+      {activeTab === "newsletter" && isOwner && (
+        <div className="space-y-6">
+          <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className={EYEBROW_CLS}>Manual dispatch</p>
+                <h2 className="mt-2 font-display text-3xl text-ink-900">Send newsletter now</h2>
+                <p className="mt-2 text-sm leading-7 text-ink-700">Assembles and sends today&apos;s newsletter for this friend immediately. Requires an email or phone number on the profile.</p>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <button className="inline-flex rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-800 disabled:cursor-not-allowed disabled:opacity-60" disabled={sendNewsletterMutation.isPending} onClick={() => { setSendResult(null); sendNewsletterMutation.mutate(); }} type="button">
+                  {sendNewsletterMutation.isPending ? "Sending…" : "Send newsletter"}
                 </button>
-                <span className="text-xs text-ink-500">
-                  {regenerationJobId
-                    ? regenerationStatus?.status_message || "Regeneration is running in the background…"
-                    : regenerateMutation.isPending
-                      ? "Starting regeneration…"
-                      : "Fetches fresh data from all providers"}
-                </span>
-                {regenerationMessage ? (
-                  <span className={`text-xs ${regenerationStatus?.state === "FAILED" ? "text-[#a0382b]" : "text-ink-500"}`}>
-                    {regenerationMessage}
-                  </span>
+                {sendResult ? (
+                  <p className={`text-sm ${sendResult.ok ? "text-green-700" : "text-[#a0382b]"}`}>{sendResult.ok ? "✓ " : "✗ "}{sendResult.message}</p>
                 ) : null}
               </div>
-            )}
+            </div>
+          </section>
+
+          <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 md:px-6">
+            <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel md:p-8">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className={EYEBROW_CLS}>Newsletter preview</p>
+                  <h2 className="mt-2 font-display text-3xl text-ink-900">Daily newsletter</h2>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button onClick={() => shiftPreviewDate(-1)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-ink-900 transition hover:border-black/20" title="Previous day" type="button">←</button>
+                  <span className="min-w-[120px] text-center text-sm font-semibold text-ink-900">{previewDate === todayStr ? "Today" : previewDate}</span>
+                  <button onClick={() => shiftPreviewDate(1)} disabled={previewDate >= todayStr} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-ink-900 transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-40" title="Next day" type="button">→</button>
+                  {previewDate === todayStr && (
+                    <div className="flex flex-col items-end gap-1">
+                      <button onClick={() => { setRegenerationMessage(null); regenerateMutation.mutate(); }} disabled={regenerateMutation.isPending || Boolean(regenerationJobId)} className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20 disabled:cursor-not-allowed disabled:opacity-60" type="button">
+                        {regenerateMutation.isPending || regenerationJobId ? "Regenerating…" : "↺ Regenerate"}
+                      </button>
+                      <span className="text-xs text-ink-500">
+                        {regenerationJobId ? regenerationStatus?.status_message || "Regeneration is running in the background…" : regenerateMutation.isPending ? "Starting regeneration…" : "Fetches fresh data from all providers"}
+                      </span>
+                      {regenerationMessage ? <span className={`text-xs ${regenerationStatus?.state === "FAILED" ? "text-[#a0382b]" : "text-ink-500"}`}>{regenerationMessage}</span> : null}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="mt-6">
+                {isLoadingPreview ? (
+                  <LoadingState label="Loading newsletter…" />
+                ) : newsletterPreview?.has_content ? (
+                  <iframe
+                    srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;background:#fff}</style></head><body>${newsletterPreview.html}</body></html>`}
+                    className="w-full rounded-2xl border border-black/10 bg-white"
+                    style={{ height: "900px" }}
+                    title={`Newsletter for ${previewDate}`}
+                    sandbox="allow-same-origin"
+                  />
+                ) : (
+                  <p className="text-sm italic text-ink-600">No newsletter content cached for this date.</p>
+                )}
+              </div>
+            </section>
           </div>
         </div>
-
-        <div className="mt-6">
-          {isLoadingPreview ? (
-            <LoadingState label="Loading newsletter…" />
-          ) : newsletterPreview?.has_content ? (
-            <iframe
-              srcDoc={`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;background:#fff}</style></head><body>${newsletterPreview.html}</body></html>`}
-                className="w-full rounded-2xl border border-black/10 bg-white"
-                style={{ height: "900px" }}
-                title={`Newsletter for ${previewDate}`}
-                sandbox="allow-same-origin"
-              />
-          ) : (
-            <p className="text-sm text-ink-600 italic">No newsletter content cached for this date.</p>
-          )}
-        </div>
-      </section>
-      </div>
-
-      {/* ── Profile summary ────────────────────────────────────────── */}
-      <section className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
-        <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="font-display text-3xl text-ink-900">Profile summary</h2>
-            <PatientAccessStateBadge state={patient.accessState as "active" | "inactive" | "archived"} />
-          </div>
-          <dl className="mt-6 grid gap-5 md:grid-cols-2">
-            <div>
-              <dt className={EYEBROW_CLS}>Family</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.familyName}</dd>
-            </div>
-            <div>
-              <dt className={EYEBROW_CLS}>Join code</dt>
-              <dd className="mt-2 font-mono text-base uppercase tracking-[0.18em] text-ink-900">{patient.joinCode}</dd>
-            </div>
-            <div>
-              <dt className={EYEBROW_CLS}>Stage</dt>
-              <dd className="mt-2 text-base capitalize text-ink-900">{patient.stage}</dd>
-            </div>
-            <div>
-              <dt className={EYEBROW_CLS}>Delivery</dt>
-              <dd className="mt-2 text-base text-ink-900">
-                {patient.deliveryTime ?? "Flexible"}{patient.days.length > 0 ? ` · ${patient.days.join(", ")}` : ""}
-              </dd>
-            </div>
-            <div>
-              <dt className={EYEBROW_CLS}>Timezone</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.timezone}</dd>
-            </div>
-            <div>
-              <dt className={EYEBROW_CLS}>Language</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.preferredLanguage}</dd>
-            </div>
-            <div>
-              <dt className={EYEBROW_CLS}>Country</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.country}</dd>
-            </div>
-            {patient.postalCode ? (
-              <div>
-                <dt className={EYEBROW_CLS}>Postal code / ZIP</dt>
-                <dd className="mt-2 text-base text-ink-900">{patient.postalCode}</dd>
-              </div>
-            ) : null}
-            {typeof patient.latitude === "number" && typeof patient.longitude === "number" ? (
-              <div className="md:col-span-2">
-                <dt className={EYEBROW_CLS}>Resolved coordinates</dt>
-                <dd className="mt-2 text-base text-ink-900">
-                  {patient.latitude.toFixed(5)}, {patient.longitude.toFixed(5)}
-                </dd>
-              </div>
-            ) : null}
-            {patient.email ? (
-              <div>
-                <dt className={EYEBROW_CLS}>Email</dt>
-                <dd className="mt-2 text-base text-ink-900">{patient.email}</dd>
-              </div>
-            ) : null}
-            {patient.phoneNumber ? (
-              <div>
-                <dt className={EYEBROW_CLS}>Phone</dt>
-                <dd className="mt-2 text-base text-ink-900">{patient.phoneNumber}</dd>
-              </div>
-            ) : null}
-          </dl>
-        </article>
-
-        <article className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-          <h2 className="font-display text-3xl text-ink-900">Image sign-in</h2>
-          <p className="mt-4 text-sm leading-7 text-ink-700">
-            Three familiar images assigned for direct friend access.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {patient.authImageKeys.map((key) => (
-              <span key={key} className="rounded-full border border-black/10 bg-[#fcfaf6] px-3 py-2 text-sm font-semibold capitalize text-ink-900">
-                {key}
-              </span>
-            ))}
-          </div>
-          <Link className="mt-6 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20" href="/care-circle-patient/login">
-            Preview friend sign-in
-          </Link>
-        </article>
-      </section>
-
-      {/* ── Preferences summary ────────────────────────────────────── */}
-      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-        <h2 className="font-display text-3xl text-ink-900">Friend preferences</h2>
-        <dl className="mt-5 grid gap-5 md:grid-cols-2">
-          {patient.preferences.hometown ? (
-            <div>
-              <dt className={EYEBROW_CLS}>Hometown</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.preferences.hometown}</dd>
-            </div>
-          ) : null}
-          {patient.preferences.eraOfYouth ? (
-            <div>
-              <dt className={EYEBROW_CLS}>Era of youth</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.preferences.eraOfYouth}</dd>
-            </div>
-          ) : null}
-          {patient.preferences.nationalityOrBackground ? (
-            <div>
-              <dt className={EYEBROW_CLS}>Background</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.preferences.nationalityOrBackground}</dd>
-            </div>
-          ) : null}
-          {patient.preferences.cityForWeather ? (
-            <div>
-              <dt className={EYEBROW_CLS}>Weather city</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.preferences.cityForWeather}</dd>
-            </div>
-          ) : null}
-          {patient.preferences.mobilityLevel ? (
-            <div>
-              <dt className={EYEBROW_CLS}>Mobility</dt>
-              <dd className="mt-2 text-base capitalize text-ink-900">{patient.preferences.mobilityLevel.replace(/_/g, " ")}</dd>
-            </div>
-          ) : null}
-          {patient.preferences.preferredPronoun ? (
-            <div>
-              <dt className={EYEBROW_CLS}>Pronoun</dt>
-              <dd className="mt-2 text-base text-ink-900">{patient.preferences.preferredPronoun}</dd>
-            </div>
-          ) : null}
-        </dl>
-
-        {[
-          { label: "Family members", items: patient.preferences.familyMembers },
-          { label: "Life roles", items: patient.preferences.lifeRoles },
-          { label: "Pets", items: patient.preferences.pets },
-          { label: "Hobbies", items: patient.preferences.hobbies },
-          { label: "Favourite activities", items: patient.preferences.favoriteActivities },
-          { label: "Favourite foods", items: patient.preferences.favouriteFoods },
-          { label: "Favourite singers", items: patient.preferences.favoriteSingers },
-          { label: "Favourite TV shows", items: patient.preferences.favouriteTvShows },
-        ].filter(({ items }) => items.length > 0).map(({ label, items }) => (
-          <div key={label} className="mt-5">
-            <p className={EYEBROW_CLS}>{label}</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {items.map((item) => (
-                <span key={item} className="rounded-full border border-black/10 bg-[#fcfaf6] px-3 py-2 text-sm text-ink-700">
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* ── Provider ordering ──────────────────────────────────────── */}
-      <section className="rounded-[28px] border border-black/10 bg-white/82 p-6 shadow-panel">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-3xl text-ink-900">Provider selection & order</h2>
-            <p className="mt-2 text-sm leading-7 text-ink-700">
-              Toggle providers on or off, then drag or use the arrows to set the order they appear in the newsletter.
-            </p>
-          </div>
-          <Link
-            className="inline-flex rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"
-            href="/care-circle-family/providers"
-          >
-            Open provider catalog
-          </Link>
-        </div>
-
-        {isLoadingProviderCatalog || isLoadingProviderConfigs ? (
-          <div className="mt-6"><LoadingState label="Loading provider options" /></div>
-        ) : isProviderCatalogError || isProviderConfigError ? (
-          <div className="mt-6">
-            <ErrorState
-              detail={
-                providerCatalogError instanceof Error ? providerCatalogError.message
-                  : providerConfigError instanceof Error ? providerConfigError.message
-                  : "Could not load provider settings."
-              }
-              title="Provider settings unavailable"
-            />
-          </div>
-        ) : (
-          <ProviderOrderingPanel
-            patientId={patientId}
-            providerCatalog={providerCatalog ?? []}
-            providerConfigs={providerConfigs ?? []}
-            readOnly={!isOwner}
-          />
-        )}
-      </section>
+      )}
     </div>
   );
 }

@@ -3,13 +3,14 @@ import { expect, test } from "@playwright/test";
 import { mockAppApis } from "./helpers";
 
 test.describe("Care Circle Family UI", () => {
-  test("family landing page renders with navigation links", async ({ page }) => {
+  test("family landing page renders welcome and quick links", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family");
 
-    await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Friends View and manage all friend profiles." })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Friend sign-in Preview the picture-based sign-in flow." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Care Circle Family" })).toBeVisible();
+    await expect(page.getByTestId("hub-card-friends")).toBeVisible();
+    await expect(page.getByTestId("hub-card-recent-activity")).toBeVisible();
+    await expect(page.getByTestId("hub-card-media")).toBeVisible();
   });
 
   test("family patients page renders patient list", async ({ page }) => {
@@ -35,11 +36,13 @@ test.describe("Care Circle Family UI", () => {
     await expect(page.getByText("crosswords")).toBeVisible();
   });
 
-  test("family patients page shows family circle members", async ({ page }) => {
+  test("family patients page shows per-friend stats", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family/patients");
 
-    await expect(page.getByText("Family circle: Nina, Paul, Maggie")).toBeVisible();
+    await expect(page.getByText("Nina, Paul, Maggie")).toBeVisible();
+    await expect(page.getByText(/Newsletters mailed/).first()).toBeVisible();
+    await expect(page.getByText(/Joined/).first()).toBeVisible();
   });
 
   test("family patients page allows navigation to patient detail", async ({ page }) => {
@@ -116,7 +119,9 @@ test.describe("Care Circle Family UI", () => {
 
   test("family patient detail page allows provider selection per patient", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await page.goto("/care-circle-family/patients/1?edit=1");
+    await page.goto("/care-circle-family/patients/1");
+
+    await page.getByRole("tab", { name: "Providers" }).click();
 
     const providerSection = page.locator("section", { has: page.getByRole("heading", { name: "Provider selection & order" }) });
 

@@ -122,11 +122,7 @@ test.describe("Blog authoring", () => {
   });
 
   test("blog dashboard shows empty state when no posts", async ({ page }) => {
-    await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/blog/posts**", async (route) => {
-      await route.fulfill({ status: 200, contentType: "application/json",
-        body: JSON.stringify({ success: true, data: [] }) });
-    });
+    await mockAppApis(page, { session: "authenticated", authorBlogPosts: "empty" });
     await page.goto("/storytelling/blog");
 
     await expect(page.getByTestId("blog-empty-state")).toBeVisible();

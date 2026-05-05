@@ -1,0 +1,471 @@
+<style>
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: none !important;
+}
+
+table td,
+table th {
+    border: none !important;
+    padding: 10px !important;
+}
+
+
+/*
+ * Theme: Classic
+ * A warm, familiar design with soft colors and high readability.
+ * Designed for memory-care / dementia-friendly newsletters.
+ *
+ * BEM Pattern:
+ *   .section                 — card container
+ *   .section--{provider}     — color variant
+ *   .section__title          — heading
+ *   .section__body           — paragraph text
+ */
+
+/* === Base Reset === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Verdana', 'Arial', sans-serif;
+    font-size: 22px;
+    line-height: 1.6;
+    color: #1e293b;
+    background: #ffffff;
+}
+
+/* === Section Card === */
+.section {
+    width: 100%;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.section__title {
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid currentColor;
+}
+
+.section__body {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.7;
+}
+
+.section__body--italic {
+    font-style: italic;
+}
+
+.section__body--large {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.section__subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+/* === Provider Color Variants === */
+
+/* Slate — weather */
+.section--weather {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+.section--weather .section__title {
+    color: #1e293b;
+    border-color: #cbd5e1;
+}
+
+/* Blue — news and history */
+.section--world-news,
+.section--this_day_history,
+.section--local_history {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+.section--world-news .section__title,
+.section--this_day_history .section__title,
+.section--local_history .section__title {
+    color: #1e3a8a;
+    border-color: #bfdbfe;
+}
+
+/* Amber — nostalgia, trivia, quotes, music */
+.section--nostalgia,
+.section--ai_trivia,
+.section--daily_quote,
+.section--song-of-the-day {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__title,
+.section--ai_trivia .section__title,
+.section--daily_quote .section__title,
+.section--song-of-the-day .section__title {
+    color: #78350f;
+    border-color: #fde68a;
+}
+.section--nostalgia .section__body,
+.section--ai_trivia .section__body {
+    color: #92400e;
+}
+
+/* Orange — hobbies, pets, recipes */
+.section--hobby_spotlight,
+.section--simple_recipe,
+.section--cat_fact,
+.section--dog_photo {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.section--hobby_spotlight .section__title,
+.section--simple_recipe .section__title,
+.section--cat_fact .section__title,
+.section--dog_photo .section__title {
+    color: #7c2d12;
+    border-color: #fed7aa;
+}
+
+/* Green — brain games and logic puzzles */
+.section--puzzle,
+.section--brain_booster,
+.section--riddle,
+.section--spot-the-difference,
+.section--finish-phrase {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+.section--puzzle .section__title,
+.section--brain_booster .section__title,
+.section--riddle .section__title,
+.section--spot-the-difference .section__title,
+.section--finish-phrase .section__title {
+    color: #064e3b;
+    border-color: #a7f3d0;
+}
+
+/* Teal — word puzzles */
+.section--missing-vowels,
+.section--word-scramble,
+.section--gridless-crossword,
+.section--complete-the-duo,
+.section--odd-one-out {
+    background: #f0fdfa;
+    border-color: #99f6e4;
+}
+.section--missing-vowels .section__title,
+.section--word-scramble .section__title,
+.section--gridless-crossword .section__title,
+.section--complete-the-duo .section__title,
+.section--odd-one-out .section__title {
+    color: #134e4a;
+    border-color: #99f6e4;
+}
+
+/* Lime — nature, movement, and activity */
+.section--nature_scene,
+.section--gentle_exercise,
+.section--activity_suggestion {
+    background: #f7fee7;
+    border-color: #d9f99d;
+}
+.section--nature_scene .section__title,
+.section--gentle_exercise .section__title,
+.section--activity_suggestion .section__title {
+    color: #365314;
+    border-color: #d9f99d;
+}
+
+/* Indigo — jokes and sensory */
+.section--joke,
+.section--sensory {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+.section--joke .section__title,
+.section--sensory .section__title {
+    color: #312e81;
+    border-color: #c7d2fe;
+}
+
+/* Purple — affirmations and gratitude */
+.section--gratitude,
+.section--daily_affirmation,
+.section--personal_affirmation {
+    background: #faf5ff;
+    border-color: #e9d5ff;
+}
+.section--gratitude .section__title,
+.section--daily_affirmation .section__title,
+.section--personal_affirmation .section__title {
+    color: #581c87;
+    border-color: #e9d5ff;
+}
+
+/* Rose — personal letters and family */
+.section--family_greeting,
+.section--family {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    text-align: center;
+}
+.section--family_greeting .section__title,
+.section--family .section__title {
+    color: #881337;
+    border-color: #fecdd3;
+}
+.section--family_greeting .section__body,
+.section--family .section__body {
+    color: #9f1239;
+    font-weight: 700;
+}
+.section--pen-pal-letter {
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+.section--pen-pal-letter .section__title {
+    color: #881337;
+    border-color: #fecdd3;
+}
+
+/* === Utilities === */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #64748b;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 30px;
+}
+
+.text-2xl {
+    font-size: 38px;
+}
+
+.mt-md {
+    margin-top: 16px;
+}
+
+.mb-md {
+    margin-bottom: 16px;
+}
+
+.divider {
+    border-top: 2px solid #e2e8f0;
+    margin: 20px 0;
+}
+
+/* === Print === */
+@media print {
+    body {
+        background: #fff;
+    }
+
+    .section {
+        break-inside: avoid;
+    }
+}
+
+.bingo {
+    padding: 10px;
+    text-align: center;
+}
+
+.bingo__table {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    border: 3px solid #1e293b;
+}
+
+.bingo__header-row {
+    background: #f1f5f9;
+}
+
+.bingo__header-cell {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+    font-size: 18px;
+}
+
+.bingo__cell {
+    min-width: 60px;
+    min-height: 50px;
+    padding: 12px 8px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.bingo__cell--free {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+</style>
+<table class="section section--bingo" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
+    <h2 class="section__title">🎯 Bingo Time!</h2>
+    <p class="section__subtitle">Mark the words as you find them in today&#39;s newsletter!</p>
+    <div class="section__body bingo">
+        <table class="bingo__table">
+            <tr class="bingo__header-row">
+                <th class="bingo__header-cell">B</th>
+                <th class="bingo__header-cell">I</th>
+                <th class="bingo__header-cell">N</th>
+                <th class="bingo__header-cell">G</th>
+                <th class="bingo__header-cell">O</th>
+            </tr>
+            
+            <tr>
+                
+                <td class="bingo__cell">
+                    Bear
+                </td>
+                
+                <td class="bingo__cell">
+                    Guitar
+                </td>
+                
+                <td class="bingo__cell">
+                    Sheet
+                </td>
+                
+                <td class="bingo__cell">
+                    Balcony
+                </td>
+                
+                <td class="bingo__cell">
+                    Pastry
+                </td>
+                
+            </tr>
+            
+            <tr>
+                
+                <td class="bingo__cell">
+                    Morning
+                </td>
+                
+                <td class="bingo__cell">
+                    Villa
+                </td>
+                
+                <td class="bingo__cell">
+                    Apple
+                </td>
+                
+                <td class="bingo__cell">
+                    Lily
+                </td>
+                
+                <td class="bingo__cell">
+                    Cookie
+                </td>
+                
+            </tr>
+            
+            <tr>
+                
+                <td class="bingo__cell">
+                    Letter
+                </td>
+                
+                <td class="bingo__cell">
+                    Hope
+                </td>
+                
+                <td class="bingo__cell bingo__cell--free">
+                    FREE
+                </td>
+                
+                <td class="bingo__cell">
+                    Card
+                </td>
+                
+                <td class="bingo__cell">
+                    Flute
+                </td>
+                
+            </tr>
+            
+            <tr>
+                
+                <td class="bingo__cell">
+                    Silk
+                </td>
+                
+                <td class="bingo__cell">
+                    Winter
+                </td>
+                
+                <td class="bingo__cell">
+                    Grape
+                </td>
+                
+                <td class="bingo__cell">
+                    Pocket
+                </td>
+                
+                <td class="bingo__cell">
+                    Zipper
+                </td>
+                
+            </tr>
+            
+            <tr>
+                
+                <td class="bingo__cell">
+                    Potato
+                </td>
+                
+                <td class="bingo__cell">
+                    Harvest
+                </td>
+                
+                <td class="bingo__cell">
+                    Clarinet
+                </td>
+                
+                <td class="bingo__cell">
+                    Friend
+                </td>
+                
+                <td class="bingo__cell">
+                    Basket
+                </td>
+                
+            </tr>
+            
+        </table>
+    </div>
+  </td></tr>
+</table>

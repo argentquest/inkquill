@@ -32,7 +32,8 @@ async def get_forum_categories(
     db: AsyncSession,
     skip: int = 0,
     limit: int = 100,
-    include_inactive: bool = False
+    include_inactive: bool = False,
+    app_source: Optional[str] = None,
 ) -> List[ForumCategory]:
     """Get all forum categories with pagination."""
     query = select(ForumCategory).options(
@@ -42,6 +43,9 @@ async def get_forum_categories(
     
     if not include_inactive:
         query = query.where(ForumCategory.is_active == True)
+
+    if app_source:
+        query = query.where(ForumCategory.app_source == app_source)
     
     query = query.order_by(ForumCategory.sort_order, ForumCategory.name)
     query = query.offset(skip).limit(limit)

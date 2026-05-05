@@ -1,7 +1,7 @@
 {
-  "enabled": false,
-  "message": "The application is getting an update and will be back in about 5 minutes.",
-  "start_time": null,
-  "estimated_end_time": null,
-  "duration_minutes": null
+  "enabled": true,
+  "message": "Upgrade in progress",
+  "start_time": "2026-05-04T06:37:03.485079",
+  "estimated_end_time": "2026-05-04T06:52:03.485079",
+  "duration_minutes": 15
 }

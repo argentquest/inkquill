@@ -17,6 +17,8 @@ interface MockOptions {
   billingDashboard?: DataMode;
   referrals?: DataMode;
   onboarding?: DataMode;
+  blogPosts?: "default" | "empty";
+  authorBlogPosts?: "default" | "empty";
 }
 
 const authenticatedUser = {
@@ -43,6 +45,8 @@ const careCirclePatients: any[] = [
     authImageKeys: ["sun", "dog", "house"],
     email: null,
     phoneNumber: null,
+    created_at: "2026-01-15T10:00:00Z",
+    newsletters_sent: 12,
     preferences: {
       recipientName: null, preferredPronoun: "she/her",
       hometown: "Springfield", cityForWeather: "Chicago",
@@ -83,6 +87,8 @@ const careCirclePatients: any[] = [
     authImageKeys: ["tree", "car", "star"],
     email: null,
     phoneNumber: null,
+    created_at: "2026-02-01T09:00:00Z",
+    newsletters_sent: 5,
     preferences: {
       recipientName: null, preferredPronoun: "he/him",
       hometown: null, cityForWeather: "New York",
@@ -464,6 +470,7 @@ const forumCategoriesSeed = [
     is_active: true,
     icon: "🌍",
     thread_count: 12,
+    app_source: "storytelling",
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-04-01T00:00:00Z",
   },
@@ -476,6 +483,124 @@ const forumCategoriesSeed = [
     is_active: true,
     icon: "✍️",
     thread_count: 8,
+    app_source: "storytelling",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 3,
+    name: "Story Feedback & Critique",
+    description: "Share works-in-progress and get reader feedback.",
+    slug: "story-feedback-critique",
+    sort_order: 3,
+    is_active: true,
+    icon: "💬",
+    thread_count: 5,
+    app_source: "storytelling",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 4,
+    name: "Character Workshop",
+    description: "Character development, backstories, and motivation deep-dives.",
+    slug: "character-workshop",
+    sort_order: 4,
+    is_active: true,
+    icon: "🎭",
+    thread_count: 4,
+    app_source: "storytelling",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 5,
+    name: "Writing Craft & Tips",
+    description: "General writing advice, prompts, and technique discussions.",
+    slug: "writing-craft-tips",
+    sort_order: 5,
+    is_active: true,
+    icon: "📝",
+    thread_count: 6,
+    app_source: "storytelling",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 6,
+    name: "AI Collaboration",
+    description: "Strategies for working with AI tools, prompt tips, and generation techniques.",
+    slug: "ai-collaboration",
+    sort_order: 6,
+    is_active: true,
+    icon: "🤖",
+    thread_count: 3,
+    app_source: "storytelling",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 7,
+    name: "Care Tips & Resources",
+    description: "Caregiving advice, medical info, daily routines, and best practices.",
+    slug: "care-tips-resources",
+    sort_order: 1,
+    is_active: true,
+    icon: "🩺",
+    thread_count: 2,
+    app_source: "care-circle",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 8,
+    name: "Family Coordination",
+    description: "Planning, schedules, events, and logistics for the care circle.",
+    slug: "family-coordination",
+    sort_order: 2,
+    is_active: true,
+    icon: "📅",
+    thread_count: 1,
+    app_source: "care-circle",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 9,
+    name: "Memory Lane",
+    description: "Sharing memories, photos, and stories about friends and loved ones.",
+    slug: "memory-lane",
+    sort_order: 3,
+    is_active: true,
+    icon: "📸",
+    thread_count: 1,
+    app_source: "care-circle",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 10,
+    name: "Wellness & Activities",
+    description: "Ideas for outings, activities, and keeping friends engaged.",
+    slug: "wellness-activities",
+    sort_order: 4,
+    is_active: true,
+    icon: "🌿",
+    thread_count: 1,
+    app_source: "care-circle",
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-04-01T00:00:00Z",
+  },
+  {
+    id: 11,
+    name: "Getting Help",
+    description: "Questions about using the Circle Friends app and troubleshooting.",
+    slug: "getting-help",
+    sort_order: 5,
+    is_active: true,
+    icon: "❓",
+    thread_count: 0,
+    app_source: "care-circle",
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-04-01T00:00:00Z",
   },
@@ -503,6 +628,7 @@ const forumThreadsSeed = [
     is_locked: false,
     created_at: "2026-04-20T08:00:00Z",
     updated_at: "2026-04-26T09:00:00Z",
+    app_source: "storytelling",
     posts: [
       {
         id: 1,
@@ -522,6 +648,150 @@ const forumThreadsSeed = [
       },
     ],
   },
+  {
+    id: 2,
+    title: "Best routines for morning care?",
+    slug: "best-routines-for-morning-care",
+    status: "open",
+    category_id: 3,
+    category_name: "Care Tips & Resources",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 45,
+    post_count: 3,
+    last_post_at: "2026-04-25T10:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-22T08:00:00Z",
+    updated_at: "2026-04-25T10:00:00Z",
+    app_source: "care-circle",
+    posts: [],
+  },
+  {
+    id: 3,
+    title: "Favorite AI prompts for character voice?",
+    slug: "favorite-ai-prompts-for-character-voice",
+    status: "open",
+    category_id: 6,
+    category_name: "AI Collaboration",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 88,
+    post_count: 4,
+    last_post_at: "2026-04-28T11:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-25T08:00:00Z",
+    updated_at: "2026-04-28T11:00:00Z",
+    app_source: "storytelling",
+    posts: [],
+  },
+  {
+    id: 4,
+    title: "Plot twist techniques that actually work",
+    slug: "plot-twist-techniques-that-actually-work",
+    status: "open",
+    category_id: 5,
+    category_name: "Writing Craft & Tips",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 210,
+    post_count: 12,
+    last_post_at: "2026-04-29T14:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-18T08:00:00Z",
+    updated_at: "2026-04-29T14:00:00Z",
+    app_source: "storytelling",
+    posts: [],
+  },
+  {
+    id: 5,
+    title: "Creating believable political systems",
+    slug: "creating-believable-political-systems",
+    status: "open",
+    category_id: 1,
+    category_name: "World Building",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 156,
+    post_count: 8,
+    last_post_at: "2026-04-30T09:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-23T08:00:00Z",
+    updated_at: "2026-04-30T09:00:00Z",
+    app_source: "storytelling",
+    posts: [],
+  },
+  {
+    id: 6,
+    title: "Photo sharing tips for Memory Lane?",
+    slug: "photo-sharing-tips-for-memory-lane",
+    status: "open",
+    category_id: 9,
+    category_name: "Memory Lane",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 34,
+    post_count: 2,
+    last_post_at: "2026-04-27T10:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-24T08:00:00Z",
+    updated_at: "2026-04-27T10:00:00Z",
+    app_source: "care-circle",
+    posts: [],
+  },
+  {
+    id: 7,
+    title: "Character arcs vs flat characters",
+    slug: "character-arcs-vs-flat-characters",
+    status: "open",
+    category_id: 4,
+    category_name: "Character Workshop",
+    user_id: 7,
+    username: "storymaker",
+    world_id: null,
+    world_name: null,
+    story_id: null,
+    story_title: null,
+    view_count: 172,
+    post_count: 9,
+    last_post_at: "2026-05-01T10:00:00Z",
+    last_post_by_username: "storymaker",
+    is_pinned: false,
+    is_locked: false,
+    created_at: "2026-04-26T08:00:00Z",
+    updated_at: "2026-05-01T10:00:00Z",
+    app_source: "storytelling",
+    posts: [],
+  },
 ];
 
 const blogPostsSeed = [
@@ -540,6 +810,126 @@ const blogPostsSeed = [
     published_at: "2026-04-15T12:00:00Z",
     created_at: "2026-04-15T10:00:00Z",
     updated_at: "2026-04-15T12:00:00Z",
+    app_source: "storytelling",
+  },
+  {
+    id: 2,
+    title: "Welcome to Care Circle",
+    slug: "welcome-to-care-circle",
+    content: "<p>Getting started with your family care circle.</p>",
+    excerpt: "Tips for setting up your first care circle.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 120,
+    like_count: 8,
+    comment_count: 2,
+    published_at: "2026-04-20T10:00:00Z",
+    created_at: "2026-04-20T10:00:00Z",
+    updated_at: "2026-04-20T10:00:00Z",
+    app_source: "care-circle",
+  },
+  {
+    id: 3,
+    title: "AI Prompting for Dialogue",
+    slug: "ai-prompting-for-dialogue",
+    content: "<p>Tips for generating natural dialogue with AI.</p>",
+    excerpt: "How to craft prompts that yield realistic character conversations.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 340,
+    like_count: 18,
+    comment_count: 4,
+    published_at: "2026-04-22T10:00:00Z",
+    created_at: "2026-04-22T08:00:00Z",
+    updated_at: "2026-04-22T10:00:00Z",
+    app_source: "storytelling",
+  },
+  {
+    id: 4,
+    title: "Using Memory Lane with Photos",
+    slug: "using-memory-lane-with-photos",
+    content: "<p>How to share photos in Memory Lane.</p>",
+    excerpt: "A guide to uploading and organizing family photos.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 85,
+    like_count: 5,
+    comment_count: 1,
+    published_at: "2026-04-24T10:00:00Z",
+    created_at: "2026-04-24T08:00:00Z",
+    updated_at: "2026-04-24T10:00:00Z",
+    app_source: "care-circle",
+  },
+  {
+    id: 5,
+    title: "Building Fantasy Economies",
+    slug: "building-fantasy-economies",
+    content: "<p>Trade, currency, and resource systems in world building.</p>",
+    excerpt: "Designing believable economic systems for your fantasy world.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 520,
+    like_count: 31,
+    comment_count: 7,
+    published_at: "2026-04-25T10:00:00Z",
+    created_at: "2026-04-25T08:00:00Z",
+    updated_at: "2026-04-25T10:00:00Z",
+    app_source: "storytelling",
+  },
+  {
+    id: 6,
+    title: "Care Circle Scheduling Tips",
+    slug: "care-circle-scheduling-tips",
+    content: "<p>How to set up daily schedules for your circle.</p>",
+    excerpt: "Best practices for scheduling care visits and activities.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 200,
+    like_count: 12,
+    comment_count: 3,
+    published_at: "2026-04-26T10:00:00Z",
+    created_at: "2026-04-26T08:00:00Z",
+    updated_at: "2026-04-26T10:00:00Z",
+    app_source: "care-circle",
+  },
+  {
+    id: 7,
+    title: "Character Voice Worksheets",
+    slug: "character-voice-worksheets",
+    content: "<p>Downloadable worksheets for developing character voice.</p>",
+    excerpt: "Free worksheets to help define how your characters speak.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 410,
+    like_count: 24,
+    comment_count: 5,
+    published_at: "2026-04-27T10:00:00Z",
+    created_at: "2026-04-27T08:00:00Z",
+    updated_at: "2026-04-27T10:00:00Z",
+    app_source: "storytelling",
+  },
+  {
+    id: 8,
+    title: "Writing Rituals That Stick",
+    slug: "writing-rituals-that-stick",
+    content: "<p>Building a consistent writing practice.</p>",
+    excerpt: "How to create writing habits that last.",
+    featured_image_url: null,
+    status: "published",
+    author_id: 7,
+    view_count: 670,
+    like_count: 45,
+    comment_count: 9,
+    published_at: "2026-04-28T10:00:00Z",
+    created_at: "2026-04-28T08:00:00Z",
+    updated_at: "2026-04-28T10:00:00Z",
+    app_source: "storytelling",
   },
 ];
 
@@ -698,6 +1088,8 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     ...t,
     posts: t.posts.map((p) => ({ ...p })),
   }));
+  let mutableBlogPosts: any[] = blogPostsSeed.map((p) => ({ ...p }));
+  let mutableAuthorBlogPosts: any[] = authorBlogPostsSeed.map((p) => ({ ...p }));
 
   let mutableChatbotSession = {
     ...chatbotSessionWithMessages,
@@ -770,7 +1162,12 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     const method = route.request().method();
 
     if (url.includes("/api/forum/categories") && method === "GET") {
-      await route.fulfill(json({ success: true, data: forumCategoriesSeed }));
+      const searchParams = new URL(url).searchParams;
+      const appSource = searchParams.get("app_source");
+      const filtered = appSource
+        ? forumCategoriesSeed.filter((c) => c.app_source === appSource)
+        : forumCategoriesSeed;
+      await route.fulfill(json({ success: true, data: filtered }));
       return;
     }
 
@@ -791,29 +1188,49 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         title?: string;
         category_id?: number;
         initial_post_content?: string;
+        app_source?: string;
       };
+      const appSource = body.app_source ?? "storytelling";
+      const category = forumCategoriesSeed.find((c) => c.id === body.category_id);
+      const now = new Date().toISOString();
       const newThread = {
-        ...forumThreadsSeed[0],
         id: 99,
         title: body.title ?? "New thread",
+        slug: "new-thread",
+        status: "open",
         category_id: body.category_id ?? 1,
+        category_name: category?.name ?? "General",
+        user_id: 7,
+        username: "storymaker",
+        world_id: null,
+        world_name: null,
+        story_id: null,
+        story_title: null,
+        view_count: 0,
         post_count: 1,
+        last_post_at: now,
+        last_post_by_username: "storymaker",
+        is_pinned: false,
+        is_locked: false,
+        created_at: now,
+        updated_at: now,
+        app_source: appSource,
         posts: [
           {
             id: 999,
             content: body.initial_post_content ?? "",
             content_html: null,
             thread_id: 99,
-            user_id: 1,
-            username: "testuser",
-            user_display_name: "Test User",
+            user_id: 7,
+            username: "storymaker",
+            user_display_name: "Story Maker",
             upvote_count: 0,
             downvote_count: 0,
             score: 0,
             edit_count: 0,
             is_deleted: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+            created_at: now,
+            updated_at: now,
           },
         ],
       };
@@ -823,7 +1240,12 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     }
 
     if (url.includes("/api/forum/threads") && method === "GET") {
-      await route.fulfill(json({ success: true, data: mutableForumThreads }));
+      const searchParams = new URL(url).searchParams;
+      const appSource = searchParams.get("app_source");
+      const filtered = appSource
+        ? mutableForumThreads.filter((t) => t.app_source === appSource)
+        : mutableForumThreads;
+      await route.fulfill(json({ success: true, data: filtered }));
       return;
     }
 
@@ -878,23 +1300,6 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
         return;
       }
       await route.fulfill(json({ success: true, data: post }));
-      return;
-    }
-
-    await route.fallback();
-  });
-
-  await page.route("**/api/blog/posts*", async (route) => {
-    const url = route.request().url();
-    const method = route.request().method();
-
-    if (method === "GET") {
-      const searchParams = new URL(url).searchParams;
-      const search = searchParams.get("search");
-      const posts = search
-        ? blogPostsSeed.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()))
-        : blogPostsSeed;
-      await route.fulfill(json({ success: true, data: posts }));
       return;
     }
 
@@ -1645,6 +2050,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
   });
 
   // Sprint 10 — Blog authoring routes (same-origin /api/blog/posts with author_id filter)
+  // Also handles public blog listings (app_source filter).
   await page.route("**/api/blog/posts**", async (route) => {
     const url = route.request().url();
     const method = route.request().method();
@@ -1656,16 +2062,27 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
 
     if (method === "GET" && !postIdMatch && !slugMatch) {
       if (hasAuthorId) {
-        await route.fulfill(json({ success: true, data: authorBlogPostsSeed }));
+        const authorPosts =
+          options.authorBlogPosts === "empty" ? [] : mutableAuthorBlogPosts;
+        await route.fulfill(json({ success: true, data: authorPosts }));
         return;
       }
-      await route.fallback();
+      const search = urlObj.searchParams.get("search");
+      const appSource = urlObj.searchParams.get("app_source");
+      let posts = options.blogPosts === "empty" ? [] : mutableBlogPosts;
+      if (appSource) {
+        posts = posts.filter((p) => p.app_source === appSource);
+      }
+      if (search) {
+        posts = posts.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()));
+      }
+      await route.fulfill(json({ success: true, data: posts }));
       return;
     }
 
     if (method === "GET" && postIdMatch) {
       const id = Number(postIdMatch[1]);
-      const found = authorBlogPostsSeed.find((p) => p.id === id);
+      const found = mutableAuthorBlogPosts.find((p) => p.id === id);
       if (found) {
         await route.fulfill(json({ success: true, data: found }));
       } else {
@@ -1675,15 +2092,17 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     }
 
     if (method === "POST" && !postIdMatch) {
-      const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string; content?: string; status?: string };
-      const created = { ...authorBlogPostsSeed[0], id: 299, title: body.title ?? "New post", status: body.status ?? "draft" };
+      const body = JSON.parse(route.request().postData() ?? "{}") as { title?: string; content?: string; status?: string; app_source?: string };
+      const created = { ...authorBlogPostsSeed[0], id: 299, title: body.title ?? "New post", status: body.status ?? "draft", app_source: body.app_source ?? "storytelling" };
+      mutableBlogPosts.unshift(created);
+      mutableAuthorBlogPosts.unshift(created);
       await route.fulfill(json({ success: true, data: created }, 201));
       return;
     }
 
     if (method === "PUT" && postIdMatch) {
       const id = Number(postIdMatch[1]);
-      const base = authorBlogPostsSeed.find((p) => p.id === id) ?? authorBlogPostsSeed[0];
+      const base = mutableAuthorBlogPosts.find((p) => p.id === id) ?? authorBlogPostsSeed[0];
       const body = JSON.parse(route.request().postData() ?? "{}") as Partial<typeof base>;
       await route.fulfill(json({ success: true, data: { ...base, ...body } }));
       return;
@@ -1702,7 +2121,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     const url = route.request().url();
     const match = url.match(/\/api\/blog\/posts\/(\d+)\/publish/);
     const id = match ? Number(match[1]) : 0;
-    const base = authorBlogPostsSeed.find((p) => p.id === id) ?? authorBlogPostsSeed[0];
+    const base = mutableAuthorBlogPosts.find((p) => p.id === id) ?? authorBlogPostsSeed[0];
     await route.fulfill(json({ success: true, data: { ...base, status: "published" } }));
   });
 }

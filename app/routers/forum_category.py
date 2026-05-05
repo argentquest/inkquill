@@ -1,5 +1,7 @@
 """API endpoints for forum categories."""
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db_session, get_current_user
@@ -25,6 +27,7 @@ def _build_category_response(category) -> ForumCategoryResponse:
         sort_order=category.sort_order,
         is_active=category.is_active,
         icon=category.icon,
+        app_source=category.app_source,
         thread_count=len([thread for thread in category.threads if not thread.is_deleted]),
         created_at=category.created_at,
         updated_at=category.updated_at,
@@ -36,11 +39,12 @@ async def get_categories(
     skip: int = 0,
     limit: int = 100,
     include_inactive: bool = False,
+    app_source: Optional[str] = Query(None, pattern="^(storytelling|care-circle)$"),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Get all forum categories."""
     categories = await crud_category.get_forum_categories(
-        db, skip=skip, limit=limit, include_inactive=include_inactive
+        db, skip=skip, limit=limit, include_inactive=include_inactive, app_source=app_source
     )
     
     # Add thread counts

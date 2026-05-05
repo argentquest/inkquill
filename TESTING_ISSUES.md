@@ -8,7 +8,7 @@
 
 ## Open Issues
 
-### Issue 1 — Blog creation restricted to non-admin users
+### ~~Issue 1~~ ✅ RESOLVED — Blog creation restricted to non-admin users
 **Area:** Blog  
 **Type:** Access Control / Bug  
 **Estimate:** `S`  
@@ -19,7 +19,7 @@
 
 ---
 
-### Issue 2 — Search button visible on pages other than Blog and Forum
+### ~~Issue 2~~ ✅ RESOLVED — Search button visible on pages other than Blog and Forum
 **Area:** Navigation / UI  
 **Type:** Bug  
 **Estimate:** `S`  
@@ -30,7 +30,7 @@
 
 ---
 
-### Issue 3 — "Stories" button visible in public / care-circle context
+### ~~Issue 3~~ ✅ RESOLVED — "Stories" button visible in public / care-circle context
 **Area:** Navigation / UI  
 **Type:** Bug  
 **Estimate:** `S`  
@@ -41,7 +41,7 @@
 
 ---
 
-### Issue 4 — Circle-friends home page has two menus; should have one
+### ~~Issue 4~~ ✅ RESOLVED — Circle-friends home page has two menus; should have one
 **Area:** Circle-Friends / Navigation / UI  
 **Type:** Bug / UX  
 **Estimate:** `M`  
@@ -52,7 +52,7 @@
 
 ---
 
-### Issue 5 — Care-circle family page has 11+ blocks needing grouping
+### ~~Issue 5~~ ✅ RESOLVED — Care-circle family page has 11+ blocks needing grouping
 **Area:** Circle-Friends / `/care-circle-family`  
 **Type:** UX / Layout  
 **Estimate:** `M`  
@@ -61,9 +61,11 @@
 **Expected:** Blocks grouped by category; accounting group at the bottom of the page.  
 **Actual:** 11+ ungrouped blocks displayed on the page.
 
+**Fix notes:** Expanded the landing page to show route cards for all sub-features and grouped them under sections: Care & Circle, Community, Account, Admin (conditional), and Accounting (bottom). Sections use `text-sm font-semibold uppercase tracking-[0.2em]` headers.
+
 ---
 
-### Issue 6 — Replace block icons with larger custom SVGs on care-circle family page
+### ~~Issue 6~~ ✅ RESOLVED — Replace block icons with larger custom SVGs on care-circle family page
 **Area:** Circle-Friends / `/care-circle-family`  
 **Type:** UX / Visual Design  
 **Estimate:** `L`  
@@ -72,9 +74,11 @@
 **Expected:** Each block has a unique, larger SVG graphic instead of a small icon.  
 **Actual:** Blocks use small generic icon fonts.
 
+**Fix notes:** Created `frontendv1/components/care-circle-family/care-circle-feature-icons.tsx` with 14 purpose-built inline SVGs (56×56 viewBox, rendered at `h-9 w-9`). Each card now shows a distinctive, larger icon inside a `h-14 w-14` container.
+
 ---
 
-### Issue 7 — Admin menu items should be consolidated under an "Admin" submenu
+### ~~Issue 7~~ ✅ RESOLVED — Admin menu items should be consolidated under an "Admin" submenu
 **Area:** Navigation / Menu  
 **Type:** UX / Organization  
 **Estimate:** `S`  
@@ -85,7 +89,7 @@
 
 ---
 
-### Issue 8 — Home page app cards: remove "Shared platform" tag; update Care Circle Family description
+### ~~Issue 8~~ ✅ RESOLVED — Home page app cards: remove "Shared platform" tag; update Care Circle Family description
 **Area:** Home Page / App Cards  
 **Type:** Content / UX  
 **Estimate:** `XS`  
@@ -105,7 +109,7 @@ With capability badges/tags:
 
 ---
 
-### Issue 9 — Patients page: add Table of Contents for quick jump to each person's block
+### ~~Issue 9~~ ✅ RESOLVED — Patients page: add Table of Contents for quick jump to each person's block
 **Area:** Circle-Friends / `/care-circle-family/patients`  
 **Type:** UX / Feature  
 **Estimate:** `S`  
@@ -116,7 +120,7 @@ With capability badges/tags:
 
 ---
 
-### Issue 10 — Patients page: show basic stats on each friend's block
+### ~~Issue 10~~ ✅ RESOLVED — Patients page: show basic stats on each friend's block
 **Area:** Circle-Friends / `/care-circle-family/patients`  
 **Type:** Feature / UX  
 **Estimate:** `M`  
@@ -131,7 +135,7 @@ Additional stats may be added over time.
 
 ---
 
-### Issue 11 — Patient edit page too long; reorganize into tabs
+### ~~Issue 11~~ ✅ RESOLVED — Patient edit page too long; reorganize into tabs
 **Area:** Circle-Friends / `/care-circle-family/patients/17?edit=1`  
 **Type:** UX / Layout  
 **Estimate:** `L`  
@@ -140,9 +144,11 @@ Additional stats may be added over time.
 **Expected:** Each existing block/section on the page becomes its own tab. Tab names and grouping to be determined by inspecting the page blocks.  
 **Actual:** All fields rendered in a single long scrolling page.
 
+**Fix notes:** The patient detail page already had top-level tabs (Overview, Edit Profile, Preferences, Providers, Newsletter). Added a secondary tab bar inside the **Edit Profile** tab with 5 sub-tabs: Family & Access, Schedule & Location, Identity & Background, People & Interests, and Image Sign-in. Also enriched the **Overview** tab to display preferences, hobbies, and family members so key data is visible immediately without tab switching.
+
 ---
 
-### Issue 12 — Media page: image previews not working
+### ~~Issue 12~~ ✅ RESOLVED — Media page: image previews not working
 **Area:** Circle-Friends / `/care-circle-family/media`  
 **Type:** Bug  
 **Estimate:** `S`  
@@ -157,13 +163,14 @@ Additional stats may be added over time.
 - FastAPI only mounts `app/static/` as `/static` ([app/main.py:258](app/main.py))
 - Relevant files: [app/services/storage/local_storage.py](app/services/storage/local_storage.py) · [app/routers/blog_media.py](app/routers/blog_media.py) · [app/core/config.py](app/core/config.py)
 
-**Fix options:**
-1. Mount the upload dir as an additional static route in `main.py`, or
-2. Change `LOCAL_STORAGE_BASE_PATH` to `app/static` and align the URL path to match.
+**Fix notes:**
+- Updated `_get_public_url` in `LocalStorageProvider` to return `/uploads/blog/{path}` instead of the misaligned `/static/uploads/blog/{path}`.
+- Added an explicit `app.mount("/uploads/blog", StaticFiles(...))` in `main.py` pointing to `LOCAL_STORAGE_BASE_PATH / LOCAL_STORAGE_BLOG_MEDIA_PATH`, ensuring the URL route matches the physical storage directory used by the upload router.
+- `blog_media.py` instantiates `LocalStorageProvider(str(UPLOAD_DIR))`, so storage path and public URL generation are now fully aligned.
 
 ---
 
-### Issue 13 — Forums have no categories; seed app-scoped categories for Circle Friends and Storytelling
+### ~~Issue 13~~ ✅ RESOLVED — Forums have no categories; seed app-scoped categories for Circle Friends and Storytelling
 **Area:** Forums  
 **Type:** Missing Data / Feature  
 **Estimate:** `M`  
@@ -191,9 +198,17 @@ Additional stats may be added over time.
 **Expected:** Forum shows the above categories scoped to the active app context.  
 **Actual:** Forum shows no categories.
 
+**Fix notes:**
+- Added `app_source` column to `ForumCategory` model with a composite unique constraint on `(app_source, slug)`.
+- Created Alembic migration `j6k7l8m9n0o1_add_app_source_to_forum_categories.py`.
+- Updated CRUD, schemas, and router to support filtering by `app_source`.
+- Created `scripts/seed_forum_categories.py` to insert the 10 defined categories.
+- Updated frontend `fetchForumCategories` to accept an `app_source` param.
+- Updated `/community/forums` and `/community/forums/new` to read `?app_source` and filter categories/threads accordingly.
+
 ---
 
-### Issue 14 — Home page of each app should surface recent blogs and forum activity
+### ~~Issue 14~~ ✅ RESOLVED — Home page of each app should surface recent blogs and forum activity
 **Area:** Home Page / Circle Friends & Storytelling  
 **Type:** Feature  
 **Estimate:** `M`  
@@ -207,11 +222,30 @@ Additional stats may be added over time.
 **Expected:** Both sections visible on each app's home page, filtered to that app's context.  
 **Actual:** No blog or forum activity surfaced on app home pages.
 
+**Fix notes:** Added "Recent Blog Posts" (up to 3) and "Recent Forum Posts" (up to 10) sections to both `/care-circle-family` and `/storytelling` home pages. Uses existing `fetchBlogPosts({ app_source })` and `fetchForumThreads({ app_source })` endpoints. Sections render conditionally when data exists. Updated Playwright mock helpers to return app-scoped data and filter by `app_source`.
+
 ---
 
 ## Resolved Issues
 
-_None yet._
+All issues from this testing session have been resolved.
+
+| # | Title | Resolution |
+|---|-------|------------|
+| 1 | Blog creation restricted to non-admin users | Fixed permission check on blog creation route. |
+| 2 | Search button visible on pages other than Blog and Forum | Added conditional route-based visibility. |
+| 3 | "Stories" button visible in public / care-circle context | Scoped Stories nav to Storytelling app only. |
+| 4 | Circle-friends home page has two menus | Consolidated into single header menu. |
+| 5 | Care-circle family page has 11+ blocks needing grouping | Grouped cards by category with Accounting at bottom. |
+| 6 | Replace block icons with larger custom SVGs | Added 14 custom inline SVGs at larger size. |
+| 7 | Admin menu items should be consolidated under an "Admin" submenu | Restructured nav into nested Admin submenu. |
+| 8 | Home page app cards: remove "Shared platform" tag; update Care Circle Family description | Removed badge and updated copy. |
+| 9 | Patients page: add Table of Contents for quick jump | Added anchor TOC strip at top of patients list. |
+| 10 | Patients page: show basic stats on each friend's block | Added Joined date and Newsletters mailed count. |
+| 11 | Patient edit page too long; reorganize into tabs | Added 5 sub-tabs inside Edit Profile; enriched Overview tab. |
+| 12 | Media page: image previews not working | Fixed path mismatch between storage and URL generation. |
+| 13 | Forums have no categories; seed app-scoped categories | Added `app_source` to categories, seeded 10 categories, updated UI filters. |
+| 14 | Home page of each app should surface recent blogs and forum activity | Added Recent Blog Posts and Recent Forum Posts sections to both app home pages. |
 
 ---
 

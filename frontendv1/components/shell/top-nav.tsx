@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { CoinBalanceBadge } from "@/components/shell/coin-balance-badge";
 import { ThemeToggle } from "@/components/shell/theme-toggle";
 import { UserMenu } from "@/components/shell/user-menu";
-import { resolveApp, publicNavLinks } from "@/lib/apps";
+import { resolveApp, publicNavLinks, type AppNavLink } from "@/lib/apps";
 
 function NibMark({ className }: { className?: string }) {
   return (
@@ -27,6 +29,51 @@ function NibMark({ className }: { className?: string }) {
   );
 }
 
+function AdminDropdown({ links }: { links: AppNavLink[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        aria-expanded={open}
+        aria-haspopup="true"
+        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-black/5 hover:text-ink-900 text-ink-700"
+        onClick={() => setOpen((v) => !v)}
+        type="button"
+      >
+        Admin
+        <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 min-w-[180px] rounded-2xl border border-black/10 bg-paper shadow-lg">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              className="block rounded-2xl px-4 py-2.5 text-sm text-ink-700 transition-colors hover:bg-black/[0.04] hover:text-ink-900"
+              href={link.href}
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function TopNav() {
   const pathname = usePathname();
   const session = useSession();
@@ -35,6 +82,15 @@ export function TopNav() {
 
   const isAdmin = session.status === "authenticated" && session.user?.is_admin === true;
   const isFamilyOwner = session.status === "authenticated" && session.user?.is_family_owner === true;
+
+  const visibleLinks = primaryLinks.filter((link) =>
+    (!link.ownerOnly || isFamilyOwner) &&
+    (!link.adminOnly || isAdmin) &&
+    (!link.visibleOnPaths || link.visibleOnPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`)))
+  );
+
+  const topLinks = visibleLinks.filter((link) => !link.group);
+  const adminGroupLinks = visibleLinks.filter((link) => link.group === "admin");
 
   return (
     <header className="sticky top-0 z-40 border-b border-black/10 bg-paper/85 backdrop-blur-md">
@@ -54,7 +110,7 @@ export function TopNav() {
         </div>
 
         <nav className="flex flex-wrap items-center gap-1 text-sm text-ink-700">
-          {primaryLinks.filter((link) => !link.ownerOnly || isFamilyOwner).map((link) => (
+          {topLinks.map((link) => (
             <Link
               className="rounded-full px-3 py-1.5 transition-colors hover:bg-black/5 hover:text-ink-900"
               href={link.href}
@@ -63,14 +119,7 @@ export function TopNav() {
               {link.label}
             </Link>
           ))}
-          {isAdmin && (
-            <Link
-              className="rounded-full px-3 py-1.5 text-ink-500 transition-colors hover:bg-black/5 hover:text-ink-900"
-              href="/admin"
-            >
-              Admin
-            </Link>
-          )}
+          {adminGroupLinks.length > 0 && <AdminDropdown links={adminGroupLinks} />}
         </nav>
       </div>
     </header>

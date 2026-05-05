@@ -25,12 +25,15 @@ class ForumCategory(Base):
     __tablename__ = "forum_categories"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    slug: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
+    slug: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     icon: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # For UI icons
+
+    # App scoping — distinguishes between storytelling and care-circle categories
+    app_source: Mapped[str] = mapped_column(String(32), nullable=False, default="storytelling", index=True)
     
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -38,6 +41,10 @@ class ForumCategory(Base):
     
     # Relationships
     threads: Mapped[List["ForumThread"]] = relationship("ForumThread", back_populates="category", lazy="selectin")
+
+    __table_args__ = (
+        UniqueConstraint("app_source", "slug", name="uq_forum_category_app_source_slug"),
+    )
     
     def __repr__(self):
         return f"<ForumCategory(id={self.id}, name='{self.name}')>"

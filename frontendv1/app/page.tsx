@@ -1,25 +1,26 @@
 import Link from "next/link";
-import { ArrowRight, PanelsTopLeft, PenTool, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { PublicShell } from "@/components/shell/public-shell";
 import { PageHeader } from "@/components/shell/page-header";
 
-const rails = [
+const apps = [
   {
-    title: "Active workspaces",
-    description: "Bring the most important worlds, stories, and drafts forward instead of dropping users into a blank admin wall.",
-    icon: PanelsTopLeft
+    href: "/storytelling",
+    eyebrow: "App one",
+    title: "Storytelling",
+    description:
+      "A full creative-authoring surface for long-form fiction, world-building, and editorial workflow.",
+    capabilities: ["User-owned", "AI-assisted writing", "Publishing & community"],
   },
   {
-    title: "Creative pacing",
-    description: "Build room for long-form writing, recent activity, and momentum cues before dense tables arrive in later sprints.",
-    icon: PenTool
+    href: "/care-circle-family",
+    eyebrow: "App two",
+    title: "Care Circle",
+    description:
+      "Family-side coordination, events, friends, and household-owned billing live here.",
+    capabilities: ["Family scope", "Realtime ready"],
   },
-  {
-    title: "System clarity",
-    description: "Maintenance, balance, session, and shell state remain visible without flattening the interface into operations chrome.",
-    icon: Sparkles
-  }
 ];
 
 export default function HomePage() {
@@ -35,36 +36,32 @@ export default function HomePage() {
             <ArrowRight className="h-4 w-4" />
           </Link>
         }
-        description="Sprint 1 establishes the public shell, app shell, route tree, theme persistence, session bootstrap, balance loading, maintenance awareness, and baseline global states."
-        eyebrow="Frontend V1"
-        title="Editorial shell, not a generic dashboard."
+        description="Choose an application below to get started."
+        eyebrow="Ink &amp; Quill"
+        title="Your creative and care platform."
       />
 
-      <section className="mt-8 grid gap-4 rounded-[28px] border border-black/10 bg-white/65 p-6 shadow-panel lg:grid-cols-3">
-        <Link className="rounded-[24px] border border-black/10 bg-[#fcfaf6] p-5 transition hover:border-black/20 hover:bg-white" href="/storytelling">
-          <p className="text-xs uppercase tracking-[0.28em] text-ink-600">App one</p>
-          <h2 className="mt-3 font-display text-3xl text-ink-900">Storytelling</h2>
-          <p className="mt-3 text-sm leading-7 text-ink-700">Creative authoring and editorial workflow surface.</p>
-        </Link>
-        <Link className="rounded-[24px] border border-black/10 bg-[#fcfaf6] p-5 transition hover:border-black/20 hover:bg-white" href="/care-circle-family">
-          <p className="text-xs uppercase tracking-[0.28em] text-ink-600">App two</p>
-          <h2 className="mt-3 font-display text-3xl text-ink-900">Care Circle</h2>
-          <p className="mt-3 text-sm leading-7 text-ink-700">Family and patient-safe care coordination surface.</p>
-        </Link>
-        <Link className="rounded-[24px] border border-black/10 bg-[#fcfaf6] p-5 transition hover:border-black/20 hover:bg-white" href="/chatbot">
-          <p className="text-xs uppercase tracking-[0.28em] text-ink-600">App three</p>
-          <h2 className="mt-3 font-display text-3xl text-ink-900">Chatbot</h2>
-          <p className="mt-3 text-sm leading-7 text-ink-700">A simple chat-first UI to validate the app split before deeper domain work.</p>
-        </Link>
-      </section>
-
-      <section className="mt-8 grid gap-6 lg:grid-cols-3">
-        {rails.map((rail) => (
-          <article className="rounded-[28px] border border-black/10 bg-white/70 p-6 shadow-panel" key={rail.title}>
-            <rail.icon className="h-8 w-8 text-ember" />
-            <h2 className="mt-5 font-display text-3xl text-ink-900">{rail.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-ink-700">{rail.description}</p>
-          </article>
+      <section className="mt-8 grid gap-4 rounded-[28px] border border-black/10 bg-white/65 p-6 shadow-panel lg:grid-cols-2">
+        {apps.map((app) => (
+          <Link
+            key={app.href}
+            className="rounded-[24px] border border-black/10 bg-[#fcfaf6] p-6 transition hover:border-black/20 hover:bg-white"
+            href={app.href}
+          >
+            <p className="text-xs uppercase tracking-[0.28em] text-ink-600">{app.eyebrow}</p>
+            <h2 className="mt-3 font-display text-3xl text-ink-900">{app.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-ink-700">{app.description}</p>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {app.capabilities.map((cap) => (
+                <li
+                  key={cap}
+                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-ink-700"
+                >
+                  {cap}
+                </li>
+              ))}
+            </ul>
+          </Link>
         ))}
       </section>
     </PublicShell>

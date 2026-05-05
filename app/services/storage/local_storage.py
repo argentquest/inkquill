@@ -38,9 +38,7 @@ class LocalStorageProvider(StorageProvider):
     
     def _get_public_url(self, file_path: str) -> str:
         """Get public URL for the file."""
-        # Assuming static files are served from /static/
-        relative_to_static = Path("uploads/blog") / file_path
-        return f"/static/{relative_to_static.as_posix()}"
+        return f"/uploads/blog/{Path(file_path).as_posix()}"
     
     async def upload(
         self, 

@@ -3,6 +3,12 @@ export interface AppNavLink {
   label: string;
   /** When true, TopNav only renders this link for family owners. */
   ownerOnly?: boolean;
+  /** When true, TopNav only renders this link for admin users. */
+  adminOnly?: boolean;
+  /** When set, TopNav only renders this link when the current path starts with one of these prefixes. */
+  visibleOnPaths?: string[];
+  /** When set, this link is grouped under a named submenu in TopNav. */
+  group?: string;
   /** When true, the link is shown in the user menu rather than top nav. */
   menuOnly?: boolean;
 }
@@ -32,10 +38,10 @@ export const apps: AppDefinition[] = [
       { href: "/storytelling/published", label: "Published" },
       { href: "/public/blog", label: "Blog" },
       { href: "/community/forums", label: "Forum" },
-      { href: "/storytelling/blog", label: "My Blog" },
-      { href: "/storytelling/account", label: "Account" },
-      { href: "/storytelling/billing", label: "Billing" },
-      { href: "/storytelling/referrals", label: "Referrals" },
+      { href: "/storytelling/blog", label: "My Blog", adminOnly: true },
+      { href: "/storytelling/account", label: "Account", group: "admin" },
+      { href: "/storytelling/billing", label: "Billing", group: "admin" },
+      { href: "/storytelling/referrals", label: "Referrals", group: "admin" },
       { href: "/help", label: "Help" },
     ],
   },
@@ -49,14 +55,14 @@ export const apps: AppDefinition[] = [
       { href: "/care-circle-family/patients", label: "Friends" },
       { href: "/care-circle-family/events", label: "Activity" },
       { href: "/care-circle-family/media", label: "Media" },
-      { href: "/care-circle-family/blog", label: "Blog" },
+      { href: "/care-circle-family/blog", label: "Blog", adminOnly: true },
       { href: "/community/forums", label: "Forum" },
-      { href: "/care-circle-family/members", label: "Members" },
-      { href: "/care-circle-family/account", label: "Account" },
-      { href: "/care-circle-family/providers", label: "Providers" },
-      { href: "/care-circle-family/admin", label: "Admin", ownerOnly: true },
-      { href: "/care-circle-family/billing", label: "Billing", ownerOnly: true },
-      { href: "/care-circle-family/referrals", label: "Referrals", ownerOnly: true },
+      { href: "/care-circle-family/members", label: "Members", group: "admin" },
+      { href: "/care-circle-family/account", label: "Account", group: "admin" },
+      { href: "/care-circle-family/providers", label: "Providers", group: "admin" },
+      { href: "/care-circle-family/admin", label: "Admin Console", ownerOnly: true, group: "admin" },
+      { href: "/care-circle-family/billing", label: "Billing", ownerOnly: true, group: "admin" },
+      { href: "/care-circle-family/referrals", label: "Referrals", ownerOnly: true, group: "admin" },
       { href: "/help", label: "Help" },
     ],
   },
@@ -77,8 +83,8 @@ export const apps: AppDefinition[] = [
 export const publicNavLinks: AppNavLink[] = [
   { href: "/", label: "Home" },
   { href: "/public/blog", label: "Blog" },
-  { href: "/public/search", label: "Search" },
-  { href: "/public/published-stories", label: "Stories" },
+  { href: "/public/search", label: "Search", visibleOnPaths: ["/public/blog", "/community/forums"] },
+  { href: "/public/published-stories", label: "Stories", visibleOnPaths: ["/storytelling", "/public/published-stories"] },
   { href: "/help", label: "Help" },
 ];
 

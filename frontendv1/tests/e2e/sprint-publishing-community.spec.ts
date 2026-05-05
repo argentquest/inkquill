@@ -153,11 +153,7 @@ test.describe("Blog routes", () => {
   });
 
   test("blog list shows empty state when no posts", async ({ page }) => {
-    await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/blog/posts*", async (route) => {
-      await route.fulfill({ status: 200, contentType: "application/json",
-        body: JSON.stringify({ success: true, data: [] }) });
-    });
+    await mockAppApis(page, { session: "authenticated", blogPosts: "empty" });
     await page.goto("/public/blog");
 
     await expect(page).toHaveURL(/\/public\/blog$/, { timeout: 15000 });
@@ -357,5 +353,128 @@ test.describe("Forum routes", () => {
 
     await expect(page).toHaveURL(/\/community\/forums\/99/, { timeout: 15000 });
     await expect(page.getByTestId("forum-thread")).toBeVisible();
+  });
+
+  test("storytelling app home page shows 5 recent forum posts", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/storytelling");
+
+    const section = page.getByTestId("recent-forum-posts");
+    await expect(section).toBeVisible();
+    await expect(section.getByText("Creating believable political systems")).toBeVisible();
+    await expect(section.getByText("Plot twist techniques that actually work")).toBeVisible();
+    await expect(section.getByText("Favorite AI prompts for character voice?")).toBeVisible();
+    await expect(section.getByText("How do you structure a magic system?")).toBeVisible();
+    await expect(section.getByText("Character arcs vs flat characters")).toBeVisible();
+  });
+
+  test("care circle family home page shows recent forum posts", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family");
+
+    const section = page.getByTestId("recent-forum-posts");
+    await expect(section).toBeVisible();
+    await expect(section.getByText("Best routines for morning care?")).toBeVisible();
+    await expect(section.getByText("Photo sharing tips for Memory Lane?")).toBeVisible();
+  });
+
+  test("storytelling forum scoped new thread picks storytelling category", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/community/forums/new?app_source=storytelling");
+
+    await expect(page.getByRole("heading", { name: "Start a new thread" })).toBeVisible();
+    await page.getByTestId("thread-title-input").fill("My magic system needs work");
+    await page.getByTestId("thread-category-select").selectOption({ label: "World Building" });
+    await page.getByTestId("thread-content-input").fill("I am struggling with hard magic rules.");
+    await page.getByRole("button", { name: "Start thread" }).click();
+
+    await expect(page).toHaveURL(/\/community\/forums\/99/, { timeout: 15000 });
+    await expect(page.getByText("My magic system needs work")).toBeVisible();
+  });
+
+  test("care circle forum scoped new thread picks care-circle category", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/community/forums/new?app_source=care-circle");
+
+    await expect(page.getByRole("heading", { name: "Start a new thread" })).toBeVisible();
+    await page.getByTestId("thread-title-input").fill("New caregiver looking for tips");
+    await page.getByTestId("thread-category-select").selectOption({ label: "Care Tips & Resources" });
+    await page.getByTestId("thread-content-input").fill("What are your best morning routine tips for seniors?");
+    await page.getByRole("button", { name: "Start thread" }).click();
+
+    await expect(page).toHaveURL(/\/community\/forums\/99/, { timeout: 15000 });
+    await expect(page.getByText("New caregiver looking for tips")).toBeVisible();
+  });
+
+  test("storytelling forum thread reply adds a post", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/community/forums/1");
+
+    await expect(page.getByTestId("reply-composer")).toBeVisible();
+    await page.getByTestId("reply-input").fill("This is exactly the approach I use for my world.");
+    await page.getByRole("button", { name: "Post reply" }).click();
+    await expect(page.getByTestId("reply-input")).toHaveValue("");
+  });
+
+  test("care circle forum thread reply adds a post", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/community/forums/2");
+
+    await expect(page.getByTestId("reply-composer")).toBeVisible();
+    await page.getByTestId("reply-input").fill("We found a gentle stretching routine that works well.");
+    await page.getByRole("button", { name: "Post reply" }).click();
+    await expect(page.getByTestId("reply-input")).toHaveValue("");
+  });
+});
+
+test.describe("Blog app-scoped routes", () => {
+  test("storytelling app home page shows 5 recent blog posts", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/storytelling");
+
+    const section = page.getByTestId("recent-blog-posts");
+    await expect(section).toBeVisible();
+    await expect(section.getByText("Writing Rituals That Stick")).toBeVisible();
+    await expect(section.getByText("Character Voice Worksheets")).toBeVisible();
+    await expect(section.getByText("Building Fantasy Economies")).toBeVisible();
+    await expect(section.getByText("AI Prompting for Dialogue")).toBeVisible();
+    await expect(section.getByText("Introducing World Builder 2.0")).toBeVisible();
+  });
+
+  test("care circle family home page shows recent blog posts", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family");
+
+    const section = page.getByTestId("recent-blog-posts");
+    await expect(section).toBeVisible();
+    await expect(section.getByText("Care Circle Scheduling Tips")).toBeVisible();
+    await expect(section.getByText("Using Memory Lane with Photos")).toBeVisible();
+    await expect(section.getByText("Welcome to Care Circle")).toBeVisible();
+  });
+
+  test("storytelling blog dashboard loads and creates a post", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/storytelling/blog/new");
+
+    await expect(page.getByRole("heading", { name: "New post" })).toBeVisible();
+    await page.getByTestId("post-title-input").fill("My New Storytelling Post");
+    await page.getByTestId("post-content-input").fill("This is content for my storytelling blog.");
+    await page.getByRole("button", { name: "Publish" }).click();
+
+    await expect(page).toHaveURL(/\/storytelling\/blog$/, { timeout: 15000 });
+    await expect(page.getByText("My New Storytelling Post")).toBeVisible();
+  });
+
+  test("care circle blog dashboard loads and creates a post", async ({ page }) => {
+    await mockAppApis(page, { session: "authenticated" });
+    await page.goto("/care-circle-family/blog/new");
+
+    await expect(page.getByRole("heading", { name: "New post" })).toBeVisible();
+    await page.getByTestId("post-title-input").fill("My New Care Circle Post");
+    await page.getByTestId("post-content-input").fill("This is content for my care circle blog.");
+    await page.getByRole("button", { name: "Publish" }).click();
+
+    await expect(page).toHaveURL(/\/care-circle-family\/blog$/, { timeout: 15000 });
+    await expect(page.getByText("My New Care Circle Post")).toBeVisible();
   });
 });

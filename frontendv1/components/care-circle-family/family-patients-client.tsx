@@ -9,6 +9,31 @@ import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { fetchCareCirclePatients } from "@/lib/api";
 
+function PatientTOC({ patients }: { patients: { id: string | number; displayName: string }[] }) {
+  if (patients.length < 3) return null;
+
+  return (
+    <nav
+      aria-label="Jump to friend"
+      className="flex flex-wrap gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 shadow-sm"
+      data-testid="patient-toc"
+    >
+      <span className="self-center text-xs font-semibold uppercase tracking-[0.18em] text-ink-500 mr-1">
+        Jump to:
+      </span>
+      {patients.map((p) => (
+        <a
+          key={p.id}
+          href={`#patient-${p.id}`}
+          className="rounded-full border border-black/10 bg-[#fcfaf6] px-3 py-1 text-xs font-medium text-ink-700 transition hover:border-black/20 hover:bg-white"
+        >
+          {p.displayName}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
 export function FamilyPatientsClient() {
   const session = useSession();
   const isOwner = session.user?.is_family_owner === true;
@@ -26,7 +51,7 @@ export function FamilyPatientsClient() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {isOwner && (
         <div className="flex justify-end">
           <Link
@@ -38,9 +63,15 @@ export function FamilyPatientsClient() {
         </div>
       )}
 
+      {data && data.length > 0 && (
+        <PatientTOC patients={data.map((p) => ({ id: p.id, displayName: p.displayName }))} />
+      )}
+
       <section className="grid gap-6">
         {data?.map((patient) => (
-          <FamilyPatientCard key={patient.id} patient={patient} />
+          <div key={patient.id} id={`patient-${patient.id}`} className="scroll-mt-24">
+            <FamilyPatientCard patient={patient} />
+          </div>
         ))}
       </section>
 

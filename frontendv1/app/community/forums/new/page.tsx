@@ -20,8 +20,8 @@ export default function NewThreadPage() {
   const [content, setContent] = useState("");
 
   const { data: categories = [], isLoading: catsLoading } = useQuery({
-    queryKey: ["forum-categories"],
-    queryFn: fetchForumCategories,
+    queryKey: ["forum-categories", appSource],
+    queryFn: () => fetchForumCategories(appSource ? { app_source: appSource } : undefined),
   });
 
   const { mutate: submit, isPending, isError, error } = useMutation({

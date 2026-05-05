@@ -15,6 +15,7 @@ class ForumCategoryBase(BaseModel):
     sort_order: Optional[int] = 0
     is_active: Optional[bool] = True
     icon: Optional[str] = Field(None, max_length=50)
+    app_source: str = Field(default="storytelling", pattern="^(storytelling|care-circle)$")
 
 
 class ForumCategoryCreate(ForumCategoryBase):
@@ -30,6 +31,7 @@ class ForumCategoryUpdate(BaseModel):
     sort_order: Optional[int] = None
     is_active: Optional[bool] = None
     icon: Optional[str] = Field(None, max_length=50)
+    app_source: Optional[str] = Field(None, pattern="^(storytelling|care-circle)$")
 
 
 class ForumCategoryResponse(ForumCategoryBase):

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, MessageSquare, PenLine } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { PageHeader } from "@/components/shell/page-header";
 import { ErrorState } from "@/components/ui/error-state";
@@ -62,17 +63,23 @@ function ThreadRow({ thread }: { thread: ForumThreadSummary }) {
 }
 
 export default function ForumCategoriesPage() {
+  const searchParams = useSearchParams();
+  const appSource = searchParams.get("app_source") ?? undefined;
+
   const { data: categories = [], isLoading: catLoading, isError: catError, error: catErr, refetch: refetchCat } = useQuery({
-    queryKey: ["forum-categories"],
-    queryFn: fetchForumCategories,
+    queryKey: ["forum-categories", appSource],
+    queryFn: () => fetchForumCategories(appSource ? { app_source: appSource } : undefined),
   });
 
   const { data: threads = [], isLoading: threadLoading } = useQuery({
-    queryKey: ["forum-threads-recent"],
-    queryFn: () => fetchForumThreads(),
+    queryKey: ["forum-threads-recent", appSource],
+    queryFn: () => fetchForumThreads(appSource ? { app_source: appSource } : undefined),
   });
 
   const isLoading = catLoading || threadLoading;
+  const newThreadHref = appSource
+    ? `/community/forums/new?app_source=${encodeURIComponent(appSource)}`
+    : "/community/forums/new";
 
   return (
     <div className="space-y-8">
@@ -85,7 +92,7 @@ export default function ForumCategoriesPage() {
         <Link
           className="mt-1 flex shrink-0 items-center gap-2 rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-paper shadow-sm transition hover:bg-ink-700"
           data-testid="new-thread-link"
-          href="/community/forums/new"
+          href={newThreadHref}
         >
           <PenLine className="size-4" />
           New thread

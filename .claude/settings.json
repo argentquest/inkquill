@@ -50,7 +50,15 @@
       "Bash(.\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests/unit/blog/test_blog_media_unit.py -v -q)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests/unit/blog/test_blog_media_unit.py -v -q 2>&1)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -m pytest tests\\\\unit -q 2>&1)",
-      "Bash(.venv/Scripts/alembic.exe heads *)"
+      "Bash(.venv/Scripts/alembic.exe heads *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Code\\\\inkandquill\\\\inkquill\\\\app\\\\templates\" -Recurse -Filter \"*.html\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(curl -sf http://localhost:8082/health)",
+      "Bash(netstat -ano)",
+      "Bash(curl -sf http://127.0.0.1:8083/health)",
+      "Bash(docker network *)",
+      "Bash(docker stop *)",
+      "Bash(docker rm *)"
     ]
   }
 }

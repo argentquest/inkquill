@@ -265,6 +265,12 @@ _os.makedirs(_published_dir, exist_ok=True)
 app.mount("/published/stories", StaticFiles(directory=_published_dir), name="published_stories")
 logger.info(f"Published stories served at /published/stories from {_published_dir}")
 
+# Serve uploaded blog/care-circle media files
+_blog_media_dir = _os.path.join(settings.LOCAL_STORAGE_BASE_PATH, settings.LOCAL_STORAGE_BLOG_MEDIA_PATH)
+_os.makedirs(_blog_media_dir, exist_ok=True)
+app.mount("/uploads/blog", StaticFiles(directory=_blog_media_dir), name="blog_media")
+logger.info(f"Blog media served at /uploads/blog from {_blog_media_dir}")
+
 # --- Setup Jinja2 Template Globals ---
 from app.core.template_filters import setup_secure_templates
 templates = setup_secure_templates()

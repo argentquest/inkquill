@@ -1,6 +1,4 @@
-[config]
-SCM_DO_BUILD_DURING_DEPLOYMENT=true
-ENABLE_ORYX_BUILD=true
-POST_BUILD_COMMAND=postDeployCommand.sh
-WEBSITE_RUN_FROM_PACKAGE=0
-SCM_COMMAND_IDLE_TIMEOUT=3600
+# Deployment strategy: Docker host (Ubuntu)
+# See deployments/docker-host/README.md for the full deployment guide.
+# Deploy scripts: scripts/deploy_care_circle_docker_host.sh (Linux)
+#                 scripts/deploy_care_circle_docker_host.ps1 (Windows/PowerShell)

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
   Globe,
@@ -15,12 +16,17 @@ import {
   UserCircle,
   Sparkles,
   Hammer,
+  ArrowRight,
+  FileText as FileTextIcon,
+  MessageSquare,
 } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 import { HelpButton } from "@/components/ui/help-modal";
 import { storytellingHelp } from "@/lib/help-content";
+import { fetchBlogPosts, fetchForumThreads } from "@/lib/api";
+import type { BlogPost, ForumThreadSummary } from "@/lib/api";
 
 const productLinks = [
   { href: "/storytelling/stories", label: "Stories", description: "Create, edit, and manage your stories.", icon: BookOpen },
@@ -68,9 +74,68 @@ function HubCard({
   );
 }
 
+function RecentSection({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const testId = title.toLowerCase().replace(/\s+/g, "-");
+  return (
+    <section className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-panel" data-testid={testId}>
+      <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
+        {icon}
+        {title}
+      </div>
+      <div className="mt-4 space-y-3">{children}</div>
+    </section>
+  );
+}
+
+function BlogRow({ post }: { post: BlogPost }) {
+  return (
+    <Link
+      className="block rounded-2xl border border-black/10 bg-white/70 p-4 transition hover:border-black/20"
+      href={`/public/blog/${post.slug}`}
+    >
+      <p className="text-sm font-semibold text-ink-900">{post.title}</p>
+      <p className="mt-1 text-xs text-ink-500">
+        {post.comment_count} comments · {post.view_count.toLocaleString()} views
+      </p>
+    </Link>
+  );
+}
+
+function ForumRow({ thread }: { thread: ForumThreadSummary }) {
+  return (
+    <Link
+      className="block rounded-2xl border border-black/10 bg-white/70 p-4 transition hover:border-black/20"
+      href={`/community/forums/${thread.id}`}
+    >
+      <p className="text-sm font-semibold text-ink-900">{thread.title}</p>
+      <p className="mt-1 text-xs text-ink-500">
+        {thread.category_name ?? "Forum"} · {thread.post_count} replies
+      </p>
+    </Link>
+  );
+}
+
 export default function StorytellingPage() {
   const { user, status } = useSession();
   const name = user?.display_name ?? user?.username;
+
+  const { data: blogPosts = [] } = useQuery({
+    queryKey: ["storytelling-blog-posts", "storytelling"],
+    queryFn: () => fetchBlogPosts({ app_source: "storytelling" }),
+  });
+
+  const { data: forumThreads = [] } = useQuery({
+    queryKey: ["storytelling-forum-threads", "storytelling"],
+    queryFn: () => fetchForumThreads({ app_source: "storytelling" }),
+  });
 
   return (
     <div className="space-y-8">
@@ -90,13 +155,38 @@ export default function StorytellingPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-600">Account & Tools</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-600">Account &amp; Tools</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {commerceLinks.map((link) => (
             <HubCard key={link.href} {...link} />
           ))}
         </div>
       </section>
+
+      {(blogPosts.length > 0 || forumThreads.length > 0) && (
+        <section className="grid gap-6 xl:grid-cols-2">
+          {blogPosts.length > 0 && (
+            <RecentSection
+              title="Recent Blog Posts"
+              icon={<FileTextIcon className="size-4 text-ink-500" />}
+            >
+              {blogPosts.slice(0, 5).map((post) => (
+                <BlogRow key={post.id} post={post} />
+              ))}
+            </RecentSection>
+          )}
+          {forumThreads.length > 0 && (
+            <RecentSection
+              title="Recent Forum Posts"
+              icon={<MessageSquare className="size-4 text-ink-500" />}
+            >
+              {forumThreads.slice(0, 5).map((thread) => (
+                <ForumRow key={thread.id} thread={thread} />
+              ))}
+            </RecentSection>
+          )}
+        </section>
+      )}
 
       <HelpButton helpContent={storytellingHelp} position="bottom-right" />
     </div>

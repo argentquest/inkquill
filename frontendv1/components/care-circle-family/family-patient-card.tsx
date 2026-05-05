@@ -51,14 +51,28 @@ export function FamilyPatientCard({ patient }: { patient: CareCirclePatientRecor
         </div>
       ) : null}
 
-      <div className="mt-6 flex items-center justify-between gap-4">
-        <p className="text-sm text-ink-700">
-          {patient.preferences.familyMembers.length > 0
-            ? `Family circle: ${patient.preferences.familyMembers.join(", ")}`
-            : null}
-        </p>
+      <div className="mt-5 flex flex-wrap gap-4 border-t border-black/[0.06] pt-4 text-xs text-ink-500">
+        <span>
+          <span className="font-semibold text-ink-700">Joined:</span>{" "}
+          {patient.created_at
+            ? new Date(patient.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            : "—"}
+        </span>
+        <span>
+          <span className="font-semibold text-ink-700">Newsletters mailed:</span>{" "}
+          {patient.newsletters_sent ?? 0}
+        </span>
+        {patient.preferences.familyMembers.length > 0 && (
+          <span>
+            <span className="font-semibold text-ink-700">Circle:</span>{" "}
+            {patient.preferences.familyMembers.join(", ")}
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center justify-end gap-4">
         
-        <div className="flex gap-3">
+        <div className="flex gap-3 ml-auto">
           {isOwner && (
             <a
               className="inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-ink-900 transition hover:border-black/20"

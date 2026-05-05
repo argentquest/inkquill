@@ -894,13 +894,15 @@ export interface ForumCategory {
   sort_order: number;
   is_active: boolean;
   icon?: string | null;
+  app_source?: string;
   thread_count: number;
   created_at: string;
   updated_at: string;
 }
 
-export async function fetchForumCategories(): Promise<ForumCategory[]> {
-  return sameOriginFetch<ForumCategory[]>("/api/forum/categories/");
+export async function fetchForumCategories(params?: { app_source?: string }): Promise<ForumCategory[]> {
+  const qs = params?.app_source ? `?app_source=${encodeURIComponent(params.app_source)}` : "";
+  return sameOriginFetch<ForumCategory[]>(`/api/forum/categories/${qs}`);
 }
 
 export interface ForumThreadSummary {
@@ -1163,6 +1165,7 @@ export interface CareCirclePatientRecord {
   phoneNumber: string | null;
   preferences: CareCirclePatientPreferences;
   created_at: string;
+  newsletters_sent?: number;
   highlights?: PatientHighlight[];
 }
 

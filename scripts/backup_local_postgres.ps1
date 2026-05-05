@@ -30,6 +30,8 @@
     .\scripts\backup_local_postgres.ps1 -Database inkandquill_test
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', 'Password',
+    Justification = 'Password is passed only as a Docker env var (PGPASSWORD) and never written to disk.')]
 param(
     [int]$Port = 5432,
 
@@ -72,7 +74,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 if (-not $PSBoundParameters.ContainsKey("User")     -or [string]::IsNullOrWhiteSpace($User))     { $User     = Get-DotEnvValue "POSTGRES_USER" }
 if (-not $PSBoundParameters.ContainsKey("Password") -or [string]::IsNullOrWhiteSpace($Password)) { $Password = Get-DotEnvValue "POSTGRES_PASSWORD" }
 if (-not $PSBoundParameters.ContainsKey("Database") -or [string]::IsNullOrWhiteSpace($Database)) { $Database = Get-DotEnvValue "POSTGRES_DB" }
-if (-not $PSBoundParameters.ContainsKey("OutDir")   -or [string]::IsNullOrWhiteSpace($OutDir))   { $OutDir   = Join-Path $RepoRoot "runtime\runtime\artifacts\db-backups" }
+if (-not $PSBoundParameters.ContainsKey("OutDir")   -or [string]::IsNullOrWhiteSpace($OutDir))   { $OutDir   = Join-Path $RepoRoot "runtime\artifacts\db-backups" }
 
 if ([string]::IsNullOrWhiteSpace($User))     { throw "-User is required (or set POSTGRES_USER in .env)" }
 if ([string]::IsNullOrWhiteSpace($Password)) { throw "-Password is required (or set POSTGRES_PASSWORD in .env)" }
