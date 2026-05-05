@@ -1,21 +1,16 @@
-<div style="height:24px; font-size:0; line-height:0;">&nbsp;</div>
-
 {% if scalar_fields or list_fields %}
-<!-- Patient profile summary -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc; border:2px solid #e2e8f0; border-radius:14px; margin-bottom:16px;">
+<table class="section" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
   <tr>
-    <td style="padding:24px 32px;">
-
-      <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#64748b; font-family:Verdana,sans-serif; margin-bottom:16px;">Patient Profile</div>
-
+    <td style="padding:16px 20px;">
+      <p class="section__subtitle" style="margin-bottom:12px;">Patient Profile</p>
       {% if scalar_fields %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if list_fields %}16px{% else %}0{% endif %};">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if list_fields %}10px{% else %}0{% endif %};">
         {% for pair in scalar_fields | batch(2, '') %}
         <tr>
           {% for field in pair %}
           {% if field %}
-          <td width="50%" valign="top" style="padding:4px 16px 4px 0;">
-            <span style="font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#94a3b8; font-family:Verdana,sans-serif;">{{ field["label"] }}&nbsp;</span><span style="font-size:14px; font-weight:600; color:#1e293b; font-family:Verdana,sans-serif;">{{ field["value"] }}</span>
+          <td width="50%" valign="top" style="padding:3px 12px 3px 0;">
+            <span class="section__subtitle" style="display:inline; letter-spacing:0.12em;">{{ field["label"] }}&nbsp;</span><span class="section__body" style="font-size:13px;">{{ field["value"] }}</span>
           </td>
           {% else %}
           <td width="50%"></td>
@@ -25,66 +20,36 @@
         {% endfor %}
       </table>
       {% endif %}
-
       {% if list_fields %}
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         {% for field in list_fields %}
         <tr>
-          <td style="padding:5px 0; vertical-align:top;">
-            <span style="font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#94a3b8; font-family:Verdana,sans-serif; display:inline-block; min-width:160px;">{{ field["label"] }}</span>
-            <span style="font-size:14px; color:#334155; font-family:Verdana,sans-serif;">{{ field["items"] | join(" · ") }}</span>
+          <td style="padding:3px 0; vertical-align:top;">
+            <span class="section__subtitle" style="display:inline-block; min-width:140px; letter-spacing:0.12em;">{{ field["label"] }}</span>
+            <span class="section__body" style="font-size:13px;">{{ field["items"] | join(" · ") }}</span>
           </td>
         </tr>
         {% endfor %}
       </table>
       {% endif %}
-
     </td>
   </tr>
 </table>
 {% endif %}
 
-<!-- Accent bar -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<table class="section section--newsletter_footer" width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
-    <td height="5" style="background:#f59e0b; font-size:0; line-height:0; border-radius:4px 4px 0 0;">&nbsp;</td>
-  </tr>
-</table>
-<!-- Footer body -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e3a5f; border-radius:0 0 14px 14px;">
-  <tr>
-    <td style="padding:20px 36px 24px;">
-
-      <p style="font-size:11px; line-height:1.6; font-style:italic; font-family:Verdana,sans-serif; color:rgba(255,255,255,0.75); margin:0 0 12px 0;">{{ disclaimer }}</p>
-
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr><td height="1" style="background:rgba(255,255,255,0.2); font-size:0; line-height:0;"></td></tr>
-        <tr><td height="10">&nbsp;</td></tr>
-      </table>
-
-      <!-- Stats row -->
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr valign="middle">
-          {% if generation_date %}
-          <td style="padding-right:16px; white-space:nowrap;">
-            <span style="font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:Verdana,sans-serif;">Generated&nbsp;</span><span style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); font-family:Verdana,sans-serif;">{{ generation_date }}</span>
-          </td>
-          {% endif %}
-          {% if total_providers %}
-          <td style="padding-right:16px; white-space:nowrap;">
-            <span style="font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:Verdana,sans-serif;">Sections&nbsp;</span><span style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); font-family:Verdana,sans-serif;">{{ total_providers }}</span>
-          </td>
-          {% endif %}
-          {% if total_tokens %}
-          <td style="padding-right:16px; white-space:nowrap;">
-            <span style="font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:Verdana,sans-serif;">Tokens&nbsp;</span><span style="font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); font-family:Verdana,sans-serif;">{{ "{:,}".format(total_tokens) }}</span>
-          </td>
-          {% endif %}
-        </tr>
-      </table>
-
-      <div style="font-size:10px; font-family:Verdana,sans-serif; color:rgba(255,255,255,0.5); margin-top:10px; text-align:right; letter-spacing:1px; text-transform:uppercase;">Care Circle &bull; Ink &amp; Quill</div>
-
+    <td align="center">
+      {% if disclaimer %}
+      <p class="section__body section__body--italic text-muted" style="font-size:12px; margin-bottom:10px;">{{ disclaimer }}</p>
+      {% endif %}
+      <p class="text-muted" style="font-size:10px; letter-spacing:0.08em;">
+        {% if generation_date %}{{ generation_date }}{% endif %}
+        {% if total_providers %} &middot; {{ total_providers }} sections{% endif %}
+        {% if total_tokens %} &middot; {{ "{:,}".format(total_tokens) }} tokens{% endif %}
+        {% if elapsed_s %} &middot; {{ elapsed_s }}s{% endif %}
+      </p>
+      <p class="text-muted" style="font-size:10px; letter-spacing:0.14em; text-transform:uppercase; margin-top:6px;">Care Circle &bull; Ink &amp; Quill</p>
     </td>
   </tr>
 </table>

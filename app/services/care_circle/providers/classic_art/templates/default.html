@@ -4,24 +4,24 @@
     <table class="classic-art__frame" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
             {% if image_url %}
-            <td class="classic-art__image-cell" width="60%" valign="top" style="padding-right:16px">
-                <img src="{{ image_url }}" alt="{{ title }}" class="classic-art__image" style="width:100%; max-height:400px; object-fit:contain; border-radius:8px; background-color:#f8f5f0; display:block">
+            <td class="classic-art__image-cell" width="60%" valign="top" style="padding-right:16px; vertical-align:top">
+                <img src="{{ image_url }}" alt="{{ title }}" class="classic-art__image" style="width:100%; max-height:400px; object-fit:contain; border-radius:8px; display:block">
             </td>
             {% endif %}
             <td class="classic-art__details-cell" width="{% if image_url %}40%{% else %}100%{% endif %}" valign="top">
-                <p class="classic-art__title section__body section__body--large" style="font-size:30px; font-weight:700; line-height:1.7; margin:0 0 8px">{{ title }}</p>
+                <p class="classic-art__title section__body section__body--large">{{ title }}</p>
                 {% if artist %}
-                <p class="classic-art__artist section__subtitle" style="font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; opacity:0.7; margin:0 0 4px; color:#5a5a5a">{{ artist }}{% if date %}, {{ date }}{% endif %}</p>
+                <p class="classic-art__artist section__subtitle mt-md">{{ artist }}{% if date %}, {{ date }}{% endif %}</p>
                 {% endif %}
                 {% if medium %}
-                <p class="classic-art__medium section__caption" style="margin:0 0 10px; font-style:italic; color:#7a7a7a; font-size:0.875rem">{{ medium }}</p>
+                <p class="classic-art__medium section__body section__body--italic text-muted mt-md">{{ medium }}</p>
                 {% endif %}
                 {% if description %}
-                <p class="classic-art__description section__body" style="font-size:24px; font-weight:500; line-height:1.7; margin:0 0 10px">{{ description }}</p>
+                <p class="classic-art__description section__body mt-md">{{ description }}</p>
                 {% endif %}
                 {% if met_url %}
-                <p class="classic-art__source section__caption" style="margin:0; font-size:0.8rem">
-                    <a href="{{ met_url }}" class="classic-art__link" style="color:#6b5b45; text-decoration:underline">View at The Metropolitan Museum of Art</a>
+                <p class="classic-art__source text-muted mt-md" style="font-size:12px;">
+                    <a href="{{ met_url }}" class="classic-art__link">View at The Metropolitan Museum of Art</a>
                 </p>
                 {% endif %}
             </td>

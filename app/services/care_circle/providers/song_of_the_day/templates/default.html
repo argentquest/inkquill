@@ -9,9 +9,9 @@
             </td>
             {% endif %}
             <td class="song-of-the-day__content-cell" width="{% if image %}30%{% else %}100%{% endif %}" valign="top">
-                <p class="song-of-the-day__song" style="margin:0 0 2px; font-size:20px; font-weight:800">{{ song }}</p>
-                <p class="song-of-the-day__artist" style="margin:0 0 10px; color:#64748b; font-size:15px">{{ artist }}{% if year %} &mdash; {{ year }}{% endif %}</p>
-                <p class="song-of-the-day__fact" style="margin:0; font-size:15px; line-height:1.6">{{ fact }}</p>
+                <p class="song-of-the-day__song section__body section__body--large">{{ song }}</p>
+                <p class="song-of-the-day__artist section__body text-muted mt-md">{{ artist }}{% if year %} &mdash; {{ year }}{% endif %}</p>
+                <p class="song-of-the-day__fact section__body mt-md">{{ fact }}</p>
             </td>
         </tr>
     </table>

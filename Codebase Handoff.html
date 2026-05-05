@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Adopting the new newsletter style — codebase handoff</title>
+<link rel="stylesheet" href="ds/colors_and_type.css" />
+<link rel="stylesheet" href="ds/kit.css" />
+<style>
+  body { margin: 0; background: var(--paper, #fcfaf6); color: var(--fg-1, #231913); font-family: var(--font-text, Georgia, serif); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 32px 80px; }
+  h1 { font-family: var(--font-display); font-size: 44px; line-height: 1.05; margin: 0 0 8px; font-weight: 600; }
+  h2 { font-family: var(--font-display); font-size: 26px; margin: 36px 0 8px; font-weight: 600; border-bottom: 1px solid rgba(35,25,19,0.12); padding-bottom: 6px; }
+  h3 { font-family: var(--font-display); font-size: 18px; margin: 22px 0 6px; }
+  p, li { font-size: 15px; line-height: 1.65; color: var(--fg-2); text-wrap: pretty; }
+  code, pre { font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+  code { background: rgba(35,25,19,0.06); padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  pre { background: #1f1a14; color: #f4ebd9; padding: 16px 18px; border-radius: 10px; overflow: auto; font-size: 12.5px; line-height: 1.55; }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  .lede { font-size: 18px; color: var(--fg-1); margin: 16px 0 28px; }
+  .step { background: rgba(255,255,255,0.7); border: 1px solid rgba(35,25,19,0.10); border-radius: 12px; padding: 18px 22px; margin: 14px 0; }
+  .step-num { display: inline-block; font-family: var(--font-display); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ember, #d86c3d); font-weight: 700; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 9999px; background: rgba(31,59,54,0.08); color: #1f3b36; font-size: 12px; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.06em; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(35,25,19,0.10); }
+  th { font-family: var(--font-display); font-weight: 600; color: var(--fg-1); }
+  .callout { border-left: 4px solid var(--ember, #d86c3d); background: rgba(216,108,61,0.08); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="pill">Codebase handoff · Ink &amp; Quill</p>
+  <h1>Adopting the new newsletter style in the codebase</h1>
+  <p class="lede">
+    The mockup in <code>newsletter-preview.jsx</code> is one component. Your codebase renders the newsletter
+    differently — Jinja templates per provider, plus a shared theme CSS. To adopt the new style without rewriting
+    your pipeline, treat it as <strong>a new theme + updated provider templates</strong>. No service code changes are required.
+  </p>
+
+  <h2>How your codebase actually renders the newsletter</h2>
+  <p>From <code>app/services/care_circle/</code>:</p>
+  <ul>
+    <li><strong><code>session_assembler.py</code></strong> orchestrates the daily session, calling each enabled provider in order.</li>
+    <li><strong><code>provider_base.BaseCareCircleProvider</code></strong> renders each provider's <code>templates/default.html</code> through Jinja, then prepends <code>get_combined_theme_css(theme_name)</code> as an inline <code>&lt;style&gt;</code> block.</li>
+    <li><strong>Theme CSS</strong> lives in <code>app/services/care_circle/providers/themes/</code> — currently <code>classic.css</code>, <code>high_contrast.css</code>, <code>soft_pastel.css</code>, plus <code>master_online.css</code> / <code>master_print.css</code>.</li>
+    <li><strong>Per-provider templates</strong> live in each provider folder, e.g. <code>providers/this_day_history/templates/default.html</code>. They emit <code>&lt;table class="section section--&lt;key&gt;"&gt;</code> with semantic classes (<code>section__title</code>, <code>section__body</code>, etc).</li>
+    <li>Header/footer are themselves providers: <code>newsletter_header</code> and <code>newsletter_footer</code>.</li>
+    <li><strong>Email delivery</strong>: <code>newsletter_email_service.py</code> takes the assembled HTML, runs Premailer to inline styles, and sends.</li>
+  </ul>
+
+  <div class="callout">
+    Implication: the design tokens that drive the look — colours, type scale, masthead treatment, card backgrounds, provenance pills — should be expressed as <strong>a new theme CSS file</strong> that overrides class hooks already in the per-provider templates. You only need to touch templates where the markup itself needs to change (masthead, family blocks, provenance badges).
+  </div>
+
+  <h2>The plan, in five steps</h2>
+
+  <div class="step">
+    <p class="step-num">Step 1</p>
+    <h3>Add a new theme: <code>ellis.css</code> (or <code>ink_quill.css</code>)</h3>
+    <p>Create <code>app/services/care_circle/providers/themes/ellis.css</code>. Translate the tokens from <code>newsletter-preview.jsx</code>'s <code>NL_CSS</code> into class-based rules that map onto the existing template hooks (<code>.section</code>, <code>.section__title</code>, <code>.section__body</code>, <code>.section--&lt;key&gt;</code>).</p>
+    <p>Use container queries on the outer wrapper so the same CSS gives 1-column on phone / narrow email and 2-column on desktop / wide email — exactly as the mockup does.</p>
+<pre><code>/* themes/ellis.css — sketch */
+.cc-newsletter { container-type: inline-size; background: #fcfaf6; color: #231913;
+  font-family: Georgia, "Times New Roman", serif; }
+.section { border-radius: 14px; padding: 16px 18px; background: #f4ebd9;
+  border: 1px solid rgba(35,25,19,0.06); margin-bottom: 14px; }
+.section__title { font-family: Georgia, serif; font-weight: 600;
+  font-size: clamp(18px, 2cqw, 22px); line-height: 1.15; margin: 8px 0 0; }
+.section__body  { font-size: clamp(14px, 1.5cqw, 16px); line-height: 1.55; }
+
+/* Theme variants per provider key */
+.section--newsletter_header { /* broadsheet masthead — see Step 3 */ }
+.section--this_day_history  { border-left: 4px solid #d86c3d; background: rgba(31,59,54,0.04); }
+.section--garden_almanac    { background: rgba(182,198,155,0.22); }
+.section--family_voice      { background: linear-gradient(135deg,#f1a57b,#d86c3d); color: #fff; }
+
+/* Two-column body on wide containers */
+@container (min-width: 720px) {
+  .cc-cols { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; }
+}</code></pre>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 2</p>
+    <h3>Wire the theme into config</h3>
+    <p>The selector is already there — <code>BaseCareCircleProvider</code> reads <code>theme</code> from the patient config and looks for <code>themes/&lt;name&gt;.css</code>. Set Rose's patient config (or the global default) to <code>"theme": "ellis"</code>. No Python changes needed.</p>
+    <p>If you want it in the admin theme dropdown, add <code>"ellis"</code> to the <code>theme_map</code> in <code>provider_base.py</code> around line ~205 (the dict that maps stems to display names).</p>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 3</p>
+    <h3>Update the masthead in <code>providers/newsletter_header/templates/default.html</code></h3>
+    <p>The current header is a navy-blue panel. Replace it with the broadsheet markup from the mockup — keep the same Jinja variables (<code>patient_name</code>, <code>family_name</code>, <code>generated_at</code>) so the provider's Python doesn't change.</p>
+<pre><code>&lt;!-- Broadsheet masthead, email-safe table version --&gt;
+&lt;table class="section section--newsletter_header cc-mast" width="100%" cellpadding="0" cellspacing="0" border="0"&gt;
+  &lt;tr&gt;&lt;td align="center" style="border-bottom:3px double #231913; padding-bottom:12px;"&gt;
+    &lt;div class="cc-mast__eyebrow"&gt;{{ generated_at }}&lt;/div&gt;
+    &lt;div class="cc-mast__title"&gt;The {{ family_name or patient_name }} Family Daily&lt;/div&gt;
+    &lt;div class="cc-mast__foot"&gt;For {{ patient_name }}&lt;/div&gt;
+  &lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+    <p>Style <code>.cc-mast__title</code> etc. in <code>ellis.css</code>.</p>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 4</p>
+    <h3>Add a provenance helper and emit it from each provider template</h3>
+    <p>Two options — pick one:</p>
+    <p><strong>4a. Jinja macro (recommended).</strong> Add <code>app/services/care_circle/templates/_macros/provenance.html</code> with a <code>{% macro prov(kind, who) %}…{% endmacro %}</code> that emits the inline-SVG badge from the mockup. Import it at the top of each provider template:</p>
+<pre><code>{% from "_macros/provenance.html" import prov %}
+&lt;table class="section section--this_day_history"&gt;
+  &lt;tr&gt;&lt;td&gt;
+    {{ prov('curated', 'On this day · ' ~ year) }}
+    &lt;h2 class="section__title"&gt;{{ event }}&lt;/h2&gt;
+  &lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+    <p>The Jinja env in <code>provider_base.py</code> uses <code>FileSystemLoader(self.template_dir)</code> per-provider, so to share the macro you'll need to add a second loader path. Easiest: change the <code>render_template</code> environment to <code>FileSystemLoader([self.template_dir, SHARED_TEMPLATES_DIR])</code> (one-line edit, ~line 340 in <code>provider_base.py</code>).</p>
+    <p><strong>4b. Pure-CSS pill.</strong> If you'd rather not touch Python, give every provider template a <code>data-prov="auto|curated|family"</code> attribute on its outer table and render the badge with a <code>::before</code> pseudo-element using a base64 SVG <code>background-image</code>. Simpler but pseudo-elements get stripped by some email clients — Gmail in particular.</p>
+    <p>Convention for which kind to use:</p>
+    <table>
+      <tr><th>kind</th><th>used by</th></tr>
+      <tr><td><code>auto</code></td><td>weather, garden_almanac, joke, recipe, this_day_history, puzzle, song_of_the_day</td></tr>
+      <tr><td><code>curated</code></td><td>hymn_of_the_day, daily_blessing, seasonal_poem, world_news</td></tr>
+      <tr><td><code>family</code></td><td>family_greeting, letter_to_family, memory_lane_photo, family voice notes</td></tr>
+    </table>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 5</p>
+    <h3>Wrap the assembled HTML in the container-query root</h3>
+    <p>In <code>session_assembler.py</code>, the assembled body is currently a stack of <code>&lt;table&gt;</code> sections. Wrap them in a single <code>&lt;div class="cc-newsletter"&gt;…&lt;/div&gt;</code> so <code>container-type: inline-size</code> has somewhere to live.</p>
+    <p>For the two-column body layout, group the "main" providers and the "sidebar" providers in <code>&lt;div class="cc-cols"&gt;&lt;div class="cc-main"&gt;…&lt;/div&gt;&lt;div class="cc-side"&gt;…&lt;/div&gt;&lt;/div&gt;</code>. Decide which provider keys go where via a small list in the assembler — or add a <code>"column": "main" | "side"</code> field to each provider's <code>config.json</code> and group on that.</p>
+    <div class="callout">
+      <strong>Email caveat:</strong> Outlook on Windows uses Word's renderer and ignores <code>@container</code> queries. For Outlook fall back gracefully — the single-column stack is what they'll see, which is fine. Premailer (already in your pipeline) will inline the rest of the styles. Do not put critical structure inside container queries.
+    </div>
+  </div>
+
+  <h2>Files you'll touch</h2>
+  <table>
+    <tr><th>Path</th><th>Change</th></tr>
+    <tr><td><code>app/services/care_circle/providers/themes/ellis.css</code></td><td><strong>NEW</strong> — translate <code>NL_CSS</code> from the mockup</td></tr>
+    <tr><td><code>app/services/care_circle/providers/newsletter_header/templates/default.html</code></td><td>Replace navy panel with broadsheet markup</td></tr>
+    <tr><td><code>app/services/care_circle/templates/_macros/provenance.html</code></td><td><strong>NEW</strong> — Jinja macro for provenance badges</td></tr>
+    <tr><td><code>app/services/care_circle/provider_base.py</code></td><td>Add shared templates dir to <code>FileSystemLoader</code> (1 line, ~line 340)</td></tr>
+    <tr><td>Each <code>providers/&lt;key&gt;/templates/default.html</code></td><td>Add <code>{% from … %}</code> + one <code>{{ prov(...) }}</code> call</td></tr>
+    <tr><td><code>app/services/care_circle/session_assembler.py</code></td><td>Wrap output in <code>&lt;div class="cc-newsletter"&gt;</code> + group main/side</td></tr>
+    <tr><td>Patient config / admin UI</td><td>Set <code>"theme": "ellis"</code> for Rose</td></tr>
+  </table>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Use <code>scripts/build_care_circle_sample_newsletter.py</code> to generate <code>runtime/artifacts/care-circle-sample-newsletter-rose-ellis.html</code> and open it in a browser at desktop and phone widths — should reflow exactly like the mockup.</li>
+    <li>Use <code>scripts/send_test_newsletter_patient5.py</code> to send through Premailer + your real email path; check Gmail (web + mobile) and Outlook web. Outlook desktop is allowed to fall back to single-column.</li>
+    <li>Run <code>scripts/validate_care_circle_newsletter_uniqueness.py</code> to make sure the theme didn't break section selectors used in tests.</li>
+  </ul>
+
+  <h2>What I can do next</h2>
+  <p>Say the word and I will:</p>
+  <ul>
+    <li>Generate the actual <code>ellis.css</code> file ready to drop into <code>providers/themes/</code>.</li>
+    <li>Rewrite the <code>newsletter_header</code> template to the broadsheet form.</li>
+    <li>Write the <code>provenance.html</code> Jinja macro with the inline-SVG icon set from the mockup.</li>
+    <li>Produce a diff for the 1-line <code>provider_base.py</code> loader change and the assembler wrapper.</li>
+  </ul>
+  <p>Tell me which of those to start with and I'll write the files into this project so you can copy them across.</p>
+
+</div>
+</body>
+</html>

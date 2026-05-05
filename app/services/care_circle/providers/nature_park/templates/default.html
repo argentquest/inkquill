@@ -4,20 +4,20 @@
     <table class="nature-park__frame" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
             {% if image_url %}
-            <td class="nature-park__image-cell" width="60%" valign="top" style="padding-right:16px">
+            <td class="nature-park__image-cell" width="60%" valign="top" style="padding-right:16px; vertical-align:top">
                 <img src="{{ image_url }}" alt="{% if title %}{{ title }}{% else %}{{ park_name }}{% endif %}" class="nature-park__image" style="width:100%; max-height:420px; object-fit:cover; border-radius:10px; display:block">
             </td>
             {% endif %}
             <td class="nature-park__details-cell" width="{% if image_url %}40%{% else %}100%{% endif %}" valign="top">
-                <p class="nature-park__park-name section__body section__body--large" style="font-size:30px; font-weight:700; line-height:1.7; margin:0 0 8px">{{ park_name }}</p>
+                <p class="nature-park__park-name section__body section__body--large">{{ park_name }}</p>
                 {% if title %}
-                <p class="nature-park__title section__subtitle" style="font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; opacity:0.7; margin:0 0 8px; color:#5a5a5a">{{ title }}</p>
+                <p class="nature-park__title section__subtitle mt-md">{{ title }}</p>
                 {% endif %}
                 {% if caption %}
-                <p class="nature-park__caption section__body" style="font-size:24px; font-weight:500; line-height:1.7; margin:0 0 10px">{{ caption }}</p>
+                <p class="nature-park__caption section__body mt-md">{{ caption }}</p>
                 {% endif %}
                 {% if credit %}
-                <p class="nature-park__credit section__caption" style="margin:0; font-size:0.8rem; color:#888; font-style:italic">Photo: {{ credit }}</p>
+                <p class="nature-park__credit text-muted section__body--italic mt-md" style="font-size:12px;">Photo: {{ credit }}</p>
                 {% endif %}
             </td>
         </tr>

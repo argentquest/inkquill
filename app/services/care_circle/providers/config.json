@@ -68,7 +68,7 @@
     {"name": "comic_moose_lake", "label": "Moose Lake Cartoons", "icon": "🗞️", "enabled": true, "order": 68, "category": "entertainment", "patient_visible": true, "family_visible": true},
     {"name": "newsletter_footer", "label": "Newsletter Footer", "icon": "📋", "enabled": true, "order": 99, "category": "layout", "patient_visible": true, "family_visible": true}
   ],
-  "default_theme": "classic",
+  "default_theme": "ellis",
   "assembly": {
     "default_mode": "linear",
     "page": {

@@ -4,27 +4,27 @@
     <p class="section__subtitle">{{ instruction }}</p>
     <table class="section__body spot-the-difference" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-            <td class="spot-the-difference__list spot-the-difference__list--a" width="50%" valign="top" style="padding:12px; border-radius:8px; border:2px solid #1e40af; vertical-align:top">
-                <p class="spot-the-difference__label spot-the-difference__label--a" style="margin:0 0 10px; text-align:center; font-size:18px; font-weight:700; color:#1e40af" align="center">List A</p>
+            <td class="spot-the-difference__list spot-the-difference__list--a" width="50%" valign="top" style="padding:12px; border-radius:8px; border:2px solid #d86c3d; vertical-align:top">
+                <p class="spot-the-difference__label section__subtitle" style="margin:0 0 10px; text-align:center;" align="center">List A</p>
                 {% for word in list_a %}
-                <p class="spot-the-difference__word" style="margin:0; padding:6px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-size:26px; font-weight:700" align="center">{{ word }}</p>
+                <p class="spot-the-difference__word section__body" style="margin:0; padding:5px 0; border-bottom:1px solid rgba(35,25,19,0.10); text-align:center;" align="center">{{ word }}</p>
                 {% endfor %}
             </td>
-            <td style="width:16px">&nbsp;</td>
-            <td class="spot-the-difference__list spot-the-difference__list--b" width="50%" valign="top" style="padding:12px; border-radius:8px; border:2px solid #059669; vertical-align:top">
-                <p class="spot-the-difference__label spot-the-difference__label--b" style="margin:0 0 10px; text-align:center; font-size:18px; font-weight:700; color:#059669" align="center">List B</p>
+            <td style="width:14px">&nbsp;</td>
+            <td class="spot-the-difference__list spot-the-difference__list--b" width="50%" valign="top" style="padding:12px; border-radius:8px; border:2px solid #1f3b36; vertical-align:top">
+                <p class="spot-the-difference__label section__subtitle" style="margin:0 0 10px; text-align:center;" align="center">List B</p>
                 {% for word in list_b %}
-                <p class="spot-the-difference__word" style="margin:0; padding:6px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-size:26px; font-weight:700" align="center">{{ word }}</p>
+                <p class="spot-the-difference__word section__body" style="margin:0; padding:5px 0; border-bottom:1px solid rgba(35,25,19,0.10); text-align:center;" align="center">{{ word }}</p>
                 {% endfor %}
             </td>
         </tr>
-        <tr><td colspan="3" height="16">&nbsp;</td></tr>
+        <tr><td colspan="3" height="14">&nbsp;</td></tr>
         <tr>
-            <td colspan="3" align="center" class="section__body section__body--italic text-muted" style="font-size:24px; font-weight:500; line-height:1.7; font-style:italic; color:#64748b">(Answer below — upside down)</td>
+            <td colspan="3" align="center" class="section__body section__body--italic text-muted">(Answer below — upside down)</td>
         </tr>
-        <tr><td colspan="3" height="12">&nbsp;</td></tr>
+        <tr><td colspan="3" height="10">&nbsp;</td></tr>
         <tr>
-            <td colspan="3" align="center" class="section__body spot-the-difference__answer" style="font-size:24px; font-weight:500; line-height:1.7; text-align:center; transform:rotate(180deg); -webkit-transform:rotate(180deg); -ms-transform:rotate(180deg)" align="center">
+            <td colspan="3" align="center" class="section__body spot-the-difference__answer" style="transform:rotate(180deg); -webkit-transform:rotate(180deg); -ms-transform:rotate(180deg)" align="center">
                 List A had "{{ changed_in_a }}" — List B had "{{ changed_in_b }}"
             </td>
         </tr>

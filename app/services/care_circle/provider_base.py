@@ -15,13 +15,66 @@ import traceback
 from pathlib import Path
 from typing import Any, Optional
 
+import re
+
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 logger = logging.getLogger(__name__)
 
+# Maps provider_key → provenance kind.  Used to auto-inject a badge above the
+# section__title without touching individual templates.
+_PROVIDER_PROVENANCE: dict[str, str] = {
+    # ── AI-generated ──────────────────────────────────────────────────────────
+    "weather": "auto", "joke": "auto", "nostalgia": "auto",
+    "puzzle": "auto", "brain_booster": "auto", "sensory": "auto",
+    "ai_trivia": "auto", "daily_quote": "auto", "dog_photo": "auto",
+    "cat_fact": "auto", "gratitude": "auto", "gentle_exercise": "auto",
+    "daily_affirmation": "auto", "nature_scene": "auto",
+    "simple_recipe": "auto", "this_day_history": "auto", "riddle": "auto",
+    "missing_vowels": "auto", "finish_phrase": "auto", "odd_one_out": "auto",
+    "word_scramble": "auto", "song_of_the_day": "auto",
+    "complete_the_duo": "auto", "spot_the_difference": "auto",
+    "pen_pal_letter": "auto", "gridless_crossword": "auto",
+    "hobby_spotlight": "auto", "local_history": "auto",
+    "personal_affirmation": "auto", "activity_suggestion": "auto",
+    "animal_friend": "auto", "bingo": "auto", "color_match": "auto",
+    "simple_math": "auto", "word_connect": "auto",
+    "morning_stretch": "auto", "word_of_the_day": "auto",
+    "country_spotlight": "auto", "number_sequence": "auto",
+    "mindful_moment": "auto", "old_saying_match": "auto",
+    "famous_face": "auto",
+    # ── Curated / sourced ─────────────────────────────────────────────────────
+    "world_news": "curated", "hymn_of_the_day": "curated",
+    "daily_blessing": "curated", "seasonal_poem": "curated",
+    "classic_art": "curated", "wikimedia_gallery": "curated",
+    "nature_park": "curated",
+    "comic_abe_martin": "curated", "comic_brownies": "curated",
+    "comic_dino_cartoons": "curated", "comic_mr_skygack": "curated",
+    "comic_wuffle": "curated", "comic_buster_brown": "curated",
+    "comic_gasoline_alley": "curated", "comic_little_nemo": "curated",
+    "comic_dream_rarebit_fiend": "curated",
+    "comic_polly_and_her_pals": "curated", "comic_pepper_carrot": "curated",
+    "comic_happy_hooligan": "curated", "comic_moose_lake": "curated",
+    # ── From the family ───────────────────────────────────────────────────────
+    "family_greeting": "family", "letter_to_family": "family",
+    "memory_lane_photo": "family",
+}
+
+_PROV_BADGE: dict[str, str] = {
+    "auto":    '<span class="prov-pill prov-pill--auto">AI Generated</span>',
+    "curated": '<span class="prov-pill prov-pill--curated">Curated</span>',
+    "family":  '<span class="prov-pill prov-pill--family">From Your Family</span>',
+}
+
+_SECTION_TITLE_RE = re.compile(
+    r'(<[^>]+class="[^"]*\bsection__title\b[^"]*"[^>]*>)',
+    re.IGNORECASE,
+)
+
 PROVIDERS_ROOT = Path(__file__).resolve().parent / "providers"
 ROOT_CONFIG_PATH = PROVIDERS_ROOT / "config.json"
 THEMES_DIR = PROVIDERS_ROOT / "themes"
+SHARED_TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 HTML_CACHE_DIR = Path(__file__).resolve().parents[2] / "logs" / "care_circle_render_cache"
 
 # Wikimedia requires a descriptive User-Agent or it returns 403.
@@ -342,7 +395,7 @@ class BaseCareCircleProvider:
                 return cached
 
         environment = Environment(
-            loader=FileSystemLoader(str(self.template_dir)),
+            loader=FileSystemLoader([str(self.template_dir), str(SHARED_TEMPLATES_DIR)]),
             autoescape=select_autoescape(["html"]),
         )
         template = environment.get_template(f"{template_name}.html")
@@ -357,6 +410,11 @@ class BaseCareCircleProvider:
                 exc,
             )
             return ""
+
+        kind = _PROVIDER_PROVENANCE.get(self.provider_key)
+        if kind:
+            badge = _PROV_BADGE[kind]
+            html = _SECTION_TITLE_RE.sub(badge + r"\1", html, count=1)
 
         theme_css = self.get_combined_theme_css(theme_name)
         combined_css = "\n\n".join(

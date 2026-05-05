@@ -35,6 +35,69 @@ from app.services.cost_tracker_service import log_ai_call
 logger = logging.getLogger(__name__)
 
 FOOTER_PROVIDER_KEY = "newsletter_footer"
+HEADER_PROVIDER_KEY = "newsletter_header"
+
+# Providers that render best in a narrow sidebar column.
+# Everything else (rich content, photos, audio, featured stories) goes in the main column.
+_SIDE_PROVIDERS: frozenset[str] = frozenset({
+    "weather", "garden_almanac",
+    "world_news", "world-news",
+    "daily_affirmation", "personal_affirmation", "gratitude",
+    "joke", "puzzle", "brain_booster", "riddle",
+    "missing-vowels", "word-scramble", "gridless-crossword",
+    "finish-phrase", "complete-the-duo", "odd-one-out", "spot-the-difference",
+    "hymn_of_the_day", "daily_blessing", "seasonal_poem",
+    "cat_fact", "dog_photo", "sensory",
+    "local_history", "daily_quote", "ai_trivia",
+})
+
+# Injected once at the top of the assembled HTML so the email service can hoist it.
+_LAYOUT_CSS = """
+.cc-newsletter { background: #fcfaf6; font-family: Georgia, "Times New Roman", serif; color: #231913; }
+.cc-cols { display: flex; align-items: flex-start; gap: 16px; }
+.cc-main { flex: 1.45; min-width: 0; }
+.cc-side { flex: 1;    min-width: 0; }
+@media only screen and (max-width: 600px) {
+    .cc-cols { flex-direction: column !important; }
+}
+"""
+
+
+def _build_newsletter_html(cards: list) -> str:
+    """Group cards into header / two-column body / footer and wrap in .cc-newsletter."""
+    header_html = ""
+    footer_html = ""
+    main_parts: list[str] = []
+    side_parts: list[str] = []
+
+    for card in cards:
+        html = (card.rendered_html or "").strip()
+        if not html:
+            continue
+        key = card.provider_key
+        if key == HEADER_PROVIDER_KEY:
+            header_html = html
+        elif key == FOOTER_PROVIDER_KEY:
+            footer_html = html
+        elif key in _SIDE_PROVIDERS:
+            side_parts.append(html)
+        else:
+            main_parts.append(html)
+
+    if main_parts or side_parts:
+        cols_html = (
+            '<div class="cc-cols">'
+            f'<div class="cc-main">{"".join(main_parts)}</div>'
+            f'<div class="cc-side">{"".join(side_parts)}</div>'
+            '</div>'
+        )
+    else:
+        cols_html = ""
+
+    inner = "\n".join(filter(None, [header_html, cols_html, footer_html]))
+    layout_style = f"<style>\n{_LAYOUT_CSS}\n</style>"
+    return f"{layout_style}\n<div class='cc-newsletter'>\n{inner}\n</div>"
+
 
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
 _STRUCTURED_SKIP_KEYS = {
@@ -536,9 +599,7 @@ async def assemble_daily_patient_session(
         await db.commit()
 
     generated_cards.sort(key=lambda c: _provider_sort_order(c.provider_key, c.display_order))
-    newsletter_html = "\n\n".join(
-        card.rendered_html for card in generated_cards if card.rendered_html
-    )
+    newsletter_html = _build_newsletter_html(generated_cards)
 
     return {
         "success": True,
@@ -578,4 +639,10 @@ async def get_newsletter_html_for_date(
             pass
 
     entries.sort(key=lambda x: _provider_sort_order(x[0], x[1]))
-    return "\n\n".join(html for _, _, html in entries)
+
+    class _SimpleCard:
+        def __init__(self, provider_key: str, rendered_html: str):
+            self.provider_key = provider_key
+            self.rendered_html = rendered_html
+
+    return _build_newsletter_html([_SimpleCard(key, html) for key, _, html in entries])

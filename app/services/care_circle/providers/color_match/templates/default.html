@@ -8,27 +8,26 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                         {% for option in options %}
-                        <td align="center" valign="middle" class="color-match__option" style="min-width:100px; padding:16px 28px; border:3px solid #059669; border-radius:12px; background:#fff; font-size:22px; font-weight:700; font-family:Verdana,Arial,sans-serif">
+                        <td align="center" valign="middle" class="color-match__option" style="min-width:100px; padding:14px 24px; border:2px solid #d86c3d; border-radius:12px; background:rgba(216,108,61,0.06);">
                             {{ option }}
                         </td>
                         {% if not loop.last %}
-                        <td style="width:20px">&nbsp;</td>
+                        <td style="width:16px">&nbsp;</td>
                         {% endif %}
                         {% endfor %}
                     </tr>
                 </table>
             </td>
         </tr>
-        <tr><td height="16">&nbsp;</td></tr>
+        <tr><td height="14">&nbsp;</td></tr>
         <tr>
-            <td align="center" class="section__body section__body--italic text-muted" style="font-size:18px; font-style:italic; color:#64748b; font-family:Verdana,Arial,sans-serif">(Answer is upside down below)</td>
+            <td align="center" class="section__body section__body--italic text-muted">(Answer is upside down below)</td>
         </tr>
-        <tr><td height="12">&nbsp;</td></tr>
+        <tr><td height="10">&nbsp;</td></tr>
         <tr>
-            <td align="center" class="color-match__answer" style="font-size:20px; font-weight:700; font-family:Verdana,Arial,sans-serif">
-                <!-- Upside-down text using flip for email compatibility -->
-                <span style="display:inline-block; transform:rotate(180deg); -webkit-transform:rotate(180deg); -ms-transform:rotate(180deg); filter:FlipV; writing-mode:vertical-rl; text-orientation:upside-down">{{ answer }}
-            </span></td>
+            <td align="center" class="color-match__answer section__body">
+                <span style="display:inline-block; transform:rotate(180deg); -webkit-transform:rotate(180deg); -ms-transform:rotate(180deg); writing-mode:vertical-rl; text-orientation:upside-down">{{ answer }}</span>
+            </td>
         </tr>
     </table>
   </td></tr>

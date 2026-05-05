@@ -1,0 +1,386 @@
+/*
+ * Theme: Ellis (Ink & Quill Broadsheet)
+ * Warm newspaper-inspired design with Georgia serif typography.
+ *
+ * BEM hooks (existing in all provider templates):
+ *   .section                 — card container
+ *   .section--{provider}     — per-provider color variant
+ *   .section__title          — heading
+ *   .section__body           — body text
+ *   .section__subtitle       — small eyebrow label
+ *   .section__body--italic / --large  — modifiers
+ *
+ * Layout roots (injected by session_assembler):
+ *   .cc-newsletter           — page root
+ *   .cc-cols / .cc-main / .cc-side  — two-column grid
+ *
+ * Masthead elements (in newsletter_header template):
+ *   .cc-mast__eyebrow / .cc-mast__title / .cc-mast__tagline
+ *
+ * Provenance badges (via _macros/provenance.html):
+ *   .prov-pill --auto / --curated / --family
+ */
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #231913;
+    background: #fcfaf6;
+}
+
+/* ── Layout root ───────────────────────────────────────────────────────────── */
+.cc-newsletter {
+    background: #fcfaf6;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #231913;
+}
+
+.cc-cols {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.cc-main { flex: 1.45; min-width: 0; }
+.cc-side { flex: 1;    min-width: 0; }
+
+@media only screen and (max-width: 600px) {
+    .cc-cols { flex-direction: column !important; }
+}
+
+/* ── Masthead typography ───────────────────────────────────────────────────── */
+.cc-mast__eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(35,25,19,0.45);
+    margin-bottom: 10px;
+}
+
+.cc-mast__title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: #231913;
+}
+
+.cc-mast__tagline {
+    font-size: 13px;
+    color: rgba(35,25,19,0.5);
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* ── Provenance badges ─────────────────────────────────────────────────────── */
+.prov-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.prov-pill--auto {
+    background: rgba(216,108,61,0.12);
+    color: #b5531f;
+    border: 1px solid rgba(216,108,61,0.25);
+}
+
+.prov-pill--curated {
+    background: rgba(31,59,54,0.10);
+    color: #1f3b36;
+    border: 1px solid rgba(31,59,54,0.20);
+}
+
+.prov-pill--family {
+    background: rgba(216,108,61,0.18);
+    color: #8c3b10;
+    border: 1px solid rgba(216,108,61,0.30);
+}
+
+/* ── Section card base ─────────────────────────────────────────────────────── */
+.section {
+    width: 100%;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(35,25,19,0.08);
+    background: #f4ebd9;
+}
+
+.section__subtitle {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(35,25,19,0.45);
+    margin-bottom: 6px;
+}
+
+.section__title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #231913;
+    margin-bottom: 10px;
+}
+
+.section__body {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    line-height: 1.65;
+    color: rgba(35,25,19,0.85);
+}
+
+.section__body--italic { font-style: italic; }
+
+.section__body--large {
+    font-size: 19px;
+    font-weight: 600;
+}
+
+/* ── Masthead section ──────────────────────────────────────────────────────── */
+.section--newsletter_header {
+    background: #fcfaf6;
+    border: none;
+    border-bottom: 3px double rgba(35,25,19,0.35);
+    border-radius: 0;
+    text-align: center;
+    padding: 24px 24px 16px;
+    margin-bottom: 18px;
+}
+
+/* ── Footer section ────────────────────────────────────────────────────────── */
+.section--newsletter_footer {
+    background: transparent;
+    border: none;
+    border-top: 1px solid rgba(35,25,19,0.12);
+    border-radius: 0;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(35,25,19,0.45);
+    margin-top: 18px;
+}
+
+/* ── Greeting / family ─────────────────────────────────────────────────────── */
+.section--family_greeting,
+.section--family {
+    background: rgba(182,198,155,0.22);
+    border-color: rgba(91,120,73,0.18);
+    text-align: center;
+}
+.section--family_greeting .section__title,
+.section--family .section__title { color: #2d4a1e; font-size: 22px; }
+.section--family_greeting .section__body,
+.section--family .section__body  { color: #3a5f28; }
+
+/* ── Personal letters ──────────────────────────────────────────────────────── */
+.section--pen-pal-letter {
+    background: #faf7f2;
+    border-color: rgba(35,25,19,0.10);
+}
+.section--pen-pal-letter .section__title { color: #231913; }
+
+/* ── Family voice (audio player) ───────────────────────────────────────────── */
+.section--family_voice {
+    background: linear-gradient(135deg, #f1a57b 0%, #d86c3d 100%);
+    border-color: transparent;
+    color: #fff;
+}
+.section--family_voice .section__title { color: #fff; }
+.section--family_voice .section__body  { color: rgba(255,255,255,0.9); }
+
+/* ── Memory lane photo ─────────────────────────────────────────────────────── */
+.section--memory_lane_photo {
+    background: #faf7f2;
+    border-color: rgba(35,25,19,0.10);
+}
+
+/* ── History ───────────────────────────────────────────────────────────────── */
+.section--this_day_history,
+.section--local_history {
+    background: rgba(244,235,217,0.9);
+    border-left: 4px solid #d86c3d;
+    border-radius: 0 14px 14px 0;
+}
+.section--this_day_history .section__title,
+.section--local_history .section__title { color: #7a3010; }
+
+/* ── World news ────────────────────────────────────────────────────────────── */
+.section--world-news,
+.section--world_news {
+    background: rgba(31,59,54,0.05);
+    border-color: rgba(31,59,54,0.15);
+}
+.section--world-news .section__title,
+.section--world_news .section__title { color: #1f3b36; }
+
+/* ── Garden & nature ───────────────────────────────────────────────────────── */
+.section--garden_almanac,
+.section--nature_scene {
+    background: rgba(182,198,155,0.20);
+    border-color: rgba(91,120,73,0.20);
+}
+.section--garden_almanac .section__title,
+.section--nature_scene .section__title { color: #2d4a1e; }
+
+/* ── Weather ───────────────────────────────────────────────────────────────── */
+.section--weather {
+    background: rgba(204,219,231,0.25);
+    border-color: rgba(88,135,175,0.20);
+}
+.section--weather .section__title { color: #1e3a5a; }
+
+/* ── Nostalgia & trivia ────────────────────────────────────────────────────── */
+.section--nostalgia,
+.section--ai_trivia {
+    background: rgba(216,108,61,0.08);
+    border-color: rgba(216,108,61,0.18);
+}
+.section--nostalgia .section__title,
+.section--ai_trivia .section__title { color: #7a3010; }
+.section--nostalgia .section__body,
+.section--ai_trivia .section__body  { color: rgba(122,48,16,0.85); }
+
+/* ── Daily quote ───────────────────────────────────────────────────────────── */
+.section--daily_quote {
+    background: #faf7f2;
+    border-left: 3px solid rgba(35,25,19,0.30);
+    border-radius: 0 14px 14px 0;
+    font-style: italic;
+}
+.section--daily_quote .section__title { color: #231913; font-style: italic; }
+
+/* ── Music ─────────────────────────────────────────────────────────────────── */
+.section--song-of-the-day,
+.section--song_of_the_day {
+    background: rgba(216,108,61,0.10);
+    border-color: rgba(216,108,61,0.20);
+}
+.section--song-of-the-day .section__title,
+.section--song_of_the_day .section__title { color: #7a3010; }
+
+/* ── Recipe & hobbies ──────────────────────────────────────────────────────── */
+.section--hobby_spotlight,
+.section--simple_recipe {
+    background: rgba(216,108,61,0.07);
+    border-color: rgba(216,108,61,0.15);
+}
+.section--hobby_spotlight .section__title,
+.section--simple_recipe .section__title { color: #7a3010; }
+
+/* ── Pets ──────────────────────────────────────────────────────────────────── */
+.section--cat_fact,
+.section--dog_photo { background: #faf7f2; border-color: rgba(35,25,19,0.10); }
+
+/* ── Movement & activity ───────────────────────────────────────────────────── */
+.section--gentle_exercise,
+.section--activity_suggestion {
+    background: rgba(182,198,155,0.15);
+    border-color: rgba(91,120,73,0.15);
+}
+.section--gentle_exercise .section__title,
+.section--activity_suggestion .section__title { color: #2d4a1e; }
+
+/* ── Brain games & puzzles ─────────────────────────────────────────────────── */
+.section--puzzle,
+.section--brain_booster,
+.section--riddle,
+.section--spot-the-difference,
+.section--finish-phrase {
+    background: rgba(31,59,54,0.06);
+    border-color: rgba(31,59,54,0.15);
+}
+.section--puzzle .section__title,
+.section--brain_booster .section__title,
+.section--riddle .section__title,
+.section--spot-the-difference .section__title,
+.section--finish-phrase .section__title { color: #1f3b36; }
+
+/* ── Word puzzles ──────────────────────────────────────────────────────────── */
+.section--missing-vowels,
+.section--word-scramble,
+.section--gridless-crossword,
+.section--complete-the-duo,
+.section--odd-one-out {
+    background: rgba(31,59,54,0.04);
+    border-color: rgba(31,59,54,0.12);
+}
+.section--missing-vowels .section__title,
+.section--word-scramble .section__title,
+.section--gridless-crossword .section__title,
+.section--complete-the-duo .section__title,
+.section--odd-one-out .section__title { color: #1f3b36; }
+
+/* ── Jokes & sensory ───────────────────────────────────────────────────────── */
+.section--joke {
+    background: rgba(216,108,61,0.07);
+    border-color: rgba(216,108,61,0.15);
+    text-align: center;
+}
+.section--joke .section__title { color: #7a3010; }
+
+.section--sensory {
+    background: rgba(204,182,220,0.20);
+    border-color: rgba(120,80,160,0.18);
+}
+.section--sensory .section__title { color: #3d1f5a; }
+
+/* ── Affirmations & gratitude ──────────────────────────────────────────────── */
+.section--gratitude,
+.section--daily_affirmation,
+.section--personal_affirmation {
+    background: rgba(182,198,155,0.18);
+    border-color: rgba(91,120,73,0.15);
+    text-align: center;
+    font-style: italic;
+}
+.section--gratitude .section__title,
+.section--daily_affirmation .section__title,
+.section--personal_affirmation .section__title { color: #2d4a1e; font-style: italic; }
+
+/* ── Spiritual / devotional ────────────────────────────────────────────────── */
+.section--hymn_of_the_day,
+.section--daily_blessing,
+.section--seasonal_poem {
+    background: rgba(204,219,231,0.20);
+    border-color: rgba(88,135,175,0.15);
+    font-style: italic;
+}
+.section--hymn_of_the_day .section__title,
+.section--daily_blessing .section__title,
+.section--seasonal_poem .section__title { color: #1e3a5a; }
+
+/* ── Utilities ─────────────────────────────────────────────────────────────── */
+.text-center { text-align: center; }
+.text-muted  { color: rgba(35,25,19,0.5); }
+.text-bold   { font-weight: 700; }
+.text-xl     { font-size: 20px; }
+.text-2xl    { font-size: 26px; }
+.mt-md       { margin-top: 14px; }
+.mb-md       { margin-bottom: 14px; }
+.divider     { border-top: 1px solid rgba(35,25,19,0.12); margin: 14px 0; }
+
+/* ── Print ─────────────────────────────────────────────────────────────────── */
+@media print {
+    body { background: #fff; }
+    .section { break-inside: avoid; }
+    .cc-cols { flex-direction: column; }
+}

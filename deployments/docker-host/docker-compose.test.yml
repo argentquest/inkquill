@@ -1,4 +1,11 @@
 services:
   backend:
+    # Bind to loopback only — direct backend access for debugging only.
     ports:
       - "127.0.0.1:${CARE_CIRCLE_BACKEND_PORT}:8000"
+
+  gateway:
+    # Test: bind to all interfaces so the stack is reachable from the dev machine
+    # without a domain name or host nginx.
+    ports:
+      - "${CARE_CIRCLE_PUBLIC_PORT}:80"

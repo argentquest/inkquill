@@ -13,13 +13,13 @@
             {% endif %}
             <td class="wikimedia-gallery__details-cell" width="{% if image_url %}40%{% else %}100%{% endif %}" valign="top">
                 {% if title %}
-                <p class="wikimedia-gallery__title section__body section__body--large" style="font-size:30px; font-weight:700; line-height:1.7; margin:0 0 8px">{{ title }}</p>
+                <p class="wikimedia-gallery__title section__body section__body--large">{{ title }}</p>
                 {% endif %}
                 {% if description %}
-                <p class="wikimedia-gallery__description section__body" style="font-size:24px; font-weight:500; line-height:1.7; margin:0 0 10px">{{ description }}</p>
+                <p class="wikimedia-gallery__description section__body mt-md">{{ description }}</p>
                 {% endif %}
                 {% if credit %}
-                <p class="wikimedia-gallery__credit section__caption" style="margin:0; font-size:0.8rem; color:#888; font-style:italic">{{ credit }}</p>
+                <p class="wikimedia-gallery__credit text-muted section__body--italic mt-md" style="font-size:12px;">{{ credit }}</p>
                 {% endif %}
             </td>
         </tr>

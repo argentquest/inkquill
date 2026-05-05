@@ -58,7 +58,25 @@
       "Bash(curl -sf http://127.0.0.1:8083/health)",
       "Bash(docker network *)",
       "Bash(docker stop *)",
-      "Bash(docker rm *)"
+      "Bash(docker rm *)",
+      "Bash(curl -sf http://127.0.0.1:8083/api/v1/health-check)",
+      "Bash(curl -v http://127.0.0.1:8083/health)",
+      "Bash(docker port *)",
+      "Bash(curl -si http://localhost:8082/)",
+      "Bash(curl -si http://localhost:8082/_next/static/css/)",
+      "Bash(curl -s http://localhost:8082/)",
+      "Bash(curl -si \"http://localhost:8082/_next/static/css\")",
+      "Bash(curl -s --raw http://localhost:8082/)",
+      "Bash(curl -si \"http://localhost:8082/_next/static/css/06aa532ab16a5a57.css\")",
+      "Bash(curl -s \"http://172.19.0.4:3000/\")",
+      "Bash(docker cp *)",
+      "Read(//tmp/**)",
+      "Bash(curl -s \"http://localhost:8082/_next/static/chunks/app/layout-3526f7e5639b0fcc.js\")",
+      "Bash(curl -s \"http://localhost:8082/_next/static/chunks/main-app-f3336e172256d2ab.js\")",
+      "Bash(curl -s \"http://localhost:8082/_next/static/css/06aa532ab16a5a57.css\")",
+      "Bash(git -C \"/c/Code/inkandquill/inkquill\" status)",
+      "Bash(git -C \"/c/Code/inkandquill/inkquill\" diff --stat HEAD)",
+      "Bash(git -C /c/Code/inkandquill/inkquill add .claude/settings.json app/services/care_circle/provider_base.py app/services/care_circle/session_assembler.py app/services/care_circle/providers/config.json app/services/care_circle/providers/themes/ellis.css app/services/care_circle/templates/ app/services/care_circle/providers/animal_friend/templates/default.html app/services/care_circle/providers/cat_fact/templates/default.html app/services/care_circle/providers/classic_art/templates/default.html app/services/care_circle/providers/color_match/templates/default.html app/services/care_circle/providers/dog_photo/templates/default.html app/services/care_circle/providers/hymn_of_the_day/templates/default.html app/services/care_circle/providers/letter_to_family/templates/default.html app/services/care_circle/providers/memory_lane_photo/templates/default.html app/services/care_circle/providers/nature_park/templates/default.html app/services/care_circle/providers/nature_scene/templates/default.html app/services/care_circle/providers/newsletter_footer/templates/default.html app/services/care_circle/providers/newsletter_header/templates/default.html app/services/care_circle/providers/seasonal_poem/templates/default.html app/services/care_circle/providers/song_of_the_day/templates/default.html app/services/care_circle/providers/spot_the_difference/templates/default.html app/services/care_circle/providers/wikimedia_gallery/templates/default.html app/services/care_circle/providers/word_connect/templates/default.html app/services/care_circle/providers/word_of_the_day/templates/default.html config/maintenance_status.json deployments/docker-host/docker-compose.base.yml deployments/docker-host/docker-compose.test.yml frontendv1/components/platform/app-shell-resolver.tsx 'Codebase Handoff.html')"
     ]
   }
 }
