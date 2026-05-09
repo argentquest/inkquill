@@ -7,7 +7,7 @@ test.describe("Care Circle Family UI", () => {
     await mockAppApis(page, { session: "authenticated" });
     await page.goto("/care-circle-family");
 
-    await expect(page.getByRole("heading", { name: "Care Circle Family" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Family Circle");
     await expect(page.getByTestId("hub-card-friends")).toBeVisible();
     await expect(page.getByTestId("hub-card-recent-activity")).toBeVisible();
     await expect(page.getByTestId("hub-card-media")).toBeVisible();

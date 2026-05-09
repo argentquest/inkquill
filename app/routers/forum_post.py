@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db_session, get_current_user
+from app.core.deps import get_db_session, get_current_active_user, get_current_user
 from app.models.user import User
 from app.models.forum import VoteType
 from app.schemas.base import ApiResponse
@@ -142,7 +142,7 @@ async def get_post(
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_post(
     post: ForumPostCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Create a new forum post."""
@@ -164,7 +164,7 @@ async def create_post(
 async def update_post(
     post_id: int,
     post_update: ForumPostUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Update a forum post."""
@@ -192,7 +192,7 @@ async def delete_post(
     post_id: int,
     deletion_reason: Optional[str] = None,
     hard_delete: bool = False,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Delete a forum post."""
@@ -214,7 +214,7 @@ async def delete_post(
 async def vote_on_post(
     post_id: int,
     vote: ForumVoteCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Vote on a forum post."""

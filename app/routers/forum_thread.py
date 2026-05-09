@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db_session, get_current_user
+from app.core.deps import get_db_session, get_current_active_user, get_current_user
 from app.models.user import User
 from app.models.forum import ThreadStatus
 from app.schemas.base import ApiResponse
@@ -180,7 +180,7 @@ async def get_thread(
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_thread(
     thread: ForumThreadCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Create a new forum thread with initial post."""
@@ -266,7 +266,7 @@ async def create_thread(
 async def update_thread(
     thread_id: int,
     thread_update: ForumThreadUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Update a forum thread."""
@@ -289,7 +289,7 @@ async def update_thread(
 async def delete_thread(
     thread_id: int,
     hard_delete: bool = False,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Delete a forum thread."""
@@ -309,7 +309,7 @@ async def delete_thread(
 @router.post("/{thread_id}/toggle-lock", response_model=ApiResponse)
 async def toggle_thread_lock(
     thread_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Toggle thread lock status. (Admin only)"""
@@ -331,7 +331,7 @@ async def toggle_thread_lock(
 @router.post("/{thread_id}/toggle-pin", response_model=ApiResponse)
 async def toggle_thread_pin(
     thread_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Toggle thread pin status. (Admin only)"""
@@ -353,7 +353,7 @@ async def toggle_thread_pin(
 @router.post("/{thread_id}/subscribe")
 async def toggle_subscription(
     thread_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Toggle subscription to a thread."""

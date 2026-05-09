@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { useLayoutEffect } from "react";
-import { CreditCard, Megaphone, Settings2, ShieldCheck, Users, Wrench } from "lucide-react";
+import { CreditCard, Megaphone, MessageSquare, Settings2, ShieldCheck, Users, Wrench } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 import { LoadingState } from "@/components/ui/loading-state";
 
 const adminSections = [
+  {
+    href: "/admin/forums",
+    label: "Forum Categories",
+    description: "Add, edit, enable, and disable forum categories for Storytelling and Care Circle apps.",
+    icon: MessageSquare,
+  },
   {
     href: "/admin/users",
     label: "Users",

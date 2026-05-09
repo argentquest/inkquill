@@ -17,16 +17,15 @@ import {
   Sparkles,
   Hammer,
   ArrowRight,
-  FileText as FileTextIcon,
-  MessageSquare,
 } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
+import { SectionHeading } from "@/components/shell/section-heading";
+import { HubSidebar } from "@/components/shell/hub-sidebar";
 import { HelpButton } from "@/components/ui/help-modal";
 import { storytellingHelp } from "@/lib/help-content";
 import { fetchBlogPosts, fetchForumThreads } from "@/lib/api";
-import type { BlogPost, ForumThreadSummary } from "@/lib/api";
 
 const productLinks = [
   { href: "/storytelling/stories", label: "Stories", description: "Create, edit, and manage your stories.", icon: BookOpen },
@@ -60,65 +59,17 @@ function HubCard({
 }) {
   return (
     <Link
-      className="flex flex-col gap-3 rounded-[24px] border border-black/10 bg-white/70 p-5 shadow-panel transition hover:border-black/20 hover:bg-white"
+      className="group flex flex-col gap-3 rounded-[24px] border border-black/10 bg-white/70 p-5 shadow-panel transition hover:border-black/20 hover:bg-white"
       href={href}
     >
       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ink-900/6">
         <Icon className="h-5 w-5 text-ink-700" />
       </div>
-      <div>
+      <div className="flex-1">
         <h2 className="font-semibold text-ink-900">{label}</h2>
         <p className="mt-1 text-sm leading-6 text-ink-600">{description}</p>
       </div>
-    </Link>
-  );
-}
-
-function RecentSection({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  const testId = title.toLowerCase().replace(/\s+/g, "-");
-  return (
-    <section className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-panel" data-testid={testId}>
-      <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
-        {icon}
-        {title}
-      </div>
-      <div className="mt-4 space-y-3">{children}</div>
-    </section>
-  );
-}
-
-function BlogRow({ post }: { post: BlogPost }) {
-  return (
-    <Link
-      className="block rounded-2xl border border-black/10 bg-white/70 p-4 transition hover:border-black/20"
-      href={`/public/blog/${post.slug}`}
-    >
-      <p className="text-sm font-semibold text-ink-900">{post.title}</p>
-      <p className="mt-1 text-xs text-ink-500">
-        {post.comment_count} comments · {post.view_count.toLocaleString()} views
-      </p>
-    </Link>
-  );
-}
-
-function ForumRow({ thread }: { thread: ForumThreadSummary }) {
-  return (
-    <Link
-      className="block rounded-2xl border border-black/10 bg-white/70 p-4 transition hover:border-black/20"
-      href={`/community/forums/${thread.id}`}
-    >
-      <p className="text-sm font-semibold text-ink-900">{thread.title}</p>
-      <p className="mt-1 text-xs text-ink-500">
-        {thread.category_name ?? "Forum"} · {thread.post_count} replies
-      </p>
+      <ArrowRight className="size-4 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-700" />
     </Link>
   );
 }
@@ -145,48 +96,36 @@ export default function StorytellingPage() {
         description="Create worlds, write stories, and share your work with the community."
       />
 
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-600">Product</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {productLinks.map((link) => (
-            <HubCard key={link.href} {...link} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-600">Account &amp; Tools</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {commerceLinks.map((link) => (
-            <HubCard key={link.href} {...link} />
-          ))}
-        </div>
-      </section>
-
-      {(blogPosts.length > 0 || forumThreads.length > 0) && (
-        <section className="grid gap-6 xl:grid-cols-2">
-          {blogPosts.length > 0 && (
-            <RecentSection
-              title="Recent Blog Posts"
-              icon={<FileTextIcon className="size-4 text-ink-500" />}
-            >
-              {blogPosts.slice(0, 5).map((post) => (
-                <BlogRow key={post.id} post={post} />
+      <div className="flex items-start gap-6">
+        <div className="min-w-0 flex-1 space-y-8">
+          <section className="space-y-4">
+            <SectionHeading title="Product" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {productLinks.map((link) => (
+                <HubCard key={link.href} {...link} />
               ))}
-            </RecentSection>
-          )}
-          {forumThreads.length > 0 && (
-            <RecentSection
-              title="Recent Forum Posts"
-              icon={<MessageSquare className="size-4 text-ink-500" />}
-            >
-              {forumThreads.slice(0, 5).map((thread) => (
-                <ForumRow key={thread.id} thread={thread} />
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <SectionHeading title="Account & Tools" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {commerceLinks.map((link) => (
+                <HubCard key={link.href} {...link} />
               ))}
-            </RecentSection>
-          )}
-        </section>
-      )}
+            </div>
+          </section>
+        </div>
+
+        <div className="hidden w-72 shrink-0 xl:block">
+          <HubSidebar
+            blogPosts={blogPosts}
+            forumThreads={forumThreads}
+            blogHref="/storytelling/blog"
+            forumHref="/community/forums"
+          />
+        </div>
+      </div>
 
       <HelpButton helpContent={storytellingHelp} position="bottom-right" />
     </div>

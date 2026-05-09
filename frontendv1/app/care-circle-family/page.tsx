@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, MessageSquare, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
+import { PageHeader } from "@/components/shell/page-header";
+import { SectionHeading } from "@/components/shell/section-heading";
+import { HubSidebar } from "@/components/shell/hub-sidebar";
 import { HelpButton } from "@/components/ui/help-modal";
 import { careCircleFamilyHelp } from "@/lib/help-content";
 import { fetchBlogPosts, fetchForumThreads } from "@/lib/api";
-import type { BlogPost, ForumThreadSummary } from "@/lib/api";
 import {
   FriendsIcon,
   MembersIcon,
@@ -139,18 +141,9 @@ const accountingGroup: HubCard[] = [
   },
 ];
 
-function SectionHeader({ title }: { title: string }) {
-  return (
-    <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-600">
-      {title}
-    </h2>
-  );
-}
-
 function FeatureCard({ href, label, description, icon: Icon }: HubCard) {
   return (
     <Link
-      key={href}
       href={href}
       data-testid={`hub-card-${label.toLowerCase().replace(/\s+/g, "-")}`}
       className="group flex flex-col gap-4 rounded-[24px] border border-black/10 bg-white/70 p-5 shadow-panel transition hover:border-black/20 hover:bg-white"
@@ -163,55 +156,6 @@ function FeatureCard({ href, label, description, icon: Icon }: HubCard) {
         <p className="mt-1 text-sm leading-6 text-ink-600">{description}</p>
       </div>
       <ArrowRight className="size-4 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-700" />
-    </Link>
-  );
-}
-
-function RecentSection({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  const testId = title.toLowerCase().replace(/\s+/g, "-");
-  return (
-    <section className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-panel" data-testid={testId}>
-      <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
-        {icon}
-        {title}
-      </div>
-      <div className="mt-4 space-y-3">{children}</div>
-    </section>
-  );
-}
-
-function BlogRow({ post }: { post: BlogPost }) {
-  return (
-    <Link
-      className="block rounded-2xl border border-black/10 bg-white/70 p-4 transition hover:border-black/20"
-      href={`/public/blog/${post.slug}`}
-    >
-      <p className="text-sm font-semibold text-ink-900">{post.title}</p>
-      <p className="mt-1 text-xs text-ink-500">
-        {post.comment_count} comments · {post.view_count.toLocaleString()} views
-      </p>
-    </Link>
-  );
-}
-
-function ForumRow({ thread }: { thread: ForumThreadSummary }) {
-  return (
-    <Link
-      className="block rounded-2xl border border-black/10 bg-white/70 p-4 transition hover:border-black/20"
-      href={`/community/forums/${thread.id}`}
-    >
-      <p className="text-sm font-semibold text-ink-900">{thread.title}</p>
-      <p className="mt-1 text-xs text-ink-500">
-        {thread.category_name ?? "Forum"} · {thread.post_count} replies
-      </p>
     </Link>
   );
 }
@@ -234,83 +178,79 @@ export default function CareCircleFamilyPage() {
 
   return (
     <div className="space-y-8">
-      {name && (
-        <p className="text-sm text-ink-600">
-          Welcome back, <span className="font-semibold text-ink-900">{name}</span>. Use the navigation above to manage your circle.
-        </p>
-      )}
+      <PageHeader
+        eyebrow="Care Circle Family"
+        title={name ? `Welcome back, ${name}.` : "Care Circle Family"}
+        description="Manage your care circle, contribute to daily editions, and stay connected with family."
+      />
 
-      <section className="space-y-4">
-        <SectionHeader title="Care &amp; Circle" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {careGroup.map((card) => (
-            <FeatureCard key={card.href} {...card} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <SectionHeader title="Community" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {communityGroup.map((card) => (
-            <FeatureCard key={card.href} {...card} />
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <SectionHeader title="Account" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {accountGroup.map((card) => (
-            <FeatureCard key={card.href} {...card} />
-          ))}
-        </div>
-      </section>
-
-      {isAdmin && (
-        <section className="space-y-4">
-          <SectionHeader title="Admin" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {adminGroup.map((card) => (
-              <FeatureCard key={card.href} {...card} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="space-y-4">
-        <SectionHeader title="Accounting" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {accountingGroup.map((card) => (
-            <FeatureCard key={card.href} {...card} />
-          ))}
-        </div>
-      </section>
-
-      {(blogPosts.length > 0 || forumThreads.length > 0) && (
-        <section className="grid gap-6 xl:grid-cols-2">
-          {blogPosts.length > 0 && (
-            <RecentSection
-              title="Recent Blog Posts"
-              icon={<FileText className="size-4 text-ink-500" />}
-            >
-              {blogPosts.slice(0, 5).map((post) => (
-                <BlogRow key={post.id} post={post} />
+      <div className="flex items-start gap-6">
+        <div className="min-w-0 flex-1 space-y-8">
+          <section className="space-y-4">
+            <SectionHeading
+              title="Care & Circle"
+              meta="Section A"
+              action={{ label: "Manage all", href: "/care-circle-family/members" }}
+            />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {careGroup.map((card) => (
+                <FeatureCard key={card.href} {...card} />
               ))}
-            </RecentSection>
-          )}
-          {forumThreads.length > 0 && (
-            <RecentSection
-              title="Recent Forum Posts"
-              icon={<MessageSquare className="size-4 text-ink-500" />}
-            >
-              {forumThreads.slice(0, 5).map((thread) => (
-                <ForumRow key={thread.id} thread={thread} />
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <SectionHeading
+              title="Community"
+              meta="Section B"
+              action={{ label: "All threads", href: "/community/forums" }}
+            />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {communityGroup.map((card) => (
+                <FeatureCard key={card.href} {...card} />
               ))}
-            </RecentSection>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <SectionHeading title="Account" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {accountGroup.map((card) => (
+                <FeatureCard key={card.href} {...card} />
+              ))}
+            </div>
+          </section>
+
+          {isAdmin && (
+            <section className="space-y-4">
+              <SectionHeading title="Admin" />
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {adminGroup.map((card) => (
+                  <FeatureCard key={card.href} {...card} />
+                ))}
+              </div>
+            </section>
           )}
-        </section>
-      )}
+
+          <section className="space-y-4">
+            <SectionHeading title="Accounting" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {accountingGroup.map((card) => (
+                <FeatureCard key={card.href} {...card} />
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="hidden w-72 shrink-0 xl:block">
+          <HubSidebar
+            blogPosts={blogPosts}
+            forumThreads={forumThreads}
+            blogHref="/care-circle-family/blog"
+            forumHref="/community/forums"
+          />
+        </div>
+      </div>
 
       <HelpButton helpContent={careCircleFamilyHelp} position="bottom-right" />
     </div>

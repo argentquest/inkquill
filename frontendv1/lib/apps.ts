@@ -1,3 +1,5 @@
+import { features } from "./features";
+
 export interface AppNavLink {
   href: string;
   label: string;
@@ -22,12 +24,15 @@ export interface AppDefinition {
   primaryLinks: AppNavLink[];
   /** Path prefixes that belong to this app. */
   pathPrefixes: string[];
+  /** Whether this app is currently enabled via feature flags. */
+  enabled: boolean;
 }
 
 export const apps: AppDefinition[] = [
   {
     id: "storytelling",
     name: "Storytelling",
+    enabled: features.storytelling,
     getEntryHref: () => "/storytelling",
     pathPrefixes: ["/storytelling", "/app"],
     primaryLinks: [
@@ -48,6 +53,7 @@ export const apps: AppDefinition[] = [
   {
     id: "care-circle",
     name: "Care Circle",
+    enabled: features.careCircle,
     getEntryHref: () => "/care-circle-family",
     pathPrefixes: ["/care-circle-family", "/care-circle-patient"],
     primaryLinks: [
@@ -68,7 +74,8 @@ export const apps: AppDefinition[] = [
   },
   {
     id: "chatbot",
-    name: "Chatbot",
+    name: "Chat",
+    enabled: features.chat,
     getEntryHref: () => "/chatbot",
     pathPrefixes: ["/chatbot"],
     primaryLinks: [
@@ -88,12 +95,15 @@ export const publicNavLinks: AppNavLink[] = [
   { href: "/help", label: "Help" },
 ];
 
+/** All apps that are currently enabled via feature flags. */
+export const enabledApps = apps.filter((app) => app.enabled);
+
 /**
- * Returns the matching app for the given pathname, or null for public routes.
+ * Returns the matching enabled app for the given pathname, or null for public routes.
  */
 export function resolveApp(pathname: string): AppDefinition | null {
   return (
-    apps.find((app) =>
+    enabledApps.find((app) =>
       app.pathPrefixes.some(
         (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
       )

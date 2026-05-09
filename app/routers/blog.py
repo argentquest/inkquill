@@ -87,6 +87,40 @@ async def get_blog_posts(
         )
 
 
+@router.get("/posts/by-id/{post_id}", response_model=ApiResponse)
+async def get_blog_post_by_id(
+    post_id: int,
+    current_user: Optional[User] = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_session)
+):
+    """Get blog post by ID (for editing)."""
+    try:
+        post = await blog_service.get_post_by_id(db, post_id)
+
+        if not post:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Blog post not found"
+            )
+
+        # Check if post is published or user is author/admin
+        if post.status.value != "published" and (not current_user or (current_user.id != post.author_id and not getattr(current_user, 'is_admin', False))):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Blog post not found"
+            )
+
+        return ApiResponse.success_response(data=_build_blog_post_read(post))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting blog post by ID {post_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve blog post"
+        )
+
+
 @router.get("/posts/{slug}", response_model=ApiResponse)
 async def get_blog_post(
     slug: str,

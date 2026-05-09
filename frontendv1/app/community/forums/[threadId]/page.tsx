@@ -2,14 +2,18 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDown, ArrowUp, Loader2, MessageSquare, Pin, Send } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { useSession } from "@/components/providers/app-providers";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { createForumPost, fetchForumThread, voteForumPost, type ForumPost } from "@/lib/api";
 
 function VoteBar({ post, threadId }: { post: ForumPost; threadId: number }) {
+  const session = useSession();
+  const isAuthenticated = session.status === "authenticated";
   const queryClient = useQueryClient();
   const [optimisticVote, setOptimisticVote] = useState<"upvote" | "downvote" | null>(post.user_vote ?? null);
   const [optimisticUp, setOptimisticUp] = useState(post.upvote_count);
@@ -25,6 +29,14 @@ function VoteBar({ post, threadId }: { post: ForumPost; threadId: number }) {
     },
   });
 
+  const handleVote = (voteType: "upvote" | "downvote") => {
+    if (!isAuthenticated) {
+      window.location.href = `/auth/login?next=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+    mutate(voteType);
+  };
+
   return (
     <div className="flex items-center gap-1" data-testid={`post-votes-${post.id}`}>
       <button
@@ -32,7 +44,8 @@ function VoteBar({ post, threadId }: { post: ForumPost; threadId: number }) {
           optimisticVote === "upvote" ? "bg-amber-100 text-amber-700" : "text-ink-500 hover:bg-black/[0.03]"
         }`}
         disabled={isPending}
-        onClick={() => mutate("upvote")}
+        onClick={() => handleVote("upvote")}
+        title={isAuthenticated ? undefined : "Sign in to vote"}
         type="button"
       >
         <ArrowUp className="size-3" />
@@ -43,7 +56,8 @@ function VoteBar({ post, threadId }: { post: ForumPost; threadId: number }) {
           optimisticVote === "downvote" ? "bg-red-100 text-red-700" : "text-ink-500 hover:bg-black/[0.03]"
         }`}
         disabled={isPending}
-        onClick={() => mutate("downvote")}
+        onClick={() => handleVote("downvote")}
+        title={isAuthenticated ? undefined : "Sign in to vote"}
         type="button"
       >
         <ArrowDown className="size-3" />
@@ -89,6 +103,8 @@ function PostCard({ post, threadId }: { post: ForumPost; threadId: number }) {
 }
 
 function ReplyComposer({ threadId, isLocked }: { threadId: number; isLocked: boolean }) {
+  const session = useSession();
+  const isAuthenticated = session.status === "authenticated";
   const [draft, setDraft] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
@@ -106,6 +122,25 @@ function ReplyComposer({ threadId, isLocked }: { threadId: number; isLocked: boo
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700" data-testid="thread-locked-notice">
         This thread is locked. No new replies can be posted.
       </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <section
+        className="flex flex-col items-center gap-3 rounded-[28px] border border-black/10 bg-white/80 p-8 text-center shadow-sm"
+        data-testid="reply-signin-prompt"
+      >
+        <MessageSquare className="size-8 text-ink-300" />
+        <p className="text-sm font-medium text-ink-700">Sign in to join the discussion</p>
+        <p className="text-xs text-ink-500">You need an account to post replies and vote on posts.</p>
+        <Link
+          className="mt-1 rounded-full bg-ink-900 px-5 py-2 text-sm font-medium text-paper transition hover:bg-ink-700"
+          href={`/auth/login?next=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "")}`}
+        >
+          Sign in
+        </Link>
+      </section>
     );
   }
 

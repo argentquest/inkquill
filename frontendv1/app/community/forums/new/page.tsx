@@ -4,16 +4,32 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
+import { useSession } from "@/components/providers/app-providers";
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/ui/loading-state";
 import { createForumThread, fetchForumCategories } from "@/lib/api";
 
 export default function NewThreadPage() {
   const router = useRouter();
+  const session = useSession();
   const searchParams = useSearchParams();
   const appSource = searchParams.get("app_source") ?? undefined;
   const backHref = appSource === "care-circle" ? "/care-circle-family" : "/community/forums";
+  const selfHref = appSource
+    ? `/community/forums/new?app_source=${encodeURIComponent(appSource)}`
+    : "/community/forums/new";
+
+  useLayoutEffect(() => {
+    if (session.status === "anonymous" || session.status === "error") {
+      window.location.replace(`/auth/login?next=${encodeURIComponent(selfHref)}`);
+    }
+  }, [session.status, selfHref]);
+
+  if (session.status === "loading" || session.status === "anonymous" || session.status === "error") {
+    return <LoadingState label="Checking access" />;
+  }
 
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<number | "">("");

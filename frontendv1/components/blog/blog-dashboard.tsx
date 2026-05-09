@@ -94,7 +94,7 @@ export function BlogDashboard({
 
   const { data: posts = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: ["author-blog-posts", user?.id, appSource],
-    queryFn: () => fetchAuthorBlogPosts(user!.id, appSource),
+    queryFn: () => fetchAuthorBlogPosts(appSource),
     enabled: !!user?.id,
   });
 

@@ -1004,6 +1004,52 @@ export async function voteForumPost(postId: number, voteType: "upvote" | "downvo
   );
 }
 
+export async function fetchForumCategoriesAdmin(params?: {
+  app_source?: string;
+  include_inactive?: boolean;
+}): Promise<ForumCategory[]> {
+  const query = new URLSearchParams();
+  if (params?.app_source) query.set("app_source", params.app_source);
+  if (params?.include_inactive) query.set("include_inactive", "true");
+  const qs = query.toString();
+  return sameOriginFetch<ForumCategory[]>(`/api/forum/categories/${qs ? `?${qs}` : ""}`);
+}
+
+export async function createForumCategory(payload: {
+  name: string;
+  description?: string;
+  icon?: string;
+  sort_order?: number;
+  app_source: string;
+}): Promise<ForumCategory> {
+  return sameOriginFetch<ForumCategory>("/api/forum/categories/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateForumCategory(
+  categoryId: number,
+  payload: Partial<{
+    name: string;
+    description: string | null;
+    icon: string | null;
+    sort_order: number;
+    is_active: boolean;
+  }>
+): Promise<ForumCategory> {
+  return sameOriginFetch<ForumCategory>(`/api/forum/categories/${categoryId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteForumCategory(categoryId: number): Promise<void> {
+  await sameOriginFetch<void>(`/api/forum/categories/${categoryId}`, { method: "DELETE" });
+}
+
 // ---------------------------------------------------------------------------
 // Blog Comments
 // ---------------------------------------------------------------------------
@@ -1774,15 +1820,15 @@ export interface BlogPostDraft extends BlogPost {
   content_html?: string | null;
 }
 
-export async function fetchAuthorBlogPosts(userId: number, appSource?: string): Promise<BlogPost[]> {
+export async function fetchAuthorBlogPosts(appSource?: string): Promise<BlogPost[]> {
   const qs = new URLSearchParams();
-  qs.set("author_id", String(userId));
+  qs.set("include_drafts", "true");
   if (appSource) qs.set("app_source", appSource);
-  return sameOriginFetch<BlogPost[]>(`/api/blog/posts?${qs.toString()}`);
+  return sameOriginFetch<BlogPost[]>(`/api/blog/my-posts?${qs.toString()}`);
 }
 
 export async function fetchBlogPostById(postId: number): Promise<BlogPost> {
-  return sameOriginFetch<BlogPost>(`/api/blog/posts/${postId}`);
+  return sameOriginFetch<BlogPost>(`/api/blog/posts/by-id/${postId}`);
 }
 
 export async function createBlogPost(payload: {

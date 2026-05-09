@@ -5,6 +5,7 @@ import { Loader2, MessageSquare, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 import { ErrorState } from "@/components/ui/error-state";
 import { fetchForumCategories, fetchForumThreads, type ForumCategory, type ForumThreadSummary } from "@/lib/api";
@@ -63,6 +64,8 @@ function ThreadRow({ thread }: { thread: ForumThreadSummary }) {
 }
 
 export default function ForumCategoriesPage() {
+  const session = useSession();
+  const isAuthenticated = session.status === "authenticated";
   const searchParams = useSearchParams();
   const appSource = searchParams.get("app_source") ?? undefined;
 
@@ -89,14 +92,25 @@ export default function ForumCategoriesPage() {
           eyebrow="Community Forums"
           title="Forums"
         />
-        <Link
-          className="mt-1 flex shrink-0 items-center gap-2 rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-paper shadow-sm transition hover:bg-ink-700"
-          data-testid="new-thread-link"
-          href={newThreadHref}
-        >
-          <PenLine className="size-4" />
-          New thread
-        </Link>
+        {isAuthenticated ? (
+          <Link
+            className="mt-1 flex shrink-0 items-center gap-2 rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-paper shadow-sm transition hover:bg-ink-700"
+            data-testid="new-thread-link"
+            href={newThreadHref}
+          >
+            <PenLine className="size-4" />
+            New thread
+          </Link>
+        ) : (
+          <Link
+            className="mt-1 flex shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-ink-700 shadow-sm transition hover:bg-ink-50"
+            data-testid="new-thread-link-signin"
+            href={`/auth/login?next=${encodeURIComponent(newThreadHref)}`}
+          >
+            <PenLine className="size-4" />
+            Sign in to post
+          </Link>
+        )}
       </div>
 
       {isLoading ? (
