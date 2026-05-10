@@ -17,6 +17,7 @@ from app.models.care_circle import (
     CareCirclePatientProviderFeedback,
     CareCircleProviderRunLog,
     CareCircleProviderSessionOutput,
+    TagTaxonomyEntry,
 )
 from app.models.user import User
 from app.services.care_circle.location_service import resolve_postal_location
@@ -139,6 +140,7 @@ def _patient_to_dict(
         "familyName": family_name,
         "joinCode": family_join_code,
         "stage": patient.stage,
+        "careMode": patient.care_mode,
         "accessState": patient.access_state,
         "timezone": patient.timezone,
         "preferredLanguage": patient.preferred_language,
@@ -571,6 +573,7 @@ async def update_family_patient_detail(
 
     patient.display_name = payload["displayName"].strip()
     patient.stage = payload["stage"].strip()
+    patient.care_mode = payload.get("careMode", "memory_care").strip()
     patient.access_state = payload["accessState"].strip()
     patient.timezone = payload["timezone"].strip()
     patient.preferred_language = payload.get("preferredLanguage", "en")
@@ -633,6 +636,7 @@ async def create_family_patient(
         created_by_user_id=user.id,
         display_name=payload["displayName"].strip(),
         stage=payload.get("stage", "moderate"),
+        care_mode=payload.get("careMode", "memory_care"),
         access_state=payload.get("accessState", "active"),
         timezone=payload.get("timezone", "America/Chicago"),
         preferred_language=payload.get("preferredLanguage", "en"),
@@ -1156,3 +1160,91 @@ async def admin_delete_family(db: AsyncSession, family_id: int) -> None:
         raise ValueError("Family not found.")
     await db.delete(family)
     await db.commit()
+
+
+# ── Tag Taxonomy ─────────────────────────────────────────────────────────────
+
+_FIELD_KEY_ORDER = [
+    "hobbies", "favoriteActivities", "lifeRoles", "pets",
+    "favouriteFoods", "favouriteTvShows", "favoriteSingers",
+]
+
+
+async def get_tag_taxonomy(db: AsyncSession) -> dict[str, list[dict]]:
+    result = await db.execute(
+        select(TagTaxonomyEntry)
+        .where(TagTaxonomyEntry.is_active == True)  # noqa: E712
+        .order_by(TagTaxonomyEntry.field_key, TagTaxonomyEntry.category, TagTaxonomyEntry.sort_order, TagTaxonomyEntry.label)
+    )
+    rows = result.scalars().all()
+
+    grouped: dict[str, dict[str, list[str]]] = {fk: {} for fk in _FIELD_KEY_ORDER}
+    for row in rows:
+        fk = row.field_key
+        if fk not in grouped:
+            grouped[fk] = {}
+        grouped[fk].setdefault(row.category, []).append(row.label)
+
+    return {
+        fk: [{"category": cat, "tags": tags} for cat, tags in cats.items()]
+        for fk, cats in grouped.items()
+    }
+
+
+async def admin_list_taxonomy_entries(db: AsyncSession) -> list[TagTaxonomyEntry]:
+    result = await db.execute(
+        select(TagTaxonomyEntry)
+        .order_by(TagTaxonomyEntry.field_key, TagTaxonomyEntry.category, TagTaxonomyEntry.sort_order, TagTaxonomyEntry.label)
+    )
+    return list(result.scalars().all())
+
+
+async def admin_create_taxonomy_entry(db: AsyncSession, field_key: str, category: str, label: str, sort_order: int = 0, source: str = "curated") -> TagTaxonomyEntry:
+    entry = TagTaxonomyEntry(
+        field_key=field_key,
+        category=category,
+        label=label,
+        sort_order=sort_order,
+        source=source,
+        is_active=True,
+    )
+    db.add(entry)
+    await db.commit()
+    await db.refresh(entry)
+    return entry
+
+
+async def admin_update_taxonomy_entry(db: AsyncSession, entry_id: int, label: str | None = None, is_active: bool | None = None, category: str | None = None, sort_order: int | None = None) -> TagTaxonomyEntry:
+    entry = await db.get(TagTaxonomyEntry, entry_id)
+    if not entry:
+        raise ValueError("Entry not found.")
+    if label is not None:
+        entry.label = label
+    if is_active is not None:
+        entry.is_active = is_active
+    if category is not None:
+        entry.category = category
+    if sort_order is not None:
+        entry.sort_order = sort_order
+    await db.commit()
+    await db.refresh(entry)
+    return entry
+
+
+async def admin_delete_taxonomy_entry(db: AsyncSession, entry_id: int) -> None:
+    entry = await db.get(TagTaxonomyEntry, entry_id)
+    if not entry:
+        raise ValueError("Entry not found.")
+    await db.delete(entry)
+    await db.commit()
+
+
+async def admin_rename_taxonomy_category(db: AsyncSession, field_key: str, old_category: str, new_category: str) -> int:
+    from sqlalchemy import update as sa_update
+    result = await db.execute(
+        sa_update(TagTaxonomyEntry)
+        .where(TagTaxonomyEntry.field_key == field_key, TagTaxonomyEntry.category == old_category)
+        .values(category=new_category)
+    )
+    await db.commit()
+    return result.rowcount

@@ -55,6 +55,7 @@ class CareCirclePatientRead(BaseModel):
     familyName: str
     joinCode: str
     stage: str  # "early", "mild", "moderate", "severe"
+    careMode: str  # "memory_care" | "general"
     accessState: str
     timezone: str
     preferredLanguage: str = Field(default="en")
@@ -107,6 +108,7 @@ class CareCirclePatientCreateRequest(BaseModel):
     displayName: str = Field(min_length=1, max_length=255)
     familyName: Optional[str] = None
     stage: str = Field(default="moderate", min_length=1, max_length=50)  # "early", "mild", "moderate", "severe"
+    careMode: str = Field(default="memory_care", min_length=1, max_length=50)  # "memory_care" | "general"
     accessState: str = Field(default="active", min_length=1, max_length=50)
     timezone: str = Field(default="America/Chicago", min_length=1, max_length=100)
     preferredLanguage: str = Field(default="en", min_length=2, max_length=10)
@@ -120,6 +122,7 @@ class CareCirclePatientUpdateRequest(BaseModel):
     joinCode: str = Field(min_length=3, max_length=20)
     displayName: str = Field(min_length=1, max_length=255)
     stage: str = Field(min_length=1, max_length=50)  # "early", "mild", "moderate", "severe"
+    careMode: str = Field(default="memory_care", min_length=1, max_length=50)  # "memory_care" | "general"
     accessState: str = Field(min_length=1, max_length=50)
     timezone: str = Field(min_length=1, max_length=100)
     preferredLanguage: str = Field(default="en", min_length=2, max_length=10)
@@ -195,3 +198,53 @@ class AdminFamilyRead(BaseModel):
 
 class AdminFamilyDisableRequest(BaseModel):
     disabled: bool
+
+
+# ── Tag Taxonomy ────────────────────────────────────────────────────────────
+
+class TagTaxonomyCategory(BaseModel):
+    category: str
+    tags: List[str]
+
+
+class TagTaxonomyResponse(BaseModel):
+    hobbies: List[TagTaxonomyCategory] = Field(default_factory=list)
+    favoriteActivities: List[TagTaxonomyCategory] = Field(default_factory=list)
+    lifeRoles: List[TagTaxonomyCategory] = Field(default_factory=list)
+    pets: List[TagTaxonomyCategory] = Field(default_factory=list)
+    favouriteFoods: List[TagTaxonomyCategory] = Field(default_factory=list)
+    favouriteTvShows: List[TagTaxonomyCategory] = Field(default_factory=list)
+    favoriteSingers: List[TagTaxonomyCategory] = Field(default_factory=list)
+
+
+class TagTaxonomyEntryRead(BaseModel):
+    id: int
+    fieldKey: str
+    category: str
+    label: str
+    sortOrder: int
+    source: str
+    isActive: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TagTaxonomyEntryCreate(BaseModel):
+    fieldKey: str
+    category: str
+    label: str
+    sortOrder: int = 0
+    source: str = "curated"
+
+
+class TagTaxonomyEntryUpdate(BaseModel):
+    label: Optional[str] = None
+    isActive: Optional[bool] = None
+    category: Optional[str] = None
+    sortOrder: Optional[int] = None
+
+
+class TagTaxonomyCategoryRename(BaseModel):
+    fieldKey: str
+    oldCategory: str
+    newCategory: str

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLayoutEffect } from "react";
-import { CreditCard, Megaphone, MessageSquare, Settings2, ShieldCheck, Users, Wrench } from "lucide-react";
+import { CreditCard, Megaphone, MessageSquare, Settings2, ShieldCheck, Tags, Users, Wrench } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
@@ -44,6 +44,12 @@ const adminSections = [
     label: "Care Circle Admin",
     description: "Manage Care Circle families, scheduler jobs, and provider template studio.",
     icon: Settings2,
+  },
+  {
+    href: "/admin/tag-taxonomy",
+    label: "Tag Taxonomy",
+    description: "Manage the categorized word suggestions shown when editing friend profiles — hobbies, activities, life roles, foods, TV shows, and more.",
+    icon: Tags,
   },
 ];
 

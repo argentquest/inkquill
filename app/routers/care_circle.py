@@ -26,6 +26,9 @@ from app.schemas.care_circle import (
     CareCircleProviderReorderRequest,
     FamilyInviteEmailRequest,
     JoinFamilyRequest,
+    TagTaxonomyCategoryRename,
+    TagTaxonomyEntryCreate,
+    TagTaxonomyEntryUpdate,
 )
 from app.services.email_service import EmailService, get_email_service
 from app.utils.iso_codes import LANGUAGES, COUNTRIES
@@ -709,3 +712,98 @@ async def admin_delete_family(
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return ApiResponse.success_response(data={"message": "Family deleted"})
+
+
+# ---------------------------------------------------------------------------
+# Tag Taxonomy endpoints
+# ---------------------------------------------------------------------------
+
+@router.get("/tag-taxonomy", response_model=ApiResponse)
+async def get_tag_taxonomy(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    data = await care_circle_crud.get_tag_taxonomy(db)
+    return ApiResponse.success_response(data=data)
+
+
+@router.get("/admin/tag-taxonomy", response_model=ApiResponse)
+async def admin_list_taxonomy(
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    entries = await care_circle_crud.admin_list_taxonomy_entries(db)
+    result = [
+        {"id": e.id, "fieldKey": e.field_key, "category": e.category, "label": e.label,
+         "sortOrder": e.sort_order, "source": e.source, "isActive": e.is_active}
+        for e in entries
+    ]
+    return ApiResponse.success_response(data=result)
+
+
+@router.post("/admin/tag-taxonomy", response_model=ApiResponse)
+async def admin_create_taxonomy_entry(
+    payload: TagTaxonomyEntryCreate,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    try:
+        entry = await care_circle_crud.admin_create_taxonomy_entry(
+            db, payload.fieldKey, payload.category, payload.label, payload.sortOrder, payload.source
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return ApiResponse.success_response(data={"id": entry.id, "fieldKey": entry.field_key, "category": entry.category, "label": entry.label, "sortOrder": entry.sort_order, "source": entry.source, "isActive": entry.is_active})
+
+
+@router.patch("/admin/tag-taxonomy/rename-category", response_model=ApiResponse)
+async def admin_rename_taxonomy_category(
+    payload: TagTaxonomyCategoryRename,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    count = await care_circle_crud.admin_rename_taxonomy_category(db, payload.fieldKey, payload.oldCategory, payload.newCategory)
+    return ApiResponse.success_response(data={"updated": count})
+
+
+@router.patch("/admin/tag-taxonomy/{entry_id}", response_model=ApiResponse)
+async def admin_update_taxonomy_entry(
+    entry_id: int,
+    payload: TagTaxonomyEntryUpdate,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    try:
+        entry = await care_circle_crud.admin_update_taxonomy_entry(
+            db, entry_id,
+            label=payload.label,
+            is_active=payload.isActive,
+            category=payload.category,
+            sort_order=payload.sortOrder,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return ApiResponse.success_response(data={"id": entry.id, "fieldKey": entry.field_key, "category": entry.category, "label": entry.label, "sortOrder": entry.sort_order, "source": entry.source, "isActive": entry.is_active})
+
+
+@router.delete("/admin/tag-taxonomy/{entry_id}", response_model=ApiResponse)
+async def admin_delete_taxonomy_entry(
+    entry_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    try:
+        await care_circle_crud.admin_delete_taxonomy_entry(db, entry_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return ApiResponse.success_response(data={"message": "Entry deleted"})

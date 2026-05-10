@@ -9,7 +9,6 @@ from typing import Any, Dict
 
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    get_dementia_system_prompt,
     generate_json_with_usage,
 )
 from app.services.care_circle.variety_utils import pick_avoiding_recent
@@ -176,9 +175,9 @@ class MindfulMomentProvider(BaseCareCircleProvider):
                 '{"title": "...", "instruction": "...", "duration_note": "Takes about X minutes."}'
             )
             data, llm_response = await generate_json_with_usage(
-                prompt, system=get_dementia_system_prompt(self.get_generation_date())
+                prompt, system=self.get_system_prompt(patient_profile)
             )
-            self.log_llm_response(llm_response, prompt=prompt, system_prompt=get_dementia_system_prompt(self.get_generation_date()))
+            self.log_llm_response(llm_response, prompt=prompt, system_prompt=self.get_system_prompt(patient_profile))
             if data.get("title") and data.get("instruction"):
                 return data
         except Exception as e:

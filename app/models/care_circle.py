@@ -42,6 +42,7 @@ class CareCirclePatientProfile(Base):
     email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
     phone_number: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
     stage: Mapped[str] = mapped_column(String(50), default="moderate", nullable=False)  # "early", "mild", "moderate", "severe"
+    care_mode: Mapped[str] = mapped_column(String(50), default="memory_care", nullable=False)  # "memory_care" | "general"
     access_state: Mapped[str] = mapped_column(String(50), default="active", nullable=False)
     timezone: Mapped[str] = mapped_column(String(100), default="America/Chicago", nullable=False)
     preferred_language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
@@ -126,6 +127,20 @@ class CareCirclePatientProviderFeedback(Base):
     feedback: Mapped[str] = mapped_column(String(20), nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class TagTaxonomyEntry(Base):
+    __tablename__ = "tag_taxonomy_entries"
+    __table_args__ = (UniqueConstraint("field_key", "label", name="uq_tag_taxonomy_field_label"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    field_key: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    category: Mapped[str] = mapped_column(String(128), nullable=False)
+    label: Mapped[str] = mapped_column(String(256), nullable=False)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    source: Mapped[str] = mapped_column(String(32), default="curated", nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class CareCircleProviderSessionOutput(Base):

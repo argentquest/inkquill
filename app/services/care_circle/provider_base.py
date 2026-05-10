@@ -18,6 +18,7 @@ from typing import Any, Optional
 import re
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from app.services.care_circle.llm_helpers import get_care_mode_system_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -461,6 +462,12 @@ class BaseCareCircleProvider:
             or getattr(patient_profile, "display_name", default)
             or default
         )
+
+    def get_system_prompt(self, patient_profile: Any) -> str:
+        """Return the appropriate system prompt based on the patient's care_mode and stage."""
+        care_mode = getattr(patient_profile, "care_mode", "memory_care") or "memory_care"
+        stage = getattr(patient_profile, "stage", "moderate") or "moderate"
+        return get_care_mode_system_prompt(care_mode, stage, self.get_generation_date())
 
     def list_templates(self) -> list[str]:
         if not self.template_dir.exists():

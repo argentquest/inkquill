@@ -34,17 +34,32 @@ async def deliver_newsletter_to_patient(
     """
     patient_id: int = patient.id
     patient_name: str = getattr(patient, "display_name", "Unknown")
+    patient_email: str | None = getattr(patient, "email", None)
+
+    logger.info(
+        "[deliver] START patient_id=%s name=%r email=%s date=%s force=%s",
+        patient_id, patient_name, patient_email or "(none)", reference_date, force_regenerate,
+    )
 
     try:
+        logger.info("[deliver] calling assemble_daily_patient_session ...")
         session_data = await assemble_daily_patient_session(
             db,
             patient_id,
             force_regenerate=force_regenerate,
             for_date=reference_date,
         )
+        logger.info(
+            "[deliver] assemble returned type=%s value=%s",
+            type(session_data).__name__,
+            session_data if not isinstance(session_data, dict) else {k: v for k, v in session_data.items() if k != "html"},
+        )
 
         if not session_data or not isinstance(session_data, dict) or not session_data.get("success"):
-            logger.warning("Newsletter assembly failed for patient %s", patient_id)
+            logger.warning(
+                "[deliver] assembly failed or returned no dict — patient=%s session_data=%r",
+                patient_id, session_data,
+            )
             return {
                 "success": False,
                 "patient_id": patient_id,
@@ -55,8 +70,12 @@ async def deliver_newsletter_to_patient(
             }
 
         html_content = session_data.get("html", "")
+        logger.info(
+            "[deliver] html_content length=%d card_count=%s",
+            len(html_content), session_data.get("card_count"),
+        )
         if not html_content:
-            logger.warning("No HTML content generated for patient %s", patient_id)
+            logger.warning("[deliver] no HTML produced for patient=%s", patient_id)
             return {
                 "success": False,
                 "patient_id": patient_id,
@@ -67,26 +86,42 @@ async def deliver_newsletter_to_patient(
             }
 
         email_sent = False
-        if getattr(patient, "email", None):
-            email_result = await send_newsletter_email(
-                patient,
-                html_content,
-                reference_date,
-            )
-            email_sent = bool(email_result.get("success"))
-            logger.info("Email to %s (%s): sent=%s", patient_name, patient.email, email_sent)
+        if patient_email:
+            logger.info("[deliver] sending email to %s (%s) ...", patient_name, patient_email)
+            try:
+                email_result = await send_newsletter_email(
+                    patient,
+                    html_content,
+                    reference_date,
+                )
+                email_sent = bool(email_result.get("success"))
+                logger.info(
+                    "[deliver] send_newsletter_email result: sent=%s result=%s",
+                    email_sent, email_result,
+                )
+            except Exception as email_exc:
+                logger.error(
+                    "[deliver] send_newsletter_email raised an exception for patient=%s: %s",
+                    patient_id, email_exc, exc_info=True,
+                )
+        else:
+            logger.info("[deliver] no email address on patient=%s — skipping send", patient_id)
 
+        logger.info("[deliver] DONE patient=%s email_sent=%s", patient_id, email_sent)
         return {
             "success": email_sent,
             "patient_id": patient_id,
             "patient_name": patient_name,
             "status": "sent",
             "email_sent": email_sent,
-            "message": "Newsletter dispatched",
+            "message": "Newsletter dispatched" if email_sent else "Newsletter assembled but no email sent (no address configured)",
         }
 
     except Exception as exc:
-        logger.error("Failed to deliver newsletter to patient %s: %s", patient_id, exc, exc_info=True)
+        logger.error(
+            "[deliver] UNHANDLED exception for patient=%s: %s",
+            patient_id, exc, exc_info=True,
+        )
         return {
             "success": False,
             "patient_id": patient_id,

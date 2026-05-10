@@ -2,7 +2,6 @@ import logging
 app_logger = logging.getLogger(__name__)
 from app.services.care_circle.provider_base import BaseCareCircleProvider
 from app.services.care_circle.llm_helpers import (
-    get_dementia_system_prompt,
     generate_image_url_with_usage,
     generate_json_with_usage,
     generate_text_with_usage,
@@ -81,12 +80,12 @@ class FamilyGreetingProvider(BaseCareCircleProvider):
                 f"{context_str}"
             )
             llm_response = await generate_text_with_usage(
-                prompt, system=get_dementia_system_prompt(self.get_generation_date())
+                prompt, system=self.get_system_prompt(patient_profile)
             )
             self.log_llm_response(
                 llm_response,
                 prompt=prompt,
-                system_prompt=get_dementia_system_prompt(self.get_generation_date()),
+                system_prompt=self.get_system_prompt(patient_profile),
             )
             if llm_response.content and len(llm_response.content) > 10:
                 return {"sender": sender, "message": llm_response.content}

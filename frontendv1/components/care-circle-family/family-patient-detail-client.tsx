@@ -19,12 +19,14 @@ import {
   fetchCareCircleProviders,
   fetchIsoCodes,
   fetchPatientNewsletterPreview,
+  fetchTagTaxonomy,
   regeneratePatientNewsletter,
   sendPatientNewsletter,
   type CareCircleAuthCatalogItem,
   type CareCirclePatientPreferences,
   type CareCirclePatientUpdateInput,
   type IsoCodeEntry,
+  type TagCategory,
   updateCareCirclePatient,
 } from "@/lib/api";
 
@@ -41,6 +43,7 @@ const EMPTY_PATIENT_FORM: CareCirclePatientUpdateInput = {
   joinCode: "",
   displayName: "",
   stage: "moderate",
+  careMode: "memory_care",
   accessState: "active",
   timezone: "America/Chicago",
   preferredLanguage: "en",
@@ -109,16 +112,19 @@ function EditSubTabBar({
 
 function FormField({
   label,
+  hint,
   children,
   span2,
 }: {
   label: string;
+  hint?: string;
   children: React.ReactNode;
   span2?: boolean;
 }) {
   return (
     <label className={`${LABEL_CLS}${span2 ? " md:col-span-2" : ""}`}>
       <span className={EYEBROW_CLS}>{label}</span>
+      {hint && <p className="mt-1 text-xs text-ink-500 leading-snug">{hint}</p>}
       {children}
     </label>
   );
@@ -131,6 +137,7 @@ function TagInput({
   placeholder,
   hint,
   span2 = true,
+  suggestions,
 }: {
   label: string;
   values: string[];
@@ -138,9 +145,19 @@ function TagInput({
   placeholder?: string;
   hint?: string;
   span2?: boolean;
+  suggestions?: TagCategory[];
 }) {
   const [draft, setDraft] = useState("");
+  const [activeCat, setActiveCat] = useState<string | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Pick first category on mount or when suggestions load
+  useEffect(() => {
+    if (suggestions && suggestions.length > 0 && activeCat === null) {
+      setActiveCat(suggestions[0].category);
+    }
+  }, [suggestions, activeCat]);
 
   function commit() {
     const trimmed = draft.trim();
@@ -149,6 +166,27 @@ function TagInput({
     }
     setDraft("");
   }
+
+  function addSuggestion(tag: string) {
+    if (!values.includes(tag)) {
+      onChange([...values, tag]);
+    }
+  }
+
+  const valuesSet = new Set(values.map((v) => v.toLowerCase()));
+
+  // Suggestions for the active category, filtered by draft text and not already added
+  const activeSuggestions = (() => {
+    if (!suggestions || !showSuggestions) return [];
+    const cat = suggestions.find((c) => c.category === activeCat);
+    if (!cat) return [];
+    const filter = draft.trim().toLowerCase();
+    return cat.tags.filter(
+      (t) => !valuesSet.has(t.toLowerCase()) && (filter === "" || t.toLowerCase().includes(filter))
+    );
+  })();
+
+  const hasSuggestions = suggestions && suggestions.length > 0;
 
   return (
     <div className={`block text-sm text-ink-800${span2 ? " md:col-span-2" : ""}`}>
@@ -186,6 +224,64 @@ function TagInput({
           value={draft}
         />
       </div>
+
+      {hasSuggestions && (
+        <div className="mt-2">
+          <button
+            className="text-xs font-medium text-ink-500 hover:text-ink-800 transition"
+            onClick={() => setShowSuggestions((v) => !v)}
+            type="button"
+          >
+            {showSuggestions ? "▾ Hide suggestions" : "▸ Show suggestions"}
+          </button>
+
+          {showSuggestions && (
+            <div className="mt-2 rounded-2xl border border-black/8 bg-white/60 p-3">
+              {/* Category pills */}
+              <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1">
+                {suggestions!.map((cat) => (
+                  <button
+                    key={cat.category}
+                    className={[
+                      "rounded-full px-3 py-1 text-xs font-semibold transition whitespace-nowrap",
+                      activeCat === cat.category
+                        ? "bg-ink-900 text-white"
+                        : "border border-ink-200 bg-white text-ink-600 hover:bg-ink-50",
+                    ].join(" ")}
+                    onClick={() => setActiveCat(cat.category)}
+                    type="button"
+                  >
+                    {cat.category}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tag grid */}
+              {activeSuggestions.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {activeSuggestions.slice(0, 30).map((tag) => (
+                    <button
+                      key={tag}
+                      className="rounded-full border border-ink-200 bg-[#f7f4ef] px-3 py-1 text-sm text-ink-700 transition hover:border-ink-400 hover:bg-ink-100"
+                      onClick={() => addSuggestion(tag)}
+                      type="button"
+                    >
+                      + {tag}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-ink-400 italic">
+                  {valuesSet.size > 0 && activeSuggestions.length === 0
+                    ? "All suggestions in this category added."
+                    : "No matches."}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {hint ? <p className="mt-2 text-xs text-ink-600">{hint}</p> : null}
     </div>
   );
@@ -261,6 +357,7 @@ function patientToForm(patient: {
   joinCode: string;
   displayName: string;
   stage: string;
+  careMode: string;
   accessState: string;
   timezone: string;
   preferredLanguage: string;
@@ -278,6 +375,7 @@ function patientToForm(patient: {
     joinCode: patient.joinCode,
     displayName: patient.displayName,
     stage: patient.stage,
+    careMode: patient.careMode ?? "memory_care",
     accessState: patient.accessState,
     timezone: patient.timezone,
     preferredLanguage: patient.preferredLanguage,
@@ -368,6 +466,11 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
   const { data: isoCodes } = useQuery({
     queryKey: ["care-circle-iso-codes"],
     queryFn: fetchIsoCodes,
+  });
+  const { data: taxonomy } = useQuery({
+    queryKey: ["tag-taxonomy"],
+    queryFn: () => fetchTagTaxonomy(),
+    staleTime: 10 * 60 * 1000,
   });
 
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -491,7 +594,8 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
               <dl className="mt-6 grid gap-5 md:grid-cols-2">
                 <div><dt className={EYEBROW_CLS}>Family</dt><dd className="mt-2 text-base text-ink-900">{patient.familyName}</dd></div>
                 <div><dt className={EYEBROW_CLS}>Join code</dt><dd className="mt-2 font-mono text-base uppercase tracking-[0.18em] text-ink-900">{patient.joinCode}</dd></div>
-                <div><dt className={EYEBROW_CLS}>Stage</dt><dd className="mt-2 text-base capitalize text-ink-900">{patient.stage}</dd></div>
+                <div><dt className={EYEBROW_CLS}>Care mode</dt><dd className="mt-2 text-base capitalize text-ink-900">{patient.careMode === "general" ? "General" : "Memory Care"}</dd></div>
+                {patient.careMode !== "general" && <div><dt className={EYEBROW_CLS}>Cognitive stage</dt><dd className="mt-2 text-base capitalize text-ink-900">{patient.stage}</dd></div>}
                 <div>
                   <dt className={EYEBROW_CLS}>Delivery</dt>
                   <dd className="mt-2 text-base text-ink-900">
@@ -600,13 +704,28 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
                 <FormField label="Newsletter name">
                   <input className={INPUT_CLS} onChange={(e) => setFormState((c) => setPrefs(c, { recipientName: e.target.value || null }))} placeholder="Name used in newsletters (defaults to display name)" value={prefs.recipientName ?? ""} />
                 </FormField>
-                <FormField label="Stage">
-                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, stage: e.target.value }))} value={formState.stage}>
-                    <option value="mild">Mild</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="severe">Severe</option>
+                <FormField
+                  label="Care mode"
+                  hint="Memory Care tailors every newsletter for someone living with cognitive decline — simpler language, shorter sentences, and a calm tone. General is for anyone who would enjoy a personalised daily newsletter without those restrictions."
+                >
+                  <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, careMode: e.target.value }))} value={formState.careMode}>
+                    <option value="memory_care">Memory Care</option>
+                    <option value="general">General</option>
                   </select>
                 </FormField>
+                {formState.careMode === "memory_care" && (
+                  <FormField
+                    label="Cognitive stage"
+                    hint="Sets how simple the AI-generated content will be. Early = longest, most natural writing. Severe = very short sentences, one idea at a time."
+                  >
+                    <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, stage: e.target.value }))} value={formState.stage}>
+                      <option value="early">Early — natural length, gentle language</option>
+                      <option value="mild">Mild — shorter sentences, clear words</option>
+                      <option value="moderate">Moderate — very simple, one idea per sentence</option>
+                      <option value="severe">Severe — minimal words, one idea only</option>
+                    </select>
+                  </FormField>
+                )}
                 <FormField label="Access state">
                   <select className={INPUT_CLS} onChange={(e) => setFormState((c) => ({ ...c, accessState: e.target.value }))} value={formState.accessState}>
                     <option value="active">Active</option>
@@ -674,15 +793,15 @@ export function FamilyPatientDetailClient({ patientId }: { patientId: string }) 
               <div className="grid gap-5 md:grid-cols-2">
                 <FormSection title="People & relationships" />
                 <TagInput label="Family members" onChange={(next) => setFormState((c) => setPrefs(c, { familyMembers: next }))} placeholder="Nina, Paul, Maggie…" values={prefs.familyMembers} />
-                <TagInput label="Life roles" onChange={(next) => setFormState((c) => setPrefs(c, { lifeRoles: next }))} placeholder="mother, teacher, nurse…" values={prefs.lifeRoles} />
-                <TagInput label="Pets" onChange={(next) => setFormState((c) => setPrefs(c, { pets: next }))} placeholder="Biscuit the dog, Mittens the cat…" values={prefs.pets} />
+                <TagInput label="Life roles" onChange={(next) => setFormState((c) => setPrefs(c, { lifeRoles: next }))} placeholder="mother, teacher, nurse…" values={prefs.lifeRoles} suggestions={taxonomy?.lifeRoles} />
+                <TagInput label="Pets" onChange={(next) => setFormState((c) => setPrefs(c, { pets: next }))} placeholder="Biscuit the dog, Mittens the cat…" values={prefs.pets} suggestions={taxonomy?.pets} />
 
                 <FormSection title="Interests & preferences" />
-                <TagInput label="Hobbies" onChange={(next) => setFormState((c) => setPrefs(c, { hobbies: next }))} placeholder="gardening, knitting, crosswords…" values={prefs.hobbies} />
-                <TagInput label="Favourite activities" onChange={(next) => setFormState((c) => setPrefs(c, { favoriteActivities: next }))} placeholder="walking, baking, reading…" values={prefs.favoriteActivities} />
-                <TagInput label="Favourite foods" onChange={(next) => setFormState((c) => setPrefs(c, { favouriteFoods: next }))} placeholder="tea and biscuits, apple pie…" values={prefs.favouriteFoods} />
-                <TagInput label="Favourite singers / musicians" onChange={(next) => setFormState((c) => setPrefs(c, { favoriteSingers: next }))} placeholder="Frank Sinatra, Doris Day…" values={prefs.favoriteSingers} />
-                <TagInput label="Favourite TV shows" onChange={(next) => setFormState((c) => setPrefs(c, { favouriteTvShows: next }))} placeholder="Lawrence Welk, Ed Sullivan…" values={prefs.favouriteTvShows} />
+                <TagInput label="Hobbies" onChange={(next) => setFormState((c) => setPrefs(c, { hobbies: next }))} placeholder="gardening, knitting, crosswords…" values={prefs.hobbies} suggestions={taxonomy?.hobbies} />
+                <TagInput label="Favourite activities" onChange={(next) => setFormState((c) => setPrefs(c, { favoriteActivities: next }))} placeholder="walking, baking, reading…" values={prefs.favoriteActivities} suggestions={taxonomy?.favoriteActivities} />
+                <TagInput label="Favourite foods" onChange={(next) => setFormState((c) => setPrefs(c, { favouriteFoods: next }))} placeholder="tea and biscuits, apple pie…" values={prefs.favouriteFoods} suggestions={taxonomy?.favouriteFoods} />
+                <TagInput label="Favourite singers / musicians" onChange={(next) => setFormState((c) => setPrefs(c, { favoriteSingers: next }))} placeholder="Frank Sinatra, Doris Day…" values={prefs.favoriteSingers} suggestions={taxonomy?.favoriteSingers} />
+                <TagInput label="Favourite TV shows" onChange={(next) => setFormState((c) => setPrefs(c, { favouriteTvShows: next }))} placeholder="Lawrence Welk, Ed Sullivan…" values={prefs.favouriteTvShows} suggestions={taxonomy?.favouriteTvShows} />
               </div>
             )}
 

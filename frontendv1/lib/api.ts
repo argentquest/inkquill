@@ -1193,6 +1193,7 @@ export interface CareCirclePatientRecord {
   familyName: string;
   displayName: string;
   stage: string;
+  careMode: string;
   accessState: string;
   timezone: string;
   preferredLanguage: string;
@@ -1217,6 +1218,7 @@ export interface CareCirclePatientUpdateInput {
   joinCode: string;
   displayName: string;
   stage: string;
+  careMode: string;
   accessState: string;
   timezone: string;
   preferredLanguage: string;
@@ -1234,6 +1236,7 @@ export interface CareCirclePatientCreateInput {
   displayName: string;
   familyName?: string;
   stage?: string;
+  careMode?: string;
   accessState?: string;
   timezone?: string;
   preferredLanguage?: string;
@@ -2147,4 +2150,79 @@ export async function fetchLocationConnections(worldId: number): Promise<Locatio
 
 export async function fetchLocationHierarchy(worldId: number): Promise<LocationHierarchyNode[]> {
   return apiFetch<LocationHierarchyNode[]>(`/worlds/${worldId}/location-connections/hierarchy`);
+}
+
+// ---------------------------------------------------------------------------
+// Tag Taxonomy
+// ---------------------------------------------------------------------------
+
+export interface TagCategory {
+  category: string;
+  tags: string[];
+}
+
+export interface TagTaxonomy {
+  hobbies: TagCategory[];
+  favoriteActivities: TagCategory[];
+  lifeRoles: TagCategory[];
+  pets: TagCategory[];
+  favouriteFoods: TagCategory[];
+  favouriteTvShows: TagCategory[];
+  favoriteSingers: TagCategory[];
+}
+
+export interface TagTaxonomyEntry {
+  id: number;
+  fieldKey: string;
+  category: string;
+  label: string;
+  sortOrder: number;
+  source: string;
+  isActive: boolean;
+}
+
+export async function fetchTagTaxonomy(): Promise<TagTaxonomy> {
+  return apiFetch<TagTaxonomy>("/care-circle/tag-taxonomy");
+}
+
+export async function adminFetchTagTaxonomy(): Promise<TagTaxonomyEntry[]> {
+  return apiFetch<TagTaxonomyEntry[]>("/care-circle/admin/tag-taxonomy");
+}
+
+export async function adminCreateTagTaxonomyEntry(data: {
+  fieldKey: string;
+  category: string;
+  label: string;
+  sortOrder?: number;
+  source?: string;
+}): Promise<TagTaxonomyEntry> {
+  return apiFetch<TagTaxonomyEntry>("/care-circle/admin/tag-taxonomy", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function adminUpdateTagTaxonomyEntry(
+  id: number,
+  data: { label?: string; isActive?: boolean; category?: string; sortOrder?: number }
+): Promise<TagTaxonomyEntry> {
+  return apiFetch<TagTaxonomyEntry>(`/care-circle/admin/tag-taxonomy/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function adminDeleteTagTaxonomyEntry(id: number): Promise<void> {
+  await apiFetch<void>(`/care-circle/admin/tag-taxonomy/${id}`, { method: "DELETE" });
+}
+
+export async function adminRenameTagTaxonomyCategory(
+  fieldKey: string,
+  oldCategory: string,
+  newCategory: string
+): Promise<{ updated: number }> {
+  return apiFetch<{ updated: number }>("/care-circle/admin/tag-taxonomy/rename-category", {
+    method: "PATCH",
+    body: JSON.stringify({ fieldKey, oldCategory, newCategory }),
+  });
 }

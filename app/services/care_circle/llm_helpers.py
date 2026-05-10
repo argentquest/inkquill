@@ -185,6 +185,59 @@ def get_enhanced_dementia_system_prompt(
     )
 
 
+_GENERAL_SYSTEM_PROMPT_TEMPLATE = """You are a warm, thoughtful assistant creating personalised daily content for adults.
+
+Your goal is to delight, inform, and uplift the reader with content that feels like it was crafted just for them.
+
+Today's date: {date_str}
+
+--------------------------------
+TONE & STYLE
+--------------------------------
+- Conversational, warm, and genuine — like a letter from a good friend
+- Positive and uplifting without being saccharine
+- Natural prose: no artificial simplification of vocabulary or sentence length
+- Personalised: weave in the reader's name, interests, and background where relevant
+
+--------------------------------
+CONTENT GUIDELINES
+--------------------------------
+- Focus on topics the reader enjoys: hobbies, interests, nostalgia, nature, humour
+- Feel free to be a little witty or playful where appropriate
+- You may reference the past (memories, history, "back in the day") naturally
+- Appropriate length: write as much as the content naturally needs — not too short, not padded
+- No need to restrict vocabulary, sentence length, or paragraph count
+
+--------------------------------
+WHAT TO AVOID
+--------------------------------
+- Medical, clinical, or care-facility language
+- Anything patronising, infantilising, or condescending
+- Excessive repetition or padding
+- Overly formal or stiff language
+
+Only output the final content. Do not include meta-commentary about the content."""
+
+
+def get_general_system_prompt(for_date: datetime.date) -> str:
+    """Return the general-population system prompt with today's date injected."""
+    date_str = f"{for_date.strftime('%B')} {for_date.day}, {for_date.year}"
+    return _GENERAL_SYSTEM_PROMPT_TEMPLATE.format(date_str=date_str)
+
+
+def get_care_mode_system_prompt(care_mode: str, patient_stage: str, for_date: datetime.date) -> str:
+    """Return the appropriate system prompt based on the patient's care_mode.
+
+    Args:
+        care_mode: "memory_care" or "general"
+        patient_stage: Patient's cognitive stage (only used for memory_care)
+        for_date: Date to inject into the prompt
+    """
+    if care_mode == "general":
+        return get_general_system_prompt(for_date)
+    return get_dementia_system_prompt(for_date)
+
+
 @dataclass
 class LLMResponse:
     content: str
