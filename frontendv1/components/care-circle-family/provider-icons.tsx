@@ -190,7 +190,7 @@ function NewsIcon({ className }: { className?: string }) {
 function NewsletterLayoutIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="6" y="6" width="44" height="44" rx="6" fill="#231913" opacity="0.06" stroke="#231913" strokeWidth="2.5" opacity="0.2" />
+      <rect x="6" y="6" width="44" height="44" rx="6" fill="#231913" opacity="0.1" stroke="#231913" strokeWidth="2.5" />
       <rect x="12" y="12" width="32" height="8" rx="2" fill="#d86c3d" opacity="0.3" stroke="#d86c3d" strokeWidth="2" />
       <line x1="12" y1="26" x2="44" y2="26" stroke="#635048" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
       <line x1="12" y1="32" x2="38" y2="32" stroke="#635048" strokeWidth="2" strokeLinecap="round" opacity="0.3" />

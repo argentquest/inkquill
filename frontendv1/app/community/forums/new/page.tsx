@@ -22,16 +22,6 @@ export default function NewThreadPage() {
     ? `/community/forums/new?app_source=${encodeURIComponent(appSource)}`
     : "/community/forums/new";
 
-  useLayoutEffect(() => {
-    if (session.status === "anonymous" || session.status === "error") {
-      window.location.replace(`/auth/login?next=${encodeURIComponent(selfHref)}`);
-    }
-  }, [session.status, selfHref]);
-
-  if (session.status === "loading" || session.status === "anonymous" || session.status === "error") {
-    return <LoadingState label="Checking access" />;
-  }
-
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<number | "">("");
   const [content, setContent] = useState("");
@@ -40,6 +30,12 @@ export default function NewThreadPage() {
     queryKey: ["forum-categories", appSource],
     queryFn: () => fetchForumCategories(appSource ? { app_source: appSource } : undefined),
   });
+
+  useLayoutEffect(() => {
+    if (session.status === "anonymous" || session.status === "error") {
+      window.location.replace(`/auth/login?next=${encodeURIComponent(selfHref)}`);
+    }
+  }, [session.status, selfHref]);
 
   const { mutate: submit, isPending, isError, error } = useMutation({
     mutationFn: () =>
