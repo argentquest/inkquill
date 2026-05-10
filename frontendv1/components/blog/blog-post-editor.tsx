@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createBlogPost, fetchBlogPostById, publishBlogPost, updateBlogPost } from "@/lib/api";
 
 interface BlogPostEditorProps {
@@ -77,7 +78,7 @@ export function BlogPostEditor({ basePath, appSource, postId }: BlogPostEditorPr
   });
 
   const isPending = isSaving || isDraftSaving || isPublishing;
-  const canSubmit = title.trim().length > 0 && content.trim().length > 0;
+  const canSubmit = title.trim().length > 0 && content.replace(/<[^>]*>/g, "").trim().length > 0;
 
   if (!isNew && isLoading) {
     return (
@@ -151,14 +152,13 @@ export function BlogPostEditor({ basePath, appSource, postId }: BlogPostEditorPr
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-ink-800" htmlFor="post-content">Content</label>
-            <textarea
-              className="w-full min-h-64 rounded-2xl border border-black/10 bg-[#fcfaf6] px-4 py-3 text-sm leading-7 text-ink-900 outline-none transition focus:border-amber-600 disabled:opacity-50"
-              data-testid="post-content-input"
+            <RichTextEditor
               disabled={isPending}
-              id="post-content"
-              onChange={(e) => { setContent(e.target.value); setDirty(true); }}
+              minHeight="16rem"
+              onChange={(html) => { setContent(html); setDirty(true); }}
               placeholder="Write your post…"
               value={content}
+              variant="full"
             />
           </div>
 

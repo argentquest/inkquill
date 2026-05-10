@@ -78,7 +78,7 @@ interface SchedulerJobResult {
 }
 
 async function schedulerFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`/api/admin/scheduler/${path}`, {
+  const response = await fetch(`/scheduler-proxy/${path}`, {
     credentials: "include",
     cache: "no-store",
     headers: {

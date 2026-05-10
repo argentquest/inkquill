@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { useLayoutEffect } from "react";
-import { CalendarClock, Paintbrush, ShieldCheck, Users } from "lucide-react";
+import { CalendarClock, MessageSquare, Paintbrush, ShieldCheck, Users } from "lucide-react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 import { LoadingState } from "@/components/ui/loading-state";
 
 const adminTools = [
+  {
+    href: "/care-circle-family/admin/forum",
+    label: "Forum Categories",
+    description: "Add, edit, enable, and disable forum categories for the Care Circle community.",
+    icon: MessageSquare,
+  },
   {
     href: "/care-circle-family/admin/template-studio",
     label: "Template Studio",

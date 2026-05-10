@@ -16,7 +16,7 @@ from app.schemas.forum import (
 )
 from app.crud import forum_post as crud_post
 
-router = APIRouter(prefix="/api/forum/posts", tags=["forum_posts"])
+router = APIRouter(prefix="/forum/posts", tags=["forum_posts"])
 
 
 def _build_post_response(post, user_vote=None, replies=None) -> ForumPostResponse:

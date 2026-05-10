@@ -27,7 +27,14 @@ LOG_LEVEL_CONSOLE / LOG_LEVEL_FILE / APP_LOG_DIR — logging configuration
 import asyncio
 import logging
 import os
+import sys
 from contextlib import asynccontextmanager
+
+# asyncpg is incompatible with Windows ProactorEventLoop (the default on Python
+# 3.8+ on Windows). Switching to SelectorEventLoop prevents the spurious
+# "InvalidStateError: invalid state" crash on shutdown.
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

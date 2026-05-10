@@ -232,11 +232,11 @@ test.describe("Forum routes", () => {
 
   test("forums page shows empty state when no categories", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/forum/categories**", async (route) => {
+    await page.route("**/api/v1/forum/categories**", async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json",
         body: JSON.stringify({ success: true, data: [] }) });
     });
-    await page.route("**/api/forum/threads**", async (route) => {
+    await page.route("**/api/v1/forum/threads**", async (route) => {
       await route.fulfill({ status: 200, contentType: "application/json",
         body: JSON.stringify({ success: true, data: [] }) });
     });
@@ -260,7 +260,7 @@ test.describe("Forum routes", () => {
 
   test("forum thread shows error state for unknown thread", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/forum/threads/999*", async (route) => {
+    await page.route("**/api/v1/forum/threads/999*", async (route) => {
       await route.fulfill({ status: 404, contentType: "application/json",
         body: JSON.stringify({ detail: "Thread not found" }) });
     });
@@ -291,7 +291,7 @@ test.describe("Forum routes", () => {
 
   test("forum thread page shows locked notice for locked thread", async ({ page }) => {
     await mockAppApis(page, { session: "authenticated" });
-    await page.route("**/api/forum/threads/1*", async (route) => {
+    await page.route("**/api/v1/forum/threads/1*", async (route) => {
       if (route.request().method() !== "GET") { await route.fallback(); return; }
       const lockedThread = {
         id: 1,

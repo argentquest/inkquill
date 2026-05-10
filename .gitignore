@@ -133,6 +133,9 @@ __pycache__/
 # Consolidated runtime directory (cache, logs, data, artifacts, test-results)
 runtime/
 
+# Care circle provider render cache (generated HTML, not source)
+app/logs/care_circle_render_cache/
+
 # Local artifacts and generated frontend files
 artifacts/
 frontendv1/.env.*

@@ -1,8 +1,10 @@
 {
     "version": "0.2.0",
     "configurations": [
+
+        // ── Backend ────────────────────────────────────────────────────────────
         {
-            "name": "Backend: Use This (stable debug)",
+            "name": "Backend · Debug (stable)",
             "type": "debugpy",
             "request": "launch",
             "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
@@ -20,7 +22,7 @@
             "stopOnEntry": false
         },
         {
-            "name": "Backend: Optional (reload, less stable)",
+            "name": "Backend · Debug (reload)",
             "type": "debugpy",
             "request": "launch",
             "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
@@ -39,81 +41,151 @@
             "stopOnEntry": false
         },
         {
-            "name": "Frontend: Use This (Next.js dev)",
+            "name": "Backend · Production",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--host", "0.0.0.0",
+                "--port", "8000",
+                "--workers", "4",
+                "--log-level", "info"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+
+        // ── Scheduler ──────────────────────────────────────────────────────────
+        {
+            "name": "Scheduler · Debug (stable)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.scheduler.main:app",
+                "--host", "localhost",
+                "--port", "8001",
+                "--log-level", "debug"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Scheduler · Debug (reload)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.scheduler.main:app",
+                "--host", "localhost",
+                "--port", "8001",
+                "--reload",
+                "--log-level", "debug"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Scheduler · Production",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+            "module": "uvicorn",
+            "args": [
+                "app.scheduler.main:app",
+                "--host", "0.0.0.0",
+                "--port", "8001",
+                "--log-level", "info"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "stopOnEntry": false
+        },
+
+        // ── Frontend ───────────────────────────────────────────────────────────
+        {
+            "name": "Frontend · Debug (Next.js dev)",
             "type": "node-terminal",
             "request": "launch",
             "command": "npm run dev -- --port 3001",
             "cwd": "${workspaceFolder}/frontendv1"
         },
         {
-            "name": "Scheduler: Use This (stable debug)",
-            "type": "debugpy",
+            "name": "Frontend · Production (build + start)",
+            "type": "node-terminal",
             "request": "launch",
-            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-            "module": "uvicorn",
-            "args": [
-                "app.scheduler.main:app",
-                "--host", "localhost",
-                "--port", "8001",
-                "--log-level", "debug"
-            ],
-            "jinja": true,
-            "cwd": "${workspaceFolder}",
-            "envFile": "${workspaceFolder}/.env",
-            "console": "integratedTerminal",
-            "stopOnEntry": false
-        },
-        {
-            "name": "Scheduler: Optional (reload, less stable)",
-            "type": "debugpy",
-            "request": "launch",
-            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-            "module": "uvicorn",
-            "args": [
-                "app.scheduler.main:app",
-                "--host", "localhost",
-                "--port", "8001",
-                "--reload",
-                "--log-level", "debug"
-            ],
-            "jinja": true,
-            "cwd": "${workspaceFolder}",
-            "envFile": "${workspaceFolder}/.env",
-            "console": "integratedTerminal",
-            "stopOnEntry": false
+            "command": "npm run build && npm run start -- --port 3001",
+            "cwd": "${workspaceFolder}/frontendv1"
         }
     ],
+
     "compounds": [
+
+        // ── Debug compounds ────────────────────────────────────────────────────
         {
-            "name": "Full Stack: Use This (stable backend + frontend)",
+            "name": "⚙  All · Debug",
             "configurations": [
-                "Backend: Use This (stable debug)",
-                "Frontend: Use This (Next.js dev)"
+                "Backend · Debug (stable)",
+                "Scheduler · Debug (stable)",
+                "Frontend · Debug (Next.js dev)"
             ],
             "stopAll": true
         },
         {
-            "name": "Full Stack: Optional (reload backend + frontend)",
+            "name": "⚙  Backend + Frontend · Debug",
             "configurations": [
-                "Backend: Optional (reload, less stable)",
-                "Frontend: Use This (Next.js dev)"
+                "Backend · Debug (stable)",
+                "Frontend · Debug (Next.js dev)"
             ],
             "stopAll": true
         },
         {
-            "name": "Full Stack + Scheduler: Use This",
+            "name": "⚙  Backend + Scheduler · Debug",
             "configurations": [
-                "Backend: Use This (stable debug)",
-                "Scheduler: Use This (stable debug)",
-                "Frontend: Use This (Next.js dev)"
+                "Backend · Debug (stable)",
+                "Scheduler · Debug (stable)"
+            ],
+            "stopAll": true
+        },
+
+        // ── Production compounds ───────────────────────────────────────────────
+        {
+            "name": "🚀  All · Production",
+            "configurations": [
+                "Backend · Production",
+                "Scheduler · Production",
+                "Frontend · Production (build + start)"
             ],
             "stopAll": true
         },
         {
-            "name": "Backend + Scheduler: Use This",
+            "name": "🚀  Backend + Frontend · Production",
             "configurations": [
-                "Backend: Use This (stable debug)",
-                "Scheduler: Use This (stable debug)"
+                "Backend · Production",
+                "Frontend · Production (build + start)"
+            ],
+            "stopAll": true
+        },
+        {
+            "name": "🚀  Backend + Scheduler · Production",
+            "configurations": [
+                "Backend · Production",
+                "Scheduler · Production"
             ],
             "stopAll": true
         }

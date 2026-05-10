@@ -902,7 +902,7 @@ export interface ForumCategory {
 
 export async function fetchForumCategories(params?: { app_source?: string }): Promise<ForumCategory[]> {
   const qs = params?.app_source ? `?app_source=${encodeURIComponent(params.app_source)}` : "";
-  return sameOriginFetch<ForumCategory[]>(`/api/forum/categories/${qs}`);
+  return apiFetch<ForumCategory[]>(`/forum/categories/${qs}`);
 }
 
 export interface ForumThreadSummary {
@@ -956,22 +956,22 @@ export async function fetchForumThreads(params?: { category_id?: number; app_sou
   if (params?.category_id !== undefined) query.set("category_id", String(params.category_id));
   if (params?.app_source) query.set("app_source", params.app_source);
   const qs = query.toString();
-  return sameOriginFetch<ForumThreadSummary[]>(`/api/forum/threads/${qs ? `?${qs}` : ""}`);
+  return apiFetch<ForumThreadSummary[]>(`/forum/threads/${qs ? `?${qs}` : ""}`);
 }
 
 export async function fetchForumThread(threadId: number): Promise<ForumThreadDetail> {
-  return sameOriginFetch<ForumThreadDetail>(`/api/forum/threads/${threadId}`);
+  return apiFetch<ForumThreadDetail>(`/forum/threads/${threadId}`);
 }
 
 export async function createForumThread(payload: {
   title: string;
   category_id: number;
   initial_post_content: string;
+  initial_post_content_html?: string;
   app_source?: string;
 }): Promise<ForumThreadDetail> {
-  return sameOriginFetch<ForumThreadDetail>("/api/forum/threads/", {
+  return apiFetch<ForumThreadDetail>("/forum/threads/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 }
@@ -979,10 +979,10 @@ export async function createForumThread(payload: {
 export async function createForumPost(payload: {
   thread_id: number;
   content: string;
+  content_html?: string;
 }): Promise<ForumPost> {
-  return sameOriginFetch<ForumPost>("/api/forum/posts/", {
+  return apiFetch<ForumPost>("/forum/posts/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 }
@@ -994,11 +994,10 @@ export async function voteForumPost(postId: number, voteType: "upvote" | "downvo
   score: number;
   user_vote: string;
 }> {
-  return sameOriginFetch<{ post_id: number; upvote_count: number; downvote_count: number; score: number; user_vote: string }>(
-    `/api/forum/posts/${postId}/vote`,
+  return apiFetch<{ post_id: number; upvote_count: number; downvote_count: number; score: number; user_vote: string }>(
+    `/forum/posts/${postId}/vote`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ post_id: postId, vote_type: voteType }),
     }
   );
@@ -1012,7 +1011,7 @@ export async function fetchForumCategoriesAdmin(params?: {
   if (params?.app_source) query.set("app_source", params.app_source);
   if (params?.include_inactive) query.set("include_inactive", "true");
   const qs = query.toString();
-  return sameOriginFetch<ForumCategory[]>(`/api/forum/categories/${qs ? `?${qs}` : ""}`);
+  return apiFetch<ForumCategory[]>(`/forum/categories/${qs ? `?${qs}` : ""}`);
 }
 
 export async function createForumCategory(payload: {
@@ -1022,9 +1021,8 @@ export async function createForumCategory(payload: {
   sort_order?: number;
   app_source: string;
 }): Promise<ForumCategory> {
-  return sameOriginFetch<ForumCategory>("/api/forum/categories/", {
+  return apiFetch<ForumCategory>("/forum/categories/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 }
@@ -1039,15 +1037,14 @@ export async function updateForumCategory(
     is_active: boolean;
   }>
 ): Promise<ForumCategory> {
-  return sameOriginFetch<ForumCategory>(`/api/forum/categories/${categoryId}`, {
+  return apiFetch<ForumCategory>(`/forum/categories/${categoryId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 }
 
 export async function deleteForumCategory(categoryId: number): Promise<void> {
-  await sameOriginFetch<void>(`/api/forum/categories/${categoryId}`, { method: "DELETE" });
+  await apiFetch<void>(`/forum/categories/${categoryId}`, { method: "DELETE" });
 }
 
 // ---------------------------------------------------------------------------
@@ -1476,6 +1473,7 @@ export interface AdminFamily {
   name: string;
   join_code: string;
   is_disabled: boolean;
+  owner_user_id: number | null;
   owner_username: string | null;
   owner_display_name: string | null;
   member_count: number;

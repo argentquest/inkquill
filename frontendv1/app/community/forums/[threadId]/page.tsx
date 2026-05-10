@@ -4,11 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDown, ArrowUp, Loader2, MessageSquare, Pin, Send } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createForumPost, fetchForumThread, voteForumPost, type ForumPost } from "@/lib/api";
 
 function VoteBar({ post, threadId }: { post: ForumPost; threadId: number }) {
@@ -106,11 +107,15 @@ function ReplyComposer({ threadId, isLocked }: { threadId: number; isLocked: boo
   const session = useSession();
   const isAuthenticated = session.status === "authenticated";
   const [draft, setDraft] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
 
   const { mutate: submitReply, isPending, isError, error } = useMutation({
-    mutationFn: (content: string) => createForumPost({ thread_id: threadId, content }),
+    mutationFn: (html: string) =>
+      createForumPost({
+        thread_id: threadId,
+        content: html.replace(/<[^>]*>/g, "").trim(),
+        content_html: html,
+      }),
     onSuccess: () => {
       setDraft("");
       void queryClient.invalidateQueries({ queryKey: ["forum-thread", threadId] });
@@ -144,25 +149,19 @@ function ReplyComposer({ threadId, isLocked }: { threadId: number; isLocked: boo
     );
   }
 
+  const draftIsEmpty = draft.replace(/<[^>]*>/g, "").trim().length === 0;
+
   return (
     <section className="rounded-[28px] border border-black/10 bg-white/80 p-6 shadow-sm" data-testid="reply-composer">
       <h2 className="text-sm font-semibold text-ink-900">Post a reply</h2>
-      <form
-        className="mt-4 space-y-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const text = draft.trim();
-          if (text) submitReply(text);
-        }}
-      >
-        <textarea
-          className="w-full min-h-24 rounded-2xl border border-black/10 bg-[#fcfaf6] px-4 py-3 text-sm leading-7 text-ink-900 outline-none transition focus:border-amber-600 disabled:opacity-50"
-          data-testid="reply-input"
+      <div className="mt-4 space-y-3">
+        <RichTextEditor
           disabled={isPending}
-          onChange={(e) => setDraft(e.target.value)}
+          minHeight="6rem"
+          onChange={setDraft}
           placeholder="Write your reply…"
-          ref={textareaRef}
           value={draft}
+          variant="compact"
         />
         {isError ? (
           <p className="text-xs text-red-600">{error instanceof Error ? error.message : "Failed to post reply."}</p>
@@ -170,14 +169,15 @@ function ReplyComposer({ threadId, isLocked }: { threadId: number; isLocked: boo
         <div className="flex justify-end">
           <Button
             className="gap-2"
-            disabled={isPending || !draft.trim()}
-            type="submit"
+            disabled={isPending || draftIsEmpty}
+            onClick={() => { if (!draftIsEmpty) submitReply(draft); }}
+            type="button"
           >
             {isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
             {isPending ? "Posting…" : "Post reply"}
           </Button>
         </div>
-      </form>
+      </div>
     </section>
   );
 }

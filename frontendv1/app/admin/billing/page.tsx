@@ -1,18 +1,23 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { DollarSign, Loader2, TrendingUp } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { DollarSign, Loader2, Minus, Plus, TrendingUp } from "lucide-react";
 import { useLayoutEffect, useState } from "react";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
-import { adminAdjustCredits, fetchAdminBillingDashboard } from "@/lib/api";
+import { adminAdjustCredits, adminFetchFamilies, fetchAdminBillingDashboard } from "@/lib/api";
+
+const INPUT_CLS =
+  "rounded-[16px] border border-black/10 bg-[#fcfaf6] px-4 py-2.5 text-base text-ink-900 outline-none focus:border-amber-600 w-full";
+const LABEL_CLS = "text-sm uppercase tracking-[0.18em] text-ink-600 font-medium";
 
 export default function AdminBillingPage() {
   const session = useSession();
   const isAdmin = session.user?.is_admin === true;
+  const queryClient = useQueryClient();
 
   useLayoutEffect(() => {
     if (session.status === "anonymous" || session.status === "error") {
@@ -28,21 +33,38 @@ export default function AdminBillingPage() {
     enabled: isAdmin,
   });
 
-  const [adjustUserId, setAdjustUserId] = useState("");
-  const [adjustAmount, setAdjustAmount] = useState("");
-  const [adjustDesc, setAdjustDesc] = useState("");
+  const { data: families = [] } = useQuery({
+    queryKey: ["admin-families"],
+    queryFn: adminFetchFamilies,
+    enabled: isAdmin,
+  });
+
+  const [selectedFamilyId, setSelectedFamilyId] = useState<string>("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
   const [adjustDone, setAdjustDone] = useState(false);
 
+  const selectedFamily = families.find((f) => String(f.id) === selectedFamilyId) ?? null;
+
   const { mutate: adjust, isPending: adjusting, isError: adjustError } = useMutation({
-    mutationFn: () =>
-      adminAdjustCredits(Number(adjustUserId), Number(adjustAmount), adjustDesc),
+    mutationFn: (coins: number) => {
+      if (!selectedFamily?.owner_user_id) throw new Error("No owner");
+      return adminAdjustCredits(selectedFamily.owner_user_id, coins, description);
+    },
     onSuccess: () => {
-      setAdjustUserId("");
-      setAdjustAmount("");
-      setAdjustDesc("");
+      setAmount("");
+      setDescription("");
       setAdjustDone(true);
+      queryClient.invalidateQueries({ queryKey: ["admin-billing-dashboard"] });
     },
   });
+
+  const parsedAmount = Number(amount);
+  const canSubmit =
+    selectedFamily?.owner_user_id != null &&
+    !isNaN(parsedAmount) &&
+    parsedAmount !== 0 &&
+    description.trim().length > 0;
 
   if (session.status === "loading" || (session.status === "authenticated" && !isAdmin)) {
     return <LoadingState label="Checking access" />;
@@ -109,70 +131,136 @@ export default function AdminBillingPage() {
         </>
       )}
 
+      {/* ── Family Credit Adjustment ─────────────────────────── */}
       <div className="rounded-[24px] border border-black/10 bg-white/70 p-6 shadow-panel">
-        <h2 className="mb-1 font-semibold text-ink-900">Manual Credit Adjustment</h2>
-        <p className="mb-5 text-sm text-ink-600">Directly add or subtract coins from any user account.</p>
+        <h2 className="mb-1 font-semibold text-ink-900">Family Credit Adjustment</h2>
+        <p className="mb-6 text-sm text-ink-600">
+          Select a family, enter a coin amount (positive to add, negative to remove), and a reason.
+        </p>
+
         <form
-          className="flex flex-col gap-4 sm:flex-row sm:items-end"
-          onSubmit={(e) => { e.preventDefault(); adjust(); }}
+          className="space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (canSubmit) {
+              setAdjustDone(false);
+              adjust(parsedAmount);
+            }
+          }}
         >
-          <div className="flex flex-col gap-1">
-            <label className="text-xs uppercase tracking-[0.2em] text-ink-600" htmlFor="adjust-user">
-              User ID
-            </label>
-            <input
-              className="rounded-[16px] border border-black/10 bg-[#fcfaf6] px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-amber-600"
-              data-testid="adjust-user-id"
-              id="adjust-user"
-              min={1}
-              onChange={(e) => setAdjustUserId(e.target.value)}
-              placeholder="42"
-              type="number"
-              value={adjustUserId}
-            />
+          {/* Family selector */}
+          <div className="flex flex-col gap-1.5">
+            <label className={LABEL_CLS} htmlFor="adjust-family">Family</label>
+            <select
+              className={INPUT_CLS}
+              data-testid="adjust-family"
+              id="adjust-family"
+              value={selectedFamilyId}
+              onChange={(e) => { setSelectedFamilyId(e.target.value); setAdjustDone(false); }}
+            >
+              <option value="">— Select a family —</option>
+              {families.map((f) => (
+                <option key={f.id} value={String(f.id)}>
+                  {f.name}
+                  {f.owner_display_name ? ` · ${f.owner_display_name}` : f.owner_username ? ` · ${f.owner_username}` : ""}
+                  {f.is_disabled ? " (disabled)" : ""}
+                </option>
+              ))}
+            </select>
+            {selectedFamily && (
+              <p className="text-sm text-ink-500">
+                Owner:{" "}
+                <span className="font-medium text-ink-700">
+                  {selectedFamily.owner_display_name ?? selectedFamily.owner_username ?? "unknown"}
+                </span>
+                {selectedFamily.owner_user_id == null && (
+                  <span className="ml-2 text-amber-600">(no owner account — cannot adjust)</span>
+                )}
+              </p>
+            )}
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs uppercase tracking-[0.2em] text-ink-600" htmlFor="adjust-amount">
-              Amount (coins)
-            </label>
-            <input
-              className="rounded-[16px] border border-black/10 bg-[#fcfaf6] px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-amber-600"
-              data-testid="adjust-amount"
-              id="adjust-amount"
-              onChange={(e) => setAdjustAmount(e.target.value)}
-              placeholder="-100 or 500"
-              type="number"
-              value={adjustAmount}
-            />
+
+          {/* Amount + quick buttons */}
+          <div className="flex flex-col gap-1.5">
+            <label className={LABEL_CLS} htmlFor="adjust-amount">Amount (coins)</label>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[-500, -100, -10].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setAmount(String(n))}
+                    className="flex items-center gap-0.5 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                  >
+                    <Minus className="size-3" />{Math.abs(n)}
+                  </button>
+                ))}
+              </div>
+              <input
+                className={INPUT_CLS}
+                data-testid="adjust-amount"
+                id="adjust-amount"
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="e.g. 500 or -100"
+                type="number"
+                value={amount}
+              />
+              <div className="flex gap-1">
+                {[10, 100, 500].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setAmount(String(n))}
+                    className="flex items-center gap-0.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                  >
+                    <Plus className="size-3" />{n}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="flex flex-1 flex-col gap-1">
-            <label className="text-xs uppercase tracking-[0.2em] text-ink-600" htmlFor="adjust-desc">
-              Description
-            </label>
+
+          {/* Description */}
+          <div className="flex flex-col gap-1.5">
+            <label className={LABEL_CLS} htmlFor="adjust-desc">Reason</label>
             <input
-              className="rounded-[16px] border border-black/10 bg-[#fcfaf6] px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-amber-600"
+              className={INPUT_CLS}
               data-testid="adjust-desc"
               id="adjust-desc"
-              onChange={(e) => setAdjustDesc(e.target.value)}
-              placeholder="Refund for billing error"
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="e.g. Promotional credit, refund for billing error"
               type="text"
-              value={adjustDesc}
+              value={description}
             />
           </div>
-          <Button
-            className="gap-2 shrink-0"
-            disabled={adjusting || !adjustUserId || !adjustAmount || !adjustDesc}
-            type="submit"
-          >
-            {adjusting ? <Loader2 className="size-4 animate-spin" /> : <DollarSign className="size-4" />}
-            Adjust credits
-          </Button>
+
+          <div className="flex items-center gap-4">
+            <Button
+              className="gap-2"
+              disabled={adjusting || !canSubmit}
+              type="submit"
+            >
+              {adjusting ? <Loader2 className="size-4 animate-spin" /> : <DollarSign className="size-4" />}
+              {parsedAmount < 0 ? "Remove credits" : "Add credits"}
+            </Button>
+            {parsedAmount !== 0 && canSubmit && (
+              <p className="text-sm text-ink-600">
+                {parsedAmount > 0 ? "+" : ""}{parsedAmount.toLocaleString()} coins →{" "}
+                <span className="font-medium text-ink-900">
+                  {selectedFamily?.owner_display_name ?? selectedFamily?.owner_username}
+                </span>
+              </p>
+            )}
+          </div>
         </form>
+
         {adjustError && (
-          <p className="mt-3 text-sm text-red-600" data-testid="adjust-error">Failed to adjust credits.</p>
+          <p className="mt-4 text-sm text-red-600" data-testid="adjust-error">Failed to adjust credits. Check that this family has an owner account.</p>
         )}
         {adjustDone && (
-          <p className="mt-3 text-sm text-emerald-600" data-testid="adjust-success">Credits adjusted successfully.</p>
+          <p className="mt-4 text-sm text-emerald-600" data-testid="adjust-success">
+            Credits adjusted successfully.
+          </p>
         )}
       </div>
     </div>

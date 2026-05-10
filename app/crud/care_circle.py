@@ -1130,6 +1130,7 @@ async def admin_list_families(db: AsyncSession) -> list[dict[str, Any]]:
             "name": family.name,
             "join_code": family.join_code,
             "is_disabled": family.is_disabled,
+            "owner_user_id": owner_user.id if owner_user else None,
             "owner_username": owner_user.username if owner_user else None,
             "owner_display_name": owner_user.display_name if owner_user else None,
             "member_count": member_count or 0,

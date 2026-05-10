@@ -184,6 +184,7 @@ class AdminFamilyRead(BaseModel):
     name: str
     join_code: str
     is_disabled: bool
+    owner_user_id: Optional[int] = None
     owner_username: Optional[str] = None
     owner_display_name: Optional[str] = None
     member_count: int

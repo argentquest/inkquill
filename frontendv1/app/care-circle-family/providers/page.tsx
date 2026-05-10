@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
 import { fetchCareCircleProviders } from "@/lib/api";
+import { ProviderIcon } from "@/components/care-circle-family/provider-icons";
 import { PageHeader } from "@/components/shell/page-header";
 import { HelpButton } from "@/components/ui/help-modal";
 import { careCircleProvidersHelp } from "@/lib/help-content";
@@ -39,8 +40,8 @@ export default function ProvidersPage() {
               className="flex items-center gap-4 rounded-[28px] border border-black/10 bg-white/70 p-5 shadow-panel transition hover:border-black/20 hover:bg-white"
               href={`/care-circle-family/providers/${provider.providerKey}`}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-paper text-2xl shadow-sm">
-                {provider.icon || "📰"}
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-ink-900/5">
+                <ProviderIcon providerKey={provider.providerKey} className="h-10 w-10" />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="truncate font-semibold text-ink-900">{provider.label}</h3>

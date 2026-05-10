@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ThumbsDown, ThumbsUp, X, ZoomIn, ZoomOut } from "lucide-react";
 
 import { saveCareCirclePatientProviderFeedback, type CareCirclePatientRecord } from "@/lib/api";
 
@@ -18,11 +18,94 @@ function getSessionFeedbackStorageKey(patientId: string) {
   return `care-circle-patient-feedback-session:${patientId}`;
 }
 
+interface ZoomedImage { src: string; alt: string }
+
+const ZOOM_STEP = 0.25;
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 4;
+
+function ImageLightbox({ image, onClose }: { image: ZoomedImage; onClose: () => void }) {
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+      if (e.key === "+" || e.key === "=") setScale((s) => Math.min(s + ZOOM_STEP, ZOOM_MAX));
+      if (e.key === "-") setScale((s) => Math.max(s - ZOOM_STEP, ZOOM_MIN));
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="absolute right-4 top-4 flex items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          aria-label="Zoom out"
+          className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/25 disabled:opacity-40"
+          disabled={scale <= ZOOM_MIN}
+          onClick={() => setScale((s) => Math.max(s - ZOOM_STEP, ZOOM_MIN))}
+          type="button"
+        >
+          <ZoomOut className="h-5 w-5" />
+        </button>
+        <span className="min-w-[3rem] text-center text-sm font-semibold text-white">
+          {Math.round(scale * 100)}%
+        </span>
+        <button
+          aria-label="Zoom in"
+          className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/25 disabled:opacity-40"
+          disabled={scale >= ZOOM_MAX}
+          onClick={() => setScale((s) => Math.min(s + ZOOM_STEP, ZOOM_MAX))}
+          type="button"
+        >
+          <ZoomIn className="h-5 w-5" />
+        </button>
+        <button
+          aria-label="Close image"
+          className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/25"
+          onClick={onClose}
+          type="button"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+      <div
+        className="overflow-auto max-h-[90vh] max-w-[95vw]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image.src}
+          alt={image.alt}
+          className="rounded-2xl shadow-2xl object-contain transition-transform duration-150"
+          style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function PatientDailyHighlights({ patient }: { patient: CareCirclePatientRecord }) {
   const highlights = patient.highlights ?? [];
   const [feedback, setFeedback] = useState<Record<string, FeedbackValue>>({});
   const [pendingProviderKeys, setPendingProviderKeys] = useState<Record<string, boolean>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<ZoomedImage | null>(null);
+
+  const handleRenderedHtmlClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "IMG") {
+      const img = target as HTMLImageElement;
+      setZoomedImage({ src: img.src, alt: img.alt || "" });
+    }
+  }, []);
 
   useEffect(() => {
     const apiFeedback = Object.fromEntries(
@@ -92,6 +175,9 @@ export function PatientDailyHighlights({ patient }: { patient: CareCirclePatient
 
   return (
     <section className="space-y-4">
+      {zoomedImage && (
+        <ImageLightbox image={zoomedImage} onClose={() => setZoomedImage(null)} />
+      )}
       {saveError ? (
         <div className="rounded-2xl border border-ember/30 bg-white/90 px-4 py-3 text-sm text-ember">
           {saveError}
@@ -114,6 +200,7 @@ export function PatientDailyHighlights({ patient }: { patient: CareCirclePatient
               <div
                 className={`care-circle-rendered-html text-lg leading-8 text-ink-700 md:text-xl ${hasRenderedHtml ? "" : "mt-4"}`}
                 dangerouslySetInnerHTML={{ __html: highlight.renderedHtml }}
+                onClick={handleRenderedHtmlClick}
               />
             ) : (
               <p className="mt-4 text-lg leading-8 text-ink-700 md:text-xl">{highlight.body}</p>

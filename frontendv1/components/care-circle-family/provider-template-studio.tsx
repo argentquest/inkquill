@@ -235,8 +235,8 @@ export function ProviderTemplateStudio() {
             value={selectedProviderKey}
             onChange={(event) => setSelectedProviderKey(event.target.value)}
           >
-            {providers.map((provider) => (
-              <option key={provider.name} value={provider.name}>
+            {providers.map((provider, index) => (
+              <option key={`${provider.name}-${index}`} value={provider.name}>
                 {provider.icon ? `${provider.icon} ` : ""}
                 {provider.label}
               </option>

@@ -15,7 +15,7 @@ export function Breadcrumbs() {
   const segments = pathname.split("/").filter(Boolean);
 
   return (
-    <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-[0.25em] text-ink-600">
+    <nav aria-label="Breadcrumb" className="text-sm uppercase tracking-[0.2em] text-ink-500">
       <ol className="flex flex-wrap items-center gap-2">
         <li>
           <Link className="transition hover:text-ink-900" href="/">

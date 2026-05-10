@@ -1,12 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" fill="none">
-  <!-- Dark ink background -->
+  <!-- Background with gradient feel -->
   <rect width="44" height="44" rx="10" fill="#231913"/>
-  <!-- Nib body -->
-  <path d="M22 6 L34 30 L22 27 L10 30 Z" fill="#f6f1e8"/>
+  <!-- Nib shadow/glow -->
+  <path d="M22 6 L34 30 L22 27 L10 30 Z" fill="#7c2d12" opacity="0.5"/>
+  <!-- Nib body — amber gold -->
+  <path d="M22 6 L34 30 L22 27 L10 30 Z" fill="#d97706"/>
+  <!-- Highlight facet -->
+  <path d="M22 6 L34 30 L22 27 Z" fill="#f59e0b" opacity="0.5"/>
   <!-- Centre slit -->
-  <path d="M22 10 L22 27" stroke="#231913" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M22 10 L22 27" stroke="#fff7ed" stroke-width="1.4" stroke-linecap="round"/>
   <!-- Nib hole -->
   <circle cx="22" cy="21" r="1.8" fill="#231913"/>
-  <!-- Ember ink drop -->
-  <circle cx="22" cy="37" r="3.2" fill="#d86c3d"/>
+  <!-- Ink drop with inner highlight -->
+  <circle cx="22" cy="37" r="3.4" fill="#d86c3d"/>
+  <circle cx="22" cy="36" r="1.4" fill="#fb923c" opacity="0.7"/>
 </svg>

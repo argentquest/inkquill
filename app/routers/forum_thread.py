@@ -17,7 +17,7 @@ from app.schemas.forum import (
 from app.crud import forum_thread as crud_thread
 from app.crud import forum_post as crud_post
 
-router = APIRouter(prefix="/api/forum/threads", tags=["forum_threads"])
+router = APIRouter(prefix="/forum/threads", tags=["forum_threads"])
 
 
 def _build_thread_list_response(thread) -> ForumThreadListResponse:

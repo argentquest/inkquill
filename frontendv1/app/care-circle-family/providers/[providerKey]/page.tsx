@@ -12,6 +12,7 @@ import {
   updateCareCirclePatientProviderConfig,
 } from "@/lib/api";
 import { useSession } from "@/components/providers/app-providers";
+import { ProviderIcon } from "@/components/care-circle-family/provider-icons";
 import { PageHeader } from "@/components/shell/page-header";
 import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -126,7 +127,8 @@ export default function ProviderDetailPage() {
       <PageHeader
         description={`Manage operational parameters and visibility testing for the ${provider.label} provider output.`}
         eyebrow="Provider Details"
-        title={`${provider.icon || "📰"} ${provider.label}`}
+        title={provider.label}
+        action={<ProviderIcon providerKey={provider.providerKey} className="h-14 w-14" />}
       />
 
       <div className="flex flex-wrap gap-3">

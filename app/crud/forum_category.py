@@ -79,7 +79,8 @@ async def create_forum_category(
         slug=slug,
         sort_order=category.sort_order or 0,
         is_active=category.is_active if category.is_active is not None else True,
-        icon=category.icon
+        icon=category.icon,
+        app_source=category.app_source,
     )
     
     db.add(db_category)

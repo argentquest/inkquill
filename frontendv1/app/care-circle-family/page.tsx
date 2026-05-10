@@ -148,12 +148,12 @@ function FeatureCard({ href, label, description, icon: Icon }: HubCard) {
       data-testid={`hub-card-${label.toLowerCase().replace(/\s+/g, "-")}`}
       className="group flex flex-col gap-4 rounded-[24px] border border-black/10 bg-white/70 p-5 shadow-panel transition hover:border-black/20 hover:bg-white"
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ink-900/6 text-ink-700">
-        <Icon className="h-9 w-9" />
+      <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-ink-900/6">
+        <Icon className="h-[72px] w-[72px]" />
       </div>
       <div className="flex-1">
         <h3 className="font-semibold text-ink-900">{label}</h3>
-        <p className="mt-1 text-sm leading-6 text-ink-600">{description}</p>
+        <p className="mt-1 text-base leading-7 text-ink-600">{description}</p>
       </div>
       <ArrowRight className="size-4 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-700" />
     </Link>

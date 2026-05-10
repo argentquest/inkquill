@@ -28,7 +28,7 @@ export function PageHeader({
 
       <div className="max-w-3xl">
         {/* Eyebrow with ember dot */}
-        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-forest">
+        <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-[0.22em] text-forest">
           <span
             aria-hidden="true"
             className="inline-block h-1.5 w-1.5 rounded-full bg-ember"

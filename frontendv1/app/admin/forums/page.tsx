@@ -13,6 +13,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useLayoutEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useSession } from "@/components/providers/app-providers";
 import { PageHeader } from "@/components/shell/page-header";
@@ -389,7 +390,9 @@ function CategoryRow({ appSource, category }: CategoryRowProps) {
 export default function AdminForumsPage() {
   const session = useSession();
   const isAdmin = session.user?.is_admin === true;
-  const [appSource, setAppSource] = useState<AppSource>("storytelling");
+  const searchParams = useSearchParams();
+  const initialApp = searchParams.get("app_source") === "care-circle" ? "care-circle" : "storytelling";
+  const [appSource, setAppSource] = useState<AppSource>(initialApp);
   const [showAddForm, setShowAddForm] = useState(false);
 
   useLayoutEffect(() => {

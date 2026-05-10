@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db_session, get_current_user
+from app.core.deps import get_db_session, get_current_user, get_current_active_user
 from app.models.user import User
 from app.schemas.base import ApiResponse
 from app.schemas.forum import (
@@ -14,7 +14,7 @@ from app.schemas.forum import (
 )
 from app.crud import forum_category as crud_category
 
-router = APIRouter(prefix="/api/forum/categories", tags=["forum_categories"])
+router = APIRouter(prefix="/forum/categories", tags=["forum_categories"])
 
 
 def _build_category_response(category) -> ForumCategoryResponse:
@@ -87,7 +87,7 @@ async def get_category_by_slug(
 @router.post("/", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
 async def create_category(
     category: ForumCategoryCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Create a new forum category. (Admin only)"""
@@ -111,7 +111,7 @@ async def create_category(
 async def update_category(
     category_id: int,
     category_update: ForumCategoryUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Update a forum category. (Admin only)"""
@@ -142,7 +142,7 @@ async def update_category(
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(
     category_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
     """Delete a forum category. (Admin only)"""

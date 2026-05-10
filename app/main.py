@@ -4,9 +4,17 @@ Main FastAPI application entry point.
 Configures logging, middleware, routers, and application lifecycle.
 """
 
+import asyncio
 import os
+import sys
 import logging
 from app.core.logging_config import setup_logging
+
+# asyncpg is incompatible with Windows ProactorEventLoop (the default on Python
+# 3.8+ on Windows). Switching to SelectorEventLoop prevents the spurious
+# "InvalidStateError: invalid state" crash on shutdown.
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # --- Configure Logging (first priority) ---
 LOG_LEVEL_CONSOLE_ENV = os.getenv("LOG_LEVEL_CONSOLE", "DEBUG")
@@ -350,9 +358,9 @@ app.include_router(world_chat.router)
 app.include_router(story_chat.router, prefix=api_v1_prefix)
 
 # Forum API routers
-app.include_router(forum_category.router)
-app.include_router(forum_thread.router)
-app.include_router(forum_post.router)
+app.include_router(forum_category.router, prefix=api_v1_prefix)
+app.include_router(forum_thread.router, prefix=api_v1_prefix)
+app.include_router(forum_post.router, prefix=api_v1_prefix)
 
 # News routers (public and admin)
 app.include_router(admin_news.router)  # Public news routes

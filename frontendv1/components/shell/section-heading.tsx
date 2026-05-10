@@ -12,8 +12,8 @@ export function SectionHeading({
   return (
     <div className="flex items-baseline justify-between">
       <div className="flex items-baseline gap-2.5">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-600">{title}</h2>
-        {meta && <span className="text-xs text-ink-400">{meta}</span>}
+        <h2 className="text-base font-semibold uppercase tracking-[0.18em] text-ink-600">{title}</h2>
+        {meta && <span className="text-sm text-ink-400">{meta}</span>}
       </div>
       {action && (
         <Link href={action.href} className="text-xs text-ember hover:underline">

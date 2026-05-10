@@ -9,6 +9,7 @@ import { useLayoutEffect, useState } from "react";
 import { useSession } from "@/components/providers/app-providers";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createForumThread, fetchForumCategories } from "@/lib/api";
 
 export default function NewThreadPage() {
@@ -45,7 +46,8 @@ export default function NewThreadPage() {
       createForumThread({
         title: title.trim(),
         category_id: Number(categoryId),
-        initial_post_content: content.trim(),
+        initial_post_content: content.replace(/<[^>]*>/g, "").trim(),
+        initial_post_content_html: content,
         app_source: appSource,
       }),
     onSuccess: (thread) => {
@@ -53,7 +55,7 @@ export default function NewThreadPage() {
     },
   });
 
-  const canSubmit = title.trim().length > 0 && categoryId !== "" && content.trim().length > 0;
+  const canSubmit = title.trim().length > 0 && categoryId !== "" && content.replace(/<[^>]*>/g, "").trim().length > 0;
 
   return (
     <div className="space-y-8">
@@ -126,14 +128,13 @@ export default function NewThreadPage() {
             <label className="block text-sm font-medium text-ink-800" htmlFor="thread-content">
               Opening post
             </label>
-            <textarea
-              className="w-full min-h-40 rounded-2xl border border-black/10 bg-[#fcfaf6] px-4 py-3 text-sm leading-7 text-ink-900 outline-none transition focus:border-amber-600 disabled:opacity-50"
-              data-testid="thread-content-input"
+            <RichTextEditor
               disabled={isPending}
-              id="thread-content"
-              onChange={(e) => setContent(e.target.value)}
+              minHeight="10rem"
+              onChange={setContent}
               placeholder="Write your opening post…"
               value={content}
+              variant="compact"
             />
           </div>
 

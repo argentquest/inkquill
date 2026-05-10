@@ -1157,11 +1157,11 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
     await route.fallback();
   });
 
-  await page.route("**/api/forum/**", async (route) => {
+  await page.route("**/api/v1/forum/**", async (route) => {
     const url = route.request().url();
     const method = route.request().method();
 
-    if (url.includes("/api/forum/categories") && method === "GET") {
+    if (url.includes("/api/v1/forum/categories") && method === "GET") {
       const searchParams = new URL(url).searchParams;
       const appSource = searchParams.get("app_source");
       const filtered = appSource
@@ -1183,7 +1183,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
-    if (url.includes("/api/forum/threads") && method === "POST") {
+    if (url.includes("/api/v1/forum/threads") && method === "POST") {
       const body = JSON.parse(route.request().postData() ?? "{}") as {
         title?: string;
         category_id?: number;
@@ -1239,7 +1239,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
-    if (url.includes("/api/forum/threads") && method === "GET") {
+    if (url.includes("/api/v1/forum/threads") && method === "GET") {
       const searchParams = new URL(url).searchParams;
       const appSource = searchParams.get("app_source");
       const filtered = appSource
@@ -1249,7 +1249,7 @@ export async function mockAppApis(page: Page, options: MockOptions = {}) {
       return;
     }
 
-    if (url.includes("/api/forum/posts") && method === "POST") {
+    if (url.includes("/api/v1/forum/posts") && method === "POST") {
       const body = JSON.parse(route.request().postData() ?? "{}") as {
         thread_id?: number;
         content?: string;
