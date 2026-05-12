@@ -283,7 +283,7 @@ export function RichTextEditor({
     if (!editor) return;
     const current = editor.getHTML();
     if (value !== current && value !== "<p></p>") {
-      editor.commands.setContent(value, false, { preserveWhitespace: "full" });
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [value, editor]);
 
