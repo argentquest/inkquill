@@ -16,21 +16,36 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.create_table(
-        "care_circle_patient_provider_feedback",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("patient_id", sa.Integer(), nullable=False),
-        sa.Column("provider_key", sa.String(length=120), nullable=False),
-        sa.Column("feedback", sa.String(length=20), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
-        sa.ForeignKeyConstraint(["patient_id"], ["care_circle_patient_profiles.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("patient_id", "provider_key", name="uq_care_circle_patient_provider_feedback"),
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    table_name = "care_circle_patient_provider_feedback"
+
+    if not inspector.has_table(table_name):
+        op.create_table(
+            table_name,
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("patient_id", sa.Integer(), nullable=False),
+            sa.Column("provider_key", sa.String(length=120), nullable=False),
+            sa.Column("feedback", sa.String(length=20), nullable=False),
+            sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+            sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+            sa.ForeignKeyConstraint(["patient_id"], ["care_circle_patient_profiles.id"], ondelete="CASCADE"),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint("patient_id", "provider_key", name="uq_care_circle_patient_provider_feedback"),
+        )
+
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_care_circle_patient_provider_feedback_id "
+        "ON care_circle_patient_provider_feedback (id)"
     )
-    op.create_index(op.f("ix_care_circle_patient_provider_feedback_id"), "care_circle_patient_provider_feedback", ["id"], unique=False)
-    op.create_index(op.f("ix_care_circle_patient_provider_feedback_patient_id"), "care_circle_patient_provider_feedback", ["patient_id"], unique=False)
-    op.create_index(op.f("ix_care_circle_patient_provider_feedback_provider_key"), "care_circle_patient_provider_feedback", ["provider_key"], unique=False)
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_care_circle_patient_provider_feedback_patient_id "
+        "ON care_circle_patient_provider_feedback (patient_id)"
+    )
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_care_circle_patient_provider_feedback_provider_key "
+        "ON care_circle_patient_provider_feedback (provider_key)"
+    )
 
 
 def downgrade() -> None:
