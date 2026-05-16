@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Adopting the new Care Circle Family home — codebase handoff</title>
+<link rel="stylesheet" href="ds/colors_and_type.css" />
+<link rel="stylesheet" href="ds/kit.css" />
+<style>
+  body { margin: 0; background: var(--paper, #fcfaf6); color: var(--fg-1, #231913); font-family: var(--font-text, "EB Garamond", Georgia, serif); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 32px 80px; }
+  h1 { font-family: var(--font-display); font-size: 44px; line-height: 1.05; margin: 0 0 8px; font-weight: 600; }
+  h2 { font-family: var(--font-display); font-size: 26px; margin: 36px 0 8px; font-weight: 600; border-bottom: 1px solid rgba(35,25,19,0.12); padding-bottom: 6px; }
+  h3 { font-family: var(--font-display); font-size: 18px; margin: 22px 0 6px; }
+  p, li { font-size: 15px; line-height: 1.65; color: var(--fg-2); text-wrap: pretty; }
+  code, pre { font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+  code { background: rgba(35,25,19,0.06); padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  pre { background: #1f1a14; color: #f4ebd9; padding: 16px 18px; border-radius: 10px; overflow: auto; font-size: 12.5px; line-height: 1.55; }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  .lede { font-size: 18px; color: var(--fg-1); margin: 16px 0 28px; }
+  .step { background: rgba(255,255,255,0.7); border: 1px solid rgba(35,25,19,0.10); border-radius: 12px; padding: 18px 22px; margin: 14px 0; }
+  .step-num { display: inline-block; font-family: var(--font-display); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ember, #d86c3d); font-weight: 700; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 9999px; background: rgba(31,59,54,0.08); color: #1f3b36; font-size: 12px; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.06em; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(35,25,19,0.10); vertical-align: top; }
+  th { font-family: var(--font-display); font-weight: 600; color: var(--fg-1); }
+  .callout { border-left: 4px solid var(--ember, #d86c3d); background: rgba(216,108,61,0.08); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; font-size: 14px; }
+  .anatomy { display: grid; grid-template-columns: 180px 1fr; gap: 10px 18px; margin: 12px 0; font-size: 14px; }
+  .anatomy dt { font-family: var(--font-display); font-weight: 600; color: var(--fg-1); }
+  .anatomy dd { margin: 0; color: var(--fg-2); line-height: 1.55; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="pill">Codebase handoff · Ink &amp; Quill</p>
+  <h1>Adopting the new Family Home design</h1>
+  <p class="lede">
+    The redesign in <code>Care Circle Family.html</code> takes the broadsheet vocabulary from the newsletter and applies it to <code>app/care-circle-family/page.tsx</code>. The route, data, and nav stay the same — what changes is the page composition: a broadsheet masthead, a photo-led "Today" hero, a two-column body, provenance pills, and an activity ledger styled as a newspaper column.
+  </p>
+
+  <h2>What stays · what changes</h2>
+  <table>
+    <tr><th>Stays</th><th>Changes</th></tr>
+    <tr>
+      <td>The route <code>/care-circle-family</code>, the <code>nav</code> link list, the icon components in <code>care-circle-feature-icons.tsx</code>, the platform shell, the auth/membership guards.</td>
+      <td>The page-level layout in <code>app/care-circle-family/page.tsx</code>, the section header style, and the card markup — everything visual below the global topbar.</td>
+    </tr>
+  </table>
+
+  <h2>Anatomy of the new page</h2>
+  <dl class="anatomy">
+    <dt>Masthead</dt><dd>Centered broadsheet block: small eyebrow, large display title ("The Silver Family Circle"), italic foot line ("Caring for Rose Ellis · weather · N contributors"). Triple-rule (top single, bottom double).</dd>
+    <dt>Greeting strip</dt><dd>Single-line welcome with caregiver first name in italic ember; right-aligned meta about next session and last delivery.</dd>
+    <dt>Today hero</dt><dd>Photo-led 2-column panel. Left: latest queued lead photo with a provenance pill overlay + italic caption. Right: eyebrow, headline, lede, then a 3-up metrics rule.</dd>
+    <dt>Section header</dt><dd>Heavy bottom rule, display-serif title with an ember dot, right-aligned "Section A · Manage all →" meta.</dd>
+    <dt>Care &amp; Circle grid</dt><dd>2×3 nav cards (was 3×2). First card is filled <code>--accent</code> (ink-900 background) to anchor the eye. Each card carries a small live count and an arrow CTA. Members card shows actual avatars + Invite button.</dd>
+    <dt>Side stack</dt><dd>Voice message in an ember gradient card (mirrors newsletter), On-this-day pull-quote, Birthdays card, Garden almanac card. All carry provenance pills.</dd>
+    <dt>Community ledger</dt><dd>Activity surfaces as a newspaper-style ledger: time · entry · tag rows separated by dashed rules. Two trailing cards for forum thread and help guide.</dd>
+    <dt>Colophon</dt><dd>Italic closer above a triple-rule, mirroring the newsletter footer.</dd>
+  </dl>
+
+  <h2>The plan, in five steps</h2>
+
+  <div class="step">
+    <p class="step-num">Step 1</p>
+    <h3>Add a shared <code>FamilyMasthead</code> component</h3>
+    <p>Create <code>frontendv1/components/care-circle-family/family-masthead.tsx</code>. Props: <code>{ familyName, patientName, weather, contributorsCount, edition }</code>. Reuse this on every Family page so the broadsheet identity carries through.</p>
+<pre><code>// family-masthead.tsx
+export function FamilyMasthead({ familyName, patientName, weather, contributorsCount, edition }) {
+  return (
+    &lt;header className="cc-mast"&gt;
+      &lt;span className="cc-mast__corner cc-mast__corner--l"&gt;{edition}&lt;/span&gt;
+      &lt;span className="cc-mast__corner cc-mast__corner--r"&gt;{formatDate(new Date())}&lt;/span&gt;
+      &lt;div className="cc-mast__eyebrow"&gt;The Family Daily&lt;/div&gt;
+      &lt;h1 className="cc-mast__title"&gt;The {familyName} Family Circle&lt;/h1&gt;
+      &lt;p className="cc-mast__foot"&gt;
+        Caring for &lt;strong&gt;{patientName}&lt;/strong&gt; · {weather} · {contributorsCount} contributors today
+      &lt;/p&gt;
+    &lt;/header&gt;
+  );
+}</code></pre>
+    <p>Tailwind classes or a co-located <code>family-masthead.module.css</code> are both fine — the rules are short. The mockup uses plain CSS in <code>.cc-mast*</code> for clarity.</p>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 2</p>
+    <h3>Add a <code>ProvBadge</code> primitive — single source of truth</h3>
+    <p>The same component you'd add to the email templates. Three kinds: <code>family</code> / <code>curated</code> / <code>auto</code>, each with its own inline SVG glyph. Keep it tiny:</p>
+<pre><code>// components/care-circle-family/prov-badge.tsx
+const ICONS = {
+  family:  &lt;path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" /&gt;,
+  curated: (&lt;&gt;&lt;path d="M3 5h7a2 2 0 0 1 2 2v13" /&gt;&lt;path d="M21 5h-7a2 2 0 0 0-2 2v13" /&gt;&lt;path d="M3 5v14h18V5" /&gt;&lt;/&gt;),
+  auto:    (&lt;&gt;&lt;path d="M12 4v2M12 18v2M4 12h2M18 12h2" /&gt;&lt;circle cx="12" cy="12" r="3" /&gt;&lt;/&gt;),
+};
+export function ProvBadge({ kind = "auto", children }) {
+  return (
+    &lt;span className={`prov prov--${kind}`}&gt;
+      &lt;svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"&gt;{ICONS[kind]}&lt;/svg&gt;
+      {children}
+    &lt;/span&gt;
+  );
+}</code></pre>
+    <p>Use this in the email templates too (Jinja macro mirrors the same SVG). One visual vocabulary across web + email.</p>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 3</p>
+    <h3>Replace the page body in <code>app/care-circle-family/page.tsx</code></h3>
+    <p>The current page maps a flat <code>nav</code> array to identical tile cards. Replace it with a structured layout that uses the same array but composes them into the redesign:</p>
+<pre><code>// app/care-circle-family/page.tsx — sketch
+const careCircleNav = nav.filter(n =&gt; n.group !== "community");
+const communityNav  = nav.filter(n =&gt; n.group === "community");
+
+return (
+  &lt;main className="cc-page"&gt;
+    &lt;Breadcrumbs trail={[{label:"Home"}, {label:"Care Circle Family", current:true}]} /&gt;
+
+    &lt;FamilyMasthead familyName={family.name} patientName={primaryPatient.name}
+                    weather={today.weather} contributorsCount={today.contributors}
+                    edition={`Vol. III · No. ${edition.number}`} /&gt;
+
+    &lt;GreetingStrip caregiverName={user.firstName} nextSessionIn={today.nextSessionIn}
+                   lastDelivered={today.lastDeliveredAt} /&gt;
+
+    &lt;TodayHero leadPhoto={today.leadPhoto} headline={today.summary}
+               lede={today.lede} metrics={today.metrics} /&gt;
+
+    &lt;SectionHead title="Care &amp; Circle" label="Section A" actionHref="/care-circle-family/admin" /&gt;
+    &lt;div className="cc-cols"&gt;
+      &lt;div className="cc-grid"&gt;
+        {careCircleNav.map((item, i) =&gt; (
+          &lt;NavCard key={item.href} accent={i === 0} {...item} count={counts[item.key]} /&gt;
+        ))}
+      &lt;/div&gt;
+      &lt;aside className="cc-side"&gt;
+        &lt;VoiceMessageCard message={today.voiceMessage} /&gt;
+        &lt;OnThisDayCard event={today.onThisDay} /&gt;
+        &lt;BirthdaysCard items={today.birthdays} /&gt;
+        &lt;GardenAlmanacCard tip={today.almanac} /&gt;
+      &lt;/aside&gt;
+    &lt;/div&gt;
+
+    &lt;SectionHead title="Community" label="Section B" actionHref="/community/forums" /&gt;
+    &lt;div className="cc-comm"&gt;
+      &lt;ActivityLedger events={recentActivity} /&gt;
+      &lt;ForumTrendingCard thread={trendingThread} /&gt;
+      &lt;HelpTipCard tip={featuredHelp} /&gt;
+    &lt;/div&gt;
+
+    &lt;Colophon /&gt;
+  &lt;/main&gt;
+);</code></pre>
+    <p>None of these need to be heavy components — most are 10–20 lines. Co-locate them under <code>components/care-circle-family/family-home/</code>.</p>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 4</p>
+    <h3>Wire the data the new layout needs</h3>
+    <p>The redesign surfaces a few new live values. They all already exist server-side — just need a single endpoint or composed query to deliver them in one round-trip:</p>
+    <table>
+      <tr><th>Field</th><th>Where it comes from</th></tr>
+      <tr><td><code>edition.number</code> &amp; <code>lastDeliveredAt</code></td><td><code>care_circle_newsletter</code> task results / delivery service</td></tr>
+      <tr><td><code>today.contributors</code></td><td>count of distinct family submissions in the last 24h</td></tr>
+      <tr><td><code>today.leadPhoto</code></td><td>most recent media upload tagged for tomorrow's edition</td></tr>
+      <tr><td><code>today.voiceMessage</code></td><td>most recent audio submission (already in family contributions)</td></tr>
+      <tr><td><code>today.onThisDay</code> / <code>almanac</code></td><td>provider results from <code>this_day_history</code> / <code>garden_almanac</code> for today</td></tr>
+      <tr><td><code>today.birthdays</code></td><td>existing patient + family member DOB data</td></tr>
+      <tr><td><code>counts[item.key]</code></td><td>per-nav small numbers (4 active, 6 seats, 12 events…)</td></tr>
+      <tr><td><code>recentActivity</code></td><td>existing activity feed, filtered to last 24–48h, with <code>kind: family|curated|auto</code> on each row for the tag column</td></tr>
+    </table>
+    <p>Suggested endpoint: <code>GET /api/care-circle-family/home-summary</code> returning all of the above so the page loads in one query.</p>
+  </div>
+
+  <div class="step">
+    <p class="step-num">Step 5</p>
+    <h3>Lift the styles into Tailwind tokens (or a CSS module)</h3>
+    <p>Two acceptable paths — pick the one that matches your codebase preference:</p>
+    <p><strong>5a. Tailwind extension</strong> — your tailwind config already has the warm palette. Add utilities for the new patterns:</p>
+<pre><code>// tailwind.config.ts — additions sketch
+extend: {
+  borderWidth: { '3': '3px' },
+  fontFamily: { display: ['Lora', 'Georgia', 'serif'], text: ['EB Garamond', 'Georgia', 'serif'] },
+  boxShadow: { paper: '0 14px 32px rgba(35,25,19,0.18)' },
+}</code></pre>
+    <p>Then write the masthead, hero, section-head etc. as Tailwind class strings.</p>
+    <p><strong>5b. CSS module</strong> — copy the <code>&lt;style&gt;</code> block from <code>Care Circle Family.html</code> into <code>family-home.module.css</code>, drop the appbar styles (already provided by your shell), and import per component. Faster path; less DRY than Tailwind.</p>
+    <p>Either way, the design tokens that already live in <code>app/globals.css</code> (paper, ink, ember, forest) are the source of truth — don't re-define colours.</p>
+  </div>
+
+  <h2>Files you'll touch</h2>
+  <table>
+    <tr><th>Path</th><th>Change</th></tr>
+    <tr><td><code>frontendv1/app/care-circle-family/page.tsx</code></td><td>Rewrite body composition; keep the <code>nav</code> array as data source</td></tr>
+    <tr><td><code>frontendv1/components/care-circle-family/family-home/family-masthead.tsx</code></td><td><strong>NEW</strong> — broadsheet masthead</td></tr>
+    <tr><td><code>frontendv1/components/care-circle-family/family-home/today-hero.tsx</code></td><td><strong>NEW</strong> — photo-led hero with 3-metric rule</td></tr>
+    <tr><td><code>frontendv1/components/care-circle-family/family-home/section-head.tsx</code></td><td><strong>NEW</strong> — broadsheet rule + ember dot</td></tr>
+    <tr><td><code>frontendv1/components/care-circle-family/family-home/nav-card.tsx</code></td><td><strong>NEW</strong> — replaces the current tile; supports <code>accent</code>, <code>count</code>, members slot</td></tr>
+    <tr><td><code>frontendv1/components/care-circle-family/family-home/{voice-message,on-this-day,birthdays,almanac,activity-ledger,forum-trending,help-tip,colophon}.tsx</code></td><td><strong>NEW</strong> — small one-purpose cards</td></tr>
+    <tr><td><code>frontendv1/components/care-circle-family/prov-badge.tsx</code></td><td><strong>NEW</strong> — shared family / curated / auto pill, used on web AND in email macros</td></tr>
+    <tr><td><code>frontendv1/app/globals.css</code> or <code>family-home.module.css</code></td><td>Add the masthead / hero / ledger styles from the mockup</td></tr>
+    <tr><td><code>tailwind.config.ts</code></td><td>Optional extensions for shadow + border widths</td></tr>
+    <tr><td>Backend: <code>/api/care-circle-family/home-summary</code></td><td><strong>NEW</strong> — composes today's data so the page does a single query</td></tr>
+  </table>
+
+  <h2>How to validate</h2>
+  <ul>
+    <li>Visual diff against <code>Care Circle Family.html</code> at 1280×, 1024×, and 720× widths — the mockup's media queries (980px, 880px, 640px) define the breakpoints.</li>
+    <li>Run the existing <code>tests/e2e/sprint-care-circle-family.spec.ts</code> suite; the nav links and labels are unchanged so most tests should keep passing. Update only the assertions that look for the old "Care &amp; Circle" / "Community" tile structure if any are pinned to those.</li>
+    <li>Lighthouse pass for accessibility — the broadsheet display sizes use <code>clamp()</code>; verify min sizes hit AA contrast on the ember-on-cream foot line.</li>
+  </ul>
+
+  <h2>Reuse with the newsletter</h2>
+  <p>The <code>ProvBadge</code> SVG glyphs and the masthead structure are <strong>shared design</strong>. When you build the email <code>ellis</code> theme from the previous handoff, use the same SVG paths inside the Jinja <code>prov</code> macro and the same broadsheet rule on the email header. That's the whole point — one identity, one badge set, two surfaces.</p>
+
+  <h2>What I can do next</h2>
+  <ul>
+    <li>Generate ready-to-paste TSX for <code>FamilyMasthead</code>, <code>TodayHero</code>, <code>SectionHead</code>, <code>NavCard</code>, and <code>ActivityLedger</code> (with Tailwind class strings, not the CSS-module path).</li>
+    <li>Produce a single <code>family-home.module.css</code> file lifted from the mockup, with selectors renamed to module conventions.</li>
+    <li>Mock the <code>home-summary</code> response shape so backend work can run in parallel.</li>
+    <li>Add a tablet (1024×) and phone (480×) artboard to the canvas so you can hand mobile fidelity to engineering as well.</li>
+  </ul>
+  <p>Tell me which to start with and I'll write it into this project.</p>
+
+</div>
+</body>
+</html>
