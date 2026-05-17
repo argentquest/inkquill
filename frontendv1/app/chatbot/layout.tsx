@@ -4,6 +4,8 @@ import { AppShell } from "@/components/shell/app-shell";
 import { AppShellGuard } from "@/components/shell/app-shell-guard";
 import { features } from "@/lib/features";
 
+export const dynamic = "force-dynamic";
+
 export default function ChatbotLayout({ children }: { children: React.ReactNode }) {
   if (!features.chat) redirect("/");
   return (

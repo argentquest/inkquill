@@ -44,6 +44,15 @@ test.describe("Sprint 2 auth", () => {
     await expect(page.url()).not.toContain("evil.example");
   });
 
+  test("login page does not redirect back to itself", async ({ page }) => {
+    await mockAppApis(page);
+    await page.goto("/auth/login?next=%2Fauth%2Flogin");
+
+    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 20000 });
+    await expect(page.getByRole("heading", { name: "Sign in to continue your work." })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText("Redirecting to login")).toHaveCount(0);
+  });
+
   test("login error renders clearly", async ({ page }) => {
     await mockAppApis(page, { login: "error" });
     await page.goto("/auth/login");
