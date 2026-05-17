@@ -77,7 +77,6 @@ async def register_new_user(user_in: schema_user.UserCreate, response: Response,
             value=access_token, 
             httponly=True, 
             max_age=int(access_token_expires.total_seconds()), 
-            expires=access_token_expires,
             samesite="Lax",
             secure=settings.APP_ENV.lower() == "production",
             path="/"
@@ -161,7 +160,6 @@ async def login_for_access_token(response: Response, db: AsyncSession = Depends(
         value=access_token, 
         httponly=True, 
         max_age=int(access_token_expires.total_seconds()), 
-        expires=access_token_expires,
         samesite="Lax",
         secure=settings.APP_ENV.lower() == "production",
         path="/"
@@ -451,7 +449,6 @@ async def impersonate_user(
         value=access_token, 
         httponly=True, 
         max_age=int(access_token_expires.total_seconds()), 
-        expires=access_token_expires,
         samesite="Lax",
         secure=settings.APP_ENV.lower() == "production",
         path="/"
@@ -520,7 +517,6 @@ async def stop_impersonation(
         value=access_token, 
         httponly=True, 
         max_age=int(access_token_expires.total_seconds()), 
-        expires=access_token_expires,
         samesite="Lax",
         secure=settings.APP_ENV.lower() == "production",
         path="/"
