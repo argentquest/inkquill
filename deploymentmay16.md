@@ -349,3 +349,34 @@ Expected:
 - Browser console should no longer show `GET https://app.inkandquill.io/auth?_rsc=... 404`
 
 After deploy, hard refresh the browser with `Ctrl+F5`.
+
+## Next Debugging Mode
+
+The next deployment/debugging session should continue directly on the Hetzner server using VS Code Remote SSH or VS Code running on the server.
+
+Expected server workspace:
+
+```bash
+/home/eric/inkquill
+```
+
+Start from a VS Code terminal on the server:
+
+```bash
+cd /home/eric/inkquill
+git pull origin master
+bash scripts/deploy_care_circle_docker_host.sh -e prod -a up -b -d
+bash scripts/deploy_care_circle_docker_host.sh -e prod -a ps
+```
+
+If auth/login still misbehaves, collect server-local checks and logs:
+
+```bash
+curl -I https://app.inkandquill.io/auth/login
+curl -s -L -o /dev/null -w "%{http_code} %{url_effective}\n" https://app.inkandquill.io/auth
+docker logs care-circle-prod-frontend-1 --tail 120
+docker logs care-circle-prod-gateway-1 --tail 120
+docker logs care-circle-prod-backend-1 --tail 120
+```
+
+This keeps future troubleshooting aligned with the actual production Docker, nginx, DNS, and HTTPS environment instead of reproducing only on the local PC.
