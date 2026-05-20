@@ -25,11 +25,12 @@ export function Breadcrumbs() {
         {segments.map((segment, index) => {
           const href = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
+          const isMissingIntermediateRoute = href === "/auth";
 
           return (
             <li className="flex items-center gap-2" key={href}>
               <span>/</span>
-              {isLast ? (
+              {isLast || isMissingIntermediateRoute ? (
                 <span className="text-ink-900">{prettify(segment)}</span>
               ) : (
                 <Link className="transition hover:text-ink-900" href={href}>
